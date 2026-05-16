@@ -1,0 +1,18 @@
+docs/issues/
+*.csv
+
+# Local Claude Code settings
+.claude/settings.local.json
+
+# Sensitive env files (each subdir's .gitignore also covers these)
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.test
+
+# Build artifacts and dependencies
+**/node_modules/
+**/.svelte-kit/
+**/build/
+**/.vercel/
+
