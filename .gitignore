@@ -15,4 +15,6 @@ docs/issues/
 **/.svelte-kit/
 **/build/
 **/.vercel/
+**/*.sqlite-shm
+**/*.sqlite-wal
 
