@@ -1,0 +1,126 @@
+{
+  "source_file": "corrections-sample (1).csv",
+  "source_records_parsed": 4865,
+  "clean_records": 4629,
+  "rejected_records": 236,
+  "reject_reasons": {
+    "no_text_change": 104,
+    "missing_after_text": 79,
+    "invalid_edited_by": 42,
+    "invalid_timestamps": 42,
+    "invalid_audio_url": 40,
+    "missing_before_text": 19,
+    "non_positive_duration": 1
+  },
+  "edited_by_counts": {
+    "task": 2566,
+    "user": 2063
+  },
+  "heuristic_route_counts": {
+    "asr_finetune": 3233,
+    "llm_post_correction": 766,
+    "rule_based": 394,
+    "review": 236
+  },
+  "heuristic_error_family_counts": {
+    "morphological_or_phonetic": 2800,
+    "capitalization_or_punctuation": 678,
+    "likely_phonetic_confusion": 433,
+    "punctuation_or_spacing": 388,
+    "missing_hallucinated_or_realigned_speech": 236,
+    "semantic_or_grammar_context": 88,
+    "greek_question_mark": 6
+  },
+  "unique_audio_urls": 270,
+  "unique_meeting_names": 234,
+  "duration_seconds": {
+    "min": 0.01,
+    "median": 2.262,
+    "mean": 3.395062216461439,
+    "max": 72.2
+  },
+  "top_audio_urls": [
+    [
+      "https://data.opencouncil.gr/audio/59nocub1zsi_v1.mp3",
+      99
+    ],
+    [
+      "https://data.opencouncil.gr/audio/n5atnqw9bpk_v1.mp3",
+      73
+    ],
+    [
+      "https://data.opencouncil.gr/audio/oeszmqy2fs_v1.mp3",
+      72
+    ],
+    [
+      "https://data.opencouncil.gr/audio/5zu7sv48lmq_v1.mp3",
+      63
+    ],
+    [
+      "https://data.opencouncil.gr/audio/0dsgkisqz9e6_v1.mp3",
+      59
+    ],
+    [
+      "https://data.opencouncil.gr/audio/u8jskxcf0zs_v1.mp3",
+      57
+    ],
+    [
+      "https://data.opencouncil.gr/audio/69sp0o4cjvk_v1.mp3",
+      53
+    ],
+    [
+      "https://data.opencouncil.gr/audio/52i7uk8da4r_v1.mp3",
+      53
+    ],
+    [
+      "https://data.opencouncil.gr/audio/iaz2mi7b6c7_v1.mp3",
+      53
+    ],
+    [
+      "https://data.opencouncil.gr/audio/zb4ozpbxzy_v1.mp3",
+      52
+    ]
+  ],
+  "top_meetings": [
+    [
+      "Δημοτικό Συμβούλιο 11/02/26",
+      138
+    ],
+    [
+      "Δημοτικό Συμβούλιο 10/12/25",
+      113
+    ],
+    [
+      "Συνεδρίαση 09/02/26",
+      112
+    ],
+    [
+      "Δημοτικό Συμβούλιο",
+      100
+    ],
+    [
+      "Δημοτικό Συμβούλιο 19/11/25",
+      76
+    ],
+    [
+      "Δημοτικό Συμβούλιο 22/12/25",
+      74
+    ],
+    [
+      "Δημοτικό Συμβούλιο 28/01/26",
+      74
+    ],
+    [
+      "Δημοτικό Συμβούλιο 11/12/25",
+      69
+    ],
+    [
+      "Δημοτικό Συμβούλιο 19/02/26",
+      67
+    ],
+    [
+      "Δημοτικό Συμβούλιο 15/12/25",
+      63
+    ]
+  ]
+}
