@@ -18,7 +18,7 @@ Key clarifications captured:
 Canonical homes established:
 
 - current truth and next action: `CURRENT.md`
-- decisions/open questions: `docs/decisions.md`
+- decisions/open questions: `docs/decisions.md` (later split into `docs/decisions/` on 2026-05-18)
 - phases/tasks: `docs/roadmap.md`
 - meeting history: `docs/meetings/`
 - product/implementation specs: `docs/specs/`
