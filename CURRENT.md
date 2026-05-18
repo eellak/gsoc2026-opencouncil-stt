@@ -1,6 +1,6 @@
 # Current State
 
-Last updated: 2026-05-15
+Last updated: 2026-05-17
 
 This is the human and LLM entry point. Read this first, then follow links only as needed.
 
@@ -22,7 +22,7 @@ The immediate practical goal is to combine the corrections CSV with OpenCouncil 
 ```mermaid
 flowchart LR
     CSV["Corrections CSV<br/>utterance-edits-may12-26.csv"]
-    Ingest["Local seed/ingest<br/>ui/scripts/seed-dummy.ts now"]
+    Ingest["CSV ingest<br/>ui/scripts/ingest-csv.ts<br/>dev seed: seed-dummy.ts"]
     DB["Turso/libSQL DB<br/>local: file:./data/corrections.sqlite<br/>prod: Turso cloud"]
     JSON["Large meeting JSON<br/>meeting + city + transcript + people"]
     Match["Match corrections<br/>to utterances"]
@@ -83,13 +83,13 @@ Continue the local/prototype exploration UI, not production annotation software.
 Implemented baseline under `ui/`:
 
 - SvelteKit review app with diff, waveform/audio region controls, labels, notes, status buttons, keyboard navigation, stats, and JSONL export of included rows.
+- Full CSV ingest script with content categorisation: `ui/scripts/ingest-csv.ts`.
 - Dummy fixture seed script: `ui/scripts/seed-dummy.ts`.
 - Local SQLite state: `ui/data/corrections.sqlite`.
 - Label-change history path: `ui/data/events.jsonl` once review edits are made.
 
 Still missing from the baseline:
 
-- active full CSV ingest script in `ui/scripts/` (an older `ingest.ts` copy is archived under `archive/ui.archive-2026-05-13/`);
 - correction-to-utterance matching against cached meeting JSON;
 - city, meeting ID, utterance ID, speaker/person, and surrounding utterance context;
 - matched/ambiguous/unmatched confidence reporting.
@@ -124,7 +124,7 @@ Secondary screen:
 
 Extend the implemented local prototype with meeting JSON matching:
 
-- [~] Raw corrections can be represented in local SQLite, but current active script is dummy seeding; restore or replace full CSV ingest before large-scale review.
+- [x] Raw corrections can be ingested into local SQLite with content categories.
 - [ ] Cached meeting JSON per meeting.
 - [ ] Matched correction-to-utterance records.
 - [x] Local labels: error category, include/exclude, timestamp adjustments, reviewer notes.
@@ -140,7 +140,8 @@ Current immediate todos:
 See:
 
 - [Roadmap](docs/roadmap.md)
-- [Decisions](docs/decisions.md)
+- [Progress vs GSoC plan](docs/progress.md)
+- [Decisions index](docs/decisions/_index.md)
 - [OpenCouncil meeting JSON schema notes](docs/reference/opencouncil-meeting-json.md)
 - [Exploration UI spec](docs/specs/exploration-ui.md)
 - [Local data model](docs/specs/local-data-model.md)

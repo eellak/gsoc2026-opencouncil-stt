@@ -8,7 +8,8 @@ This is the working structure for the OpenCouncil ASR dataset exploration projec
 - [Agent instructions](../CLAUDE.md): guidance for coding/LLM agents working in this vault (`AGENTS.md` is a symlink to the same file).
 - [Correction data quality](../data/reports/data_quality.md): what was cleaned, rejected, and why.
 - [Roadmap](roadmap.md): phased plan from vault organization to UI, labels, dataset selection, and evaluation.
-- [Decisions](decisions.md): accepted decisions and open questions.
+- [Progress](progress.md): current status against the GSoC plan (planned focus lives in the [proposal](reference/gsoc-proposal.md)).
+- [Decisions index](decisions/_index.md): accepted decisions and open questions, split by theme (`data`, `storage`, `ui`, `audio`, `matching`).
 
 ## Meeting Notes
 
@@ -20,7 +21,7 @@ This is the working structure for the OpenCouncil ASR dataset exploration projec
 
 - [Exploration UI spec](specs/exploration-ui.md): prototype UI behavior, local labels, and stats.
 - [Local data model](specs/local-data-model.md): local records/tables for CSV corrections, cached JSON, matches, labels, and history.
-- [UI prototype](../ui/README.md): implemented SvelteKit review app, dummy seed command, local SQLite state, and export behavior.
+- [UI prototype](../ui/README.md): implemented SvelteKit review app, CSV ingest, dummy seed command, local/Turso SQLite-compatible state, and export behavior.
 
 ## Reference Notes
 
@@ -34,10 +35,12 @@ This is the working structure for the OpenCouncil ASR dataset exploration projec
 
 ## History Logs
 
+See [logs/_index.md](logs/_index.md) for cadence rules (weekly digest, skip empty weeks).
+
 - [2026-05-12 - Vault setup](logs/2026-05-12-vault-setup.md): consolidated record of vault organization, agent instructions, meeting-notes skill, Mermaid diagrams, and PRD todo notation.
-- [2026-05-13 - Daily normalization](logs/2026-05-13-daily-normalization.md): synchronized canonical docs with the implemented UI prototype and fixed matching-reference drift.
-- [2026-05-14 - Daily normalization](logs/2026-05-14-daily-normalization.md): restored the UI README and moved the superseded UI copy under `archive/`.
-- [2026-05-15 - Daily normalization](logs/2026-05-15-daily-normalization.md): reviewed recent canonical edits and confirmed no additional normalization was needed.
+- [2026-05-18 - Weekly digest](logs/2026-05-18-weekly.md): full CSV ingest, audio CORS workaround, decisions split, weekly cadence adopted.
+
+Older daily-normalization entries (May 13–18) are archived under [`archive/logs/2026-W20-daily-normalizations/`](../archive/logs/2026-W20-daily-normalizations/).
 
 ## Data Folders
 
@@ -49,8 +52,8 @@ This is the working structure for the OpenCouncil ASR dataset exploration projec
 ## Immediate Workflow
 
 1. Keep [Current state](../CURRENT.md) updated.
-2. Use [Roadmap](roadmap.md) and [Decisions](decisions.md) to avoid losing context.
-3. Use the implemented [UI prototype](../ui/README.md) to review raw CSV correction pairs.
+2. Use [Roadmap](roadmap.md), [Progress](progress.md), and the [Decisions index](decisions/_index.md) to avoid losing context.
+3. Use the implemented [UI prototype](../ui/README.md) to ingest and review raw CSV correction pairs.
 4. Extend the [local data model](specs/local-data-model.md) with cached meeting JSON and matched utterances.
 5. Match the May 12 CSV rows to utterances from the large meeting JSON.
 6. Then run dataset profiling and taxonomy validation with the UI-backed labels.

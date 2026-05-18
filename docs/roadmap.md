@@ -43,7 +43,7 @@ Goal: keep the project readable by humans and LLMs.
 Deliverables:
 
 - [x] [CURRENT.md](../CURRENT.md): current state and next action.
-- [x] [decisions.md](decisions.md): accepted decisions and open questions.
+- [x] [decisions/](decisions/_index.md): accepted decisions and open questions, split by theme.
 - [x] [roadmap.md](roadmap.md): phased plan.
 - [x] [reference/](reference): stable technical references.
 - [x] [logs/](logs): dated meeting/work logs.
@@ -72,11 +72,11 @@ Tasks:
 
 - [ ] Define correction-to-utterance matching rules.
 - [ ] Identify meeting JSON URLs for a representative subset of CSV rows.
-- [~] Restore or replace full CSV ingest. (Current active script seeds dummy fixtures; archived copy exists.)
+- [x] Restore or replace full CSV ingest.
 - [ ] Cache meeting JSON files locally.
 - [ ] Build a matched records table with confidence flags.
 - [x] Decide final local label storage: SQLite plus JSONL history.
-- [~] Ingest raw CSV corrections into local SQLite. (Schema exists; active script currently seeds dummy fixtures.)
+- [x] Ingest raw CSV corrections into local SQLite with content categorisation.
 - [x] Generate basic stats from local correction/review-label records.
 - [ ] Generate matched/ambiguous/unmatched stats from meeting JSON matches.
 

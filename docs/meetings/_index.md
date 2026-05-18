@@ -11,7 +11,7 @@ This folder contains normalized meeting notes. Raw notes or transcripts should e
 
 - Keep one normalized note per meeting.
 - Put raw transcript/rough notes under `## Raw Notes` only when they are short enough to be useful; otherwise archive them and link to the archive path.
-- Decisions that remain true after the meeting belong in `../decisions.md`.
+- Decisions that remain true after the meeting belong in the relevant file under `../decisions/` (see [decisions index](../decisions/_index.md)).
 - Action items that affect execution belong in `../roadmap.md` or `../../CURRENT.md`.
 - Stable technical details belong in `../reference/`.
 - Product or implementation requirements belong in `../specs/`.

@@ -20,9 +20,10 @@ The project is currently in dataset exploration mode, not training mode. Priorit
 Always read these first:
 
 1. `CURRENT.md`
-2. `docs/decisions.md`
-3. `docs/roadmap.md`
-4. `docs/project-map.md`
+2. `docs/decisions/_index.md`
+3. `docs/progress.md`
+4. `docs/roadmap.md`
+5. `docs/project-map.md`
 
 Then follow only the links needed for the task.
 
@@ -33,7 +34,7 @@ When processing raw meeting notes, transcripts, mentor sync notes, or project di
 That skill defines how to:
 
 - create normalized meeting notes under `docs/meetings/`;
-- update `CURRENT.md`, `docs/decisions.md`, and `docs/roadmap.md`;
+- update `CURRENT.md`, the relevant file under `docs/decisions/`, and `docs/roadmap.md`;
 - update specs and reference notes without duplication;
 - keep Mermaid diagrams and PRD todos synchronized;
 - archive raw or superseded notes.
@@ -59,27 +60,37 @@ Do not treat training, benchmarking, or model selection as the next step unless 
 ## Vault Organization Rules
 
 - `CURRENT.md` is the short entry point. Update it when the actual current direction changes.
-- `docs/decisions.md` is for accepted decisions and open questions. Keep it concise.
+- `docs/decisions/` holds accepted decisions and open questions, split by theme (`data.md`, `storage.md`, `ui.md`, `audio.md`, `matching.md`) with an `_index.md`. Keep each file concise.
+- `docs/progress.md` is the current status snapshot against the GSoC plan. The plan itself lives in `docs/reference/gsoc-proposal.md` — do not duplicate it.
 - `docs/roadmap.md` is for phases and next milestones.
 - `docs/meetings/` is for normalized meeting notes.
 - `docs/specs/` is for product and implementation specs.
-- `docs/logs/YYYY-MM-DD-*.md` is for dated vault/implementation history.
+- `docs/logs/` is for weekly digests and ad-hoc incident logs only. See `docs/logs/_index.md` for cadence rules.
 - `docs/reference/` is for stable technical references and schemas.
 - `archive/` is for raw, superseded, or non-current material.
 - `data/` is for generated data outputs and reports.
 - `scripts/` is for reproducible processing scripts.
 
-Do not scatter important state across random notes. If something changes the plan, update `CURRENT.md` or `docs/decisions.md`.
+Do not scatter important state across random notes. If something changes the plan, update `CURRENT.md` or the relevant file under `docs/decisions/`.
 
 ## History Tracking
 
-When a meaningful decision, clarification, or meeting summary is added:
+Default cadence is a **weekly digest** under `docs/logs/YYYY-MM-DD-weekly.md`, written on Fridays. Skip the week entirely if none of the following happened:
 
-1. Add or update the relevant canonical note.
-2. Add a dated log under `docs/logs/`.
-3. Link the log from `docs/project-map.md` if it is important.
+- a canonical doc was updated (`CURRENT.md`, `docs/decisions/**`, `docs/roadmap.md`, `docs/specs/**`);
+- a decision was added, changed, or superseded;
+- an implementation milestone landed;
+- a real ambiguity surfaced that needs a future decision.
 
-Prefer short decision entries over long narrative.
+Routine "I reviewed the diff and nothing structural changed" days do not deserve a log entry. Use an ad-hoc dated log (`YYYY-MM-DD-<slug>.md`) only for a significant incident or one-off decision that does not fit a weekly digest.
+
+When something does warrant a log:
+
+1. Update the relevant canonical note (decisions, spec, roadmap, current).
+2. Add it to the week's digest.
+3. Link the digest from `docs/logs/_index.md` and, if structurally important, from `docs/project-map.md`.
+
+Also update the relevant row in `docs/progress.md` when an implementation milestone changes status. Prefer short decision entries over long narrative.
 
 ## Mermaid Diagrams
 
