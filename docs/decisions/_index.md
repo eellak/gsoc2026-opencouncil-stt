@@ -1,6 +1,6 @@
 # Decisions
 
-This folder tracks accepted decisions and open questions, split by theme. Keep each file short and current. Move long reasoning into dated logs or reference notes.
+Accepted decisions and open questions, one file per theme. Keep entries short — long reasoning belongs in dated logs or reference notes.
 
 ## Files
 

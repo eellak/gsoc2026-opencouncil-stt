@@ -1,10 +1,10 @@
 # Progress
 
-Source of truth for the planned timeline is the [GSoC proposal](reference/gsoc-proposal.md#timeline-12-weeks--350-hours). This file shows where we currently stand against that plan, and links to the evidence.
+Planned timeline lives in the [GSoC proposal](reference/gsoc-proposal.md#timeline-12-weeks--350-hours). This file tracks where we actually are.
 
-Status legend: `not started` · `in progress` · `done` · `blocked`.
+Status: `not started` · `in progress` · `done` · `blocked`.
 
-> Note: GSoC weeks 1–12 are the coding-period weeks. The current pre-coding work (vault organisation, dataset exploration, review UI prototype) is preparation that feeds Week 1 — tracked under "Pre-coding" below.
+GSoC weeks 1–12 are the coding-period weeks. Pre-coding work (vault setup, dataset exploration, review UI) runs before week 1 and is tracked separately below.
 
 ## Pre-coding (community bonding / preparation)
 
@@ -35,4 +35,4 @@ Status legend: `not started` · `in progress` · `done` · `blocked`.
 | 11   | Plug `WhisperTranscriber` into production pipeline; end-to-end tests on new meetings                          | not started |          |
 | 12   | Documentation, reproducibility scripts, final evaluation report. **Final milestone**: merged into OpenCouncil | not started |          |
 
-Update the Status / Evidence columns when meaningful progress lands. Keep the Planned focus column aligned with the proposal — do not edit it without also editing the proposal.
+Update Status / Evidence as work lands. The Planned focus column mirrors the proposal — change it there first, then here.
