@@ -6,9 +6,7 @@ This is the human and LLM entry point. Read this first, then follow links only a
 
 ## Goal Right Now
 
-Organize the project around dataset exploration before training.
-
-The immediate practical goal is to combine the corrections CSV with OpenCouncil transcript data so we can build an exploration UI:
+Combine the corrections CSV with OpenCouncil transcript data to build an exploration UI that can:
 
 - show `before_text` and `after_text` diff;
 - play the relevant audio span;
@@ -50,7 +48,7 @@ Update this diagram when the main project flow changes.
 - Rows: 379194
 - Fields: `edit_id`, `edit_timestamp`, `edit_updated_at`, `before_text`, `after_text`, `edited_by`, `utterance_start`, `utterance_end`, `audio_url`, `youtube_url`, `meeting_name`, `meeting_date`
 
-The CSV is useful but incomplete for the UI because it does not include stable `utterance_id`, `meeting_id`, `city_id`, `speakerSegmentId`, or speaker/person metadata.
+Missing from the CSV: stable `utterance_id`, `meeting_id`, `city_id`, `speakerSegmentId`, speaker/person metadata.
 
 ## OpenCouncil Data Access
 
@@ -74,11 +72,11 @@ meeting/city metadata
     -> utterances[]
 ```
 
-This means we probably do not need a new API endpoint for the first prototype. We can fetch/cache the large meeting JSON and match CSV corrections to utterances.
+No new API endpoint needed — the large meeting JSON can be cached locally and CSV rows matched against it.
 
 ## Current Product Direction
 
-Continue the local/prototype exploration UI, not production annotation software.
+Local exploration prototype, not production annotation software.
 
 Implemented baseline under `ui/`:
 
@@ -112,14 +110,6 @@ Secondary screen:
 - distribution of included corrections by error category;
 - counts by city, meeting, editor type, duration bucket, and include/exclude state.
 
-## Clarified Decisions
-
-- Do not block on finding the exact external query that produced the CSV.
-- Do not block on a new context API endpoint.
-- Use the large meeting JSON as the first source for utterance IDs, city/meeting IDs, speaker context, and nearby utterances.
-- Range requests are not a decision point right now. The UI can start by using the audio URL and browser audio controls.
-- Task version is not needed for the first exploration UI. It may matter later for rigorous baseline comparisons.
-
 ## Next Concrete Step
 
 Extend the implemented local prototype with meeting JSON matching:
@@ -130,7 +120,7 @@ Extend the implemented local prototype with meeting JSON matching:
 - [x] Local labels: error category, include/exclude, timestamp adjustments, reviewer notes.
 - [x] Aggregate stats generated from local labels.
 
-Current immediate todos:
+Immediate todos:
 
 - [ ] Get or define example meeting JSON URLs for rows in `utterance-edits-may12-26.csv`.
 - [ ] Define matching confidence levels: exact, time-near, text-near, ambiguous, unmatched.
