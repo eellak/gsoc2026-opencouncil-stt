@@ -1,6 +1,31 @@
 docs/issues/
 *.csv
 
+# Archived / superseded material — kept locally, never pushed to remote.
+# Moving a tracked file into archive/ shows as a delete in git status;
+# stage and commit it to remove the file from the remote.
+archive/
+
+# Generated audio repair artifacts
+data/audio-fix/check-cache/
+data/audio-fix/original/
+data/audio-fix/fixed/
+data/audio-fix/streaming-work/
+data/audio-fix/*.log
+data/audio-fix/*.pid
+data/audio-fix/*.tmp
+data/audio-fix/all-audio-urls.txt
+data/audio-fix/decode-report.jsonl
+data/audio-fix/inventory.json
+data/audio-fix/problematic-urls.txt
+data/audio-fix/url-map.json
+data/decode-failures.jsonl
+
+# Local database files
+**/*.sqlite
+**/*.sqlite-shm
+**/*.sqlite-wal
+
 # Local Claude Code settings
 .claude/settings.local.json
 
@@ -15,6 +40,3 @@ docs/issues/
 **/.svelte-kit/
 **/build/
 **/.vercel/
-**/*.sqlite-shm
-**/*.sqlite-wal
-
