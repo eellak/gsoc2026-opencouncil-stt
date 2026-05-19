@@ -6,6 +6,7 @@ This folder contains normalized meeting notes. Raw notes or transcripts should e
 | --- | --- | --- | --- |
 | 2026-05-08 | [First sync](2026-05-08-first-sync.md) | normalized from raw notes | metrics, initial backlog, mentor questions |
 | 2026-05-12 | [Dataset exploration sync](2026-05-12-dataset-exploration-sync.md) | normalized from conversation notes | exploration-first plan, UI direction, data-access clarifications |
+| 2026-05-19 | [Notes](2026-05-19.md) | normalized notes | midterm target, new CSV export, nearby utterances API, seeded review order |
 
 ## Meeting Note Rules
 
