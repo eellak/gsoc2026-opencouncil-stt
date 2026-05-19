@@ -31,3 +31,11 @@ Reason: dropping rows at ingest time is irreversible and makes it impossible to 
 CSV is structurally clean (RFC-4180 quoted, parseable by `csv-parse`). Issues are content-level only: 5 219 no-ops, 1 384 multiline, 1 219 whitespace-only, 1 950 empty-before, 3 812 empty-after, 27 embedded-reasoning. 96.4% categorise as `clean`.
 
 Scripts: `ui/scripts/analyze-csv.ts` (read-only report) and `ui/scripts/ingest-csv.ts` (full ingest with categorisation). Library of pure transforms in `ui/scripts/lib/csv-clean.ts` with unit tests.
+
+### 2026-05-19 - GSoC milestone split
+
+Midterm milestone is **M1: Curated ASR Dataset and Base Model**, not completion of model training.
+
+Reason: fine-tuning should start only after correction matching, taxonomy, include/exclude rules, evaluation metrics, and base-model benchmarks are stable enough to make the tuning work meaningful.
+
+Final target remains **Deployed Fine-Tuned ASR Transcriber for OpenCouncil**. By the end, there should be a selected fine-tuned checkpoint, reproducible evaluation, a deployment target, and a path into the OpenCouncil task pipeline.

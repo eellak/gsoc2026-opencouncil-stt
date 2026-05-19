@@ -1,6 +1,6 @@
 # Current State
 
-Last updated: 2026-05-17
+Last updated: 2026-05-19
 
 This is the human and LLM entry point. Read this first, then follow links only as needed.
 
@@ -14,6 +14,8 @@ Combine the corrections CSV with OpenCouncil transcript data to build an explora
 - classify the correction error type;
 - mark whether the correction should be included or excluded from a future training/evaluation dataset;
 - show aggregate stats over all corrections and over selected corrections.
+
+Broader GSoC target: have a fine-tuned ASR transcriber deployed somewhere OpenCouncil tasks can use it. The midpoint should be earlier in the pipeline: curated v1 dataset, evaluation scripts, and a base model picked for the fine-tuning runs.
 
 ## Current Flow
 
