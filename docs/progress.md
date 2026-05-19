@@ -1,6 +1,6 @@
 # Progress
 
-Planned timeline lives in the [GSoC proposal](reference/gsoc-proposal.md#timeline-12-weeks--350-hours). This file tracks where we actually are.
+The historical proposal timeline lives in the [GSoC proposal](reference/gsoc-proposal.md#timeline-12-weeks--350-hours). This file tracks the plan we are actually working from now.
 
 Status: `not started` · `in progress` · `done` · `blocked`.
 
@@ -18,21 +18,21 @@ GSoC weeks 1–12 are the coding-period weeks. Pre-coding work (vault setup, dat
 | Audio CORS / decoding workaround (proxy + URL map)                                                     | in progress   | [decisions/audio.md](decisions/audio.md#2026-05-16---audio-workaround-via-vercel-proxy-and-fixed-file-map-pending-proper-fix)           |
 | Stable-ID corrections export from mentors                                                              | blocked       | [decisions/data.md](decisions/data.md#2026-05-12---waiting-on-a-new-corrections-export-with-stable-ids)                                 |
 
-## GSoC weeks 1–12 (planned)
+## GSoC weeks 1–12 (working plan)
 
-| Week | Planned focus (from proposal)                                                                                 | Status      | Evidence |
-| ---- | ------------------------------------------------------------------------------------------------------------- | ----------- | -------- |
-| 1    | Dataset work: error auto-classification, audio preprocessing (noise reduction, VAD), 2–5 min segments         | not started |          |
-| 2    | Dataset work continued: train/val/test split with two held-out municipalities + date-based test split         | not started |          |
-| 3    | Dataset finalisation; publish reproducible dataset on HuggingFace                                             | not started |          |
-| 4    | Baseline evaluation: Gladia WER/CER reconstructed from `UtteranceEdit.beforeText`                             | not started |          |
-| 5    | Baseline evaluation: zero-shot Whisper-large-v3, Charalampos/whisper-medium-el, Cohere transcribe. **M1**     | not started |          |
-| 6    | LoRA fine-tuning, hyperparameter sweep (rank, alpha, learning rate)                                           | not started |          |
-| 7    | LoRA fine-tuning continued; evaluate on held-out municipalities                                               | not started |          |
-| 8    | Target morphological errors and domain terminology                                                            | not started |          |
-| 9    | Ablation studies (concatenation, data subsets). **M2: ≥15% relative DS-WER over Gladia baseline**             | not started |          |
-| 10   | CTranslate2 conversion; benchmark inference (target RTF < 0.5)                                                | not started |          |
-| 11   | Plug `WhisperTranscriber` into production pipeline; end-to-end tests on new meetings                          | not started |          |
-| 12   | Documentation, reproducibility scripts, final evaluation report. **Final milestone**: merged into OpenCouncil | not started |          |
+| Week | Working focus                                                                                                      | Status      | Evidence |
+| ---- | ------------------------------------------------------------------------------------------------------------------ | ----------- | -------- |
+| 1    | Data joining: cache meeting JSON, match CSV corrections to utterances, report matched/ambiguous/unmatched rows     | not started |          |
+| 2    | Taxonomy and review UI: validate error taxonomy, review sample rows with audio/context, refine include/exclude      | not started |          |
+| 3    | Curated dataset v1: export ASR fine-tuning candidates, define split policy, check city/meeting distribution         | not started |          |
+| 4    | Evaluation harness: Greek-aware WER/CER, Domain WER, baseline reconstruction from `before_text`                     | not started |          |
+| 5    | Base-model benchmark and **M1: Curated ASR Dataset and Base Model**                                                 | not started |          |
+| 6    | First LoRA fine-tuning run on the selected base model                                                              | not started |          |
+| 7    | Hypertuning sweep: rank, alpha, learning rate, dataset subset, segment length/concatenation                         | not started |          |
+| 8    | Model selection: compare checkpoints on fixed metrics, domain terms, hallucinations, and runtime                    | not started |          |
+| 9    | Final fine-tuned checkpoint selection and reproducibility report                                                    | not started |          |
+| 10   | Optimization and deployment: faster-whisper/CTranslate2 packaging if feasible, inference benchmarks                 | not started |          |
+| 11   | OpenCouncil tasks integration: transcriber adapter, configuration, end-to-end held-out meeting test                 | not started |          |
+| 12   | Final docs, deployment notes, evaluation report, **Final: Deployed Fine-Tuned ASR Transcriber for OpenCouncil**     | not started |          |
 
-Update Status / Evidence as work lands. The Planned focus column mirrors the proposal — change it there first, then here.
+Update Status / Evidence as work lands. The proposal stays as history; this table is the working plan.

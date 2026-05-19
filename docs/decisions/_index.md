@@ -26,6 +26,7 @@ Accepted decisions and open questions, one file per theme. Keep entries short �
 - [Waveform bars + peaks-cache prefetch](ui.md#2026-05-15---waveform-bars--peaks-cache-prefetch) — 2026-05-15
 - [Categorise all CSV rows instead of dropping](data.md#2026-05-16---categorise-all-csv-rows-instead-of-dropping) — 2026-05-16
 - [Audio workaround via Vercel proxy and fixed-file map](audio.md#2026-05-16---audio-workaround-via-vercel-proxy-and-fixed-file-map-pending-proper-fix) — 2026-05-16
+- [GSoC milestone split](data.md#2026-05-19---gsoc-milestone-split) — 2026-05-19
 
 ### Open
 
