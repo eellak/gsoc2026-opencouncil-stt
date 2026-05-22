@@ -61,14 +61,21 @@ export class SidecarStore {
 	}
 
 	private async rehydrate(): Promise<void> {
-		// 1. Try snapshot.
+		// 1. Try snapshot. Build into locals first and commit atomically so a
+		//    mid-iteration failure can't leave us with half-loaded labels and
+		//    a stale lastEventId.
 		try {
 			const raw = await fs.readFile(this.paths.snapshotPath, 'utf8');
 			const snap = JSON.parse(raw) as Snapshot;
+			if (typeof snap.last_event_id !== 'number' || !Number.isFinite(snap.last_event_id) || snap.last_event_id < 0) {
+				throw new Error('snapshot has invalid last_event_id');
+			}
+			const staged = new Map<string, GroupLabel>();
 			for (const [id, lbl] of Object.entries(snap.labels)) {
 				// Canonicalize on load so legacy single-value labels show up as arrays.
-				this.labels.set(id, canonicalizeLabel(lbl));
+				staged.set(id, canonicalizeLabel(lbl));
 			}
+			this.labels = staged;
 			this.lastEventId = snap.last_event_id;
 		} catch {
 			/* missing or corrupt snapshot — replay from scratch */
@@ -138,8 +145,14 @@ export class SidecarStore {
 		// SvelteKit handler.
 		const canonicalPatch = canonicalizePatchForWrite(patch);
 		validatePatch(canonicalPatch);
-		this.writeQueue = this.writeQueue.then(() => this.doPatch(utterance_id, canonicalPatch));
-		await this.writeQueue;
+		// Pass `null` as onRejected so a poisoned previous op does NOT skip the
+		// next doPatch. The chain's tail swallows errors so subsequent callers
+		// see a fresh, fulfilled writeQueue; the current caller still observes
+		// this op's outcome via `await op`.
+		const run = () => this.doPatch(utterance_id, canonicalPatch);
+		const op = this.writeQueue.then(run, run);
+		this.writeQueue = op.catch(() => {});
+		await op;
 		return this.get(utterance_id);
 	}
 
@@ -156,7 +169,13 @@ export class SidecarStore {
 			source: 'local',
 			patch
 		};
-		await fs.appendFile(this.paths.eventsPath, JSON.stringify(ev) + '\n');
+		const handle = await fs.open(this.paths.eventsPath, 'a');
+		try {
+			await handle.appendFile(JSON.stringify(ev) + '\n');
+			await handle.datasync();
+		} finally {
+			await handle.close();
+		}
 		this.lastEventId = tentativeId;
 		this.apply(ev);
 		this.eventsAppendedSinceSnapshot += 1;
@@ -165,14 +184,29 @@ export class SidecarStore {
 		}
 	}
 
-	async flushSnapshot(): Promise<void> {
+	private async flushSnapshot(): Promise<void> {
 		const snap: Snapshot = {
 			last_event_id: this.lastEventId,
 			labels: Object.fromEntries(this.labels)
 		};
 		const tmp = `${this.paths.snapshotPath}.tmp`;
-		await fs.writeFile(tmp, JSON.stringify(snap));
+		const handle = await fs.open(tmp, 'w');
+		try {
+			await handle.writeFile(JSON.stringify(snap));
+			await handle.sync();
+		} finally {
+			await handle.close();
+		}
 		await fs.rename(tmp, this.paths.snapshotPath);
+		// fsync parent dir so the rename is durable across power loss.
+		// Best-effort: directory fsync is Linux-canonical but inconsistent on
+		// macOS dev machines, so swallow unsupported errors silently.
+		try {
+			const dir = await fs.open(dirname(this.paths.snapshotPath), 'r');
+			try { await dir.sync(); } finally { await dir.close(); }
+		} catch {
+			/* dev/macOS may not support directory fsync — best-effort only */
+		}
 		this.eventsAppendedSinceSnapshot = 0;
 	}
 

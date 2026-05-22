@@ -128,7 +128,9 @@ function loadOnce(cityId: string, meetingId: string): Promise<MeetingHandle | nu
 		// Keep the parallel resolved cache in sync. `null` results (network
 		// failures) are intentionally not stored so a retry path stays open
 		// — the lru entry is still there to dedup concurrent retries.
-		if (handle) resolved.set(k, handle);
+		// Skip if the LRU evicted this key while the fetch was in flight,
+		// otherwise we leak entries that the eviction policy already let go of.
+		if (handle && lru.has(k)) resolved.set(k, handle);
 		return handle;
 	});
 	touchLru(k, promise);

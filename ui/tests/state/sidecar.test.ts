@@ -79,6 +79,49 @@ describe('SidecarStore', () => {
 		expect(s2.get('u1').include_status).toBe('include');
 	});
 
+	it('recovers from a transient append failure without poisoning the write queue', async () => {
+		const s = await SidecarStore.load(dir);
+		// Land one good patch so the queue is "warm".
+		await s.patch('u1', { include_status: 'include' });
+
+		// Wrap fs.open so the next file handle's appendFile throws once.
+		const eventsPath = join(dir, 'review-events.jsonl');
+		const realOpen = fs.open.bind(fs);
+		let failed = false;
+		(fs as unknown as { open: typeof fs.open }).open = (async (
+			path: Parameters<typeof fs.open>[0],
+			flags?: Parameters<typeof fs.open>[1],
+			mode?: Parameters<typeof fs.open>[2]
+		) => {
+			const handle = await realOpen(path, flags ?? 'r', mode);
+			if (!failed && String(path) === eventsPath) {
+				const realAppend = handle.appendFile.bind(handle);
+				(handle as unknown as { appendFile: typeof handle.appendFile }).appendFile = (async () => {
+					failed = true;
+					throw new Error('boom');
+				}) as typeof handle.appendFile;
+				// Keep handle close working so we don't leak.
+				void realAppend;
+			}
+			return handle;
+		}) as typeof fs.open;
+
+		try {
+			await expect(s.patch('u2', { include_status: 'exclude' })).rejects.toThrow(/boom/);
+			// Queue must not be permanently poisoned: the next patch should land.
+			await s.patch('u3', { include_status: 'include' });
+			await s.flush();
+		} finally {
+			(fs as unknown as { open: typeof fs.open }).open = realOpen;
+		}
+
+		const s2 = await SidecarStore.load(dir);
+		expect(s2.get('u1').include_status).toBe('include');
+		expect(s2.get('u3').include_status).toBe('include');
+		// u2 must not have leaked into durable state.
+		expect(s2.get('u2').include_status).toBe('unreviewed');
+	});
+
 	it('replays events past the snapshot last_event_id', async () => {
 		const s1 = await SidecarStore.load(dir);
 		for (let i = 0; i < 150; i++) {

@@ -16,7 +16,13 @@ import { getRepo } from '$lib/server/repo';
 import { getStatsCache } from '$lib/server/state/stats-cache';
 
 if (process.env.NODE_ENV !== 'test') {
-	getStatsCache().startBackgroundRefresh(() => getRepo());
+	try {
+		getStatsCache().startBackgroundRefresh(() => getRepo());
+	} catch (err) {
+		// Don't fail server startup on a stats-refresh init error — the page
+		// will still serve, just paying the aggregation cost on first request.
+		console.error('[hooks] startBackgroundRefresh failed', err);
+	}
 }
 
 // SvelteKit doesn't require a `handle` export but linters expect at least one

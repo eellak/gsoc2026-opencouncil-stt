@@ -41,17 +41,20 @@ export const GET: RequestHandler = async ({ params, fetch }) => {
 		throw error(upstream.status === 404 ? 404 : 502, `upstream ${upstream.status}`);
 	}
 
-	// `text()` can reject if the upstream tears the body down mid-read
-	// (TCP reset, transient TLS hiccup). Catch it explicitly so the client
-	// gets a clean 502 instead of an unhandled rejection turning into 500.
-	let body: string;
-	try {
-		body = await upstream.text();
-	} catch (err) {
-		console.warn('[oc-meeting] body read failed', url, err);
-		throw error(502, 'upstream body read failed');
+	// Reject obviously oversized bodies up front. The transcripts we serve are
+	// typically <2MB; 10MB is a hard ceiling so a misbehaving upstream cannot
+	// blow up memory on a 1GB VM.
+	const cl = upstream.headers.get('content-length');
+	if (cl) {
+		const n = Number.parseInt(cl, 10);
+		if (Number.isFinite(n) && n > 10 * 1024 * 1024) {
+			throw error(502, 'upstream body too large');
+		}
 	}
-	return new Response(body, {
+
+	// Stream pass-through — the bridge does no parsing, so there is no reason
+	// to buffer the entire body in memory before responding.
+	return new Response(upstream.body, {
 		headers: {
 			'content-type': 'application/json; charset=utf-8',
 			'cache-control': 'public, max-age=3600, s-maxage=3600',
