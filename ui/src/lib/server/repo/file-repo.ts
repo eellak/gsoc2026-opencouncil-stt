@@ -157,7 +157,12 @@ export class FileRepo {
 	// Mulberry32: small, deterministic 32-bit PRNG. Sufficient for shuffle.
 	private seededOrder(seed: number): string[] {
 		const cached = this.orderCache.get(seed);
-		if (cached) return cached;
+		if (cached) {
+			// LRU refresh — keep recently-used seeds (paging callers reuse the same seed).
+			this.orderCache.delete(seed);
+			this.orderCache.set(seed, cached);
+			return cached;
+		}
 		const arr = [...this.orderedIds];
 		let state = (seed >>> 0) || 1;
 		for (let i = arr.length - 1; i > 0; i--) {
@@ -169,12 +174,20 @@ export class FileRepo {
 			const j = Math.floor(r * (i + 1));
 			[arr[i], arr[j]] = [arr[j], arr[i]];
 		}
+		// Bounded LRU: prevents memory DoS via /api/review/queue?seed=<random>.
+		// Each entry holds a full id array (~10k strings); cap keeps it bounded.
+		if (this.orderCache.size >= ORDER_CACHE_MAX) {
+			const oldest = this.orderCache.keys().next().value;
+			if (oldest !== undefined) this.orderCache.delete(oldest);
+		}
 		this.orderCache.set(seed, arr);
 		return arr;
 	}
 
 	private orderCache = new Map<number, string[]>();
 }
+
+const ORDER_CACHE_MAX = 8;
 
 // Module-level singleton wired into SvelteKit endpoints. Lazy: first call
 // loads cache and sidecar; later calls return the same instance.

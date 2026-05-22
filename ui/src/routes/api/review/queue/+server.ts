@@ -20,8 +20,11 @@ export const GET: RequestHandler = async ({ url }) => {
 	const seed = Number.parseInt(seedStr, 10);
 	const from = Number.parseInt(fromStr, 10);
 	const n = Number.parseInt(nStr, 10);
-	if (!Number.isFinite(seed) || !Number.isFinite(from) || !Number.isFinite(n)) {
+	if (!Number.isInteger(seed) || !Number.isInteger(from) || !Number.isInteger(n)) {
 		throw error(400, 'seed, from, n must be integers');
+	}
+	if (from < 0 || n < 1 || n > 100) {
+		throw error(400, 'from must be ≥ 0; n must be in [1, 100]');
 	}
 
 	const repo = await getRepo();

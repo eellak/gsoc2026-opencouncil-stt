@@ -18,7 +18,9 @@ const isIncludeStatus = (v: unknown): v is IncludeStatus =>
 	typeof v === 'string' && (INCLUDE_STATUSES as string[]).includes(v);
 
 function parsePatch(raw: unknown): GroupPatchBody {
-	if (raw === null || typeof raw !== 'object') throw error(400, 'body must be a JSON object');
+	if (raw === null || typeof raw !== 'object' || Array.isArray(raw)) {
+		throw error(400, 'body must be a JSON object');
+	}
 	const r = raw as Record<string, unknown>;
 	const out: GroupPatchBody = {};
 
