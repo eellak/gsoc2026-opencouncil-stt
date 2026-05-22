@@ -1,0 +1,72 @@
+[
+  {
+    "edit_id": "edit-001",
+    "edit_timestamp": "2026-01-15T10:00:00Z",
+    "edit_updated_at": null,
+    "before_text": "Ο δήμαρχος ανεφερε οτι η συνεδρίαση",
+    "after_text": "Ο δήμαρχος ανέφερε ότι η συνεδρίαση",
+    "edited_by": "reviewer-1",
+    "utterance_start": 12.5,
+    "utterance_end": 18.3,
+    "audio_url": "https://cdn.example.com/audio/meeting-2026-01-15.mp3",
+    "youtube_url": null,
+    "meeting_name": "Δημοτικό Συμβούλιο Αθήνας",
+    "meeting_date": "2026-01-15"
+  },
+  {
+    "edit_id": "edit-002",
+    "edit_timestamp": "2026-01-15T10:05:00Z",
+    "edit_updated_at": null,
+    "before_text": "θα προχωρήσουμε στην εγκριση του προϋπολογισμού",
+    "after_text": "θα προχωρήσουμε στην έγκριση του προϋπολογισμού",
+    "edited_by": "reviewer-1",
+    "utterance_start": 45.0,
+    "utterance_end": 52.1,
+    "audio_url": "https://cdn.example.com/audio/meeting-2026-01-15.mp3",
+    "youtube_url": null,
+    "meeting_name": "Δημοτικό Συμβούλιο Αθήνας",
+    "meeting_date": "2026-01-15"
+  },
+  {
+    "edit_id": "edit-003",
+    "edit_timestamp": "2026-01-16T09:30:00Z",
+    "edit_updated_at": "2026-01-16T10:00:00Z",
+    "before_text": "η πρόταση αφόρα τον δημο Θεσσαλονίκης",
+    "after_text": "η πρόταση αφορά τον δήμο Θεσσαλονίκης",
+    "edited_by": "reviewer-2",
+    "utterance_start": 5.0,
+    "utterance_end": 9.8,
+    "audio_url": "https://cdn.example.com/audio/meeting-2026-01-16.mp3",
+    "youtube_url": "https://youtube.com/watch?v=example1",
+    "meeting_name": "Δημοτικό Συμβούλιο Θεσσαλονίκης",
+    "meeting_date": "2026-01-16"
+  },
+  {
+    "edit_id": "edit-004",
+    "edit_timestamp": "2026-01-16T09:35:00Z",
+    "edit_updated_at": null,
+    "before_text": "ο αντιδήμαρχος ειπε πως",
+    "after_text": "ο αντιδήμαρχος είπε πως",
+    "edited_by": "reviewer-2",
+    "utterance_start": 30.0,
+    "utterance_end": 33.5,
+    "audio_url": "https://cdn.example.com/audio/meeting-2026-01-16.mp3",
+    "youtube_url": "https://youtube.com/watch?v=example1",
+    "meeting_name": "Δημοτικό Συμβούλιο Θεσσαλονίκης",
+    "meeting_date": "2026-01-16"
+  },
+  {
+    "edit_id": "edit-005",
+    "edit_timestamp": "2026-01-17T14:00:00Z",
+    "edit_updated_at": null,
+    "before_text": "συμφωνούμε να γίνει αναβολή",
+    "after_text": "συμφωνούμε να γίνει αναβολή",
+    "edited_by": "reviewer-1",
+    "utterance_start": 120.0,
+    "utterance_end": 124.5,
+    "audio_url": "https://cdn.example.com/audio/meeting-2026-01-17.mp3",
+    "youtube_url": null,
+    "meeting_name": "Δημοτικό Συμβούλιο Πάτρας",
+    "meeting_date": "2026-01-17"
+  }
+]

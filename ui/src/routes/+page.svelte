@@ -1,0 +1,97 @@
+<script lang="ts">
+	import { goto } from '$app/navigation';
+	import { parseSeedParam, randomSeed, UINT32_MAX } from '$lib/shared/urls';
+	import { t } from '$lib/i18n.svelte';
+	import type { PageData } from './$types';
+
+	const { data }: { data: PageData } = $props();
+
+	let seedInput = $state<string>('');
+	let error = $state<string | null>(null);
+
+	function start() {
+		error = null;
+		const raw = seedInput.trim();
+		let seed: number;
+		if (raw === '') {
+			seed = data.suggestedSeed;
+		} else {
+			const parsed = parseSeedParam(raw);
+			if (parsed === null) {
+				error = t('seedInvalid');
+				return;
+			}
+			seed = parsed;
+		}
+		goto(`/?seed=${seed}`);
+	}
+
+	function newRandom() {
+		seedInput = String(randomSeed());
+	}
+</script>
+
+<div class="landing">
+	<h1>{t('landingTitle')}</h1>
+	<p class="lead">{t('landingLead')}</p>
+
+	<form
+		class="seed-form"
+		onsubmit={(e) => {
+			e.preventDefault();
+			start();
+		}}
+	>
+		<label>
+			<span>{t('seedLabel')}</span>
+			<div class="row">
+				<input
+					type="text"
+					inputmode="numeric"
+					pattern="\d*"
+					placeholder={t('seedPlaceholder', { default: String(data.suggestedSeed) })}
+					bind:value={seedInput}
+					aria-invalid={error !== null}
+				/>
+				<button type="button" class="ghost" onclick={newRandom}>{t('seedRandomize')}</button>
+			</div>
+			{#if error}<span class="error">{error}</span>{/if}
+			<small class="hint">{t('seedHint', { max: UINT32_MAX.toLocaleString() })}</small>
+		</label>
+		<button type="submit" class="primary">{t('startReview')}</button>
+	</form>
+
+	<nav class="links">
+		<a href="/stats">{t('statsLink')}</a>
+	</nav>
+</div>
+
+<style>
+	.landing { max-width: 520px; margin: 4rem auto; padding: 1.5rem; }
+	h1 { font-size: 1.6rem; margin: 0 0 0.4rem; }
+	.lead { color: var(--text-2, #475569); margin: 0 0 1.4rem; }
+	.seed-form { display: flex; flex-direction: column; gap: 1rem; }
+	label { display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.85rem; color: var(--text-2, #475569); }
+	.row { display: flex; gap: 0.5rem; }
+	input {
+		flex: 1; padding: 0.55rem 0.75rem; font-size: 1rem;
+		border: 1px solid var(--border, #e2e8f0); border-radius: 8px;
+		font-family: monospace;
+	}
+	input[aria-invalid='true'] { border-color: #dc2626; }
+	.hint { font-size: 0.72rem; color: var(--text-3, #94a3b8); }
+	.error { font-size: 0.78rem; color: #dc2626; }
+	button {
+		padding: 0.5rem 0.95rem; font-size: 0.9rem;
+		border-radius: 8px; cursor: pointer; font-family: inherit;
+	}
+	.primary { background: var(--accent, #2563eb); color: white; border: none; }
+	.primary:hover { background: var(--accent-dark, #1d4ed8); }
+	.ghost {
+		background: var(--surface-2, #f8fafc); color: var(--text-2, #475569);
+		border: 1px solid var(--border, #e2e8f0);
+	}
+	.ghost:hover { background: var(--surface-3, #f1f5f9); }
+	.links { margin-top: 2rem; display: flex; gap: 1rem; }
+	.links a { color: var(--accent, #2563eb); font-size: 0.9rem; }
+</style>

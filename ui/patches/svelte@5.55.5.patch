@@ -1,0 +1,22 @@
+diff --git a/compiler-esm.js b/compiler-esm.js
+new file mode 100644
+--- /dev/null
++++ b/compiler-esm.js
+@@ -0,0 +1,7 @@
++// ESM wrapper for svelte/compiler — re-exports named exports from the CJS build
++import cjs from './compiler/index.js';
++export const {
++	VERSION, compile, compileModule, parse, parseCss, migrate, preprocess, print
++} = cjs;
++export default cjs;
+diff --git a/package.json b/package.json
+--- a/package.json
++++ b/package.json
+@@ -35,7 +35,8 @@
+ 		"./compiler": {
+ 			"types": "./types/index.d.ts",
+ 			"require": "./compiler/index.js",
+-			"default": "./src/compiler/index.js"
++			"default": "./compiler-esm.js",
++			"import": "./compiler-esm.js"
+ 		},
