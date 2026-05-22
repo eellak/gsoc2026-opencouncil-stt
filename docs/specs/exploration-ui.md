@@ -26,17 +26,19 @@ stateDiagram-v2
     }
 ```
 
-Every transition should update current SQLite state and append a JSONL history event.
+Every transition should update current review state and append an audit event.
 
 ## Core Objects
 
 ### Correction
 
-Comes from `utterance-edits-may12-26.csv`.
+Comes from `data-1779206108158.csv`; the earlier `utterance-edits-may12-26.csv` remains as the v1 reference export.
 
 Fields:
 
 - `edit_id`
+- `utterance_id`
+- `meeting_id`
 - `edit_timestamp`
 - `edit_updated_at`
 - `before_text`
@@ -44,10 +46,17 @@ Fields:
 - `edited_by`
 - `utterance_start`
 - `utterance_end`
-- `audio_url`
-- `youtube_url`
+- `ingest_category`
+- `latest_per_utterance`
+
+Meeting and audio metadata are currently normalised into the `meetings` table:
+
 - `meeting_name`
 - `meeting_date`
+- `city_id`
+- `audio_url`
+- `audio_cdn_url`
+- `youtube_url`
 
 ### Matched Utterance
 
@@ -167,7 +176,7 @@ Show distributions for:
 
 ## Storage Recommendation
 
-Use SQLite for UI state and stats.
+Use the review database for UI state and stats. The current hosted implementation is Supabase Postgres; the earlier local prototype used SQLite/JSONL.
 
 Reasons:
 
@@ -176,7 +185,7 @@ Reasons:
 - supports matched records plus labels;
 - avoids rewriting a huge CSV on every review action.
 
-Also keep a JSONL event log for history:
+Keep an append-only audit log for history:
 
 ```json
 {"ts":"2026-05-12T12:00:00Z","edit_id":"...","field":"include_status","old":"unreviewed","new":"include","actor":"human"}
