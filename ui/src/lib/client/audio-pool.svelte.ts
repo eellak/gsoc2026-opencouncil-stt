@@ -33,7 +33,9 @@ export interface Neighbour {
 }
 
 const MAX_CONCURRENT = 4;
-const MAX_POOL = 18;
+// Holds the current item + up to 2×radius neighbours (radius=10 → 21 elements)
+// plus a small headroom so the LRU eviction doesn't churn at the edges.
+const MAX_POOL = 24;
 
 class AudioPool {
 	private elements = new Map<string, HTMLAudioElement>();

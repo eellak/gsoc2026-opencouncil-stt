@@ -101,7 +101,7 @@
 		const id = currentId;
 		untrack(() => {
 			usingFallback = false;
-			const audioNeighbours = queue.neighborsAround(id, 5).map((g) => ({
+			const audioNeighbours = queue.neighborsAround(id, 10).map((g) => ({
 				utterance_id: g.utterance_id,
 				url: resolveAudioUrls(g.audio_url).direct,
 				// Use the adjusted_start if the reviewer already set one for
@@ -121,7 +121,7 @@
 		const id = currentId;
 		untrack(() => {
 			const seenMeetings = new Set<string>();
-			for (const g of queue.neighborsAround(id, 5)) {
+			for (const g of queue.neighborsAround(id, 10)) {
 				if (!g.city_id || !g.meeting_id) continue;
 				const k = `${g.city_id}|${g.meeting_id}`;
 				if (seenMeetings.has(k)) continue;
