@@ -9,7 +9,7 @@
 	import type { Group, GroupPatchBody } from '$lib/domain/groups';
 	import type { MeetingContext } from '$lib/domain/meeting-context';
 	import { TAXONOMY, normalizeTaxonomyId, type TaxonomyId } from '$lib/shared/taxonomy';
-	import { t } from '$lib/i18n.svelte';
+	import { t, getLang } from '$lib/i18n.svelte';
 	import * as queue from '$lib/client/group-queue.svelte';
 	import { resolveAudioUrls } from '$lib/client/audio-source';
 	import { audioPool } from '$lib/client/audio-pool.svelte';
@@ -39,6 +39,8 @@
 
 	let saveStatus = $state<'idle' | 'saving' | 'saved' | 'error'>('idle');
 	let saveTimer: ReturnType<typeof setTimeout>;
+	let shareCopied = $state(false);
+	let shareCopiedTimer: ReturnType<typeof setTimeout>;
 
 	async function patch(updates: GroupPatchBody) {
 		clearTimeout(saveTimer);
@@ -64,9 +66,10 @@
 	// playing. The native control still renders, but we overlay a skeleton +
 	// disable the keyboard shortcut so a Space press doesn't silently fail.
 	let audioReady = $state(false);
-	function onAudioCanPlay() { audioReady = true; }
-	function onAudioWaiting() { audioReady = false; }
-	function onAudioLoadStart() { audioReady = false; }
+	let audioReadyFlash = $state(false);
+	function onAudioCanPlay() { audioReady = true; audioReadyFlash = true; }
+	function onAudioWaiting() { audioReady = false; audioReadyFlash = false; }
+	function onAudioLoadStart() { audioReady = false; audioReadyFlash = false; }
 	// Native <audio> playback does NOT need CORS. Direct CDN is preferred so
 	// Vercel proxy bandwidth stays near zero. `audio-source.ts` keeps the proxied
 	// URL as a fallback for onerror. See decisions/audio.md.
@@ -134,11 +137,22 @@
 	// server-side) and slices ±5 around the current utterance here.
 	let contextState = $state<'loading' | 'ready' | 'error' | 'empty'>('loading');
 	let contextData = $state<MeetingContext | null>(null);
+	let prevRadius = $state(5);
+	let nextRadius = $state(5);
+
+	// Reset context radii when navigating to a new utterance
+	$effect(() => {
+		currentId;
+		prevRadius = 5;
+		nextRadius = 5;
+	});
 
 	$effect(() => {
 		const id = currentId;
 		const cityId = currentCityId;
 		const meetingId = currentMeetingId;
+		const pr = prevRadius;
+		const nr = nextRadius;
 		let cancelled = false;
 
 		// Avoid the "loading…" flicker when the meeting is already resolved
@@ -153,7 +167,7 @@
 		}
 
 		meetingCtx
-			.getContext(cityId, meetingId, id, 5)
+			.getContext(cityId, meetingId, id, Math.max(pr, nr))
 			.then((data) => {
 				if (cancelled) return;
 				contextData = data;
@@ -227,6 +241,9 @@
 		} catch {
 			// ignore — clipboard blocked
 		}
+		clearTimeout(shareCopiedTimer);
+		shareCopied = true;
+		shareCopiedTimer = setTimeout(() => (shareCopied = false), 1500);
 	}
 
 	function onKeydown(e: KeyboardEvent) {
@@ -266,9 +283,10 @@
 			<button
 				type="button"
 				class="badge mode share-btn"
+				class:copied={shareCopied}
 				onclick={copyShareLink}
 				title={t('shareSeedTitle')}
-			>seed {data.seed} · {t('shareSeed')}</button>
+			>{shareCopied ? t('shareCopied') : `seed ${data.seed} · ${t('shareSeed')}`}</button>
 			{#if item.meeting_name}
 				<span class="badge meeting">{item.meeting_name}</span>
 			{/if}
@@ -294,9 +312,12 @@
 
 	<main class="content">
 		<MeetingContextPanel
-			utterances={contextData?.prev ?? []}
+			utterances={contextData?.prev.slice(-prevRadius) ?? []}
 			label={t('contextBefore')}
 			state={contextState}
+			hasMore={!!contextData && contextData.prev.length >= prevRadius}
+			onLoadMore={() => (prevRadius += 5)}
+			loadMoreAtTop
 		/>
 
 		<section class="diff-section">
@@ -319,13 +340,21 @@
 					{t('chainToggle', { n: item.edits.length })} <kbd>c</kbd>
 				</label>
 			{/if}
-			<Diff before={beforeText} after={afterText} speakerName={currentSpeakerName} />
+			<Diff
+				before={beforeText}
+				after={afterText}
+				speakerName={currentSpeakerName}
+				errorCategoryIds={item.label.error_categories}
+				lang={getLang()}
+			/>
 		</section>
 
 		<MeetingContextPanel
-			utterances={contextData?.next ?? []}
+			utterances={contextData?.next.slice(0, nextRadius) ?? []}
 			label={t('contextAfter')}
 			state={contextState}
+			hasMore={!!contextData && contextData.next.length >= nextRadius}
+			onLoadMore={() => (nextRadius += 5)}
 		/>
 
 		<section class="audio-section">
@@ -338,7 +367,14 @@
 				3-hour meeting MP3.
 			-->
 			<div class="audio-toolbar">
-				<button type="button" class="play-btn" onclick={togglePlay} title="Space">▶/⏸</button>
+				<div
+					class="play-btn-wrap"
+					class:loading-audio={!audioReady}
+					class:ready-flash={audioReadyFlash}
+					onanimationend={(e) => { if (e.animationName === 'sweep-border') audioReadyFlash = false; }}
+				>
+					<button type="button" class="play-btn" onclick={togglePlay} title="Space">▶/⏸</button>
+				</div>
 				<label>
 					<span>start</span>
 					<input
@@ -454,8 +490,9 @@
 		font-weight: 500; letter-spacing: 0.01em;
 	}
 	.badge.mode { background: #0f172a; color: #f8fafc; }
-	.badge.share-btn { cursor: pointer; font-family: inherit; border: none; }
+	.badge.share-btn { cursor: pointer; font-family: inherit; border: none; transition: background 0.2s; }
 	.badge.share-btn:hover { background: #1e293b; }
+	.badge.share-btn.copied { background: #15803d; }
 	.highlight-banner {
 		background: #fef3c7; color: #92400e; padding: 0.45rem 0.7rem;
 		border: 1px solid #fbbf24; border-radius: 6px; font-size: 0.85rem;
@@ -488,6 +525,7 @@
 		border-radius: var(--radius-sm, 6px);
 		font-size: 0.85rem; background: var(--surface, #fff);
 	}
+	.play-btn-wrap { position: relative; display: inline-flex; }
 	.audio-toolbar .play-btn {
 		padding: 0.2rem 0.7rem;
 		border: 1px solid var(--border-accent, #93c5fd);
@@ -495,6 +533,37 @@
 		border-radius: 999px; cursor: pointer; font-size: 0.85rem;
 	}
 	.audio-toolbar .play-btn:hover { background: var(--accent-light, #dbeafe); }
+
+	/* Pulse while audio is buffering */
+	.play-btn-wrap.loading-audio .play-btn {
+		animation: play-btn-pulse 1.4s ease-in-out infinite;
+	}
+	@keyframes play-btn-pulse {
+		0%, 100% { opacity: 0.45; }
+		50% { opacity: 0.85; }
+	}
+
+	/* One-shot sweep animation when audio becomes ready */
+	@property --sweep-angle {
+		syntax: '<angle>';
+		inherits: false;
+		initial-value: 0deg;
+	}
+	.play-btn-wrap.ready-flash::before {
+		content: '';
+		position: absolute;
+		inset: -2px;
+		border-radius: 999px;
+		background: conic-gradient(#60a5fa var(--sweep-angle), transparent var(--sweep-angle));
+		mask: radial-gradient(farthest-side, transparent calc(100% - 2px), black calc(100% - 2px));
+		-webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), black calc(100% - 2px));
+		animation: sweep-border 0.3s linear forwards;
+		pointer-events: none;
+	}
+	@keyframes sweep-border {
+		from { --sweep-angle: 0deg; }
+		to { --sweep-angle: 360deg; }
+	}
 	.audio-toolbar .hint { color: var(--text-3, #94a3b8); font-size: 0.78rem; margin-left: auto; }
 	.native-player { width: 100%; height: 36px; display: block; }
 	.audio-wrap { position: relative; }

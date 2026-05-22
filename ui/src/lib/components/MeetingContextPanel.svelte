@@ -7,8 +7,11 @@
 		utterances: ContextUtterance[];
 		label: string;
 		state: 'loading' | 'ready' | 'error' | 'empty';
+		onLoadMore?: () => void;
+		hasMore?: boolean;
+		loadMoreAtTop?: boolean;
 	}
-	const { utterances, label, state }: Props = $props();
+	const { utterances, label, state, onLoadMore, hasMore, loadMoreAtTop }: Props = $props();
 
 	const runs = $derived(mergeBySpeaker(utterances));
 
@@ -29,6 +32,11 @@
 	{:else if state === 'empty' || runs.length === 0}
 		<div class="status muted">{t('noContext')}</div>
 	{:else}
+		{#if hasMore && onLoadMore && loadMoreAtTop}
+			<button type="button" class="load-more-btn top" onclick={onLoadMore} title={t('loadMoreContext')}>
+				↑ {t('loadMoreContext')}
+			</button>
+		{/if}
 		<ol>
 			{#each runs as run (run.parts[0].utterance_id)}
 				<li class:same-speaker={run.same_speaker_as_current}>
@@ -37,14 +45,16 @@
 							{run.speaker_name ?? run.speaker_label ?? '—'}
 						</span>
 						<span class="time">{fmt(run.start)}</span>
-						{#if run.parts.length > 1}
-							<span class="merged-badge" title="{run.parts.length} consecutive utterances merged">×{run.parts.length}</span>
-						{/if}
 					</div>
 					<div class="text">{run.text}</div>
 				</li>
 			{/each}
 		</ol>
+		{#if hasMore && onLoadMore && !loadMoreAtTop}
+			<button type="button" class="load-more-btn bottom" onclick={onLoadMore} title={t('loadMoreContext')}>
+				↓ {t('loadMoreContext')}
+			</button>
+		{/if}
 	{/if}
 </aside>
 
@@ -98,13 +108,23 @@
 	}
 	.speaker { font-weight: 600; color: var(--text-2, #475569); }
 	.time { font-variant-numeric: tabular-nums; }
-	.merged-badge {
-		font-size: 0.65rem;
-		padding: 0.05rem 0.3rem;
-		border-radius: 999px;
-		background: var(--surface-3, #f1f5f9);
-		color: var(--text-3, #94a3b8);
-		font-variant-numeric: tabular-nums;
-	}
 	.text { color: var(--text, #0f172a); white-space: pre-wrap; word-break: break-word; }
+
+	.load-more-btn {
+		display: block;
+		width: 100%;
+		padding: 0.18rem 0.4rem;
+		font-size: 0.68rem;
+		color: var(--text-3, #94a3b8);
+		background: none;
+		border: 1px dashed var(--border, #e2e8f0);
+		border-radius: 4px;
+		cursor: pointer;
+		text-align: center;
+		font-family: inherit;
+		transition: color 0.15s, border-color 0.15s;
+	}
+	.load-more-btn:hover { color: var(--text-2, #475569); border-color: var(--text-3, #94a3b8); }
+	.load-more-btn.top { margin-bottom: 0.35rem; }
+	.load-more-btn.bottom { margin-top: 0.35rem; }
 </style>

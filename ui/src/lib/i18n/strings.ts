@@ -107,6 +107,8 @@ export const strings = {
 	startReview: { en: 'Start review', el: 'Έναρξη αξιολόγησης' },
 	shareSeed: { en: 'share', el: 'κοινοποίηση' },
 	shareSeedTitle: { en: 'Copy a link with this seed to the clipboard', el: 'Αντιγραφή συνδέσμου με αυτό το seed στο πρόχειρο' },
+	shareCopied: { en: '✓ Copied!', el: '✓ Αντιγράφηκε!' },
+	loadMoreContext: { en: 'Load 5 more', el: '+5 utterances' },
 
 	// Highlight / sibling edits
 	highlightingEdit: { en: 'Highlighted edit:', el: 'Τονισμένο edit:' },

@@ -1,19 +1,16 @@
 <script lang="ts">
 	import DiffMatchPatch from 'diff-match-patch';
+	import { TAXONOMY_MAP, normalizeTaxonomyId, type TaxonomyEntry } from '$lib/shared/taxonomy';
+	import type { Lang } from '$lib/shared/taxonomy';
 
 	interface Props {
 		before?: string;
 		after?: string;
-		/**
-		 * Optional resolved speaker name (or SPEAKER_N label fallback) for the
-		 * utterance these diff blocks belong to. When provided, renders a
-		 * compact header above both blocks so the reviewer sees who was
-		 * speaking next to the correction instead of having to read the top
-		 * meta bar.
-		 */
 		speakerName?: string | null;
+		errorCategoryIds?: readonly string[];
+		lang?: Lang;
 	}
-	const { before = '', after = '', speakerName = null }: Props = $props();
+	const { before = '', after = '', speakerName = null, errorCategoryIds = [], lang = 'el' }: Props = $props();
 
 	const dmp = new DiffMatchPatch();
 
@@ -23,11 +20,38 @@
 		dmp.diff_cleanupSemantic(d);
 		return d;
 	});
+
+	const resolvedCategories = $derived(
+		errorCategoryIds
+			.map((id) => normalizeTaxonomyId(id))
+			.filter((id): id is NonNullable<typeof id> => id !== null)
+			.map((id) => TAXONOMY_MAP[id])
+			.filter((e): e is TaxonomyEntry => !!e)
+	);
 </script>
 
 <div class="diff" class:has-speaker={!!speakerName}>
 	{#if speakerName}
-		<div class="diff-speaker" aria-label="Speaker">🎙 {speakerName}</div>
+		<div class="diff-header">
+			<div class="diff-speaker" aria-label="Speaker">🎙 {speakerName}</div>
+			{#if resolvedCategories.length > 0}
+				<div class="diff-categories">
+					{#each resolvedCategories as entry (entry.id)}
+						<button type="button" class="cat-chip group-{entry.group}">
+							<span class="cat-label">{entry[lang]}</span>
+							<span class="cat-popover" role="tooltip">
+								<strong>{entry[lang]}</strong>
+								<span class="cat-example">
+									<mark class="del">{entry.example_before}</mark>
+									<span class="arrow">→</span>
+									<mark class="ins">{entry.example_after}</mark>
+								</span>
+							</span>
+						</button>
+					{/each}
+				</div>
+			{/if}
+		</div>
 	{/if}
 	<div class="diff-block before">
 		{#each diffs as [op, text]}
@@ -58,11 +82,18 @@
 		line-height: 1.6;
 	}
 	.diff.has-speaker {
-		grid-template-areas: 'speaker speaker' 'before after';
+		grid-template-areas: 'header header' 'before after';
 	}
-	.diff.has-speaker .diff-speaker { grid-area: speaker; }
+	.diff.has-speaker .diff-header { grid-area: header; }
 	.diff.has-speaker .diff-block.before { grid-area: before; }
 	.diff.has-speaker .diff-block.after { grid-area: after; }
+
+	.diff-header {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		flex-wrap: wrap;
+	}
 
 	.diff-speaker {
 		font-size: 0.78rem;
@@ -72,11 +103,84 @@
 		background: #ede9fe;
 		border-radius: 6px;
 		display: inline-flex;
-		align-self: start;
-		justify-self: start;
-		max-width: 100%;
+		flex-shrink: 0;
 	}
 
+	.diff-categories {
+		display: flex;
+		gap: 0.3rem;
+		flex-wrap: wrap;
+		margin-left: auto;
+	}
+
+	/* Category chip */
+	.cat-chip {
+		position: relative;
+		display: inline-flex;
+		align-items: center;
+		font-size: 0.7rem;
+		font-weight: 500;
+		padding: 0.18rem 0.48rem;
+		border-radius: 999px;
+		cursor: default;
+		outline-offset: 2px;
+		max-width: 11rem;
+	}
+	.cat-chip:focus-visible { outline: 2px solid #3b82f6; }
+
+	.cat-label {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	/* Group tints */
+	.cat-chip.group-phonetic        { background: #dbeafe; color: #1e40af; }
+	.cat-chip.group-morphological   { background: #ede9fe; color: #4c1d95; }
+	.cat-chip.group-named_entity    { background: #fef3c7; color: #78350f; }
+	.cat-chip.group-formatting      { background: #f1f5f9; color: #334155; }
+	.cat-chip.group-meta            { background: #fee2e2; color: #7f1d1d; }
+
+	/* Popover */
+	.cat-popover {
+		position: absolute;
+		top: calc(100% + 4px);
+		right: 0;
+		z-index: 30;
+		min-width: 13rem;
+		max-width: 18rem;
+		background: #fff;
+		border: 1px solid var(--border, #e2e8f0);
+		border-radius: 8px;
+		box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+		padding: 0.5rem 0.65rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.35rem;
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 120ms ease;
+		font-size: 0.78rem;
+		color: var(--text, #0f172a);
+		white-space: normal;
+	}
+	.cat-chip:hover .cat-popover,
+	.cat-chip:focus-within .cat-popover {
+		opacity: 1;
+		pointer-events: auto;
+	}
+
+	.cat-popover strong { font-weight: 600; display: block; }
+
+	.cat-example {
+		display: flex;
+		align-items: baseline;
+		gap: 0.3rem;
+		flex-wrap: wrap;
+	}
+	.cat-example .arrow { color: var(--text-3, #94a3b8); font-size: 0.72rem; }
+
+	/* Diff blocks */
 	.diff-block {
 		padding: 0.75rem 1rem;
 		border-radius: 6px;
