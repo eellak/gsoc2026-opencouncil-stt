@@ -4,22 +4,21 @@
 
 ```mermaid
 timeline
-    title OpenCouncil ASR Fine-Tuning Timeline
+    title OpenCouncil ASR Dataset Exploration Timeline
     Phase 0 : Vault organization
             : Current state, decisions, roadmap, logs
-    Phase 1 : Join data, review errors, settle taxonomy
+    Phase 1 : Data joining and local state
             : CSV + meeting JSON matching
+            : Review DB state and audit history
+    Phase 2 : Exploration UI prototype
             : Diff, audio, context, labels, include/exclude
-    Phase 2 : M1 Curated ASR dataset + base model
-            : Dataset v1, splits, metrics, baseline benchmarks
-            : Pick the model to fine-tune
-    Phase 3 : Hypertuning and model selection
-            : LoRA runs, parameter sweeps, evaluation table
-    Phase 4 : Optimization and deployment
-            : Faster inference package, deployed transcriber service
-    Phase 5 : OpenCouncil tasks integration
-            : WhisperTranscriber-compatible integration
-            : End-to-end transcription test
+    Phase 3 : LLM pre-classification
+            : Initial category and usefulness labels
+            : Human review and overrides
+    Phase 4 : Dataset selection
+            : Included rows, balance checks, export candidates
+    Phase 5 : Evaluation and training
+            : WER, Domain WER, Human Intervention Rate
 ```
 
 Keep this timeline synchronized with the phase sections below.
@@ -63,33 +62,30 @@ Acceptance criteria:
 - [x] Major project flow diagrams are linked from the relevant docs.
 - [x] Meetings, specs, references, logs, and archive each have distinct responsibilities.
 
-## Phase 1 - Join Data, Review Errors, Settle Taxonomy
+## Phase 1 - Data Joining and Local State
 
 Status: `[~]` in progress
 
-Goal: connect the CSV corrections to meeting JSON and make the errors easy to inspect.
+Goal: combine CSV corrections with OpenCouncil meeting JSON.
 
 Tasks:
 
 - [ ] Define correction-to-utterance matching rules.
-- [ ] Identify meeting JSON URLs for a representative subset of CSV rows.
+- [ ] Identify meeting JSON URLs for a representative subset of v2 CSV rows.
 - [x] Restore or replace full CSV ingest.
 - [ ] Cache meeting JSON files locally.
 - [ ] Build a matched records table with confidence flags.
-- [x] Decide final local label storage: SQLite plus JSONL history.
-- [x] Ingest raw CSV corrections into local SQLite with content categorisation.
+- [x] Decide review-label storage.
+- [x] Ingest raw CSV corrections with content categorisation.
+- [x] Ingest v2 CSV corrections into Supabase Postgres with normalised meetings.
+- [x] Reduce live DB to latest edit per utterance while preserving the CSV as source of truth.
 - [x] Generate basic stats from local correction/review-label records.
 - [ ] Generate matched/ambiguous/unmatched stats from meeting JSON matches.
-- [x] Review UI shows `before_text` / `after_text` diff, audio controls, labels, status buttons, notes, and JSONL export.
-- [ ] Add matched context utterances, meeting/city IDs, speaker/person metadata, and confidence filters to the UI.
-- [ ] Validate the first error taxonomy against manually reviewed rows.
-- [ ] Use the exploration UI to mark include/exclude/uncertain decisions on a representative sample.
 
 Output:
 
-- A local review dataset the UI can load quickly.
+- A local dataset the UI can read quickly.
 - A report showing matched, ambiguous, and unmatched correction rows.
-- A taxonomy that separates ASR fine-tuning, LLM post-correction, rule-based cleanup, and review/exclusion rows.
 
 Acceptance criteria:
 
@@ -97,104 +93,93 @@ Acceptance criteria:
 - [ ] Ambiguous and unmatched rows are preserved for review, not silently dropped.
 - [x] Local labels can be updated without rewriting the large source CSV.
 - [x] A history trail exists for review-label changes.
+
+Experimental side-track (branch `codex/file-backed-review-ui`, 2026-05-20): the runtime DB dependency is removed in favour of a generated `ui/.cache/groups.v1.json` (built by `bun ui/scripts/build-cache.ts`) and sidecar `ui/.state/review-{events.jsonl,labels.snapshot.json}`. Review unit becomes the **utterance group**. Local-only — incompatible with serverless deploy. See [decisions/storage.md](decisions/storage.md#2026-05-20---file-backed-prototype-on-codexfile-backed-review-ui-experimental-local-only) and [specs/local-data-model.md](specs/local-data-model.md#file-backed-prototype-codexfile-backed-review-ui-2026-05-20).
+
+## Phase 2 - Exploration UI Prototype
+
+Status: `[~]` in progress
+
+Goal: inspect and label corrections quickly.
+
+Primary screen:
+
+- [x] Red/green diff for `before_text` and `after_text`.
+- [x] Audio playback around the utterance span.
+- [x] Editable start/end timestamps.
+- [x] Previous/next corrected utterance navigation.
+- [ ] Context utterances.
+- [x] Error-category select.
+- [x] Include/exclude/uncertain controls.
+- [x] Reviewer notes.
+
+Stats screen:
+
+- [x] Counts by error category.
+- [x] Counts by include/exclude/uncertain.
+- [~] Distributions by city, meeting, duration, and editor type.
+- [ ] Separate stats for all corrections and included corrections.
+- [x] Export included rows as JSONL.
+
+Acceptance criteria:
+
 - [x] A reviewer can classify a correction without opening raw CSV/JSON.
 - [x] A reviewer can listen to the relevant audio span from the same screen.
-- [ ] Reviewed labels are sufficient to choose which rows are candidates for ASR fine-tuning experiments.
+- [x] Include/exclude changes persist and are visible in stats.
+- [~] The UI can filter to unreviewed, ambiguous, included, and excluded rows.
 
-## Phase 2 - M1: Curated ASR Dataset and Base Model
+## Phase 3 - LLM Pre-Classification
 
-Status: `[ ]` not started
-
-Goal: reach midterm with the data and metrics ready, plus a base model chosen for the tuning runs.
-
-Tasks:
-
-- [ ] Export curated v1 ASR fine-tuning candidates with audio spans and corrected text.
-- [ ] Define train/validation/test split policy, including municipality/date leakage checks.
-- [ ] Implement Greek-aware WER and CER evaluation scripts.
-- [ ] Implement Domain WER focused on municipal terms, names, acronyms, and other domain-critical words.
-- [ ] Define the base-model benchmark sample.
-- [ ] Benchmark candidate base models on the same sample.
-- [ ] Select the base model for hypertuning.
-- [ ] Write a short M1 report covering dataset quality, taxonomy, metrics, benchmark results, and the base-model choice.
-
-Candidate base models:
-
-- [ ] Whisper large-v3.
-- [ ] Whisper large-v3-turbo.
-- [ ] Whisper large-v2, if it remains a plausible baseline.
-- [ ] Greek/community fine-tuned Whisper model, if available and runnable.
-- [ ] Any mentor-approved alternative that fits the same evaluation harness.
-
-Acceptance criteria:
-
-- [ ] M1 deliverable is a curated v1 dataset good enough for fine-tuning experiments, not a dataset frozen forever.
-- [ ] Every exported candidate can be traced back to source CSV rows and matched utterances.
-- [ ] Metrics run reproducibly on the benchmark sample.
-- [ ] Base-model choice is backed by measured quality, domain-term behavior, runtime, and integration constraints.
-
-## Phase 3 - Hypertuning and Model Selection
-
-Status: `[ ]` not started
-
-Goal: run the tuning experiments and pick the checkpoint worth deploying.
+Goal: reduce manual review load.
 
 Tasks:
 
-- [ ] Run initial LoRA fine-tuning on the selected base model.
-- [ ] Sweep a small set of parameters: rank, alpha, learning rate, dataset subset, and segment length/concatenation strategy.
-- [ ] Evaluate each run on the fixed validation/test split.
-- [ ] Compare WER, CER, Domain WER, hallucination/truncation behavior, runtime, and resource cost.
-- [ ] Select the best fine-tuned checkpoint for deployment work.
-- [ ] Document failed runs and dataset issues found during training.
+- [ ] Define LLM classification prompt/schema.
+- [ ] Run LLM classification over correction pairs.
+- [ ] Assign initial error category and usefulness label.
+- [ ] Store model label, confidence, and rationale separately from human label.
+- [ ] Use the UI to review and override labels.
 
 Acceptance criteria:
 
-- [ ] Training runs are reproducible from committed scripts/configs.
-- [ ] The selected checkpoint has a documented evaluation table against the base model and current baseline.
-- [ ] Any dataset changes after M1 are recorded and justified.
+- [ ] LLM labels never overwrite human labels.
+- [ ] Low-confidence or unclear rows are easy to filter.
+- [ ] Human overrides are recorded in the history log.
 
-## Phase 4 - Optimization and Deployment
+## Phase 4 - Dataset Selection
 
-Status: `[ ]` not started
-
-Goal: get the selected fine-tuned model running somewhere OpenCouncil can use it.
+Goal: create a candidate dataset for evaluation and training.
 
 Tasks:
 
-- [ ] Prepare the selected checkpoint or LoRA adapter for inference.
-- [ ] Convert or package the model with faster-whisper/CTranslate2 if feasible.
-- [ ] Benchmark inference speed and memory use.
-- [ ] Define the deployment target with mentors.
-- [ ] Deploy a transcriber service or model artifact that can be called from the pipeline.
-- [ ] Document deployment commands, model artifacts, and rollback/fallback path.
+- [ ] Filter included corrections by category and confidence.
+- [ ] Check category distribution.
+- [ ] Check city/meeting distribution.
+- [ ] Balance across cities/meetings if needed.
+- [ ] Export candidate rows with audio spans and corrected text.
+- [ ] Keep excluded and uncertain rows available for analysis.
 
 Acceptance criteria:
 
-- [ ] The deployed transcriber can process held-out audio.
-- [ ] Runtime and resource requirements are documented.
-- [ ] Deployment does not depend on hidden local state.
+- [ ] Exported candidates can be traced back to source CSV rows and matched utterances.
+- [ ] Dataset composition is visible before training.
+- [ ] Exclusions have reasons or categories.
 
-## Phase 5 - OpenCouncil Tasks Integration
+## Phase 5 - Evaluation and Training
 
-Status: `[ ]` not started
+Goal: only after exploration, define benchmark and training experiments.
 
-Goal: wire the deployed fine-tuned transcriber into the OpenCouncil task pipeline.
+Possible metrics:
 
-Tasks:
+- [ ] WER
+- [ ] Domain WER
+- [ ] Human Intervention Rate
+- [ ] CER if it adds signal
 
-- [ ] Implement an OpenCouncil-compatible transcriber adapter, likely `WhisperTranscriber`.
-- [ ] Preserve the existing task pipeline transcript output shape.
-- [ ] Add configuration for choosing the deployed fine-tuned transcriber versus the current provider.
-- [ ] Run an end-to-end transcription test on at least one held-out council meeting.
-- [ ] Write final documentation covering dataset, training, evaluation, deployment, and integration.
-
-Final target:
-
-- [ ] **Final: Deployed Fine-Tuned ASR Transcriber for OpenCouncil**.
+Training is intentionally deferred until the dataset quality is understood.
 
 Acceptance criteria:
 
-- [ ] OpenCouncil tasks can call the fine-tuned transcriber for transcription.
-- [ ] End-to-end output can be compared with the existing transcription baseline.
-- [ ] Final report states remaining quality, infra, and production-hardening risks.
+- [ ] Evaluation set is separated from training candidates.
+- [ ] Metrics are computed on clearly defined references.
+- [ ] Training starts only after dataset selection and evaluation definitions are reviewed.

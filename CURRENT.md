@@ -1,6 +1,16 @@
 # Current State
 
-Last updated: 2026-05-19
+Last updated: 2026-05-20
+
+> An experimental branch `codex/file-backed-review-ui` removes the runtime
+> DB dependency and switches the review unit to the utterance group. It does
+> not replace the DB-backed flow on `main`; see
+> [decisions/storage.md](docs/decisions/storage.md#2026-05-20---file-backed-prototype-on-codexfile-backed-review-ui-experimental-local-only).
+>
+> 2026-05-20 update on the same branch: multi-category labels, seed UX,
+> direct-CDN audio with ±5 player pool, `/edit/[edit_id]` deep link, and
+> clickable stats categories landed.
+> See [decisions/ui.md](docs/decisions/ui.md#2026-05-20---multi-category-labels-seed-ux-direct-cdn-audio-branch-codexfile-backed-review-ui).
 
 This is the human and LLM entry point. Read this first, then follow links only as needed.
 
@@ -15,20 +25,18 @@ Combine the corrections CSV with OpenCouncil transcript data to build an explora
 - mark whether the correction should be included or excluded from a future training/evaluation dataset;
 - show aggregate stats over all corrections and over selected corrections.
 
-Broader GSoC target: have a fine-tuned ASR transcriber deployed somewhere OpenCouncil tasks can use it. The midpoint should be earlier in the pipeline: curated v1 dataset, evaluation scripts, and a base model picked for the fine-tuning runs.
-
 ## Current Flow
 
 ```mermaid
 flowchart LR
-    CSV["Corrections CSV<br/>utterance-edits-may12-26.csv"]
-    Ingest["CSV ingest<br/>ui/scripts/ingest-csv.ts<br/>dev seed: seed-dummy.ts"]
-    DB["Turso/libSQL DB<br/>local: file:./data/corrections.sqlite<br/>prod: Turso cloud"]
+    CSV["Corrections CSV<br/>data-1779206108158.csv"]
+    Ingest["CSV ingest<br/>ui/scripts/ingest-csv-v2.ts<br/>v1: ingest-csv.ts"]
+    DB["Postgres review DB<br/>Supabase project: opencouncil-edits-v2"]
     JSON["Large meeting JSON<br/>meeting + city + transcript + people"]
     Match["Match corrections<br/>to utterances"]
     State["Review state<br/>labels + include/exclude + timestamp edits"]
     UI["Svelte exploration UI<br/>Vercel-hosted — review + stats + export"]
-    Events["Events table<br/>in Turso (audit log)"]
+    Events["Events table<br/>review audit log"]
     Stats["Stats and candidate export"]
 
     CSV --> Ingest
@@ -46,11 +54,13 @@ Update this diagram when the main project flow changes.
 
 ## Current Input Data
 
-- Corrections export: [utterance-edits-may12-26.csv](utterance-edits-may12-26.csv)
-- Rows: 379194
-- Fields: `edit_id`, `edit_timestamp`, `edit_updated_at`, `before_text`, `after_text`, `edited_by`, `utterance_start`, `utterance_end`, `audio_url`, `youtube_url`, `meeting_name`, `meeting_date`
+- v2 corrections export (with stable IDs): [data-1779206108158.csv](data-1779206108158.csv) — 393 970 rows
+- Fields: v1 fields **plus** `utterance_id`, `meeting_id`, `city_id`
+- v1 corrections export (kept for reference): [utterance-edits-may12-26.csv](utterance-edits-may12-26.csv)
 
-Missing from the CSV: stable `utterance_id`, `meeting_id`, `city_id`, `speakerSegmentId`, speaker/person metadata.
+Still missing from the CSV: `speakerSegmentId`, speaker/person metadata.
+
+In the live DB (Supabase Postgres, project `opencouncil-edits-v2`): **287 605 corrections** — one row per `utterance_id`, latest edit only. The 106 365 superseded chain edits live only in the CSV, see [data/reports/latest-per-utterance.md](data/reports/latest-per-utterance.md).
 
 ## OpenCouncil Data Access
 
@@ -83,10 +93,10 @@ Local exploration prototype, not production annotation software.
 Implemented baseline under `ui/`:
 
 - SvelteKit review app with diff, waveform/audio region controls, labels, notes, status buttons, keyboard navigation, stats, and JSONL export of included rows.
-- Full CSV ingest script with content categorisation: `ui/scripts/ingest-csv.ts`.
+- Full CSV ingest scripts with content categorisation: `ui/scripts/ingest-csv-v2.ts` for the stable-ID export, `ui/scripts/ingest-csv.ts` for the v1 export.
 - Dummy fixture seed script: `ui/scripts/seed-dummy.ts`.
-- Local SQLite state: `ui/data/corrections.sqlite`.
-- Label-change history path: `ui/data/events.jsonl` once review edits are made.
+- Supabase Postgres review state, with schema in `ui/drizzle/schema.ts`.
+- Review audit history in the Postgres `events` table.
 
 Still missing from the baseline:
 
@@ -116,7 +126,7 @@ Secondary screen:
 
 Extend the implemented local prototype with meeting JSON matching:
 
-- [x] Raw corrections can be ingested into local SQLite with content categories.
+- [x] Raw corrections can be ingested with content categories.
 - [ ] Cached meeting JSON per meeting.
 - [ ] Matched correction-to-utterance records.
 - [x] Local labels: error category, include/exclude, timestamp adjustments, reviewer notes.
@@ -124,9 +134,9 @@ Extend the implemented local prototype with meeting JSON matching:
 
 Immediate todos:
 
-- [ ] Get or define example meeting JSON URLs for rows in `utterance-edits-may12-26.csv`.
+- [ ] Get or define example meeting JSON URLs for rows in `data-1779206108158.csv`.
 - [ ] Define matching confidence levels: exact, time-near, text-near, ambiguous, unmatched.
-- [x] Decide local storage shape: SQLite tables plus JSONL event log.
+- [x] Decide review storage shape: Supabase Postgres for current state and audit events.
 - [ ] Draft the first implementation plan for cached meeting JSON and correction matching.
 
 See:

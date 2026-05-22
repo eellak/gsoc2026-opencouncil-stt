@@ -32,10 +32,37 @@ CSV is structurally clean (RFC-4180 quoted, parseable by `csv-parse`). Issues ar
 
 Scripts: `ui/scripts/analyze-csv.ts` (read-only report) and `ui/scripts/ingest-csv.ts` (full ingest with categorisation). Library of pure transforms in `ui/scripts/lib/csv-clean.ts` with unit tests.
 
-### 2026-05-19 - GSoC milestone split
+### 2026-05-19 - Stable IDs export arrived
 
-Midterm milestone is **M1: Curated ASR Dataset and Base Model**, not completion of model training.
+A second export landed at the repo root (`data-1779206108158.csv`, ~246 MB, 397 556 rows) carrying the IDs that were pending in [2026-05-12 - Waiting on a new corrections export with stable IDs](#2026-05-12---waiting-on-a-new-corrections-export-with-stable-ids):
 
-Reason: fine-tuning should start only after correction matching, taxonomy, include/exclude rules, evaluation metrics, and base-model benchmarks are stable enough to make the tuning work meaningful.
+- `utterance_id` (the stable utterance identifier)
+- `meeting_id` (FK into the new normalised `meetings` table)
+- `city_id`
 
-Final target remains **Deployed Fine-Tuned ASR Transcriber for OpenCouncil**. By the end, there should be a selected fine-tuned checkpoint, reproducible evaluation, a deployment target, and a path into the OpenCouncil task pipeline.
+`ui/scripts/ingest-csv-v2.ts` reads this CSV and upserts directly into the Postgres schema. The first ingest landed 393 970 rows after CSV-level filtering.
+
+### 2026-05-19 - Normalise meetings out of corrections
+
+`meeting_name`, `meeting_date`, `city_id`, `audio_url`, `youtube_url`, and `audio_cdn_url` are no longer stored per-correction. They live on a new `meetings` table (PK `meeting_id`, 242 rows) and `corrections` joins via `meeting_id`.
+
+Reason: the unnormalised layout duplicated those columns across hundreds of thousands of rows for only 242 distinct meetings — roughly 110 MB of redundant text plus the index overhead. With normalisation the corrections table dropped from 463 MB to ~106 MB and stays well under the Supabase free-tier ceiling.
+
+Implementation note: `corrections.audio_cdn_url` was moved to `meetings.audio_cdn_url`; `scripts/apply-audio-cdn-map.ts` still writes the same key, just on a different table.
+
+### 2026-05-19 - Keep only the latest edit per utterance
+
+`corrections` stores **one row per `utterance_id`** — the most recent edit, ordered by `COALESCE(edit_updated_at, edit_timestamp) DESC, edit_id DESC`. The 106 365 superseded chain edits are not kept in the live DB.
+
+Reason: for the training/evaluation dataset the only useful signal is the final corrected text. Intermediate edits in a chain are noise: they capture transient states (e.g. mid-typo, accidental space, partial paste) that the reviewer themselves discarded in the next edit. Loading the chain into the review UI also wastes reviewer time on rows that are already known to be superseded.
+
+Numbers from the CSV (see [data/reports/latest-per-utterance.md](../../data/reports/latest-per-utterance.md) for distribution and worked examples):
+
+- 287 605 unique utterances total
+- 70.2 % had a single edit (no chain)
+- 27 % had a 2- or 3-edit chain
+- ~0.4 % had 5+ edits; the longest chain is 27 edits on one utterance
+
+Implication: if at some point we want the full chain for audit or to study reviewer behaviour, we re-ingest `data-1779206108158.csv` into a separate `corrections_history` table — the CSV is the source of truth. The decision is reversible without data loss.
+
+Implementation: `latest_per_utterance` flag computed via window function in `ui/scripts/ingest-csv-v2.ts` follow-up, non-latest rows deleted in batches, table compacted via `VACUUM FULL` to bring DB size from 568 MB to 215 MB.
