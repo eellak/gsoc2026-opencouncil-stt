@@ -26,6 +26,7 @@ import type {
 	GroupPatchBody,
 	QueueResponse
 } from '$lib/domain/groups';
+import type { IncludeStatus } from '$lib/domain/types';
 import { SidecarStore } from '../state/sidecar';
 
 // Defaults are resolved from `process.cwd()` so the bundled adapter-node
@@ -216,6 +217,26 @@ export class SqliteRepo {
 	utteranceIdForEdit(edit_id: string): string | null {
 		const row = this.editToUtteranceStmt.get(edit_id) as { utterance_id: string } | undefined;
 		return row?.utterance_id ?? null;
+	}
+
+	get labelsRevision(): number {
+		return this.sidecar.revision;
+	}
+
+	idsByStatus(status: IncludeStatus): string[] {
+		const out: string[] = [];
+		if (status === 'unreviewed') {
+			const labels = this.sidecar.all();
+			for (const id of this.orderedIds) {
+				const lbl = labels.get(id);
+				if (!lbl || lbl.include_status === 'unreviewed') out.push(id);
+			}
+			return out;
+		}
+		for (const [id, lbl] of this.sidecar.all()) {
+			if (lbl.include_status === status) out.push(id);
+		}
+		return out;
 	}
 
 	groupsByErrorCategory(category: string): Group[] {

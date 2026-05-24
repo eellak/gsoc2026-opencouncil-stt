@@ -20,6 +20,7 @@ import type { TaxonomyId } from './taxonomy';
 // sigma normalization). Used for acronym detection.
 const GREEK_LOWER = 'αβγδεζηθικλμνξοπρστυφχψω';
 const GREEK_UPPER = 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ';
+const GREEK_LETTER_RE = new RegExp(`^[${GREEK_LOWER}${GREEK_UPPER}]$`);
 
 // Combining tonos / oxia (U+0301). Stripped for accent_tonos comparisons.
 // We deliberately do NOT strip combining dialytika (U+0308) so that
@@ -216,8 +217,6 @@ function detectAcronym(spaced: string, concat: string): boolean {
 	}
 	return false;
 }
-
-const GREEK_LETTER_RE = new RegExp(`^[${GREEK_LOWER}${GREEK_UPPER}]$`);
 
 function ruleDisfluencyCleanup(a: string, b: string): boolean {
 	const ta = tokens(a);

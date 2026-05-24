@@ -3,6 +3,7 @@
 	import { getLang, t } from '$lib/i18n.svelte';
 	import { taxonomyLabel } from '$lib/shared/taxonomy';
 	import { errorCategoryHref } from '$lib/shared/urls';
+	import StatusDistribution from '$lib/components/StatusDistribution.svelte';
 	const { data }: { data: PageData } = $props();
 	const stats = $derived(data.stats);
 	const lang = $derived(getLang());
@@ -29,18 +30,9 @@
 			<p class="big-number">{stats.total.toLocaleString('el-GR')}</p>
 		</section>
 
-		<section class="card">
+		<section class="card wide">
 			<h2>Ανά κατάσταση</h2>
-			<table>
-				<tbody>
-					{#each Object.entries(stats.by_status) as [status, count]}
-						<tr>
-							<td class="status-cell {status}">{t(status as 'include' | 'exclude' | 'uncertain' | 'unreviewed')}</td>
-							<td class="count">{count.toLocaleString('el-GR')}</td>
-						</tr>
-					{/each}
-				</tbody>
-			</table>
+			<StatusDistribution counts={stats.by_status} variant="full" />
 		</section>
 
 		<section class="card">
@@ -98,7 +90,7 @@
 				<tbody>
 					{#each stats.by_meeting as row}
 						<tr>
-							<td>{row.meeting_name ?? '(άγνωστη)'}</td>
+							<td class="ellipsis" title={row.meeting_name ?? ''}>{row.meeting_name ?? '(άγνωστη)'}</td>
 							<td class="count">{row.count.toLocaleString('el-GR')}</td>
 						</tr>
 					{/each}
@@ -150,6 +142,7 @@
 	.cat-none { color: #94a3b8; font-style: italic; }
 	.rejected-badge { margin-left: 0.4rem; font-size: 0.7rem; padding: 0.1rem 0.4rem; background: #fee2e2; color: #b91c1c; border-radius: 999px; vertical-align: middle; }
 	.reason-cell { font-size: 0.78rem; color: #6b7280; max-width: 400px; white-space: normal; line-height: 1.4; }
+	.ellipsis { max-width: 18rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 	.card { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1rem; }
 	h2 { margin: 0 0 0.75rem; font-size: 1rem; color: #374151; }
 	.big-number { font-size: 2.5rem; font-weight: 700; margin: 0; color: #1e40af; }
@@ -157,8 +150,22 @@
 	tr:not(:last-child) td { border-bottom: 1px solid #f3f4f6; }
 	td { padding: 0.3rem 0; }
 	td.count { text-align: right; color: #374151; font-variant-numeric: tabular-nums; }
-	.status-cell.include { color: #15803d; }
-	.status-cell.exclude { color: #b91c1c; }
-	.status-cell.uncertain { color: #b45309; }
-	.status-cell.unreviewed { color: #6b7280; }
+	@media (max-width: 640px) {
+		.stats-page { padding: 1rem 0.75rem; }
+		.grid { grid-template-columns: 1fr; gap: 0.75rem; }
+		.card { padding: 0.85rem; }
+		h1 { font-size: 1.25rem; }
+		.big-number { font-size: 2rem; }
+		.ellipsis { max-width: 100%; }
+		.reason-cell {
+			max-width: 100%;
+			display: -webkit-box;
+			-webkit-line-clamp: 2;
+			line-clamp: 2;
+			-webkit-box-orient: vertical;
+			overflow: hidden;
+		}
+		.cat-row td { padding: 0.45rem 0; }
+		table { font-size: 0.82rem; }
+	}
 </style>

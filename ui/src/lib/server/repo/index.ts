@@ -19,10 +19,13 @@ import type {
 	GroupPatchBody,
 	QueueResponse
 } from '$lib/domain/groups';
+import type { IncludeStatus } from '$lib/domain/types';
 
 export interface ReviewRepo {
 	readonly hash: string;
 	readonly total: number;
+	/** Monotonic label revision (sidecar event id). Use as cache key. */
+	readonly labelsRevision: number;
 	getGroup(utterance_id: string): Group | null;
 	queue(seed: number, from: number, n: number): QueueResponse;
 	patchLabel(utterance_id: string, patch: GroupPatchBody): Promise<GroupLabel | null>;
@@ -31,6 +34,7 @@ export interface ReviewRepo {
 	iterGroups(): IterableIterator<Group>;
 	utteranceIdForEdit(edit_id: string): string | null;
 	groupsByErrorCategory(category: string): Group[];
+	idsByStatus(status: IncludeStatus): string[];
 	flush(): Promise<void>;
 }
 
