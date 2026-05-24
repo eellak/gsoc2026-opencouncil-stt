@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { parseSeedParam, randomSeed, UINT32_MAX } from '$lib/shared/urls';
 	import { t } from '$lib/i18n.svelte';
+	import StatusDistribution from '$lib/components/StatusDistribution.svelte';
 	import type { PageData } from './$types';
 
 	const { data }: { data: PageData } = $props();
@@ -35,6 +36,13 @@
 	<h1>{t('landingTitle')}</h1>
 	<p class="lead">{t('landingLead')}</p>
 
+	{#if data.distribution}
+		<section class="distribution">
+			<h2>{t('distributionTitle')}</h2>
+			<StatusDistribution counts={data.distribution} seed={data.suggestedSeed} variant="compact" />
+		</section>
+	{/if}
+
 	<form
 		class="seed-form"
 		onsubmit={(e) => {
@@ -67,9 +75,11 @@
 </div>
 
 <style>
-	.landing { max-width: 520px; margin: 4rem auto; padding: 1.5rem; }
+	.landing { max-width: 620px; margin: 3rem auto; padding: 1.5rem; }
 	h1 { font-size: 1.6rem; margin: 0 0 0.4rem; }
+	h2 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-3, #94a3b8); margin: 0 0 0.55rem; font-weight: 600; }
 	.lead { color: var(--text-2, #475569); margin: 0 0 1.4rem; }
+	.distribution { margin: 0 0 1.8rem; }
 	.seed-form { display: flex; flex-direction: column; gap: 1rem; }
 	label { display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.85rem; color: var(--text-2, #475569); }
 	.row { display: flex; gap: 0.5rem; }

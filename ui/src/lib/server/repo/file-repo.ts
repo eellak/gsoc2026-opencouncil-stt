@@ -12,6 +12,7 @@
 import { promises as fs } from 'node:fs';
 import { resolve } from 'node:path';
 import type { Group, GroupLabel, GroupPatchBody, CacheMeta, QueueResponse } from '$lib/domain/groups';
+import type { IncludeStatus } from '$lib/domain/types';
 import { SidecarStore } from '../state/sidecar';
 
 // Same convention as SqliteRepo: defaults resolve from `process.cwd()` so the
@@ -135,6 +136,27 @@ export class FileRepo {
 			this.editToUtteranceIndex = map;
 		}
 		return this.editToUtteranceIndex.get(edit_id) ?? null;
+	}
+
+	get labelsRevision(): number {
+		return this.sidecar.revision;
+	}
+
+	/** utterance_ids whose label.include_status matches `status`. */
+	idsByStatus(status: IncludeStatus): string[] {
+		const out: string[] = [];
+		if (status === 'unreviewed') {
+			const labels = this.sidecar.all();
+			for (const id of this.orderedIds) {
+				const lbl = labels.get(id);
+				if (!lbl || lbl.include_status === 'unreviewed') out.push(id);
+			}
+			return out;
+		}
+		for (const [id, lbl] of this.sidecar.all()) {
+			if (lbl.include_status === status) out.push(id);
+		}
+		return out;
 	}
 
 	/** Groups whose label.error_categories array contains `category`. */

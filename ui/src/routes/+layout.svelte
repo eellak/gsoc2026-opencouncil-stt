@@ -14,7 +14,6 @@
 		<a href="/" class="brand">OpenCouncil</a>
 		<a href="/" class="nav-link">{t('review')}</a>
 		<a href="/stats" class="nav-link">{t('stats')}</a>
-		<a href="/api/export" class="nav-link export" download="included-corrections.jsonl">{t('export')}</a>
 		<span class="spacer"></span>
 		<LangToggle />
 	</nav>
@@ -78,8 +77,6 @@
 	}
 
 	.nav-link:hover { color: var(--accent); background: var(--accent-light); }
-	.nav-link.export { color: #065f46; }
-	.nav-link.export:hover { background: #d1fae5; }
 
 	.spacer { flex: 1; }
 

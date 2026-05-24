@@ -11,6 +11,7 @@
 	import { TAXONOMY, normalizeTaxonomyId, type TaxonomyId } from '$lib/shared/taxonomy';
 	import { t, getLang } from '$lib/i18n.svelte';
 	import * as queue from '$lib/client/group-queue.svelte';
+	import type { IncludeStatus } from '$lib/domain/types';
 	import { resolveAudioUrls } from '$lib/client/audio-source';
 	import { audioPool } from '$lib/client/audio-pool.svelte';
 	import * as meetingCtx from '$lib/client/meeting-context.svelte';
@@ -24,9 +25,42 @@
 
 	const { data }: { data: PageData } = $props();
 
+	const STATUS_SET: ReadonlySet<IncludeStatus> = new Set([
+		'include',
+		'exclude',
+		'uncertain'
+	]);
+	const statusFilter = $derived.by((): IncludeStatus | null => {
+		const raw = page.url.searchParams.get('status');
+		return raw && STATUS_SET.has(raw as IncludeStatus) ? (raw as IncludeStatus) : null;
+	});
+
+	// In status-filter mode, populate the client queue from /api/review/ids
+	// once per (status, revision) so j/k walks only items matching the filter.
+	// Mutually exclusive with seed mode; seed param is ignored when status is set.
+	$effect(() => {
+		const sf = statusFilter;
+		if (!sf) return;
+		let cancelled = false;
+		(async () => {
+			try {
+				const resp = await queue.fetchStatusIds(sf);
+				if (cancelled) return;
+				queue.setStatusOrder(sf, resp.ids, resp.revision, resp.cache_hash);
+			} catch (e) {
+				console.warn('[review] fetchStatusIds failed', e);
+			}
+		})();
+		return () => {
+			cancelled = true;
+		};
+	});
+
 	const item = $derived<Group>(queue.get(data.item.utterance_id) ?? data.item);
 	const prev = $derived(queue.prevOf(data.item.utterance_id));
 	const next = $derived(queue.nextOf(data.item.utterance_id));
+	const prevId = $derived(queue.prevIdOf(data.item.utterance_id));
+	const nextId = $derived(queue.nextIdOf(data.item.utterance_id));
 
 	let showFullChain = $state(false);
 
@@ -67,9 +101,13 @@
 	// disable the keyboard shortcut so a Space press doesn't silently fail.
 	let audioReady = $state(false);
 	let audioReadyFlash = $state(false);
+	let isPlaying = $state(false);
 	function onAudioCanPlay() { audioReady = true; audioReadyFlash = true; }
 	function onAudioWaiting() { audioReady = false; audioReadyFlash = false; }
-	function onAudioLoadStart() { audioReady = false; audioReadyFlash = false; }
+	function onAudioLoadStart() { audioReady = false; audioReadyFlash = false; isPlaying = false; }
+	function onAudioPlay() { isPlaying = true; }
+	function onAudioPause() { isPlaying = false; }
+	function onAudioEnded() { isPlaying = false; }
 	// Native <audio> playback does NOT need CORS. Direct CDN is preferred so
 	// Vercel proxy bandwidth stays near zero. `audio-source.ts` keeps the proxied
 	// URL as a fallback for onerror. See decisions/audio.md.
@@ -226,8 +264,16 @@
 		patch({ adjusted_start: start, adjusted_end: end });
 	}
 
-	const prevHref = $derived(prev ? reviewHref({ utterance_id: prev.utterance_id, seed: data.seed }) : null);
-	const nextHref = $derived(next ? reviewHref({ utterance_id: next.utterance_id, seed: data.seed }) : null);
+	function navHref(targetId: string | undefined | null): string | null {
+		if (!targetId) return null;
+		if (statusFilter) {
+			// Preserve status in the URL so the next page stays in filter mode.
+			return `/review/${encodeURIComponent(targetId)}?status=${statusFilter}`;
+		}
+		return reviewHref({ utterance_id: targetId, seed: data.seed });
+	}
+	const prevHref = $derived(navHref(prev?.utterance_id ?? prevId ?? null));
+	const nextHref = $derived(navHref(next?.utterance_id ?? nextId ?? null));
 	const highlightEditId = $derived(page.url.searchParams.get('highlight'));
 
 	function goNext() { if (nextHref) goto(nextHref); }
@@ -246,18 +292,30 @@
 		shareCopiedTimer = setTimeout(() => (shareCopied = false), 1500);
 	}
 
+	// Greek QWERTY physical-key aliases. When the user has the Greek layout
+	// active and presses the same physical key as English `i`, `e.key` is `ι`,
+	// not `i`. Map both so shortcuts work in either layout.
+	function normalizeShortcut(k: string): string {
+		const m: Record<string, string> = {
+			ι: 'i', χ: 'x', θ: 'u', ψ: 'c', ξ: 'j', κ: 'k', ν: 'n', ' ': ' ',
+			Ι: 'i', Χ: 'x', Θ: 'u', Ψ: 'c', Ξ: 'j', Κ: 'k', Ν: 'n'
+		};
+		return m[k] ?? k;
+	}
+
 	function onKeydown(e: KeyboardEvent) {
 		if (['INPUT', 'TEXTAREA', 'SELECT'].includes((e.target as HTMLElement).tagName)) return;
 		if (paletteOpen) return;
 		if (e.ctrlKey || e.metaKey || e.altKey) return;
-		if ((e.key === 'ArrowLeft' || e.key === 'k') && prevHref) { e.preventDefault(); goPrev(); }
-		if ((e.key === 'ArrowRight' || e.key === 'j') && nextHref) { e.preventDefault(); goNext(); }
-		if (e.key === 'i') patch({ include_status: 'include' });
-		if (e.key === 'x') patch({ include_status: 'exclude' });
-		if (e.key === 'u') patch({ include_status: 'uncertain' });
-		if (e.key === ' ') { e.preventDefault(); togglePlay(); }
+		const k = normalizeShortcut(e.key);
+		if ((e.key === 'ArrowLeft' || k === 'k') && prevHref) { e.preventDefault(); goPrev(); }
+		if ((e.key === 'ArrowRight' || k === 'j') && nextHref) { e.preventDefault(); goNext(); }
+		if (k === 'i') patch({ include_status: 'include' });
+		if (k === 'x') patch({ include_status: 'exclude' });
+		if (k === 'u') patch({ include_status: 'uncertain' });
+		if (k === ' ') { e.preventDefault(); togglePlay(); }
 		if (e.key === '/') { e.preventDefault(); paletteOpen = true; return; }
-		if (e.key === 'c' && item.edits.length > 1) { e.preventDefault(); showFullChain = !showFullChain; }
+		if (k === 'c' && item.edits.length > 1) { e.preventDefault(); showFullChain = !showFullChain; }
 		const catId = DIGIT_SHORTCUTS.get(e.key);
 		if (catId) { e.preventDefault(); toggleCategory(catId); }
 	}
@@ -285,8 +343,11 @@
 				class="badge mode share-btn"
 				class:copied={shareCopied}
 				onclick={copyShareLink}
-				title={t('shareSeedTitle')}
-			>{shareCopied ? t('shareCopied') : `seed ${data.seed} · ${t('shareSeed')}`}</button>
+				title={`${t('shareSeedTitle')} (seed ${data.seed})`}
+			>{shareCopied ? t('shareCopied') : t('shareSeed')}</button>
+			{#if statusFilter}
+				<span class="badge filter {statusFilter}">{t('filteredQueueLabel', { status: t(statusFilter) })}</span>
+			{/if}
 			{#if item.meeting_name}
 				<span class="badge meeting">{item.meeting_name}</span>
 			{/if}
@@ -304,9 +365,8 @@
 			{/if}
 		</div>
 		<div class="nav-links">
-			{#if prevHref}<a href={prevHref} class="nav-btn" title="k / ←">{t('prev')}</a>{/if}
-			{#if nextHref}<a href={nextHref} class="nav-btn" title="j / →" onclick={(e) => { e.preventDefault(); goNext(); }}>{t('next')}</a>{/if}
-			<a href="/stats" class="nav-btn stats-link">{t('statsLink')}</a>
+			{#if prevHref}<a href={prevHref} class="nav-btn icon" title="k / ←" aria-label={t('prevAria')}>{t('prev')}</a>{/if}
+			{#if nextHref}<a href={nextHref} class="nav-btn icon" title="j / →" aria-label={t('nextAria')} onclick={(e) => { e.preventDefault(); goNext(); }}>{t('next')}</a>{/if}
 		</div>
 	</header>
 
@@ -340,12 +400,32 @@
 					{t('chainToggle', { n: item.edits.length })} <kbd>c</kbd>
 				</label>
 			{/if}
+			{#snippet playButton()}
+				<div
+					class="play-btn-wrap"
+					class:loading-audio={!audioReady}
+					class:ready-flash={audioReadyFlash}
+					class:playing={isPlaying}
+					onanimationend={(e) => { if (e.animationName === 'sweep-border') audioReadyFlash = false; }}
+				>
+					<button
+						type="button"
+						class="play-btn"
+						class:playing={isPlaying}
+						onclick={togglePlay}
+						title="Space"
+						aria-label={isPlaying ? 'Pause' : 'Play'}
+					>{isPlaying ? '⏸' : '▶'}</button>
+				</div>
+			{/snippet}
 			<Diff
 				before={beforeText}
 				after={afterText}
 				speakerName={currentSpeakerName}
+				speakerLoading={contextState === 'loading'}
 				errorCategoryIds={item.label.error_categories}
 				lang={getLang()}
+				playSlot={playButton}
 			/>
 		</section>
 
@@ -367,14 +447,6 @@
 				3-hour meeting MP3.
 			-->
 			<div class="audio-toolbar">
-				<div
-					class="play-btn-wrap"
-					class:loading-audio={!audioReady}
-					class:ready-flash={audioReadyFlash}
-					onanimationend={(e) => { if (e.animationName === 'sweep-border') audioReadyFlash = false; }}
-				>
-					<button type="button" class="play-btn" onclick={togglePlay} title="Space">▶/⏸</button>
-				</div>
 				<label>
 					<span>start</span>
 					<input
@@ -410,6 +482,9 @@
 					oncanplay={onAudioCanPlay}
 					onwaiting={onAudioWaiting}
 					onloadstart={onAudioLoadStart}
+					onplay={onAudioPlay}
+					onpause={onAudioPause}
+					onended={onAudioEnded}
 				></audio>
 				{#if !audioReady}
 					<div class="audio-skeleton" aria-hidden="true" role="presentation">
@@ -479,10 +554,15 @@
 	.review-page { max-width: 860px; margin: 0 auto; padding: 1rem 1rem 5rem; }
 	.top-bar {
 		position: sticky; top: 0; z-index: 10;
-		background: var(--surface-2, #f8fafc);
+		/* Fully opaque — covers content behind it cleanly on all viewports. */
+		background: #ffffff;
 		border-bottom: 1px solid var(--border, #e2e8f0);
+		box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06);
 		display: flex; justify-content: space-between; align-items: center;
-		padding: 0.5rem 0; margin-bottom: 1.2rem; gap: 0.5rem; flex-wrap: wrap;
+		padding: 0.6rem 1rem;
+		/* Stretch full-bleed within the page padding so nothing pokes out the sides. */
+		margin: -1rem -1rem 1.2rem;
+		gap: 0.5rem; flex-wrap: wrap;
 	}
 	.meta { display: flex; gap: 0.35rem; flex-wrap: wrap; }
 	.badge {
@@ -513,6 +593,17 @@
 		text-decoration: none; color: var(--text-2, #475569);
 	}
 	.nav-btn:hover { background: var(--surface-3, #f1f5f9); }
+	.nav-btn.icon {
+		min-width: 2.1rem;
+		text-align: center;
+		font-size: 1rem;
+		line-height: 1;
+		padding: 0.35rem 0.55rem;
+	}
+	.badge.filter { font-weight: 600; }
+	.badge.filter.include { background: #dcfce7; color: #14532d; }
+	.badge.filter.exclude { background: #fee2e2; color: #7f1d1d; }
+	.badge.filter.uncertain { background: #fef3c7; color: #78350f; }
 	.content { display: flex; flex-direction: column; gap: 1.2rem; }
 	.audio-toolbar {
 		display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
@@ -526,16 +617,32 @@
 		font-size: 0.85rem; background: var(--surface, #fff);
 	}
 	.play-btn-wrap { position: relative; display: inline-flex; }
-	.audio-toolbar .play-btn {
-		padding: 0.2rem 0.7rem;
+	.play-btn {
+		min-width: 2.4rem;
+		padding: 0.3rem 0.9rem;
 		border: 1px solid var(--border-accent, #93c5fd);
 		background: var(--surface, #fff);
-		border-radius: 999px; cursor: pointer; font-size: 0.85rem;
+		border-radius: 999px; cursor: pointer; font-size: 0.95rem;
+		line-height: 1.2;
+		transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.05s;
 	}
-	.audio-toolbar .play-btn:hover { background: var(--accent-light, #dbeafe); }
+	.play-btn:hover { background: var(--accent-light, #dbeafe); }
+	.play-btn:active { transform: scale(0.96); }
+	.play-btn.playing {
+		background: #16a34a;
+		border-color: #15803d;
+		color: #fff;
+	}
+	.play-btn-wrap.playing .play-btn {
+		animation: play-btn-throb 1.5s ease-in-out infinite;
+	}
+	@keyframes play-btn-throb {
+		0%, 100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.55); }
+		50%      { box-shadow: 0 0 0 6px rgba(22, 163, 74, 0); }
+	}
 
-	/* Pulse while audio is buffering */
-	.play-btn-wrap.loading-audio .play-btn {
+	/* Pulse while audio is buffering (but not while playing — the throb takes over) */
+	.play-btn-wrap.loading-audio:not(.playing) .play-btn {
 		animation: play-btn-pulse 1.4s ease-in-out infinite;
 	}
 	@keyframes play-btn-pulse {

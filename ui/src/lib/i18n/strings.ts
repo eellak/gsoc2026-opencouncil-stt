@@ -13,8 +13,10 @@ export const strings = {
 	startLabel: { en: 'Start', el: 'Αρχή' },
 	endLabel: { en: 'End', el: 'Τέλος' },
 	duration: { en: 'Duration', el: 'Διάρκεια' },
-	prev: { en: '← Prev', el: '← Προηγ.' },
-	next: { en: 'Next →', el: 'Επόμ. →' },
+	prev: { en: '←', el: '←' },
+	next: { en: '→', el: '→' },
+	prevAria: { en: 'Previous', el: 'Προηγούμενο' },
+	nextAria: { en: 'Next', el: 'Επόμενο' },
 	nextUnreviewed: { en: 'Next unreviewed (n)', el: 'Επόμ. μη αξιολογημένο (n)' },
 	nextUnreviewedShort: { en: 'Unrev. →', el: 'Αδιαμ. →' },
 	before: { en: 'Before', el: 'Πριν' },
@@ -82,7 +84,7 @@ export const strings = {
 	chainToggleHint: { en: 'toggle chain', el: 'εναλλαγή αλυσίδας' },
 	contextBefore: { en: 'Before', el: 'Προηγούμενα' },
 	contextAfter: { en: 'After', el: 'Επόμενα' },
-	loadingContext: { en: 'Loading context…', el: 'Φόρτωση πλαισίου…' },
+	loadingContext: { en: 'Loading transcript…', el: 'Φόρτωση απομαγνητοφώνησης…' },
 	contextUnavailable: { en: 'Context unavailable', el: 'Μη διαθέσιμο πλαίσιο' },
 	noContext: { en: 'No surrounding utterances', el: 'Καμία γύρω εκφορά' },
 
@@ -126,7 +128,19 @@ export const strings = {
 	openInQueue: { en: 'Open queue for this category', el: 'Άνοιγμα queue για αυτή την κατηγορία' },
 	errorCategoryPage: { en: 'Error category', el: 'Κατηγορία λάθους' },
 	totalItems: { en: 'Total: {n}', el: 'Σύνολο: {n}' },
-	noItems: { en: 'No items.', el: 'Καμία εγγραφή.' }
+	noItems: { en: 'No items.', el: 'Καμία εγγραφή.' },
+
+	// Status distribution / filtered review queue
+	distributionTitle: { en: 'Distribution', el: 'Κατανομή' },
+	openListForStatus: { en: 'Open list', el: 'Άνοιγμα λίστας' },
+	openFilteredQueue: { en: 'Open filtered queue', el: 'Φιλτραρισμένη ροή' },
+	byStatusHeading: { en: '{status} corrections', el: 'Διορθώσεις: {status}' },
+	backToStats: { en: '← Back to stats', el: '← Επιστροφή στα στατιστικά' },
+	editsCount: {
+		en: '{n} edit{plural}',
+		el: '{n} αλλαγ{plural}'
+	},
+	filteredQueueLabel: { en: 'Filtered: {status}', el: 'Φίλτρο: {status}' }
 } as const satisfies Record<string, { en: string; el: string }>;
 
 export type StringKey = keyof typeof strings;

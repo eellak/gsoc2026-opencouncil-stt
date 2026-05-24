@@ -139,6 +139,11 @@ export class SidecarStore {
 		return this.labels;
 	}
 
+	/** Monotonic revision — last appended event id. Use as cache key. */
+	get revision(): number {
+		return this.lastEventId;
+	}
+
 	async patch(utterance_id: string, patch: GroupPatchBody): Promise<GroupLabel> {
 		// Validate before queueing. `async` ensures the throw becomes a
 		// rejected Promise rather than a synchronous exception inside the

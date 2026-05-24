@@ -1,5 +1,6 @@
 <script lang="ts">
 	import DiffMatchPatch from 'diff-match-patch';
+	import type { Snippet } from 'svelte';
 	import { TAXONOMY_MAP, normalizeTaxonomyId, type TaxonomyEntry } from '$lib/shared/taxonomy';
 	import type { Lang } from '$lib/shared/taxonomy';
 
@@ -7,10 +8,22 @@
 		before?: string;
 		after?: string;
 		speakerName?: string | null;
+		/** Whether the meeting-context transcript fetch is still in flight. */
+		speakerLoading?: boolean;
 		errorCategoryIds?: readonly string[];
 		lang?: Lang;
+		/** Snippet rendered in the centre of the header (play button). */
+		playSlot?: Snippet;
 	}
-	const { before = '', after = '', speakerName = null, errorCategoryIds = [], lang = 'el' }: Props = $props();
+	const {
+		before = '',
+		after = '',
+		speakerName = null,
+		speakerLoading = false,
+		errorCategoryIds = [],
+		lang = 'el',
+		playSlot
+	}: Props = $props();
 
 	const dmp = new DiffMatchPatch();
 
@@ -30,29 +43,36 @@
 	);
 </script>
 
-<div class="diff" class:has-speaker={!!speakerName}>
-	{#if speakerName}
-		<div class="diff-header">
-			<div class="diff-speaker" aria-label="Speaker">🎙 {speakerName}</div>
-			{#if resolvedCategories.length > 0}
-				<div class="diff-categories">
-					{#each resolvedCategories as entry (entry.id)}
-						<button type="button" class="cat-chip group-{entry.group}">
-							<span class="cat-label">{entry[lang]}</span>
-							<span class="cat-popover" role="tooltip">
-								<strong>{entry[lang]}</strong>
-								<span class="cat-example">
-									<mark class="del">{entry.example_before}</mark>
-									<span class="arrow">→</span>
-									<mark class="ins">{entry.example_after}</mark>
-								</span>
-							</span>
-						</button>
-					{/each}
-				</div>
+<div class="diff has-header">
+	<div class="diff-header">
+		<div class="diff-speaker" aria-label="Speaker" class:placeholder={!speakerName}>
+			{#if speakerName}
+				🎙 {speakerName}
+			{:else if speakerLoading}
+				<span class="dot-shimmer" aria-hidden="true">🎙 …</span>
+			{:else}
+				🎙 —
 			{/if}
 		</div>
-	{/if}
+		{#if playSlot}
+			<div class="diff-play">{@render playSlot()}</div>
+		{/if}
+		<div class="diff-categories">
+			{#each resolvedCategories as entry (entry.id)}
+				<button type="button" class="cat-chip group-{entry.group}">
+					<span class="cat-label">{entry[lang]}</span>
+					<span class="cat-popover" role="tooltip">
+						<strong>{entry[lang]}</strong>
+						<span class="cat-example">
+							<mark class="del">{entry.example_before}</mark>
+							<span class="arrow">→</span>
+							<mark class="ins">{entry.example_after}</mark>
+						</span>
+					</span>
+				</button>
+			{/each}
+		</div>
+	</div>
 	<div class="diff-block before">
 		{#each diffs as [op, text]}
 			{#if op === -1}
@@ -81,18 +101,21 @@
 		font-size: 1rem;
 		line-height: 1.6;
 	}
-	.diff.has-speaker {
+	.diff.has-header {
 		grid-template-areas: 'header header' 'before after';
 	}
-	.diff.has-speaker .diff-header { grid-area: header; }
-	.diff.has-speaker .diff-block.before { grid-area: before; }
-	.diff.has-speaker .diff-block.after { grid-area: after; }
+	.diff.has-header .diff-header { grid-area: header; }
+	.diff.has-header .diff-block.before { grid-area: before; }
+	.diff.has-header .diff-block.after { grid-area: after; }
 
 	.diff-header {
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
 		flex-wrap: wrap;
+		/* Reserve a stable strip so the layout doesn't jump when the speaker
+		   resolves or categories arrive. */
+		min-height: 2.1rem;
 	}
 
 	.diff-speaker {
@@ -104,6 +127,24 @@
 		border-radius: 6px;
 		display: inline-flex;
 		flex-shrink: 0;
+	}
+	.diff-speaker.placeholder {
+		background: #f1f5f9;
+		color: var(--text-3, #94a3b8);
+	}
+	.dot-shimmer {
+		display: inline-block;
+		animation: speaker-shimmer 1.2s ease-in-out infinite;
+	}
+	@keyframes speaker-shimmer {
+		0%, 100% { opacity: 0.55; }
+		50% { opacity: 0.95; }
+	}
+
+	.diff-play {
+		display: inline-flex;
+		align-items: center;
+		/* Sits between speaker (left) and categories (right). */
 	}
 
 	.diff-categories {
@@ -125,6 +166,7 @@
 		cursor: default;
 		outline-offset: 2px;
 		max-width: 11rem;
+		border: none;
 	}
 	.cat-chip:focus-visible { outline: 2px solid #3b82f6; }
 
@@ -203,5 +245,15 @@
 	mark.ins {
 		background: #d7ffd7;
 		color: #060;
+	}
+
+	@media (max-width: 640px) {
+		.diff {
+			grid-template-columns: 1fr;
+		}
+		.diff.has-header {
+			grid-template-areas: 'header' 'before' 'after';
+		}
+		.diff-categories { margin-left: 0; width: 100%; }
 	}
 </style>

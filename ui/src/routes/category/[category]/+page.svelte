@@ -6,11 +6,14 @@
 
 	const totalPages = $derived(Math.ceil(data.total / data.page_size));
 	const seedQs = $derived(pageState.url.searchParams.get('seed') ?? '');
+	// Only treat seedQs as a real seed when it's a non-negative integer string.
+	// Number("abc") would otherwise hand NaN to editHref.
+	const validatedSeed = $derived(/^\d+$/.test(seedQs) ? Number(seedQs) : undefined);
 
 	function pageUrl(p: number) {
 		const params = new URLSearchParams();
 		params.set('page', String(p));
-		if (seedQs) params.set('seed', seedQs);
+		if (validatedSeed !== undefined) params.set('seed', String(validatedSeed));
 		return `?${params.toString()}`;
 	}
 </script>
@@ -31,30 +34,22 @@
 	{#if data.items.length === 0}
 		<p class="empty">Καμία εγγραφή σε αυτή την κατηγορία.</p>
 	{:else}
-		<table>
-			<thead>
-				<tr>
-					<th>before_text</th>
-					<th>after_text</th>
-					<th>editor</th>
-					<th>cleaning</th>
-					<th></th>
-				</tr>
-			</thead>
-			<tbody>
-				{#each data.items as item}
-					<tr>
-						<td class="text before">{item.before_text?.slice(0, 120) ?? ''}</td>
-						<td class="text after">{item.after_text?.slice(0, 120) ?? ''}</td>
-						<td class="meta">{item.edited_by ?? '—'}</td>
-						<td class="meta small">{item.cleaning_applied || '—'}</td>
-						<td class="action">
-							<a href={editHref(item.edit_id, seedQs ? Number(seedQs) : undefined)} class="view-btn">Άνοιγμα</a>
-						</td>
-					</tr>
-				{/each}
-			</tbody>
-		</table>
+		<ul class="rows">
+			{#each data.items as item}
+				<li>
+					<a class="row" href={editHref(item.edit_id, validatedSeed)}>
+						<div class="meta">
+							{#if item.edited_by}<span class="editor">{item.edited_by}</span>{/if}
+							{#if item.cleaning_applied}<span class="cleaning">{item.cleaning_applied}</span>{/if}
+						</div>
+						<div class="diffs">
+							<div class="before">{item.before_text?.slice(0, 200) ?? ''}</div>
+							<div class="after">{item.after_text?.slice(0, 200) ?? ''}</div>
+						</div>
+					</a>
+				</li>
+			{/each}
+		</ul>
 
 		{#if totalPages > 1}
 			<nav class="pagination">
@@ -83,21 +78,33 @@
 	.count { color: #6b7280; font-size: 0.9rem; margin-left: auto; }
 	.reason { margin: 0.5rem 0 0; color: #374151; font-size: 0.9rem; line-height: 1.5; max-width: 700px; }
 
-	table { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-top: 1rem; }
-	thead th { text-align: left; padding: 0.4rem 0.5rem; border-bottom: 2px solid #e5e7eb; color: #6b7280; font-weight: 600; }
-	tbody tr:hover { background: #f9fafb; }
-	td { padding: 0.35rem 0.5rem; border-bottom: 1px solid #f3f4f6; vertical-align: top; }
-	td.text { max-width: 350px; white-space: pre-wrap; word-break: break-word; }
-	td.before { color: #7f1d1d; }
-	td.after { color: #14532d; }
-	td.meta { color: #6b7280; white-space: nowrap; }
-	td.small { font-size: 0.75rem; }
-	.view-btn { font-size: 0.78rem; padding: 0.15rem 0.5rem; background: #f0f0f0; border-radius: 4px; text-decoration: none; color: #374151; white-space: nowrap; }
-	.view-btn:hover { background: #dbeafe; color: #1e40af; }
+	.rows { list-style: none; padding: 0; margin: 1rem 0 0; display: flex; flex-direction: column; gap: 0.5rem; }
+	.row {
+		display: flex; flex-direction: column; gap: 0.5rem;
+		padding: 0.75rem 0.9rem;
+		background: #fff;
+		border: 1px solid #e5e7eb;
+		border-radius: 8px;
+		text-decoration: none; color: inherit;
+		transition: border-color 0.15s, box-shadow 0.15s;
+	}
+	.row:hover { border-color: #93c5fd; box-shadow: 0 2px 8px rgba(37,99,235,.08); }
+	.meta { display: flex; flex-wrap: wrap; gap: 0.3rem 0.6rem; font-size: 0.74rem; color: #475569; }
+	.meta .editor { color: #1e3a8a; font-weight: 500; }
+	.meta .cleaning { background: #f1f5f9; padding: 0.05rem 0.4rem; border-radius: 4px; color: #475569; font-size: 0.7rem; }
+	.diffs { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.88rem; line-height: 1.45; }
+	.before { background: #fef2f2; padding: 0.4rem 0.55rem; border-radius: 5px; color: #7f1d1d; white-space: pre-wrap; word-break: break-word; }
+	.after  { background: #f0fdf4; padding: 0.4rem 0.55rem; border-radius: 5px; color: #14532d; white-space: pre-wrap; word-break: break-word; }
 
 	.empty { color: #9ca3af; padding: 2rem; text-align: center; }
 	.pagination { display: flex; gap: 0.75rem; align-items: center; margin-top: 1.5rem; justify-content: center; }
 	.pg-btn { font-size: 0.85rem; padding: 0.3rem 0.8rem; background: #f0f0f0; border-radius: 4px; text-decoration: none; color: #374151; }
 	.pg-btn:hover { background: #dbeafe; color: #1e40af; }
 	.pg-info { font-size: 0.85rem; color: #6b7280; }
+
+	@media (max-width: 640px) {
+		.page { padding: 1rem 0.75rem; }
+		h1 { font-size: 1.1rem; }
+		.diffs { grid-template-columns: 1fr; }
+	}
 </style>

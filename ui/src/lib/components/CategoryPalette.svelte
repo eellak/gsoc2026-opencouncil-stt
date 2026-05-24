@@ -6,7 +6,31 @@
 		type TaxonomyId
 	} from '$lib/shared/taxonomy';
 	import { getLang, t } from '$lib/i18n.svelte';
+	import { foldAscii, greekToLatin } from '$lib/shared/greeklish';
 	import { tick } from 'svelte';
+
+	// Precompute one accent-folded, multi-form haystack per taxonomy entry so
+	// search matches against: Greek label (folded), English label (folded),
+	// id, shortcut, AND a Greeklish transliteration of the Greek label.
+	// Typing "akronymio" → matches Ακρωνύμιο; typing "punctuation" → matches
+	// the English label; typing the Greek label still works.
+	const HAYSTACKS = new Map<string, string>(
+		TAXONOMY.map((c) => [
+			c.id,
+			[
+				foldAscii(c.el),
+				foldAscii(c.en),
+				foldAscii(c.id),
+				c.shortcut ?? '',
+				greekToLatin(c.el),
+				// Also transliterate the English label so typing partial
+				// English in a Greek layout still resolves.
+				greekToLatin(c.en),
+				foldAscii(TAXONOMY_GROUP_LABELS[c.group].el),
+				foldAscii(TAXONOMY_GROUP_LABELS[c.group].en)
+			].join(' ')
+		])
+	);
 
 	interface Props {
 		open: boolean;
@@ -31,11 +55,18 @@
 	));
 
 	const filtered = $derived.by(() => {
-		const q = query.trim().toLowerCase();
-		if (!q) return TAXONOMY.slice();
+		const raw = query.trim();
+		if (!raw) return TAXONOMY.slice();
+		// Each input token is tested in two forms (accent-folded and
+		// transliterated) against a multi-form haystack. The query matches
+		// if every token matches at least one form.
+		const queryForms = raw
+			.split(/\s+/)
+			.filter(Boolean)
+			.map((tok) => [foldAscii(tok), greekToLatin(tok)] as const);
 		return TAXONOMY.filter((cat) => {
-			const haystack = `${cat.el} ${cat.en} ${cat.id} ${cat.shortcut ?? ''}`.toLowerCase();
-			return q.split(/\s+/).every((tok) => haystack.includes(tok));
+			const hay = HAYSTACKS.get(cat.id) ?? '';
+			return queryForms.every(([f, l]) => hay.includes(f) || hay.includes(l));
 		});
 	});
 
