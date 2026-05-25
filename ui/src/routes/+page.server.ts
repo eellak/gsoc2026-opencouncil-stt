@@ -42,6 +42,31 @@ export const load: PageServerLoad = async ({ url }) => {
 	const seedParam = parseSeedParam(url.searchParams.get('seed'));
 	if (seedParam !== null) {
 		const repo = await getRepo();
+		const skipClassified = url.searchParams.get('skip') === '1';
+		if (skipClassified) {
+			// Walk the seeded order and pick the first unreviewed group.
+			// Caps the scan at 5000 to stay cheap; falls back to the first.
+			const labels = repo.allLabels();
+			let landed: string | null = null;
+			let cursor = 0;
+			while (cursor < 5000) {
+				const page = repo.queue(seedParam, cursor, 100);
+				if (!page.groups.length) break;
+				for (const g of page.groups) {
+					const lbl = labels.get(g.utterance_id);
+					if (!lbl || lbl.include_status === 'unreviewed') { landed = g.utterance_id; break; }
+				}
+				if (landed) break;
+				if (page.next_cursor === null) break;
+				cursor = page.next_cursor;
+			}
+			if (!landed) {
+				const { groups } = repo.queue(seedParam, 0, 1);
+				if (!groups.length) throw redirect(302, '/stats');
+				landed = groups[0].utterance_id;
+			}
+			throw redirect(302, reviewHref({ utterance_id: landed, seed: seedParam }));
+		}
 		const { groups } = repo.queue(seedParam, 0, 1);
 		if (!groups.length) throw redirect(302, '/stats');
 		throw redirect(302, reviewHref({ utterance_id: groups[0].utterance_id, seed: seedParam }));

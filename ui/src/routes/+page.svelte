@@ -8,6 +8,7 @@
 	const { data }: { data: PageData } = $props();
 
 	let seedInput = $state<string>('');
+	let skipClassified = $state(true);
 	let error = $state<string | null>(null);
 
 	const INT_RE = /^\d+$/;
@@ -31,7 +32,9 @@
 			}
 			seed = parsed;
 		}
-		goto(`/?seed=${seed}`);
+		const params = new URLSearchParams({ seed: String(seed) });
+		if (skipClassified) params.set('skip', '1');
+		goto(`/?${params.toString()}`);
 	}
 
 	function newRandom() {
@@ -74,6 +77,10 @@
 			{#if error}<span class="error">{error}</span>{/if}
 			<small class="hint">{t('seedHint')}</small>
 		</label>
+		<label class="skip-toggle">
+			<input type="checkbox" bind:checked={skipClassified} />
+			<span>{t('skipClassifiedLabel')}</span>
+		</label>
 		<button type="submit" class="primary">{t('startReview')}</button>
 	</form>
 
@@ -99,6 +106,11 @@
 	input[aria-invalid='true'] { border-color: #dc2626; }
 	.hint { font-size: 0.72rem; color: var(--text-3, #94a3b8); }
 	.preview { font-size: 0.72rem; color: var(--accent, #2563eb); font-family: monospace; }
+	.skip-toggle {
+		display: flex; flex-direction: row; align-items: center; gap: 0.45rem;
+		font-size: 0.82rem; color: var(--text-2, #475569); margin-top: 0.2rem;
+	}
+	.skip-toggle input { accent-color: var(--accent, #2563eb); }
 	.error { font-size: 0.78rem; color: #dc2626; }
 	button {
 		padding: 0.5rem 0.95rem; font-size: 0.9rem;
