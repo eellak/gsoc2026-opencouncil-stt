@@ -277,7 +277,7 @@ test('j-press prefetch: measure latency, requests, cache hits', async ({ page, b
 
 	console.log(
 		`\n=== verdict === ${fastPresses}/${jTimings.length} presses under 200ms; slowest=${slowMax}ms; ` +
-			`htttpCacheHits=${totalCacheHits} (expected 0 — Chrome's audio decoder reuse is invisible to HTTP cache)`
+			`httpCacheHits=${totalCacheHits} (expected 0 — Chrome's audio decoder reuse is invisible to HTTP cache)`
 	);
 
 	// At least one j-press must hit the warm path. If zero presses are

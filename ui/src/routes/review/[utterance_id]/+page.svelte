@@ -18,6 +18,10 @@
 	import { reviewHref } from '$lib/shared/urls';
 	import { page } from '$app/state';
 	import type { PageData } from './$types';
+	import { userStore } from '$lib/client/user-store.svelte';
+	import { playbackPrefs } from '$lib/client/playback-prefs.svelte';
+	import UserPickerModal from '$lib/components/UserPickerModal.svelte';
+	import ShortcutsModal from '$lib/components/ShortcutsModal.svelte';
 
 	const DIGIT_SHORTCUTS: ReadonlyMap<string, TaxonomyId> = new Map(
 		TAXONOMY.filter((c) => c.shortcut).map((c) => [c.shortcut!, c.id as TaxonomyId])
@@ -80,11 +84,12 @@
 		clearTimeout(saveTimer);
 		saveStatus = 'saving';
 		queue.patchLocalLabel(item.utterance_id, updates);
+		const body = userStore.value ? { ...updates, username: userStore.value } : updates;
 		try {
 			const res = await fetch(`/api/review/group/${encodeURIComponent(item.utterance_id)}`, {
 				method: 'PATCH',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(updates)
+				body: JSON.stringify(body)
 			});
 			if (!res.ok) throw new Error(await res.text());
 			saveStatus = 'saved';
@@ -95,6 +100,8 @@
 	}
 
 	let paletteOpen = $state(false);
+	let shortcutsOpen = $state(false);
+	let showUserModal = $state(userStore.value === '');
 	// The visible <audio> element is owned by the pool — pool.setActive moves
 	// the matching pool element into our `audioSlot` div. We read it back via
 	// the pool's reactive state to call play/pause/seek and attach listeners.
@@ -103,10 +110,31 @@
 	const audioEl = $derived(audioPool.state.activeEl);
 	let audioReady = $state(false);
 	let audioReadyFlash = $state(false);
+	let audioAutoplayReady = $state(false);
+	let autoplayFallbackTimer: ReturnType<typeof setTimeout> | null = null;
 	let isPlaying = $state(false);
-	function onAudioCanPlay() { audioReady = true; audioReadyFlash = true; }
-	function onAudioWaiting() { audioReady = false; audioReadyFlash = false; }
-	function onAudioLoadStart() { audioReady = false; audioReadyFlash = false; isPlaying = false; }
+	function clearAutoplayFallback() {
+		if (autoplayFallbackTimer) { clearTimeout(autoplayFallbackTimer); autoplayFallbackTimer = null; }
+	}
+	function onAudioCanPlay() {
+		audioReady = true;
+		audioReadyFlash = true;
+		// Fallback: if canplaythrough never fires (slow/unstable network, Safari
+		// quirks), unblock autoplay 1.5s after canplay so we don't stall forever.
+		if (!audioAutoplayReady && !autoplayFallbackTimer) {
+			autoplayFallbackTimer = setTimeout(() => {
+				audioAutoplayReady = true;
+				autoplayFallbackTimer = null;
+			}, 1500);
+		}
+	}
+	function onAudioCanPlayThrough() {
+		audioReady = true;
+		audioAutoplayReady = true;
+		clearAutoplayFallback();
+	}
+	function onAudioWaiting() { audioReady = false; audioReadyFlash = false; audioAutoplayReady = false; clearAutoplayFallback(); }
+	function onAudioLoadStart() { audioReady = false; audioReadyFlash = false; audioAutoplayReady = false; isPlaying = false; clearAutoplayFallback(); }
 	function onAudioPlay() { isPlaying = true; }
 	function onAudioPause() { isPlaying = false; }
 	function onAudioEnded() { isPlaying = false; }
@@ -176,8 +204,18 @@
 		if (!el) return;
 		// Sync from element's actual condition.
 		audioReady = el.readyState >= 3;
+		audioAutoplayReady = el.readyState >= 4;
 		audioReadyFlash = false;
 		isPlaying = !el.paused;
+		clearAutoplayFallback();
+		// If element already canplay but not canplaythrough, arm the fallback
+		// so autoplay doesn't wait forever for an event that already fired.
+		if (audioReady && !audioAutoplayReady) {
+			autoplayFallbackTimer = setTimeout(() => {
+				audioAutoplayReady = true;
+				autoplayFallbackTimer = null;
+			}, 1500);
+		}
 		// On (re-)activation, snap playhead to the segment start if we're
 		// not already inside the region. Element survives across nav, so
 		// `currentTime` might be wherever the previous viewing left it.
@@ -190,6 +228,7 @@
 		el.addEventListener('timeupdate', onAudioTimeUpdate);
 		el.addEventListener('error', onAudioError);
 		el.addEventListener('canplay', onAudioCanPlay);
+		el.addEventListener('canplaythrough', onAudioCanPlayThrough);
 		el.addEventListener('waiting', onAudioWaiting);
 		el.addEventListener('loadstart', onAudioLoadStart);
 		el.addEventListener('play', onAudioPlay);
@@ -200,12 +239,25 @@
 			el.removeEventListener('timeupdate', onAudioTimeUpdate);
 			el.removeEventListener('error', onAudioError);
 			el.removeEventListener('canplay', onAudioCanPlay);
+			el.removeEventListener('canplaythrough', onAudioCanPlayThrough);
 			el.removeEventListener('waiting', onAudioWaiting);
 			el.removeEventListener('loadstart', onAudioLoadStart);
 			el.removeEventListener('play', onAudioPlay);
 			el.removeEventListener('pause', onAudioPause);
 			el.removeEventListener('ended', onAudioEnded);
 		};
+	});
+
+	// Autoplay: wait for canplaythrough (or 1.5s fallback after canplay) to
+	// avoid the "start → stall → resume" stutter that comes from playing on
+	// canplay alone. See onAudioCanPlay/onAudioCanPlayThrough.
+	$effect(() => {
+		if (audioAutoplayReady && playbackPrefs.autoplay && audioEl && audioEl.paused) {
+			if (audioEl.currentTime < regionStart || audioEl.currentTime >= regionEnd) {
+				try { audioEl.currentTime = regionStart; } catch { /* fine */ }
+			}
+			void audioEl.play();
+		}
 	});
 
 	// Transcript prefetch: same sliding window, separate effect so its
@@ -307,11 +359,16 @@
 		if (audioEl) audioEl.currentTime = regionStart;
 	}
 
+	let loopTimer: ReturnType<typeof setTimeout>;
 	function onAudioTimeUpdate() {
 		if (!audioEl) return;
 		if (!audioEl.paused && audioEl.currentTime >= regionEnd) {
 			audioEl.pause();
 			audioEl.currentTime = regionStart;
+			if (playbackPrefs.loop) {
+				clearTimeout(loopTimer);
+				loopTimer = setTimeout(() => { void audioEl?.play(); }, 100);
+			}
 		}
 	}
 
@@ -330,10 +387,32 @@
 	}
 	const prevHref = $derived(navHref(prev?.utterance_id ?? prevId ?? null));
 	const nextHref = $derived(navHref(next?.utterance_id ?? nextId ?? null));
-	const highlightEditId = $derived(page.url.searchParams.get('highlight'));
 
 	function goNext() { if (nextHref) goto(nextHref); }
 	function goPrev() { if (prevHref) goto(prevHref); }
+
+	// Touch swipe nav — touch only (no mouse), so Mac trackpad swipe-back
+	// keeps working. Threshold 60px horizontal, must be mostly horizontal.
+	let touchStartX = 0;
+	let touchStartY = 0;
+	let touchStartT = 0;
+	function onTouchStart(e: TouchEvent) {
+		if (e.touches.length !== 1) return;
+		touchStartX = e.touches[0].clientX;
+		touchStartY = e.touches[0].clientY;
+		touchStartT = performance.now();
+	}
+	function onTouchEnd(e: TouchEvent) {
+		if (e.changedTouches.length !== 1) return;
+		const dx = e.changedTouches[0].clientX - touchStartX;
+		const dy = e.changedTouches[0].clientY - touchStartY;
+		const dt = performance.now() - touchStartT;
+		if (Math.abs(dx) < 60) return;
+		if (Math.abs(dy) > Math.abs(dx) * 0.6) return;
+		if (dt > 600) return;
+		if (dx < 0 && nextHref) goNext();
+		else if (dx > 0 && prevHref) goPrev();
+	}
 
 	async function copyShareLink() {
 		const url = new URL(window.location.href);
@@ -353,16 +432,19 @@
 	// not `i`. Map both so shortcuts work in either layout.
 	function normalizeShortcut(k: string): string {
 		const m: Record<string, string> = {
-			ι: 'i', χ: 'x', θ: 'u', ψ: 'c', ξ: 'j', κ: 'k', ν: 'n', ' ': ' ',
-			Ι: 'i', Χ: 'x', Θ: 'u', Ψ: 'c', Ξ: 'j', Κ: 'k', Ν: 'n'
+			ι: 'i', χ: 'x', θ: 'u', ψ: 'c', ξ: 'j', κ: 'k', ν: 'n', α: 'a', λ: 'l', ' ': ' ',
+			Ι: 'i', Χ: 'x', Θ: 'u', Ψ: 'c', Ξ: 'j', Κ: 'k', Ν: 'n', Α: 'a', Λ: 'l'
 		};
 		return m[k] ?? k;
 	}
 
 	function onKeydown(e: KeyboardEvent) {
 		if (['INPUT', 'TEXTAREA', 'SELECT'].includes((e.target as HTMLElement).tagName)) return;
-		if (paletteOpen) return;
+		if (paletteOpen || showUserModal) return;
 		if (e.ctrlKey || e.metaKey || e.altKey) return;
+		// ? toggles shortcuts modal; allow it through even when shortcutsOpen is true
+		if (e.key === '?') { e.preventDefault(); shortcutsOpen = !shortcutsOpen; return; }
+		if (shortcutsOpen) return;
 		const k = normalizeShortcut(e.key);
 		if ((e.key === 'ArrowLeft' || k === 'k') && prevHref) { e.preventDefault(); goPrev(); }
 		if ((e.key === 'ArrowRight' || k === 'j') && nextHref) { e.preventDefault(); goNext(); }
@@ -370,6 +452,8 @@
 		if (k === 'x') patch({ include_status: 'exclude' });
 		if (k === 'u') patch({ include_status: 'uncertain' });
 		if (k === ' ') { e.preventDefault(); togglePlay(); }
+		if (k === 'a') { e.preventDefault(); playbackPrefs.toggleAutoplay(); }
+		if (k === 'l') { e.preventDefault(); playbackPrefs.toggleLoop(); }
 		if (e.key === '/') { e.preventDefault(); paletteOpen = true; return; }
 		if (k === 'c' && item.edits.length > 1) { e.preventDefault(); showFullChain = !showFullChain; }
 		const catId = DIGIT_SHORTCUTS.get(e.key);
@@ -393,36 +477,54 @@
 
 <div class="review-page">
 	<header class="top-bar">
-		<div class="meta">
-			<button
-				type="button"
-				class="badge mode share-btn"
-				class:copied={shareCopied}
-				onclick={copyShareLink}
-				title={`${t('shareSeedTitle')} (seed ${data.seed})`}
-			>{shareCopied ? t('shareCopied') : t('shareSeed')}</button>
-			{#if statusFilter}
-				<span class="badge filter {statusFilter}">{t('filteredQueueLabel', { status: t(statusFilter) })}</span>
-			{/if}
-			{#if item.meeting_name}
-				<span class="badge meeting">{item.meeting_name}</span>
-			{/if}
-			{#if item.city_id}
-				<span class="badge city">{item.city_id}</span>
-			{/if}
-			{#if item.meeting_date}
-				<span class="badge date">{item.meeting_date}</span>
-			{/if}
-			<span class="badge edits" title="Number of edits in this utterance group">
-				{item.edits.length} edit{item.edits.length === 1 ? '' : 's'}
-			</span>
-			{#if !item.chain_consistent}
-				<span class="badge warn" title="Some edit's before_text does not match the previous after_text">chain break</span>
-			{/if}
+		<div class="top-row">
+			<div class="meeting-info">
+				{#if item.meeting_name}<span class="meeting-title">{item.meeting_name}</span>{/if}
+				{#if item.city_id}<span class="badge city">{item.city_id}</span>{/if}
+				{#if item.meeting_date}<span class="badge date">{item.meeting_date}</span>{/if}
+			</div>
+			<div class="top-row-actions">
+				{#if userStore.value}
+					<button type="button" class="user-chip" onclick={() => (showUserModal = true)} title="Αλλαγή χρήστη">
+						{userStore.value} ✎
+					</button>
+				{:else}
+					<button type="button" class="user-chip missing" onclick={() => (showUserModal = true)}>
+						+ όνομα
+					</button>
+				{/if}
+				<button
+					type="button"
+					class="share-icon-btn"
+					class:copied={shareCopied}
+					onclick={copyShareLink}
+					title={`${t('shareSeedTitle')} (seed ${data.seed})`}
+					aria-label={t('shareSeed')}
+				>
+					{#if shareCopied}
+						<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.5 3.5L13 5"/></svg>
+					{:else}
+						<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 11V2"/><path d="M5 5l3-3 3 3"/><path d="M3 9v4a1 1 0 001 1h8a1 1 0 001-1V9"/></svg>
+					{/if}
+				</button>
+			</div>
 		</div>
-		<div class="nav-links">
-			{#if prevHref}<a href={prevHref} class="nav-btn icon" title="k / ←" aria-label={t('prevAria')}>{t('prev')}</a>{/if}
-			{#if nextHref}<a href={nextHref} class="nav-btn icon" title="j / →" aria-label={t('nextAria')} onclick={(e) => { e.preventDefault(); goNext(); }}>{t('next')}</a>{/if}
+		<div class="bottom-row">
+			<div class="meta">
+				{#if statusFilter}
+					<span class="badge filter {statusFilter}">{t('filteredQueueLabel', { status: t(statusFilter) })}</span>
+				{/if}
+				<span class="badge edits" title="Number of edits in this utterance group">
+					{item.edits.length} edit{item.edits.length === 1 ? '' : 's'}
+				</span>
+				{#if !item.chain_consistent}
+					<span class="badge warn" title="Some edit's before_text does not match the previous after_text">chain break</span>
+				{/if}
+			</div>
+			<div class="nav-links">
+				{#if prevHref}<a href={prevHref} class="nav-btn" title="k / ←" aria-label={t('prevAria')}>{t('prev')} <kbd>k</kbd></a>{/if}
+				{#if nextHref}<a href={nextHref} class="nav-btn" title="j / →" aria-label={t('nextAria')} onclick={(e) => { e.preventDefault(); goNext(); }}>{t('next')} <kbd>j</kbd></a>{/if}
+			</div>
 		</div>
 	</header>
 
@@ -436,19 +538,21 @@
 			loadMoreAtTop
 		/>
 
-		<section class="diff-section">
-			{#if highlightEditId}
-				{@const hl = item.edits.find((e) => e.edit_id === highlightEditId)}
-				<div class="highlight-banner">
-					{#if hl}
-						{t('highlightingEdit')} <code>{highlightEditId}</code>
-						{#if item.edits.length > 1}
-							· {item.edits.length} {t('editsInThisUtterance')}
-						{/if}
-					{:else}
-						{t('highlightEditNotFound')} <code>{highlightEditId}</code>
-					{/if}
-				</div>
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
+		<section
+			class="diff-section"
+			ontouchstart={onTouchStart}
+			ontouchend={onTouchEnd}
+		>
+			{#if prevHref}
+				<a href={prevHref} class="utt-chevron left" title={t('prev') + ' (k)'} aria-label={t('prevAria')}>
+					<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 6 9 12 15 18"/></svg>
+				</a>
+			{/if}
+			{#if nextHref}
+				<a href={nextHref} class="utt-chevron right" title={t('next') + ' (j)'} aria-label={t('nextAria')} onclick={(e) => { e.preventDefault(); goNext(); }}>
+					<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 6 15 12 9 18"/></svg>
+				</a>
 			{/if}
 			{#if item.edits.length > 1}
 				<label class="chain-toggle">
@@ -457,21 +561,37 @@
 				</label>
 			{/if}
 			{#snippet playButton()}
-				<div
-					class="play-btn-wrap"
-					class:loading-audio={!audioReady}
-					class:ready-flash={audioReadyFlash}
-					class:playing={isPlaying}
-					onanimationend={(e) => { if (e.animationName === 'sweep-border') audioReadyFlash = false; }}
-				>
-					<button
-						type="button"
-						class="play-btn"
+				<div class="play-controls">
+					<div
+						class="play-btn-wrap"
+						class:loading-audio={!audioReady}
+						class:ready-flash={audioReadyFlash}
 						class:playing={isPlaying}
-						onclick={togglePlay}
-						title="Space"
-						aria-label={isPlaying ? 'Pause' : 'Play'}
-					>{isPlaying ? '⏸' : '▶'}</button>
+						onanimationend={(e) => { if (e.animationName === 'sweep-border') audioReadyFlash = false; }}
+					>
+						<button
+							type="button"
+							class="play-btn"
+							class:playing={isPlaying}
+							disabled={!audioReady}
+							onclick={togglePlay}
+							aria-label={!audioReady ? 'Φόρτωση...' : isPlaying ? 'Pause' : 'Play'}
+						>
+							{#if !audioReady}
+								<span class="spinner" aria-hidden="true"></span>
+							{:else}
+								{isPlaying ? '⏸' : '▶'}
+							{/if}
+						</button>
+					</div>
+					<label class="pref-toggle" title="Autoplay (a)">
+						<input type="checkbox" checked={playbackPrefs.autoplay} onchange={() => playbackPrefs.toggleAutoplay()} />
+						<span>auto</span> <kbd>a</kbd>
+					</label>
+					<label class="pref-toggle" title="Loop (l)">
+						<input type="checkbox" checked={playbackPrefs.loop} onchange={() => playbackPrefs.toggleLoop()} />
+						<span>loop</span> <kbd>l</kbd>
+					</label>
 				</div>
 			{/snippet}
 			<Diff
@@ -572,6 +692,9 @@
 				<kbd>i</kbd><kbd>x</kbd><kbd>u</kbd> include/exclude/uncertain
 				<kbd>1</kbd>…<kbd>0</kbd> category
 				<kbd>/</kbd> palette
+				<kbd>a</kbd> autoplay
+				<kbd>l</kbd> loop
+				<kbd>?</kbd> {t('shortcutsModalTitle')}
 				{#if item.edits.length > 1}<kbd>c</kbd> {t('chainToggleHint')}{/if}
 			</div>
 		</section>
@@ -584,8 +707,8 @@
 			onchange={(s) => patch({ include_status: s })}
 		/>
 		<div class="footer-nav">
-			{#if prevHref}<a href={prevHref} class="footer-nav-btn">{t('prev')}</a>{/if}
-			{#if nextHref}<a href={nextHref} class="footer-nav-btn primary" onclick={(e) => { e.preventDefault(); goNext(); }}>{t('next')}</a>{/if}
+			{#if prevHref}<a href={prevHref} class="footer-nav-btn">{t('prev')} <kbd>k</kbd></a>{/if}
+			{#if nextHref}<a href={nextHref} class="footer-nav-btn primary" onclick={(e) => { e.preventDefault(); goNext(); }}>{t('next')} <kbd>j</kbd></a>{/if}
 		</div>
 	</footer>
 
@@ -597,35 +720,56 @@
 	/>
 </div>
 
+{#if showUserModal}
+	<UserPickerModal onclose={() => (showUserModal = false)} />
+{/if}
+
+<ShortcutsModal open={shortcutsOpen} onclose={() => (shortcutsOpen = false)} showChain={item.edits.length > 1} />
+
 <style>
 	.review-page { max-width: 860px; margin: 0 auto; padding: 1rem 1rem 5rem; }
 	.top-bar {
 		position: sticky; top: 0; z-index: 10;
-		/* Fully opaque — covers content behind it cleanly on all viewports. */
 		background: #ffffff;
 		border-bottom: 1px solid var(--border, #e2e8f0);
 		box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06);
-		display: flex; justify-content: space-between; align-items: center;
-		padding: 0.6rem 1rem;
-		/* Stretch full-bleed within the page padding so nothing pokes out the sides. */
+		padding: 0.5rem 1rem 0.4rem;
 		margin: -1rem -1rem 1.2rem;
-		gap: 0.5rem; flex-wrap: wrap;
+		display: flex; flex-direction: column; gap: 0.3rem;
 	}
-	.meta { display: flex; gap: 0.35rem; flex-wrap: wrap; }
+	.top-row {
+		display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;
+	}
+	.meeting-info {
+		display: flex; align-items: baseline; gap: 0.4rem; flex-wrap: wrap; min-width: 0;
+	}
+	.meeting-title {
+		font-size: 0.95rem; font-weight: 600; color: #0f172a;
+		white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 380px;
+	}
+	.top-row-actions { display: flex; align-items: center; gap: 0.35rem; flex-shrink: 0; }
+	.user-chip {
+		font-size: 0.72rem; padding: 0.18rem 0.55rem; border-radius: 999px;
+		background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0;
+		cursor: pointer; font-family: inherit; white-space: nowrap;
+	}
+	.user-chip:hover { background: #e2e8f0; }
+	.user-chip.missing { color: #2563eb; border-color: #93c5fd; background: #eff6ff; }
+	.share-icon-btn {
+		font-size: 0.85rem; padding: 0.2rem 0.45rem; border-radius: 6px;
+		background: transparent; border: 1px solid var(--border, #e2e8f0);
+		cursor: pointer; transition: background 0.15s; line-height: 1;
+	}
+	.share-icon-btn:hover { background: #f1f5f9; }
+	.share-icon-btn.copied { background: #dcfce7; border-color: #86efac; }
+	.bottom-row {
+		display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;
+	}
+	.meta { display: flex; gap: 0.35rem; flex-wrap: wrap; align-items: center; }
 	.badge {
 		font-size: 0.72rem; padding: 0.18rem 0.55rem; border-radius: 999px;
 		font-weight: 500; letter-spacing: 0.01em;
 	}
-	.badge.mode { background: #0f172a; color: #f8fafc; }
-	.badge.share-btn { cursor: pointer; font-family: inherit; border: none; transition: background 0.2s; }
-	.badge.share-btn:hover { background: #1e293b; }
-	.badge.share-btn.copied { background: #15803d; }
-	.highlight-banner {
-		background: #fef3c7; color: #92400e; padding: 0.45rem 0.7rem;
-		border: 1px solid #fbbf24; border-radius: 6px; font-size: 0.85rem;
-		margin-bottom: 0.6rem;
-	}
-	.highlight-banner code { background: #fde68a; padding: 0 0.3rem; border-radius: 3px; }
 	.badge.meeting { background: var(--accent-light, #dbeafe); color: #1e3a8a; }
 	.badge.date { background: var(--surface-3, #f1f5f9); color: var(--text-2, #475569); }
 	.badge.city { background: #ecfdf5; color: #047857; }
@@ -638,15 +782,9 @@
 		background: var(--surface, #fff);
 		border: 1px solid var(--border, #e2e8f0);
 		text-decoration: none; color: var(--text-2, #475569);
+		display: inline-flex; align-items: center; gap: 0.3rem;
 	}
 	.nav-btn:hover { background: var(--surface-3, #f1f5f9); }
-	.nav-btn.icon {
-		min-width: 2.1rem;
-		text-align: center;
-		font-size: 1rem;
-		line-height: 1;
-		padding: 0.35rem 0.55rem;
-	}
 	.badge.filter { font-weight: 600; }
 	.badge.filter.include { background: #dcfce7; color: #14532d; }
 	.badge.filter.exclude { background: #fee2e2; color: #7f1d1d; }
@@ -663,6 +801,25 @@
 		border-radius: var(--radius-sm, 6px);
 		font-size: 0.85rem; background: var(--surface, #fff);
 	}
+	.play-controls { display: inline-flex; align-items: center; gap: 0.5rem; }
+	.pref-toggle {
+		display: inline-flex; align-items: center; gap: 0.2rem;
+		font-size: 0.72rem; color: var(--text-2, #475569); cursor: pointer;
+		user-select: none;
+	}
+	.pref-toggle input { margin: 0; cursor: pointer; }
+	.spinner {
+		display: inline-block; width: 0.9em; height: 0.9em;
+		border: 2px solid currentColor; border-top-color: transparent;
+		border-radius: 50%;
+		animation: spin 0.7s linear infinite;
+	}
+	@keyframes spin { to { transform: rotate(360deg); } }
+	kbd {
+		display: inline-block; padding: 0 4px; font: 11px ui-monospace, monospace;
+		border: 1px solid #cbd5e1; border-bottom-width: 2px; border-radius: 3px;
+		background: #f8fafc; color: #475569; line-height: 1.6;
+	}
 	.play-btn-wrap { position: relative; display: inline-flex; }
 	.play-btn {
 		min-width: 2.4rem;
@@ -673,8 +830,9 @@
 		line-height: 1.2;
 		transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.05s;
 	}
-	.play-btn:hover { background: var(--accent-light, #dbeafe); }
-	.play-btn:active { transform: scale(0.96); }
+	.play-btn:hover:not(:disabled) { background: var(--accent-light, #dbeafe); }
+	.play-btn:active:not(:disabled) { transform: scale(0.96); }
+	.play-btn:disabled { cursor: default; }
 	.play-btn.playing {
 		background: #16a34a;
 		border-color: #15803d;
@@ -721,11 +879,6 @@
 	.audio-toolbar .hint { color: var(--text-3, #94a3b8); font-size: 0.78rem; margin-left: auto; }
 	.native-player { width: 100%; height: 36px; display: block; }
 	.audio-wrap { position: relative; }
-	/* While the audio buffers, dim the native control and overlay a skeleton
-	   that visibly signals the play button isn't ready yet. Pointer events
-	   stay enabled on the overlay so clicks land on it (not the disabled
-	   play button), and the keyboard toggle is guarded server-side too. */
-	.audio-wrap.loading .native-player { opacity: 0.45; pointer-events: none; filter: grayscale(0.4); }
 	.audio-skeleton {
 		position: absolute; inset: 0;
 		display: flex; align-items: center; gap: 0.6rem;
@@ -758,6 +911,28 @@
 		border-radius: var(--radius, 10px);
 		padding: 1rem 1.1rem;
 		box-shadow: var(--shadow, 0 1px 3px rgba(0,0,0,.08));
+	}
+	.diff-section { position: relative; }
+	.utt-chevron {
+		position: absolute; top: 50%; transform: translateY(-50%);
+		width: 30px; height: 30px;
+		display: flex; align-items: center; justify-content: center;
+		border-radius: 50%;
+		background: rgba(248, 250, 252, 0.85);
+		border: 1px solid var(--border, #e2e8f0);
+		color: #64748b; text-decoration: none;
+		opacity: 0.55; transition: opacity 0.15s, color 0.15s, background 0.15s;
+	}
+	.utt-chevron:hover { opacity: 1; color: #0f172a; background: #f1f5f9; }
+	.utt-chevron.left { left: -42px; }
+	.utt-chevron.right { right: -42px; }
+	@media (max-width: 960px) {
+		.utt-chevron.left { left: -8px; }
+		.utt-chevron.right { right: -8px; }
+		.utt-chevron { background: rgba(255, 255, 255, 0.92); }
+	}
+	@media (max-width: 640px) {
+		.utt-chevron { display: none; }
 	}
 	.chain-toggle {
 		display: flex; align-items: center; gap: 0.4rem;

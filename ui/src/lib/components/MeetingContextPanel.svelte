@@ -2,6 +2,7 @@
 	import { t } from '$lib/i18n.svelte';
 	import type { ContextUtterance } from '$lib/domain/meeting-context';
 	import { mergeBySpeaker } from '$lib/client/meeting-context.svelte';
+	import { toGreekUpper } from '$lib/shared/text';
 
 	interface Props {
 		utterances: ContextUtterance[];
@@ -24,7 +25,6 @@
 </script>
 
 <aside class="ctx-panel" aria-label={label}>
-	<header>{label}</header>
 	{#if state === 'loading'}
 		<div class="status loading">{t('loadingContext')}</div>
 	{:else if state === 'error'}
@@ -66,14 +66,6 @@
 		padding: 0.5rem 0.75rem;
 		font-size: 0.82rem;
 		line-height: 1.45;
-	}
-	header {
-		font-size: 0.7rem;
-		font-weight: 600;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		color: var(--text-3, #94a3b8);
-		margin-bottom: 0.3rem;
 	}
 	.status {
 		color: var(--text-3, #94a3b8);

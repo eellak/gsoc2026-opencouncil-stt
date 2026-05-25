@@ -1,7 +1,12 @@
 <script lang="ts">
 	import { userStore } from '$lib/client/user-store.svelte';
+	import { t } from '$lib/i18n.svelte';
 
 	let { onclose = () => {} }: { onclose?: () => void } = $props();
+
+	function onKey(e: KeyboardEvent) {
+		if (e.key === 'Escape') onclose();
+	}
 
 	let existingUsernames = $state<string[]>([]);
 	let newName = $state('');
@@ -30,8 +35,11 @@
 	}
 </script>
 
-<div class="overlay" role="dialog" aria-modal="true" aria-label="Επιλογή χρήστη">
-	<div class="modal">
+<svelte:window onkeydown={onKey} />
+
+<div class="overlay" role="presentation" onclick={(e) => { if (e.target === e.currentTarget) onclose(); }}>
+	<div class="modal" role="dialog" aria-modal="true" aria-label="Επιλογή χρήστη">
+		<button type="button" class="close" onclick={onclose} aria-label={t('closeModal')}>✕</button>
 		<h2>Ποιος κάνει review;</h2>
 		<p class="sub">Το όνομά σου αποθηκεύεται με κάθε annotation. Δεν χρειάζεται κωδικός.</p>
 
@@ -72,7 +80,15 @@
 	.modal {
 		background: white; border-radius: 12px; padding: 1.75rem 2rem;
 		width: min(380px, 90vw); box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+		position: relative;
 	}
+	.close {
+		position: absolute; top: 0.5rem; right: 0.6rem;
+		background: transparent; border: 0; cursor: pointer;
+		font-size: 1rem; color: #94a3b8; padding: 0.2rem 0.45rem;
+		border-radius: 4px;
+	}
+	.close:hover { color: #0f172a; background: #f1f5f9; }
 	h2 { margin: 0 0 0.25rem; font-size: 1.15rem; }
 	.sub { margin: 0 0 1.1rem; font-size: 0.82rem; color: #64748b; }
 	.existing { list-style: none; padding: 0; margin: 0 0 0.5rem; display: flex; flex-wrap: wrap; gap: 0.4rem; }
