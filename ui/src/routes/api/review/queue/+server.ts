@@ -10,6 +10,7 @@
 
 import { json, error } from '@sveltejs/kit';
 import { getRepo } from '$lib/server/repo';
+import { parseSeedParam } from '$lib/shared/urls';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ url }) => {
@@ -17,11 +18,11 @@ export const GET: RequestHandler = async ({ url }) => {
 	const fromStr = url.searchParams.get('from') ?? '0';
 	const nStr = url.searchParams.get('n') ?? '5';
 
-	const seed = Number.parseInt(seedStr, 10);
+	const seed = parseSeedParam(seedStr) ?? 1;
 	const from = Number.parseInt(fromStr, 10);
 	const n = Number.parseInt(nStr, 10);
-	if (!Number.isInteger(seed) || !Number.isInteger(from) || !Number.isInteger(n)) {
-		throw error(400, 'seed, from, n must be integers');
+	if (!Number.isInteger(from) || !Number.isInteger(n)) {
+		throw error(400, 'from, n must be integers');
 	}
 	if (from < 0 || n < 1 || n > 100) {
 		throw error(400, 'from must be ≥ 0; n must be in [1, 100]');

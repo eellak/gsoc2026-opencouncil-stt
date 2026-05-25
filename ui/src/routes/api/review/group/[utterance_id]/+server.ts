@@ -17,11 +17,19 @@ import type { RequestHandler } from './$types';
 const isIncludeStatus = (v: unknown): v is IncludeStatus =>
 	typeof v === 'string' && (INCLUDE_STATUSES as string[]).includes(v);
 
-function parsePatch(raw: unknown): GroupPatchBody {
+function parseUsername(raw: Record<string, unknown>): string | undefined {
+	if (!('username' in raw)) return undefined;
+	const v = raw.username;
+	if (typeof v !== 'string' || v.trim() === '') throw error(400, 'username must be a non-empty string');
+	return v.trim();
+}
+
+function parsePatch(raw: unknown): { patch: GroupPatchBody; username: string | undefined } {
 	if (raw === null || typeof raw !== 'object' || Array.isArray(raw)) {
 		throw error(400, 'body must be a JSON object');
 	}
 	const r = raw as Record<string, unknown>;
+	const username = parseUsername(r);
 	const out: GroupPatchBody = {};
 
 	if ('error_categories' in r) {
@@ -54,7 +62,7 @@ function parsePatch(raw: unknown): GroupPatchBody {
 		if (v !== null && typeof v !== 'string') throw error(400, 'reviewer_notes must be string or null');
 		out.reviewer_notes = v as string | null;
 	}
-	return out;
+	return { patch: out, username };
 }
 
 export const GET: RequestHandler = async ({ params }) => {
@@ -71,11 +79,11 @@ export const PATCH: RequestHandler = async ({ params, request }) => {
 	} catch {
 		throw error(400, 'invalid JSON');
 	}
-	const patch = parsePatch(raw);
+	const { patch, username } = parsePatch(raw);
 
 	const repo = await getRepo();
 	try {
-		const label = await repo.patchLabel(params.utterance_id, patch);
+		const label = await repo.patchLabel(params.utterance_id, patch, username);
 		if (!label) throw error(404, 'utterance not found');
 		return json({ ok: true, label });
 	} catch (e) {

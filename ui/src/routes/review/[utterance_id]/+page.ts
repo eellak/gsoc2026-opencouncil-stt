@@ -1,6 +1,7 @@
 import { error } from '@sveltejs/kit';
 import * as queue from '$lib/client/group-queue.svelte';
 import { ensureMirrorMapLoaded } from '$lib/client/audio-source';
+import { parseSeedParam } from '$lib/shared/urls';
 import type { IncludeStatus } from '$lib/domain/types';
 import type { PageLoad } from './$types';
 
@@ -29,8 +30,8 @@ export const load: PageLoad = async ({ params, url }) => {
 	} else {
 		const seedParam = url.searchParams.get('seed');
 		if (seedParam) {
-			const s = Number.parseInt(seedParam, 10);
-			if (Number.isFinite(s)) queue.setSeed(s);
+			const s = parseSeedParam(seedParam);
+			if (s !== null) queue.setSeed(s);
 		}
 	}
 

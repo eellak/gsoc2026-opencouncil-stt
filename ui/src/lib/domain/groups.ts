@@ -88,6 +88,8 @@ export interface GroupPatchBody {
 	adjusted_start?: number | null;
 	adjusted_end?: number | null;
 	reviewer_notes?: string | null;
+	/** Reviewer identity — required for new annotations; stored in the event log. */
+	username?: string;
 }
 
 export const DEFAULT_LABEL: GroupLabel = {

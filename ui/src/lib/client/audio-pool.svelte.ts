@@ -1,169 +1,231 @@
 /**
- * Audio prefetch pool: keeps a small set of hidden <audio> elements with
- * `preload="auto"` for the ±radius utterances around the current one, so the
- * browser fetches the first chunks of each upcoming MP3 *before* the user
- * presses j/k.
+ * Audio prefetch pool, element-swap edition.
  *
- * Critically, we also `audioEl.currentTime = neighbour.start` after the
- * `loadedmetadata` event fires. The full meeting MP3 is ~135 MB; without the
- * seek the browser only caches the first few hundred KB (header + initial
- * frames). With the seek, it issues a second range request for the byte
- * offset corresponding to the utterance start time, populating the browser's
- * HTTP cache for that exact range. The visible player on navigation then
- * gets a cache hit when it does its own seek.
+ * Earlier design (parallel hidden warmers): pool owned a set of hidden
+ * <audio> elements that preloaded the next ±N utterances, and the page
+ * mounted its OWN <audio> for playback. Diagnostic e2e proved this fails
+ * the central goal — Chrome stores the warmed bytes in the hidden
+ * element's media buffer and DOES NOT share them with the visible
+ * player. The page's <audio> issues a fresh range request even when the
+ * URL is already fully buffered next door. Plus the pool's hidden
+ * elements keep HTTP/1.1 sockets open, queueing the visible player's
+ * fetch behind them. Bimodal latency: fast presses 30-80ms, slow
+ * presses 700-2600ms (measured in e2e/audio-prefetch.spec.ts).
  *
- * Constraints learned from codex review:
- *   - <audio preload="auto"> is a hint; don't assume bytes have actually landed.
- *   - 11 simultaneous range requests can saturate the connection. We rate-limit
- *     to MAX_CONCURRENT warms; the rest queue and start as slots free up.
- *   - On rapid j/k the user may jump past pre-warmed items. Each warm carries a
- *     `generation` counter tied to the current utterance; when the generation
- *     bumps, in-flight warms are aborted (clearing `src` cancels Range requests
- *     in Chromium and WebKit).
+ * This rewrite: pool owns EVERY <audio> element. The visible player IS
+ * one of the pool elements. `setActive(current, neighbours)` promotes
+ * the target element to the visible slot (adds `native-player` class +
+ * controls, moves into the page's audio-slot div) and demotes the
+ * previous one back to the hidden host. One element per utterance, ever.
+ * No duplicate fetches; no socket competition.
  *
- * Lives in the browser only. SSR-safe via the `typeof document` guard inside
- * `ensureContainer`.
+ * Page-side integration:
+ *   - On mount, the page calls `attachHiddenHost(div)` (typically once
+ *     in +layout) and `attachVisibleHost(div)` (in +page.svelte).
+ *   - On each navigation, the page calls `setActive(current, neighbours)`.
+ *   - The page reads `state.activeEl` (an $state field) to wire its own
+ *     addEventListener-based handlers. The reference is stable for a
+ *     given utterance: once an element is created for an id, every
+ *     subsequent `setActive` for that id returns the same instance.
+ *   - The page must clean up listeners on $effect cleanup since the same
+ *     element is reused later.
  */
 
 export interface Neighbour {
 	utterance_id: string;
 	url: string;
-	/** Region start in seconds. Used to force a byte-range fetch via seek. */
+	/** Region start in seconds — seeked to once metadata lands so the warm fetches the right byte range. */
 	start: number;
 }
 
-const MAX_CONCURRENT = 4;
-// Holds the current item + up to 2×radius neighbours (radius=10 → 21 elements)
-// plus a small headroom so the LRU eviction doesn't churn at the edges.
+interface PoolItem {
+	el: HTMLAudioElement;
+	url: string;
+	start: number;
+}
+
+// Cap. Big enough to hold current + 2×radius neighbours with headroom.
+// At radius=10 that's 21 elements; 24 keeps a small buffer against churn.
 const MAX_POOL = 24;
 
 class AudioPool {
-	private elements = new Map<string, HTMLAudioElement>();
-	private generation = 0;
-	private active = 0;
-	private waiting: Array<() => void> = [];
-	private container: HTMLDivElement | null = null;
+	private items = new Map<string, PoolItem>();
+	private hiddenHost: HTMLDivElement | null = null;
+	private visibleHost: HTMLElement | null = null;
+	private activeId: string | null = null;
 
-	private ensureContainer(): HTMLDivElement | null {
-		if (typeof document === 'undefined') return null;
-		if (this.container && this.container.isConnected) return this.container;
-		const el = document.createElement('div');
-		el.setAttribute('aria-hidden', 'true');
-		el.style.position = 'absolute';
-		el.style.left = '-9999px';
-		el.style.top = '0';
-		el.style.width = '0';
-		el.style.height = '0';
-		el.style.overflow = 'hidden';
-		document.body.appendChild(el);
-		this.container = el;
-		return el;
+	// Reactive surface for the page. $state is a Svelte 5 rune; allowed in
+	// .svelte.ts modules. The page does `audioPool.state.activeEl` in a
+	// $derived/$effect to track the current element.
+	state = $state<{ activeEl: HTMLAudioElement | null; activeId: string | null; generation: number }>({
+		activeEl: null,
+		activeId: null,
+		generation: 0
+	});
+
+	/** Attach (or detach by passing null) the offscreen host used to park hidden pool elements. */
+	attachHiddenHost(el: HTMLDivElement | null): void {
+		if (el === this.hiddenHost) return;
+		this.hiddenHost = el;
+		if (!el) return;
+		// Adopt any orphan elements (e.g., recreated host on HMR).
+		for (const [id, item] of this.items) {
+			if (id === this.activeId) continue;
+			if (!item.el.isConnected) el.appendChild(item.el);
+		}
+	}
+
+	/** Attach (or detach by passing null) the visible audio slot inside the page. */
+	attachVisibleHost(el: HTMLElement | null): void {
+		if (el === this.visibleHost) return;
+		this.visibleHost = el;
+		// If we already have an active element, place it in the new host.
+		if (el && this.activeId) {
+			const active = this.items.get(this.activeId);
+			if (active) el.appendChild(active.el);
+		}
 	}
 
 	/**
-	 * Mark `currentId` as the focus; ensure ±radius neighbours are being warmed.
-	 * Aborts any warms started under a previous generation that haven't started yet.
+	 * Make `current` the visible/active audio. Ensure pool elements exist
+	 * for every neighbour. Evict beyond MAX_POOL.
 	 */
-	warm(currentId: string, neighbours: Neighbour[]): void {
-		const container = this.ensureContainer();
-		if (!container) return;
+	setActive(current: Neighbour, neighbours: Neighbour[]): void {
+		this.ensureHiddenHost();
+		const host = this.hiddenHost;
+		if (!host) return;
 
-		this.generation += 1;
-		const gen = this.generation;
-		this.waiting.length = 0; // queued-but-not-started warms from the previous generation are gone
-
-		// Make sure the current id has an element (no need to be warmed via the
-		// throttle queue — the visible <audio> already drives its own loading).
-		// We still want it in the LRU map so future generations don't evict it.
-		if (!this.elements.has(currentId)) {
-			this.elements.set(currentId, this.createEl(container, '', 0));
+		// (1) Get-or-create the element for `current`.
+		let active = this.items.get(current.utterance_id);
+		if (!active) {
+			active = this.createItem(current.url, current.start);
+			this.items.set(current.utterance_id, active);
+		} else if (active.url !== current.url) {
+			// The URL changed for this id (rare — e.g. mirror reassignment). Reset.
+			active.el.src = current.url;
+			active.url = current.url;
+			active.start = current.start;
 		}
 
+		// (2) Demote the previously-active element if it's a different one.
+		if (this.activeId && this.activeId !== current.utterance_id) {
+			const prev = this.items.get(this.activeId);
+			if (prev) this.demote(prev.el);
+		}
+
+		// (3) Promote the new active. The element keeps its loaded bytes and
+		// readyState — moving it across the DOM doesn't reset the media.
+		this.promote(active.el);
+		this.activeId = current.utterance_id;
+		this.state.activeEl = active.el;
+		this.state.activeId = current.utterance_id;
+		this.state.generation += 1;
+		// Test hook: e2e measures latency by waiting for this counter to
+		// bump after a j press. The visible <audio> doesn't always fire a
+		// fresh `loadstart` (when the pool already had the element loaded,
+		// promotion is just class+host shuffle), so a DOM event isn't
+		// reliable — the generation counter is.
+		if (typeof window !== 'undefined') {
+			(window as unknown as { __audioPoolGeneration?: number }).__audioPoolGeneration = this.state.generation;
+		}
+
+		// (4) Ensure neighbour elements exist (warm side).
 		for (const n of neighbours) {
-			if (n.utterance_id === currentId) continue;
-			if (this.elements.has(n.utterance_id)) continue;
-			this.schedule(gen, container, n);
+			if (n.utterance_id === current.utterance_id) continue;
+			if (this.items.has(n.utterance_id)) continue;
+			const item = this.createItem(n.url, n.start);
+			this.items.set(n.utterance_id, item);
 		}
-		this.evict(currentId, neighbours);
+
+		// (5) Evict.
+		this.evict(current.utterance_id, neighbours);
 	}
 
-	private schedule(gen: number, container: HTMLDivElement, n: Neighbour): void {
-		const start = () => {
-			if (gen !== this.generation) return; // generation moved on while we were queued
-			this.active += 1;
-			const el = this.createEl(container, n.url, n.start);
-			this.elements.set(n.utterance_id, el);
-			const release = () => {
-				el.removeEventListener('loadeddata', release);
-				el.removeEventListener('canplay', release);
-				el.removeEventListener('error', release);
-				this.active -= 1;
-				const next = this.waiting.shift();
-				if (next) next();
-			};
-			// `canplay` is the right signal here — it fires once the browser has
-			// buffered enough from the *current playback position* to start
-			// playing, i.e. after the seek-driven byte range has actually
-			// landed. Falling back to `loadeddata` is just safety in case a
-			// codec quirk prevents canplay from firing.
-			el.addEventListener('canplay', release, { once: true });
-			el.addEventListener('loadeddata', release, { once: true });
-			el.addEventListener('error', release, { once: true });
-		};
-		if (this.active < MAX_CONCURRENT) {
-			start();
-		} else {
-			this.waiting.push(start);
-		}
+	/** Read-only accessor for the active element (used by .ts callers without rune support). */
+	getActiveEl(): HTMLAudioElement | null {
+		return this.state.activeEl;
 	}
 
-	private createEl(container: HTMLDivElement, src: string, start: number): HTMLAudioElement {
+	private ensureHiddenHost(): void {
+		if (this.hiddenHost && this.hiddenHost.isConnected) return;
+		if (typeof document === 'undefined') return;
+		const div = document.createElement('div');
+		div.setAttribute('aria-hidden', 'true');
+		div.style.position = 'absolute';
+		div.style.left = '-9999px';
+		div.style.top = '0';
+		div.style.width = '0';
+		div.style.height = '0';
+		div.style.overflow = 'hidden';
+		document.body.appendChild(div);
+		this.hiddenHost = div;
+	}
+
+	private createItem(url: string, start: number): PoolItem {
 		const el = document.createElement('audio');
 		el.preload = 'auto';
-		// Intentionally NOT setting `crossOrigin`. Per the HTML spec, any value
-		// (including the empty string) puts the element into CORS mode, and the
-		// opencouncil origin doesn't return Access-Control-Allow-Origin. Hidden
-		// warms only need to populate the HTTP cache, not run through WebAudio,
-		// so a no-cors load is what we want.
-		if (src) el.src = src;
-		// Seek to the utterance's start once metadata arrives. The browser
-		// then issues a second range request for the byte offset matching
-		// `start`, which is the actual segment the user will hear. Without
-		// this, the warm only buffers the MP3 header.
-		if (src && start > 0) {
+		// crossOrigin is intentionally NOT set — see audio-source.ts for the
+		// no-CORS rationale; opencouncil's CDN doesn't return ACAO.
+		if (url) el.src = url;
+		// Seek to the utterance start once metadata lands. The browser then
+		// issues a Range request for the byte offset matching `start`, so the
+		// warm targets the segment the user will actually play.
+		if (url && start > 0) {
 			const onMeta = () => {
 				try {
 					el.currentTime = start;
 				} catch {
-					/* element may have been evicted between meta load and now */
+					/* element may have been evicted between meta and now */
 				}
 			};
 			el.addEventListener('loadedmetadata', onMeta, { once: true });
 		}
-		container.appendChild(el);
-		return el;
+		if (this.hiddenHost) this.hiddenHost.appendChild(el);
+		return { el, url, start };
 	}
 
-	/**
-	 * Evict elements not in the new neighbour set + currentId, capped at MAX_POOL.
-	 * Removes from the DOM and clears `src` (which cancels in-flight Range requests).
-	 */
+	private promote(el: HTMLAudioElement): void {
+		el.classList.add('native-player');
+		el.controls = true;
+		el.style.display = '';
+		if (this.visibleHost) this.visibleHost.appendChild(el);
+	}
+
+	private demote(el: HTMLAudioElement): void {
+		try {
+			el.pause();
+		} catch {
+			/* ignore */
+		}
+		el.classList.remove('native-player');
+		el.controls = false;
+		// Keep the element alive — its bytes are why we're here. Just park
+		// it back in the hidden host.
+		if (this.hiddenHost) this.hiddenHost.appendChild(el);
+	}
+
 	private evict(currentId: string, neighbours: Neighbour[]): void {
 		const keep = new Set<string>([currentId, ...neighbours.map((n) => n.utterance_id)]);
-		for (const [id, el] of [...this.elements.entries()]) {
+		// Walk insertion order — Map preserves it, so oldest non-keep first.
+		for (const [id, item] of [...this.items.entries()]) {
+			if (this.items.size <= MAX_POOL) break;
 			if (keep.has(id)) continue;
-			if (this.elements.size <= MAX_POOL) break;
-			el.src = '';
-			el.removeAttribute('src');
-			el.load();
-			el.remove();
-			this.elements.delete(id);
+			if (id === this.activeId) continue;
+			item.el.src = '';
+			item.el.removeAttribute('src');
+			item.el.load(); // cancels in-flight Range requests
+			item.el.remove();
+			this.items.delete(id);
 		}
 	}
 
 	/** Test/debug only. */
 	_stats() {
-		return { size: this.elements.size, active: this.active, queued: this.waiting.length, generation: this.generation };
+		return {
+			size: this.items.size,
+			activeId: this.activeId,
+			generation: this.state.generation
+		};
 	}
 }
 

@@ -14,9 +14,12 @@
 		"test": "node node_modules/.bin/vitest run --config vitest.config.ts --pool=vmThreads --no-file-parallelism",
 		"test:watch": "node node_modules/.bin/vitest --config vitest.config.ts --pool=vmThreads --no-file-parallelism",
 		"seed": "bun scripts/seed-dummy.ts",
-		"build:cache": "tsx scripts/build-cache.ts"
+		"build:cache": "tsx scripts/build-cache.ts",
+		"e2e:install": "playwright install chromium",
+		"test:e2e": "playwright test"
 	},
 	"devDependencies": {
+		"@playwright/test": "^1.49.0",
 		"@sveltejs/adapter-node": "^5.5.4",
 		"@sveltejs/kit": "^2.57.0",
 		"@sveltejs/vite-plugin-svelte": "^7.1.2",
