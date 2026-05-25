@@ -28,11 +28,17 @@ export interface SidecarPaths {
 	snapshotPath: string;
 }
 
+export interface ReviewEventSource {
+	kind: 'local';
+	username: string | null;
+}
+
 export interface ReviewEvent {
 	id: number;
 	ts: string;
 	utterance_id: string;
-	source: string; // "local" for now; future imports can use a different tag
+	/** Structured source. Legacy events written before username support have source: "local" (string). */
+	source: ReviewEventSource | string;
 	patch: GroupPatchBody;
 }
 
@@ -107,6 +113,7 @@ export class SidecarStore {
 			}
 			if (ev.id <= this.lastEventId) continue; // already in snapshot
 			this.apply(ev);
+			this.recordUsername(ev);
 			this.lastEventId = ev.id;
 		}
 	}
@@ -144,34 +151,42 @@ export class SidecarStore {
 		return this.lastEventId;
 	}
 
-	async patch(utterance_id: string, patch: GroupPatchBody): Promise<GroupLabel> {
+	listUsernames(): string[] {
+		const seen = new Set<string>();
+		// We can't read the JSONL here synchronously — usernames are collected
+		// in-memory during rehydrate via a separate pass. For simplicity we keep
+		// a live set updated on every write.
+		return [...this._usernames].sort();
+	}
+
+	private _usernames = new Set<string>();
+
+	private recordUsername(ev: ReviewEvent): void {
+		if (typeof ev.source === 'object' && ev.source.username) {
+			this._usernames.add(ev.source.username);
+		}
+	}
+
+	async patch(utterance_id: string, patch: GroupPatchBody, username?: string): Promise<GroupLabel> {
 		// Validate before queueing. `async` ensures the throw becomes a
 		// rejected Promise rather than a synchronous exception inside the
 		// SvelteKit handler.
 		const canonicalPatch = canonicalizePatchForWrite(patch);
 		validatePatch(canonicalPatch);
-		// Pass `null` as onRejected so a poisoned previous op does NOT skip the
-		// next doPatch. The chain's tail swallows errors so subsequent callers
-		// see a fresh, fulfilled writeQueue; the current caller still observes
-		// this op's outcome via `await op`.
-		const run = () => this.doPatch(utterance_id, canonicalPatch);
+		const run = () => this.doPatch(utterance_id, canonicalPatch, username ?? null);
 		const op = this.writeQueue.then(run, run);
 		this.writeQueue = op.catch(() => {});
 		await op;
 		return this.get(utterance_id);
 	}
 
-	private async doPatch(utterance_id: string, patch: GroupPatchBody): Promise<void> {
-		// Tentatively assign the next id, but DO NOT mutate in-memory state until
-		// the durable append succeeds. If the write fails we leave lastEventId
-		// untouched so the next patch retries with the same id and there is no
-		// in-memory/disk divergence.
+	private async doPatch(utterance_id: string, patch: GroupPatchBody, username: string | null): Promise<void> {
 		const tentativeId = this.lastEventId + 1;
 		const ev: ReviewEvent = {
 			id: tentativeId,
 			ts: new Date().toISOString(),
 			utterance_id,
-			source: 'local',
+			source: { kind: 'local', username },
 			patch
 		};
 		const handle = await fs.open(this.paths.eventsPath, 'a');
@@ -183,6 +198,7 @@ export class SidecarStore {
 		}
 		this.lastEventId = tentativeId;
 		this.apply(ev);
+		this.recordUsername(ev);
 		this.eventsAppendedSinceSnapshot += 1;
 		if (this.eventsAppendedSinceSnapshot >= SNAPSHOT_EVERY) {
 			await this.flushSnapshot();

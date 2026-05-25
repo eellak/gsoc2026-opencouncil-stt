@@ -11,6 +11,17 @@
 export const UINT32_MAX = 4_294_967_295;
 const INT_RE = /^\d+$/;
 
+/** FNV-1a 32-bit hash — maps any string to a stable uint32. */
+export function hashSeedString(s: string): number {
+	const input = s.trim().toLowerCase();
+	let h = 0x811c9dc5;
+	for (let i = 0; i < input.length; i++) {
+		h ^= input.charCodeAt(i);
+		h = Math.imul(h, 0x01000193) >>> 0;
+	}
+	return h;
+}
+
 export interface ReviewHrefArgs {
 	utterance_id: string;
 	seed: number;
@@ -42,16 +53,19 @@ export function categoryHref(category: string, seed?: number): string {
 }
 
 /**
- * Strict integer parse for `?seed=N`. Accepts only `^\d+$` digits in [0, 2^32-1].
- * Rejects floats, NaN, negatives, scientific notation, overflow.
+ * Parse a seed param — accepts a uint32 digit string OR any non-empty string
+ * (hashed via FNV-1a to a deterministic uint32). URLs always carry the numeric
+ * form so share links are stable regardless of the input format.
  */
 export function parseSeedParam(raw: string | null | undefined): number | null {
 	if (raw == null || raw === '') return null;
-	if (!INT_RE.test(raw)) return null;
-	const n = Number(raw);
-	if (!Number.isFinite(n) || !Number.isInteger(n)) return null;
-	if (n < 0 || n > UINT32_MAX) return null;
-	return n;
+	if (INT_RE.test(raw)) {
+		const n = Number(raw);
+		if (!Number.isFinite(n) || !Number.isInteger(n)) return null;
+		if (n < 0 || n > UINT32_MAX) return null;
+		return n;
+	}
+	return hashSeedString(raw);
 }
 
 /** Uniform random uint32. Uses crypto when available, falls back to Math.random. */

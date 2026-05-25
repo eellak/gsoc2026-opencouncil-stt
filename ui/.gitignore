@@ -30,3 +30,7 @@ vite.config.ts.timestamp-*
 /.cache
 /.state
 local.db
+
+# Playwright
+/playwright-report
+/test-results

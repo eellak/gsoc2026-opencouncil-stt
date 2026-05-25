@@ -95,10 +95,12 @@
 	}
 
 	let paletteOpen = $state(false);
-	let audioEl: HTMLAudioElement | null = $state(null);
-	// Track whether the active <audio> has buffered enough data to start
-	// playing. The native control still renders, but we overlay a skeleton +
-	// disable the keyboard shortcut so a Space press doesn't silently fail.
+	// The visible <audio> element is owned by the pool — pool.setActive moves
+	// the matching pool element into our `audioSlot` div. We read it back via
+	// the pool's reactive state to call play/pause/seek and attach listeners.
+	// See `audio-pool.svelte.ts` for the element-swap rationale.
+	let audioSlot: HTMLDivElement | null = $state(null);
+	const audioEl = $derived(audioPool.state.activeEl);
 	let audioReady = $state(false);
 	let audioReadyFlash = $state(false);
 	let isPlaying = $state(false);
@@ -108,9 +110,6 @@
 	function onAudioPlay() { isPlaying = true; }
 	function onAudioPause() { isPlaying = false; }
 	function onAudioEnded() { isPlaying = false; }
-	// Native <audio> playback does NOT need CORS. Direct CDN is preferred so
-	// Vercel proxy bandwidth stays near zero. `audio-source.ts` keeps the proxied
-	// URL as a fallback for onerror. See decisions/audio.md.
 	const audioSources = $derived(resolveAudioUrls(item.audio_url));
 	const primaryAudioUrl = $derived(audioSources.direct);
 	let usingFallback = $state(false);
@@ -131,25 +130,82 @@
 	const currentCityId = $derived(item.city_id);
 	const currentMeetingId = $derived(item.meeting_id);
 
-	// Audio prefetch: only re-run when the *id* changes. The neighbours
-	// snapshot is read inside untrack() so SvelteMap mutations on neighbour
-	// groups (a label patch on a +3 ahead, for example) don't drag this
-	// effect with them. Same for the usingFallback reset.
+	// Wire the pool to our visible slot. The pool moves elements in/out as
+	// the active id changes. Cleanup on unmount so a navigation away from
+	// /review doesn't strand the audio element in a destroyed slot.
+	$effect(() => {
+		audioPool.attachVisibleHost(audioSlot);
+		return () => audioPool.attachVisibleHost(null);
+	});
+
+	// Drive pool.setActive on id (or URL — fallback flip) change. The URL
+	// is part of the trigger because flipping `usingFallback` after a direct
+	// load fails needs to swap src on the active element. Everything else
+	// (neighbours snapshot, fallback reset) runs untracked so a label patch
+	// or timestamp edit on a neighbour doesn't churn the pool.
 	$effect(() => {
 		const id = currentId;
+		const url = activeAudioUrl;
 		untrack(() => {
-			usingFallback = false;
+			if (!usingFallback) usingFallback = false; // no-op; reset happens when id changes below
 			const audioNeighbours = queue.neighborsAround(id, 10).map((g) => ({
 				utterance_id: g.utterance_id,
 				url: resolveAudioUrls(g.audio_url).direct,
-				// Use the adjusted_start if the reviewer already set one for
-				// this neighbour; otherwise the original start. This is the
-				// time the visible player will seek to when the user
-				// navigates to it.
 				start: g.label.adjusted_start ?? g.start
 			}));
-			audioPool.warm(id, audioNeighbours);
+			audioPool.setActive(
+				{ utterance_id: id, url, start: regionStart },
+				audioNeighbours
+			);
 		});
+	});
+
+	// Reset the fallback flag when the utterance id changes — each clip
+	// starts on the direct CDN URL; only failure flips it to proxied.
+	$effect(() => {
+		currentId; // dep
+		untrack(() => { usingFallback = false; });
+	});
+
+	// Listener wiring: when the pool hands us a new active <audio>, attach
+	// our state-syncing handlers and seed audioReady/isPlaying from the
+	// element's current state (it may already have buffered + canplayed
+	// while it sat in the pool — those events fired before we listened).
+	$effect(() => {
+		const el = audioEl;
+		if (!el) return;
+		// Sync from element's actual condition.
+		audioReady = el.readyState >= 3;
+		audioReadyFlash = false;
+		isPlaying = !el.paused;
+		// On (re-)activation, snap playhead to the segment start if we're
+		// not already inside the region. Element survives across nav, so
+		// `currentTime` might be wherever the previous viewing left it.
+		if (el.paused && el.readyState >= 1) {
+			if (el.currentTime < regionStart || el.currentTime >= regionEnd) {
+				try { el.currentTime = regionStart; } catch { /* fine */ }
+			}
+		}
+		el.addEventListener('loadedmetadata', onAudioMeta);
+		el.addEventListener('timeupdate', onAudioTimeUpdate);
+		el.addEventListener('error', onAudioError);
+		el.addEventListener('canplay', onAudioCanPlay);
+		el.addEventListener('waiting', onAudioWaiting);
+		el.addEventListener('loadstart', onAudioLoadStart);
+		el.addEventListener('play', onAudioPlay);
+		el.addEventListener('pause', onAudioPause);
+		el.addEventListener('ended', onAudioEnded);
+		return () => {
+			el.removeEventListener('loadedmetadata', onAudioMeta);
+			el.removeEventListener('timeupdate', onAudioTimeUpdate);
+			el.removeEventListener('error', onAudioError);
+			el.removeEventListener('canplay', onAudioCanPlay);
+			el.removeEventListener('waiting', onAudioWaiting);
+			el.removeEventListener('loadstart', onAudioLoadStart);
+			el.removeEventListener('play', onAudioPlay);
+			el.removeEventListener('pause', onAudioPause);
+			el.removeEventListener('ended', onAudioEnded);
+		};
 	});
 
 	// Transcript prefetch: same sliding window, separate effect so its
@@ -470,22 +526,13 @@
 				<span class="hint">segment: {(regionEnd - regionStart).toFixed(2)}s of {item.end.toFixed(1)}s</span>
 			</div>
 			<div class="audio-wrap" class:loading={!audioReady}>
-				<audio
-					bind:this={audioEl}
-					class="native-player"
-					controls
-					preload="auto"
-					src={activeAudioUrl}
-					onloadedmetadata={onAudioMeta}
-					ontimeupdate={onAudioTimeUpdate}
-					onerror={onAudioError}
-					oncanplay={onAudioCanPlay}
-					onwaiting={onAudioWaiting}
-					onloadstart={onAudioLoadStart}
-					onplay={onAudioPlay}
-					onpause={onAudioPause}
-					onended={onAudioEnded}
-				></audio>
+				<!--
+					The visible <audio> is owned by audioPool. On every
+					setActive, the pool moves the corresponding element
+					(which may already be fully buffered from prefetch)
+					into this slot — no duplicate fetch.
+				-->
+				<div class="audio-slot" bind:this={audioSlot}></div>
 				{#if !audioReady}
 					<div class="audio-skeleton" aria-hidden="true" role="presentation">
 						<span class="audio-skeleton-bar"></span>

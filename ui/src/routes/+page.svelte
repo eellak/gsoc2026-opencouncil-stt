@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { parseSeedParam, randomSeed, UINT32_MAX } from '$lib/shared/urls';
+	import { parseSeedParam, randomSeed, hashSeedString, UINT32_MAX } from '$lib/shared/urls';
 	import { t } from '$lib/i18n.svelte';
 	import StatusDistribution from '$lib/components/StatusDistribution.svelte';
 	import type { PageData } from './$types';
@@ -9,6 +9,13 @@
 
 	let seedInput = $state<string>('');
 	let error = $state<string | null>(null);
+
+	const INT_RE = /^\d+$/;
+	const seedPreview = $derived.by(() => {
+		const raw = seedInput.trim();
+		if (raw === '' || INT_RE.test(raw)) return null;
+		return hashSeedString(raw);
+	});
 
 	function start() {
 		error = null;
@@ -55,16 +62,17 @@
 			<div class="row">
 				<input
 					type="text"
-					inputmode="numeric"
-					pattern="\d*"
 					placeholder={t('seedPlaceholder', { default: String(data.suggestedSeed) })}
 					bind:value={seedInput}
 					aria-invalid={error !== null}
 				/>
 				<button type="button" class="ghost" onclick={newRandom}>{t('seedRandomize')}</button>
 			</div>
+			{#if seedPreview !== null}
+				<small class="preview">→ {seedPreview}</small>
+			{/if}
 			{#if error}<span class="error">{error}</span>{/if}
-			<small class="hint">{t('seedHint', { max: UINT32_MAX.toLocaleString() })}</small>
+			<small class="hint">{t('seedHint')}</small>
 		</label>
 		<button type="submit" class="primary">{t('startReview')}</button>
 	</form>
@@ -90,6 +98,7 @@
 	}
 	input[aria-invalid='true'] { border-color: #dc2626; }
 	.hint { font-size: 0.72rem; color: var(--text-3, #94a3b8); }
+	.preview { font-size: 0.72rem; color: var(--accent, #2563eb); font-family: monospace; }
 	.error { font-size: 0.78rem; color: #dc2626; }
 	button {
 		padding: 0.5rem 0.95rem; font-size: 0.9rem;

@@ -28,7 +28,8 @@ export interface ReviewRepo {
 	readonly labelsRevision: number;
 	getGroup(utterance_id: string): Group | null;
 	queue(seed: number, from: number, n: number): QueueResponse;
-	patchLabel(utterance_id: string, patch: GroupPatchBody): Promise<GroupLabel | null>;
+	patchLabel(utterance_id: string, patch: GroupPatchBody, username?: string): Promise<GroupLabel | null>;
+	listUsernames(): string[];
 	allLabels(): ReadonlyMap<string, GroupLabel>;
 	allGroups(): Group[];
 	iterGroups(): IterableIterator<Group>;

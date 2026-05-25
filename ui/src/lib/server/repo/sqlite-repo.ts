@@ -180,12 +180,14 @@ export class SqliteRepo {
 		return { cache_hash: this.cacheHash, total: order.length, groups, next_cursor };
 	}
 
-	async patchLabel(utterance_id: string, patch: GroupPatchBody): Promise<GroupLabel | null> {
-		// Cheap existence check via the prepared statement — same shape as
-		// FileRepo's "is the utterance in my map?" guard.
+	async patchLabel(utterance_id: string, patch: GroupPatchBody, username?: string): Promise<GroupLabel | null> {
 		const exists = this.getByIdStmt.get(utterance_id);
 		if (!exists) return null;
-		return this.sidecar.patch(utterance_id, patch);
+		return this.sidecar.patch(utterance_id, patch, username);
+	}
+
+	listUsernames(): string[] {
+		return this.sidecar.listUsernames();
 	}
 
 	allLabels(): ReadonlyMap<string, GroupLabel> {

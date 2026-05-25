@@ -1,6 +1,5 @@
 import { readFile } from 'fs/promises';
-import { fileURLToPath } from 'url';
-import { dirname, resolve } from 'path';
+import { resolve } from 'path';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
@@ -9,8 +8,7 @@ import type { RequestHandler } from './$types';
 // going through /api/audio. The map rarely changes — clients are expected to
 // fetch this once on first use.
 
-const HERE = dirname(fileURLToPath(import.meta.url));
-const URL_MAP_PATH = resolve(HERE, '..', '..', '..', '..', '..', '..', 'data', 'audio-fix', 'url-map.json');
+const URL_MAP_PATH = process.env.REVIEW_AUDIO_MAP_PATH ?? resolve(process.cwd(), '..', 'data', 'audio-fix', 'url-map.json');
 
 let cached: Record<string, string> | null = null;
 

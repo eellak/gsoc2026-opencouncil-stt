@@ -106,9 +106,13 @@ export class FileRepo {
 		return { cache_hash: this.cacheHash, total: order.length, groups, next_cursor };
 	}
 
-	async patchLabel(utterance_id: string, patch: GroupPatchBody): Promise<GroupLabel | null> {
+	async patchLabel(utterance_id: string, patch: GroupPatchBody, username?: string): Promise<GroupLabel | null> {
 		if (!this.groupsById.has(utterance_id)) return null;
-		return this.sidecar.patch(utterance_id, patch);
+		return this.sidecar.patch(utterance_id, patch, username);
+	}
+
+	listUsernames(): string[] {
+		return this.sidecar.listUsernames();
 	}
 
 	allLabels(): ReadonlyMap<string, GroupLabel> {

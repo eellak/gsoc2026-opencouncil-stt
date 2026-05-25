@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { reviewHref, editHref, errorCategoryHref, parseSeedParam, randomSeed } from '../../src/lib/shared/urls';
+import { reviewHref, editHref, errorCategoryHref, parseSeedParam, randomSeed, hashSeedString } from '../../src/lib/shared/urls';
 
 describe('reviewHref', () => {
 	it('builds basic href', () => {
@@ -51,13 +51,30 @@ describe('parseSeedParam', () => {
 		expect(parseSeedParam('4294967295')).toBe(4294967295); // uint32 max
 	});
 
-	it('rejects negative, float, NaN, overflow, garbage', () => {
-		expect(parseSeedParam('-1')).toBeNull();
-		expect(parseSeedParam('1.5')).toBeNull();
-		expect(parseSeedParam('abc')).toBeNull();
+	it('returns null for empty / null', () => {
 		expect(parseSeedParam('')).toBeNull();
 		expect(parseSeedParam(null)).toBeNull();
-		expect(parseSeedParam('4294967296')).toBeNull(); // > uint32 max
+		expect(parseSeedParam(undefined)).toBeNull();
+	});
+
+	it('rejects overflow integer (> uint32 max)', () => {
+		// digits-only but out of uint32 range → null
+		expect(parseSeedParam('4294967296')).toBeNull();
+	});
+
+	it('hashes any non-empty non-integer string to a stable uint32', () => {
+		const h = parseSeedParam('christos');
+		expect(h).not.toBeNull();
+		expect(Number.isInteger(h)).toBe(true);
+		expect(h!).toBeGreaterThanOrEqual(0);
+		expect(h!).toBeLessThanOrEqual(4294967295);
+		// Stable: same input → same output
+		expect(parseSeedParam('christos')).toBe(h);
+		// Case-insensitive
+		expect(parseSeedParam('CHRISTOS')).toBe(h);
+		// Negative sign, dots, etc. become part of the string → hash
+		expect(parseSeedParam('-1')).toBe(hashSeedString('-1'));
+		expect(parseSeedParam('1.5')).toBe(hashSeedString('1.5'));
 	});
 });
 
