@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
+	import { goto, afterNavigate } from '$app/navigation';
 	import { untrack } from 'svelte';
 	import Diff from '$lib/components/Diff.svelte';
 	import StatusButtons from '$lib/components/StatusButtons.svelte';
@@ -136,7 +136,6 @@
 	}
 	function onAudioCanPlay() {
 		audioReady = true;
-		audioReadyFlash = true;
 		// Fallback: if canplaythrough never fires (slow/unstable network, Safari
 		// quirks), unblock autoplay 1.5s after canplay so we don't stall forever.
 		if (!audioAutoplayReady && !autoplayFallbackTimer) {
@@ -153,7 +152,12 @@
 	}
 	function onAudioWaiting() { audioReady = false; audioReadyFlash = false; audioAutoplayReady = false; clearAutoplayFallback(); }
 	function onAudioLoadStart() { audioReady = false; audioReadyFlash = false; audioAutoplayReady = false; isPlaying = false; clearAutoplayFallback(); }
-	function onAudioPlay() { isPlaying = true; }
+	function onAudioPlay() {
+		isPlaying = true;
+		// Flash sweeps once per play-start regardless of how it started
+		// (manual click vs autoplay). The :playing throb takes over after.
+		audioReadyFlash = true;
+	}
 	function onAudioPause() { isPlaying = false; }
 	function onAudioEnded() { isPlaying = false; }
 	const audioSources = $derived(resolveAudioUrls(item.audio_url));
@@ -264,6 +268,55 @@
 			el.removeEventListener('pause', onAudioPause);
 			el.removeEventListener('ended', onAudioEnded);
 		};
+	});
+
+	let utteranceAnchor: HTMLElement | null = $state(null);
+	let topBarEl: HTMLElement | null = $state(null);
+	// After every navigation (including j/k and swipe-commit), scroll so the
+	// utterance edit sits near the top of the viewport instead of getting
+	// buried under the (slowly-loading) transcript panel above. Offset is
+	// measured from the actual sticky-header so wrapped rows on mobile
+	// don't hide the card behind it.
+	afterNavigate(() => {
+		if (typeof window === 'undefined') return;
+		// Only force-scroll in mobile mode; on desktop the user keeps
+		// their own scroll position across navigations.
+		if (!reviewPrefs.mobileMode) return;
+		requestAnimationFrame(() => {
+			if (!utteranceAnchor) return;
+			const headerH = topBarEl?.getBoundingClientRect().height ?? 70;
+			const rect = utteranceAnchor.getBoundingClientRect();
+			const offset = headerH + 12;
+			const target = window.scrollY + rect.top - offset;
+			window.scrollTo({ top: Math.max(0, target), behavior: 'smooth' });
+		});
+	});
+
+	// Keep scroll-margin-top in sync with the sticky header so anchor jumps
+	// (e.g. browser back/forward) also clear it.
+	$effect(() => {
+		if (typeof document === 'undefined') return;
+		const update = () => {
+			const h = topBarEl?.getBoundingClientRect().height ?? 70;
+			document.documentElement.style.setProperty('--top-bar-h', `${Math.ceil(h)}px`);
+		};
+		update();
+		const ro = topBarEl ? new ResizeObserver(update) : null;
+		if (topBarEl && ro) ro.observe(topBarEl);
+		window.addEventListener('resize', update);
+		return () => {
+			ro?.disconnect();
+			window.removeEventListener('resize', update);
+		};
+	});
+
+	// Toggle a body class so global CSS can react to mobile-mode (e.g. hide
+	// keyboard shortcut hints that aren't useful on touch).
+	$effect(() => {
+		if (typeof document === 'undefined') return;
+		const on = reviewPrefs.mobileMode;
+		document.body.classList.toggle('mobile-mode', on);
+		return () => document.body.classList.remove('mobile-mode');
 	});
 
 	// Autoplay: wait for canplaythrough (or 1.5s fallback after canplay) to
@@ -385,7 +438,7 @@
 			audioEl.currentTime = regionStart;
 			if (playbackPrefs.loop) {
 				clearTimeout(loopTimer);
-				loopTimer = setTimeout(() => { void audioEl?.play(); }, 100);
+				loopTimer = setTimeout(() => { void audioEl?.play(); }, playbackPrefs.loopGapMs);
 			}
 		}
 	}
@@ -494,7 +547,7 @@
 <svelte:window onkeydown={onKeydown} />
 
 <div class="review-page">
-	<header class="top-bar">
+	<header class="top-bar" bind:this={topBarEl}>
 		<div class="top-row">
 			<div class="meeting-info">
 				{#if item.meeting_name}<span class="meeting-title">{item.meeting_name}</span>{/if}
@@ -565,26 +618,28 @@
 			loadMoreAtTop
 		/>
 
-		{#if reviewPrefs.mobileMode}
-			<MobileSwipeCard
-				onInclude={swipeInclude}
-				onExclude={swipeExclude}
-				onTap={goNext}
-				labelInclude={t('swipeInclude')}
-				labelExclude={t('swipeExclude')}
-			>
-				{@render diffCardBody()}
-			</MobileSwipeCard>
-		{:else}
-			<!-- svelte-ignore a11y_no_static_element_interactions -->
-			<section
-				class="diff-section"
-				ontouchstart={onTouchStart}
-				ontouchend={onTouchEnd}
-			>
-				{@render diffCardBody()}
-			</section>
-		{/if}
+		<div id="utterance-edit" bind:this={utteranceAnchor} class="utt-anchor">
+			{#if reviewPrefs.mobileMode}
+				<MobileSwipeCard
+					onInclude={swipeInclude}
+					onExclude={swipeExclude}
+					onTap={reviewPrefs.tapAdvances ? goNext : undefined}
+					labelInclude={t('swipeInclude')}
+					labelExclude={t('swipeExclude')}
+				>
+					{@render diffCardBody()}
+				</MobileSwipeCard>
+			{:else}
+				<!-- svelte-ignore a11y_no_static_element_interactions -->
+				<section
+					class="diff-section"
+					ontouchstart={onTouchStart}
+					ontouchend={onTouchEnd}
+				>
+					{@render diffCardBody()}
+				</section>
+			{/if}
+		</div>
 
 		{#snippet diffCardBody()}
 			{#if prevHref}
@@ -852,7 +907,15 @@
 		border-radius: var(--radius-sm, 6px);
 		font-size: 0.85rem; background: var(--surface, #fff);
 	}
-	.play-controls { display: inline-flex; align-items: center; gap: 0.5rem; }
+	.play-controls {
+		display: inline-flex; align-items: center; gap: 0.5rem;
+		flex-wrap: nowrap; min-width: 0;
+	}
+	:global(body.mobile-mode) .play-controls kbd { display: none; }
+	:global(body.mobile-mode) .pref-toggle { font-size: 0.7rem; }
+	@media (max-width: 540px) {
+		.play-controls kbd { display: none; }
+	}
 	.pref-toggle {
 		display: inline-flex; align-items: center; gap: 0.2rem;
 		font-size: 0.72rem; color: var(--text-2, #475569); cursor: pointer;
@@ -963,7 +1026,8 @@
 		padding: 1rem 1.1rem;
 		box-shadow: var(--shadow, 0 1px 3px rgba(0,0,0,.08));
 	}
-	.diff-section { position: relative; }
+	.diff-section { position: relative; min-width: 0; overflow: hidden; }
+	.utt-anchor { scroll-margin-top: calc(var(--top-bar-h, 80px) + 12px); min-width: 0; }
 	.utt-chevron {
 		position: absolute; top: 50%; transform: translateY(-50%);
 		width: 30px; height: 30px;

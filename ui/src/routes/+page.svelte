@@ -107,10 +107,18 @@
 	.hint { font-size: 0.72rem; color: var(--text-3, #94a3b8); }
 	.preview { font-size: 0.72rem; color: var(--accent, #2563eb); font-family: monospace; }
 	.skip-toggle {
-		display: flex; flex-direction: row; align-items: center; gap: 0.45rem;
-		font-size: 0.82rem; color: var(--text-2, #475569); margin-top: 0.2rem;
+		display: flex; flex-direction: row; align-items: center;
+		justify-content: flex-start; gap: 0.55rem;
+		align-self: flex-start;
+		font-size: 0.82rem; color: var(--text-2, #475569);
+		margin-top: 0.2rem; padding: 0.3rem 0;
+		cursor: pointer; user-select: none;
 	}
-	.skip-toggle input { accent-color: var(--accent, #2563eb); }
+	.skip-toggle input {
+		accent-color: var(--accent, #2563eb);
+		width: 1rem; height: 1rem; margin: 0; flex-shrink: 0;
+	}
+	.skip-toggle span { flex: 0 1 auto; }
 	.error { font-size: 0.78rem; color: #dc2626; }
 	button {
 		padding: 0.5rem 0.95rem; font-size: 0.9rem;

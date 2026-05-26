@@ -11,10 +11,11 @@
 	const { status, saving = false, onchange }: Props = $props();
 	const value = $derived(status);
 
+	// Order matches the swipe convention: exclude (left) ← uncertain → include (right).
 	const options: { status: IncludeStatus; key: Parameters<typeof t>[0]; color: string }[] = [
-		{ status: 'include', key: 'include', color: 'green' },
 		{ status: 'exclude', key: 'exclude', color: 'red' },
-		{ status: 'uncertain', key: 'uncertain', color: 'yellow' }
+		{ status: 'uncertain', key: 'uncertain', color: 'yellow' },
+		{ status: 'include', key: 'include', color: 'green' }
 	];
 </script>
 
