@@ -36,6 +36,23 @@
 					<span class="rlabel">{t('settingsLoop')}</span>
 					<small class="hint">{t('settingsLoopHint')}</small>
 				</label>
+				{#if playbackPrefs.loop}
+					<label class="row indent slider-row">
+						<span class="rlabel">{t('settingsLoopGap')}</span>
+						<span class="slider-wrap">
+							<input
+								type="range"
+								min="0"
+								max="2000"
+								step="50"
+								value={playbackPrefs.loopGapMs}
+								oninput={(e) => playbackPrefs.setLoopGapMs(Number((e.target as HTMLInputElement).value))}
+							/>
+							<span class="slider-value">{playbackPrefs.loopGapMs}ms</span>
+						</span>
+						<small class="hint">{t('settingsLoopGapHint')}</small>
+					</label>
+				{/if}
 			</section>
 
 			<section>
@@ -50,11 +67,13 @@
 					<span class="rlabel">{t('settingsMobileMode')}</span>
 					<small class="hint">{t('settingsMobileModeHint')}</small>
 				</label>
-			</section>
-
-			<section class="coming-soon">
-				<h3>{t('settingsLayoutHeading')}</h3>
-				<p class="placeholder">{t('settingsComingSoon')}</p>
+				{#if reviewPrefs.mobileMode}
+					<label class="row indent">
+						<input type="checkbox" checked={reviewPrefs.tapAdvances} onchange={() => reviewPrefs.toggleTapAdvances()} />
+						<span class="rlabel">{t('settingsTapAdvances')}</span>
+						<small class="hint">{t('settingsTapAdvancesHint')}</small>
+					</label>
+				{/if}
 			</section>
 
 		</div>
@@ -97,12 +116,16 @@
 		align-items: center; padding: 0.35rem 0; cursor: pointer;
 	}
 	.row input { accent-color: #2563eb; }
+	.row.indent { padding-left: 1.5rem; opacity: 0.95; }
 	.rlabel { font-size: 0.9rem; color: #0f172a; }
 	.hint { grid-column: 2; font-size: 0.72rem; color: #64748b; }
-	.coming-soon h3 { color: #cbd5e1; }
-	.placeholder {
-		margin: 0; font-size: 0.78rem; color: #94a3b8; font-style: italic;
-		padding: 0.4rem 0.6rem; background: #f8fafc;
-		border: 1px dashed #e2e8f0; border-radius: 6px;
+	.slider-row .slider-wrap {
+		display: inline-flex; align-items: center; gap: 0.5rem;
+		grid-column: 2;
+	}
+	.slider-row input[type='range'] { flex: 1; min-width: 140px; max-width: 240px; }
+	.slider-row .slider-value {
+		font-size: 0.78rem; font-family: ui-monospace, monospace;
+		color: #334155; min-width: 3.5rem;
 	}
 </style>

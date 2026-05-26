@@ -45,9 +45,15 @@
 
 <div class="diff has-header">
 	<div class="diff-header">
-		<div class="diff-speaker" aria-label="Speaker" class:placeholder={!speakerName}>
+		<div
+			class="diff-speaker"
+			aria-label="Speaker"
+			class:placeholder={!speakerName}
+			title={speakerName ?? ''}
+		>
 			{#if speakerName}
-				🎙 {speakerName}
+				<span class="mic" aria-hidden="true">🎙</span>
+				<span class="speaker-name">{speakerName}</span>
 			{:else if speakerLoading}
 				<span class="dot-shimmer" aria-hidden="true">🎙 …</span>
 			{:else}
@@ -96,10 +102,11 @@
 <style>
 	.diff {
 		display: grid;
-		grid-template-columns: 1fr 1fr;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 		gap: 0.5rem;
 		font-size: 1rem;
 		line-height: 1.6;
+		min-width: 0;
 	}
 	.diff.has-header {
 		grid-template-areas: 'header header' 'before after';
@@ -126,7 +133,18 @@
 		background: #ede9fe;
 		border-radius: 6px;
 		display: inline-flex;
-		flex-shrink: 0;
+		align-items: center;
+		gap: 0.3rem;
+		max-width: min(220px, 50%);
+		min-width: 0;
+		cursor: help;
+	}
+	.diff-speaker .mic { flex-shrink: 0; }
+	.diff-speaker .speaker-name {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		min-width: 0;
 	}
 	.diff-speaker.placeholder {
 		background: #f1f5f9;
@@ -228,7 +246,10 @@
 		border-radius: 6px;
 		background: var(--surface2, #f5f5f5);
 		word-break: break-word;
+		overflow-wrap: anywhere;
 		white-space: pre-wrap;
+		min-width: 0;
+		max-width: 100%;
 	}
 
 	mark {
