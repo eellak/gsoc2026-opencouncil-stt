@@ -22,6 +22,9 @@
 	import { playbackPrefs } from '$lib/client/playback-prefs.svelte';
 	import UserPickerModal from '$lib/components/UserPickerModal.svelte';
 	import ShortcutsModal from '$lib/components/ShortcutsModal.svelte';
+	import SettingsModal from '$lib/components/SettingsModal.svelte';
+	import MobileSwipeCard from '$lib/components/MobileSwipeCard.svelte';
+	import { reviewPrefs } from '$lib/client/review-prefs.svelte';
 
 	const DIGIT_SHORTCUTS: ReadonlyMap<string, TaxonomyId> = new Map(
 		TAXONOMY.filter((c) => c.shortcut).map((c) => [c.shortcut!, c.id as TaxonomyId])
@@ -99,8 +102,23 @@
 		saveTimer = setTimeout(() => (saveStatus = 'idle'), 2000);
 	}
 
+	function patchStatus(status: IncludeStatus, opts: { advance?: boolean } = {}) {
+		patch({ include_status: status });
+		// Only auto-advance for terminal decisions, not 'unreviewed' reverts.
+		if (status === 'unreviewed') return;
+		const shouldAdvance = opts.advance ?? reviewPrefs.autoAdvance;
+		if (shouldAdvance && nextHref) {
+			// Tiny delay so the status flash is visible before navigation.
+			setTimeout(() => goNext(), 120);
+		}
+	}
+
+	function swipeInclude() { patchStatus('include', { advance: true }); }
+	function swipeExclude() { patchStatus('exclude', { advance: true }); }
+
 	let paletteOpen = $state(false);
 	let shortcutsOpen = $state(false);
+	let settingsOpen = $state(false);
 	let showUserModal = $state(userStore.value === '');
 	// The visible <audio> element is owned by the pool — pool.setActive moves
 	// the matching pool element into our `audioSlot` div. We read it back via
@@ -440,7 +458,7 @@
 
 	function onKeydown(e: KeyboardEvent) {
 		if (['INPUT', 'TEXTAREA', 'SELECT'].includes((e.target as HTMLElement).tagName)) return;
-		if (paletteOpen || showUserModal) return;
+		if (paletteOpen || showUserModal || settingsOpen) return;
 		if (e.ctrlKey || e.metaKey || e.altKey) return;
 		// ? toggles shortcuts modal; allow it through even when shortcutsOpen is true
 		if (e.key === '?') { e.preventDefault(); shortcutsOpen = !shortcutsOpen; return; }
@@ -448,9 +466,9 @@
 		const k = normalizeShortcut(e.key);
 		if ((e.key === 'ArrowLeft' || k === 'k') && prevHref) { e.preventDefault(); goPrev(); }
 		if ((e.key === 'ArrowRight' || k === 'j') && nextHref) { e.preventDefault(); goNext(); }
-		if (k === 'i') patch({ include_status: 'include' });
-		if (k === 'x') patch({ include_status: 'exclude' });
-		if (k === 'u') patch({ include_status: 'uncertain' });
+		if (k === 'i') patchStatus('include');
+		if (k === 'x') patchStatus('exclude');
+		if (k === 'u') patchStatus('uncertain');
 		if (k === ' ') { e.preventDefault(); togglePlay(); }
 		if (k === 'a') { e.preventDefault(); playbackPrefs.toggleAutoplay(); }
 		if (k === 'l') { e.preventDefault(); playbackPrefs.toggleLoop(); }
@@ -493,6 +511,15 @@
 						+ όνομα
 					</button>
 				{/if}
+				<button
+					type="button"
+					class="settings-cog-btn"
+					onclick={() => (settingsOpen = true)}
+					aria-label={t('settingsAria')}
+					title={t('settingsTitle')}
+				>
+					<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+				</button>
 				<button
 					type="button"
 					class="share-icon-btn"
@@ -538,12 +565,28 @@
 			loadMoreAtTop
 		/>
 
-		<!-- svelte-ignore a11y_no_static_element_interactions -->
-		<section
-			class="diff-section"
-			ontouchstart={onTouchStart}
-			ontouchend={onTouchEnd}
-		>
+		{#if reviewPrefs.mobileMode}
+			<MobileSwipeCard
+				onInclude={swipeInclude}
+				onExclude={swipeExclude}
+				onTap={goNext}
+				labelInclude={t('swipeInclude')}
+				labelExclude={t('swipeExclude')}
+			>
+				{@render diffCardBody()}
+			</MobileSwipeCard>
+		{:else}
+			<!-- svelte-ignore a11y_no_static_element_interactions -->
+			<section
+				class="diff-section"
+				ontouchstart={onTouchStart}
+				ontouchend={onTouchEnd}
+			>
+				{@render diffCardBody()}
+			</section>
+		{/if}
+
+		{#snippet diffCardBody()}
 			{#if prevHref}
 				<a href={prevHref} class="utt-chevron left" title={t('prev') + ' (k)'} aria-label={t('prevAria')}>
 					<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 6 9 12 15 18"/></svg>
@@ -603,7 +646,7 @@
 				lang={getLang()}
 				playSlot={playButton}
 			/>
-		</section>
+		{/snippet}
 
 		<MeetingContextPanel
 			utterances={contextData?.next.slice(0, nextRadius) ?? []}
@@ -704,7 +747,7 @@
 		<StatusButtons
 			status={item.label.include_status}
 			saving={saveStatus === 'saving'}
-			onchange={(s) => patch({ include_status: s })}
+			onchange={(s) => patchStatus(s)}
 		/>
 		<div class="footer-nav">
 			{#if prevHref}<a href={prevHref} class="footer-nav-btn">{t('prev')} <kbd>k</kbd></a>{/if}
@@ -725,6 +768,7 @@
 {/if}
 
 <ShortcutsModal open={shortcutsOpen} onclose={() => (shortcutsOpen = false)} showChain={item.edits.length > 1} />
+<SettingsModal open={settingsOpen} onclose={() => (settingsOpen = false)} />
 
 <style>
 	.review-page { max-width: 860px; margin: 0 auto; padding: 1rem 1rem 5rem; }
@@ -761,6 +805,13 @@
 		cursor: pointer; transition: background 0.15s; line-height: 1;
 	}
 	.share-icon-btn:hover { background: #f1f5f9; }
+	.settings-cog-btn {
+		display: inline-flex; align-items: center; justify-content: center;
+		padding: 0.2rem 0.35rem; border-radius: 6px;
+		background: transparent; border: 1px solid var(--border, #e2e8f0);
+		cursor: pointer; color: #475569; transition: background 0.15s, color 0.15s;
+	}
+	.settings-cog-btn:hover { background: #f1f5f9; color: #0f172a; }
 	.share-icon-btn.copied { background: #dcfce7; border-color: #86efac; }
 	.bottom-row {
 		display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;
