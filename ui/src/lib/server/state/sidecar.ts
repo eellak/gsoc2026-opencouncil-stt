@@ -173,20 +173,38 @@ export class SidecarStore {
 		// SvelteKit handler.
 		const canonicalPatch = canonicalizePatchForWrite(patch);
 		validatePatch(canonicalPatch);
-		const run = () => this.doPatch(utterance_id, canonicalPatch, username ?? null);
+		const run = () => this.doPatch(utterance_id, canonicalPatch, { kind: 'local', username: username ?? null });
 		const op = this.writeQueue.then(run, run);
 		this.writeQueue = op.catch(() => {});
 		await op;
 		return this.get(utterance_id);
 	}
 
-	private async doPatch(utterance_id: string, patch: GroupPatchBody, username: string | null): Promise<void> {
+	/**
+	 * Write a patch with an explicit string source (e.g. "ext-gemini-2.5-pro").
+	 * Used by the external-LLM ingest path. Source must already be sanitized
+	 * by the caller; this method does not slugify.
+	 */
+	async patchWithSource(utterance_id: string, patch: GroupPatchBody, source: string): Promise<GroupLabel> {
+		if (typeof source !== 'string' || !/^[a-z0-9._-]{1,64}$/i.test(source)) {
+			throw new Error(`invalid source slug: ${source}`);
+		}
+		const canonicalPatch = canonicalizePatchForWrite(patch);
+		validatePatch(canonicalPatch);
+		const run = () => this.doPatch(utterance_id, canonicalPatch, source);
+		const op = this.writeQueue.then(run, run);
+		this.writeQueue = op.catch(() => {});
+		await op;
+		return this.get(utterance_id);
+	}
+
+	private async doPatch(utterance_id: string, patch: GroupPatchBody, source: ReviewEventSource | string): Promise<void> {
 		const tentativeId = this.lastEventId + 1;
 		const ev: ReviewEvent = {
 			id: tentativeId,
 			ts: new Date().toISOString(),
 			utterance_id,
-			source: { kind: 'local', username },
+			source,
 			patch
 		};
 		const handle = await fs.open(this.paths.eventsPath, 'a');

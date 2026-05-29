@@ -111,6 +111,16 @@ export class FileRepo {
 		return this.sidecar.patch(utterance_id, patch, username);
 	}
 
+	/**
+	 * Write a label patch with an explicit source slug (e.g. "ext-gemini-2.5-pro").
+	 * Used by the external-LLM ingest path. Returns null when the utterance is
+	 * unknown to the repo.
+	 */
+	async patchLabelExt(utterance_id: string, patch: GroupPatchBody, source: string): Promise<GroupLabel | null> {
+		if (!this.groupsById.has(utterance_id)) return null;
+		return this.sidecar.patchWithSource(utterance_id, patch, source);
+	}
+
 	listUsernames(): string[] {
 		return this.sidecar.listUsernames();
 	}

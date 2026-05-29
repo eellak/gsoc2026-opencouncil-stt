@@ -186,6 +186,12 @@ export class SqliteRepo {
 		return this.sidecar.patch(utterance_id, patch, username);
 	}
 
+	async patchLabelExt(utterance_id: string, patch: GroupPatchBody, source: string): Promise<GroupLabel | null> {
+		const exists = this.getByIdStmt.get(utterance_id);
+		if (!exists) return null;
+		return this.sidecar.patchWithSource(utterance_id, patch, source);
+	}
+
 	listUsernames(): string[] {
 		return this.sidecar.listUsernames();
 	}
