@@ -1,83 +1,60 @@
 /**
  * Client-side surrounding-utterance context.
  *
- * The browser fetches the full meeting JSON for each meeting we need
- * (relayed via /api/oc-meeting/{city}/{meeting}, which is just a CORS
- * bridge — no slicing or caching happens there), caches it in memory under
- * an LRU cap, and slices it locally to produce ±radius context for any
- * `utterance_id` known to be in that meeting.
+ * Fetches just the N utterances before/after the target from the OpenCouncil
+ * per-utterance context endpoint, relayed through /api/oc-context/{id} (a CORS
+ * bridge — no slicing happens there). This replaces the old approach of
+ * downloading the entire ~600 KB meeting transcript and slicing it locally;
+ * payloads are now a few KB.
  *
- * Pairs with the audio prefetch sliding window: every time the review page
- * advances, we also call `prefetch(neighbours)` so that the meeting JSON for
- * upcoming utterances is already in memory when the user lands on them.
+ * The endpoint returns only `speakerTagId` per neighbour (no speaker names),
+ * so we surface no human-readable speaker names. We still group adjacent
+ * same-speaker utterances by stashing the tag id in `speaker_person_id`
+ * (used purely as a grouping key by `mergeBySpeaker`; never rendered as a
+ * name — the panel falls back to "—").
  *
- * SSR-safe: `fetch` works server-side too, but the singleton is only
- * meaningful in the browser. The module never touches `window` directly so
- * importing it during SSR is harmless.
+ * Pairs with the audio prefetch sliding window: as the review page advances we
+ * `prefetch(id)` upcoming utterances so their context is warm on arrival.
+ *
+ * SSR-safe: `fetch` works server-side too; the module never touches `window`.
  */
 
 import type { MeetingContext, ContextUtterance } from '$lib/domain/meeting-context';
 
-// Each meeting JSON is ~600 KB. 100 entries ≈ 60 MB browser memory — well
-// inside a modern Chromium tab budget but big enough that a reviewer
-// crossing a whole seeded random window never sees a re-fetch within one
-// session. The LRU still evicts oldest beyond the cap so memory is bounded.
-const LRU_CAP = 100;
+// Each context response is a few KB. 200 entries is a comfortably small cache
+// that survives crossing a seeded window without re-fetching.
+const LRU_CAP = 200;
+const MAX_NEIGHBOURS = 50;
+/** Radius used by background prefetch (matches the page's initial window). */
+const PREFETCH_RADIUS = 5;
 
-interface OcUtterance {
+interface OcNeighbour {
 	id: string;
-	startTimestamp: number;
-	endTimestamp: number;
 	text: string;
-	speakerSegmentId: string;
+	start: number;
+	end: number;
+	speakerTagId: string | null;
 }
 
-interface OcSpeakerTag {
-	id: string;
-	label: string;
-	personId: string | null;
+interface OcContextResponse {
+	meeting?: { id?: string; cityId?: string; name?: string; dateTime?: string };
+	before?: OcNeighbour[];
+	after?: OcNeighbour[];
 }
 
-interface OcSegment {
-	id: string;
-	startTimestamp: number;
-	endTimestamp: number;
-	speakerTagId: string;
-	speakerTag?: OcSpeakerTag;
-	utterances: OcUtterance[];
+const lru = new Map<string, Promise<MeetingContext>>();
+const resolved = new Map<string, MeetingContext>();
+
+function clampRadius(n: number): number {
+	if (!Number.isFinite(n)) return 0;
+	return Math.max(0, Math.min(MAX_NEIGHBOURS, Math.floor(n)));
 }
 
-interface OcPerson {
-	id: string;
-	name?: string;
-	name_short?: string;
+function key(utteranceId: string, before: number, after: number): string {
+	return `${utteranceId}|${before}|${after}`;
 }
 
-interface OcMeeting {
-	transcript: OcSegment[];
-	people?: OcPerson[];
-	speakerTags?: OcSpeakerTag[];
-}
-
-interface MeetingHandle {
-	json: OcMeeting;
-	utteranceIndex: Map<string, { segIdx: number; uttIdx: number }>;
-	peopleById: Map<string, OcPerson>;
-	speakerTagsById: Map<string, OcSpeakerTag>;
-}
-
-const lru = new Map<string, Promise<MeetingHandle | null>>();
-// Parallel resolved-handle cache so callers (notably the review page's
-// context effect) can synchronously decide whether a meeting is ready and
-// avoid showing a `loading…` flicker for cache hits. Kept in lockstep with
-// `lru` — both are populated on settle and evicted in touchLru below.
-const resolved = new Map<string, MeetingHandle>();
-
-function key(cityId: string, meetingId: string): string {
-	return `${cityId}|${meetingId}`;
-}
-
-function touchLru(k: string, value: Promise<MeetingHandle | null>): void {
+function touchLru(k: string, value: Promise<MeetingContext>): void {
 	lru.delete(k);
 	lru.set(k, value);
 	while (lru.size > LRU_CAP) {
@@ -88,177 +65,109 @@ function touchLru(k: string, value: Promise<MeetingHandle | null>): void {
 	}
 }
 
-async function fetchMeeting(cityId: string, meetingId: string): Promise<MeetingHandle | null> {
-	const url = `/api/oc-meeting/${encodeURIComponent(cityId)}/${encodeURIComponent(meetingId)}`;
+function toCtx(n: OcNeighbour): ContextUtterance {
+	return {
+		utterance_id: n.id,
+		start: n.start,
+		end: n.end,
+		text: n.text,
+		// Tag id drives same-speaker grouping only — never displayed as a name.
+		speaker_label: null,
+		speaker_person_id: n.speakerTagId ?? null,
+		speaker_name: null,
+		is_current: false,
+		same_speaker_as_current: false
+	};
+}
+
+async function fetchContext(
+	utteranceId: string,
+	before: number,
+	after: number
+): Promise<MeetingContext> {
+	const ctx: MeetingContext = {
+		city_id: '',
+		meeting_id: '',
+		current: null,
+		prev: [],
+		next: [],
+		error: null
+	};
+	const url = `/api/oc-context/${encodeURIComponent(utteranceId)}?before=${before}&after=${after}`;
 	try {
 		const resp = await fetch(url);
-		if (!resp.ok) return null;
-		const json = (await resp.json()) as OcMeeting;
-		if (!json?.transcript) return null;
-
-		const utteranceIndex = new Map<string, { segIdx: number; uttIdx: number }>();
-		for (let s = 0; s < json.transcript.length; s++) {
-			const seg = json.transcript[s];
-			const utts = seg.utterances ?? [];
-			for (let u = 0; u < utts.length; u++) {
-				utteranceIndex.set(utts[u].id, { segIdx: s, uttIdx: u });
-			}
+		if (!resp.ok) {
+			ctx.error = resp.status === 404 ? 'utterance not found' : 'upstream context fetch failed';
+			return ctx;
 		}
-		const peopleById = new Map<string, OcPerson>();
-		for (const p of json.people ?? []) peopleById.set(p.id, p);
-		const speakerTagsById = new Map<string, OcSpeakerTag>();
-		for (const t of json.speakerTags ?? []) speakerTagsById.set(t.id, t);
-
-		return { json, utteranceIndex, peopleById, speakerTagsById };
+		const json = (await resp.json()) as OcContextResponse;
+		ctx.city_id = json.meeting?.cityId ?? '';
+		ctx.meeting_id = json.meeting?.id ?? '';
+		// `before`/`after` arrive chronological (oldest→newest); map straight to
+		// prev/next around the (locally-known) current utterance.
+		ctx.prev = (json.before ?? []).map(toCtx);
+		ctx.next = (json.after ?? []).map(toCtx);
+		return ctx;
 	} catch {
-		return null;
+		ctx.error = 'upstream context fetch failed';
+		return ctx;
 	}
 }
 
-function loadOnce(cityId: string, meetingId: string): Promise<MeetingHandle | null> {
-	if (!cityId || !meetingId) return Promise.resolve(null);
-	const k = key(cityId, meetingId);
+function loadOnce(utteranceId: string, before: number, after: number): Promise<MeetingContext> {
+	if (!utteranceId) {
+		return Promise.resolve({
+			city_id: '', meeting_id: '', current: null, prev: [], next: [], error: 'missing utterance id'
+		});
+	}
+	const b = clampRadius(before);
+	const a = clampRadius(after);
+	const k = key(utteranceId, b, a);
 	const existing = lru.get(k);
 	if (existing) {
-		// Touch order even on hit so the meeting stays warm.
 		touchLru(k, existing);
 		return existing;
 	}
-	const promise = fetchMeeting(cityId, meetingId).then((handle) => {
-		// Keep the parallel resolved cache in sync. `null` results (network
-		// failures) are intentionally not stored so a retry path stays open
-		// — the lru entry is still there to dedup concurrent retries.
-		// Skip if the LRU evicted this key while the fetch was in flight,
-		// otherwise we leak entries that the eviction policy already let go of.
-		if (handle && lru.has(k)) resolved.set(k, handle);
-		return handle;
+	const promise = fetchContext(utteranceId, b, a).then((ctx) => {
+		if (!ctx.error && lru.has(k)) {
+			resolved.set(k, ctx);
+		} else if (ctx.error && lru.get(k) === promise) {
+			// Evict the failed lookup so a later getContext/prefetch refetches
+			// instead of replaying this cached error. Guard on identity so we
+			// don't clobber a newer in-flight fetch for the same key.
+			lru.delete(k);
+		}
+		return ctx;
 	});
 	touchLru(k, promise);
 	return promise;
 }
 
 /**
- * Synchronously check whether a meeting is already resolved in the cache.
- * Returns true only when a successful fetch has landed AND the entry hasn't
- * been evicted. Used by the review page to skip the `loading…` UI flicker on
- * cache hits.
+ * Synchronously check whether this exact (id, before, after) context is already
+ * resolved in cache — lets the review page skip the "loading…" flicker on hits.
  */
-export function hasMeeting(
-	cityId: string | null | undefined,
-	meetingId: string | null | undefined
-): boolean {
-	if (!cityId || !meetingId) return false;
-	return resolved.has(key(cityId, meetingId));
+export function hasContext(utteranceId: string, before: number, after: number): boolean {
+	if (!utteranceId) return false;
+	return resolved.has(key(utteranceId, clampRadius(before), clampRadius(after)));
+}
+
+/** Kick off a background fetch of an utterance's default-radius context. */
+export function prefetch(utteranceId: string | null | undefined): void {
+	if (!utteranceId) return;
+	void loadOnce(utteranceId, PREFETCH_RADIUS, PREFETCH_RADIUS);
 }
 
 /**
- * Kick off a background fetch of the meeting JSON without waiting on the
- * result. Safe to call repeatedly — concurrent calls share the same
- * underlying promise.
+ * Fetch (or reuse cached) context: `before` utterances before and `after`
+ * after the target. Resolves with `error` populated on failure.
  */
-export function prefetch(cityId: string | null | undefined, meetingId: string | null | undefined): void {
-	if (!cityId || !meetingId) return;
-	// Force-load into the LRU; the returned promise is intentionally ignored.
-	void loadOnce(cityId, meetingId);
-}
-
-function resolveSpeaker(
-	handle: MeetingHandle,
-	speakerTagId: string | null
-): { speaker_label: string | null; speaker_person_id: string | null; speaker_name: string | null } {
-	if (!speakerTagId) return { speaker_label: null, speaker_person_id: null, speaker_name: null };
-	const tag = handle.speakerTagsById.get(speakerTagId) ?? null;
-	const person = tag?.personId ? handle.peopleById.get(tag.personId) ?? null : null;
-	return {
-		speaker_label: tag?.label ?? null,
-		speaker_person_id: tag?.personId ?? null,
-		speaker_name: person?.name_short ?? person?.name ?? null
-	};
-}
-
-/**
- * Fetch (or reuse cached) meeting JSON and return ±radius context around
- * `utteranceId`. Resolves to a context with `error` populated if the meeting
- * can't be loaded or the utterance isn't in it.
- */
-export async function getContext(
-	cityId: string | null | undefined,
-	meetingId: string | null | undefined,
+export function getContext(
 	utteranceId: string,
-	radius: number
+	before: number,
+	after: number
 ): Promise<MeetingContext> {
-	const ctx: MeetingContext = {
-		city_id: cityId ?? '',
-		meeting_id: meetingId ?? '',
-		current: null,
-		prev: [],
-		next: [],
-		error: null
-	};
-
-	if (!cityId || !meetingId) {
-		ctx.error = 'missing city/meeting id';
-		return ctx;
-	}
-
-	const handle = await loadOnce(cityId, meetingId);
-	if (!handle) {
-		ctx.error = 'upstream meeting fetch failed';
-		return ctx;
-	}
-
-	const ix = handle.utteranceIndex.get(utteranceId);
-	if (!ix) {
-		ctx.error = 'utterance not found in meeting transcript';
-		return ctx;
-	}
-
-	// Build a flat list in transcript order so neighbour slicing is linear
-	// across segment boundaries. Cheap on a single meeting (~hundreds of
-	// utterances) and avoids building the same flat array on every call.
-	interface Flat {
-		utt: OcUtterance;
-		speakerTagId: string | null;
-	}
-	const flat: Flat[] = [];
-	let targetIdx = -1;
-	for (const seg of handle.json.transcript) {
-		const tagId = seg.speakerTagId ?? seg.speakerTag?.id ?? null;
-		for (const u of seg.utterances ?? []) {
-			if (u.id === utteranceId) targetIdx = flat.length;
-			flat.push({ utt: u, speakerTagId: tagId });
-		}
-	}
-	if (targetIdx < 0) {
-		ctx.error = 'utterance not found in meeting transcript';
-		return ctx;
-	}
-
-	const safeRadius = Math.max(0, Math.min(20, Math.floor(radius)));
-	const lo = Math.max(0, targetIdx - safeRadius);
-	const hi = Math.min(flat.length, targetIdx + safeRadius + 1);
-	const currentTagId = flat[targetIdx].speakerTagId;
-
-	const toCtx = (f: Flat, isCurrent: boolean): ContextUtterance => {
-		const sp = resolveSpeaker(handle, f.speakerTagId);
-		return {
-			utterance_id: f.utt.id,
-			start: f.utt.startTimestamp,
-			end: f.utt.endTimestamp,
-			text: f.utt.text,
-			speaker_label: sp.speaker_label,
-			speaker_person_id: sp.speaker_person_id,
-			speaker_name: sp.speaker_name,
-			is_current: isCurrent,
-			same_speaker_as_current: !!(currentTagId && f.speakerTagId === currentTagId)
-		};
-	};
-
-	for (let i = lo; i < targetIdx; i++) ctx.prev.push(toCtx(flat[i], false));
-	ctx.current = toCtx(flat[targetIdx], true);
-	for (let i = targetIdx + 1; i < hi; i++) ctx.next.push(toCtx(flat[i], false));
-
-	return ctx;
+	return loadOnce(utteranceId, before, after);
 }
 
 /** Test/debug only. */
