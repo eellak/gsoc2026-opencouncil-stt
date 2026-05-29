@@ -33,6 +33,18 @@ export interface ReviewEventSource {
 	username: string | null;
 }
 
+/** Per-reviewer decision tallies. Counts decision *actions* (status-setting
+ *  events), so re-deciding the same utterance counts again — this is an
+ *  activity meter, not a distinct-utterance count. */
+export interface UserCounts {
+	include: number;
+	exclude: number;
+	uncertain: number;
+	total: number;
+}
+
+const DECISION_STATUSES = new Set(['include', 'exclude', 'uncertain']);
+
 export interface ReviewEvent {
 	id: number;
 	ts: string;
@@ -111,9 +123,14 @@ export class SidecarStore {
 				}
 				throw new Error(`[sidecar] corrupt event at line ${i + 1}: ${(err as Error).message}`);
 			}
-			if (ev.id <= this.lastEventId) continue; // already in snapshot
-			this.apply(ev);
+			// Username + counts accumulate over the FULL history, independent of
+			// the snapshot — every line is parsed here anyway, so tally before the
+			// skip. (Doing it after the `continue` would miss every reviewer whose
+			// events predate the snapshot.)
 			this.recordUsername(ev);
+			this.bumpUserCounts(ev);
+			if (ev.id <= this.lastEventId) continue; // already folded into snapshot — don't re-apply
+			this.apply(ev);
 			this.lastEventId = ev.id;
 		}
 	}
@@ -160,11 +177,34 @@ export class SidecarStore {
 	}
 
 	private _usernames = new Set<string>();
+	private _userCounts = new Map<string, UserCounts>();
 
 	private recordUsername(ev: ReviewEvent): void {
 		if (typeof ev.source === 'object' && ev.source.username) {
 			this._usernames.add(ev.source.username);
 		}
+	}
+
+	/**
+	 * Tally a decision against its reviewer. O(1) per event, run during both
+	 * boot replay and live writes, so /api/users can surface per-user counts
+	 * without re-scanning the log (no UI lag). Only local human reviews that
+	 * set a real decision status are counted (LLM `ext-*` writes are skipped).
+	 */
+	private bumpUserCounts(ev: ReviewEvent): void {
+		if (typeof ev.source !== 'object' || !ev.source.username) return;
+		const status = (ev.patch as Record<string, unknown>).include_status;
+		if (typeof status !== 'string' || !DECISION_STATUSES.has(status)) return;
+		const u = ev.source.username;
+		const c = this._userCounts.get(u) ?? { include: 0, exclude: 0, uncertain: 0, total: 0 };
+		c[status as 'include' | 'exclude' | 'uncertain'] += 1;
+		c.total += 1;
+		this._userCounts.set(u, c);
+	}
+
+	/** Per-reviewer decision tallies. Keyed by username. */
+	userCounts(): Record<string, UserCounts> {
+		return Object.fromEntries(this._userCounts);
 	}
 
 	async patch(utterance_id: string, patch: GroupPatchBody, username?: string): Promise<GroupLabel> {
@@ -217,6 +257,7 @@ export class SidecarStore {
 		this.lastEventId = tentativeId;
 		this.apply(ev);
 		this.recordUsername(ev);
+		this.bumpUserCounts(ev);
 		this.eventsAppendedSinceSnapshot += 1;
 		if (this.eventsAppendedSinceSnapshot >= SNAPSHOT_EVERY) {
 			await this.flushSnapshot();

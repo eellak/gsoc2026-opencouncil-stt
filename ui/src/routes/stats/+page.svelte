@@ -4,9 +4,38 @@
 	import { taxonomyLabel } from '$lib/shared/taxonomy';
 	import { errorCategoryHref } from '$lib/shared/urls';
 	import StatusDistribution from '$lib/components/StatusDistribution.svelte';
+	import { invalidateAll } from '$app/navigation';
 	const { data }: { data: PageData } = $props();
 	const stats = $derived(data.stats);
 	const lang = $derived(getLang());
+
+	let refreshing = $state(false);
+	// Bump on refresh so the "updated N ago" label recomputes against the clock.
+	let nowTick = $state(Date.now());
+
+	const updatedLabel = $derived.by(() => {
+		if (!data.computedAt) return null;
+		void nowTick;
+		const secs = Math.max(0, Math.round((Date.now() - data.computedAt) / 1000));
+		if (secs < 60) return `πριν ${secs}″`;
+		const mins = Math.round(secs / 60);
+		if (mins < 60) return `πριν ${mins}′`;
+		return `πριν ${Math.round(mins / 60)}h`;
+	});
+
+	async function refreshStats() {
+		if (refreshing) return;
+		refreshing = true;
+		try {
+			await fetch('/api/stats/refresh', { method: 'POST' });
+			await invalidateAll();
+			nowTick = Date.now();
+		} catch (err) {
+			console.error('[stats] refresh failed', err);
+		} finally {
+			refreshing = false;
+		}
+	}
 
 	function categoryDisplay(id: string | null): string {
 		if (!id) return t('uncategorized');
@@ -19,6 +48,12 @@
 	<header>
 		<h1>Στατιστικά</h1>
 		<div class="header-actions">
+			{#if updatedLabel}
+				<span class="updated" title="Ηλικία στιγμιότυπου στατιστικών">Ενημερώθηκε {updatedLabel}</span>
+			{/if}
+			<button type="button" class="btn refresh" onclick={refreshStats} disabled={refreshing}>
+				{refreshing ? 'Ανανέωση…' : 'Ανανέωση τώρα'}
+			</button>
 			<a href="/" class="btn">Αρχική</a>
 			<a href="/api/export" class="btn export">Εξαγωγή included</a>
 		</div>
@@ -132,7 +167,10 @@
 	.header-actions { display: flex; gap: 0.5rem; }
 	.btn { font-size: 0.85rem; padding: 0.3rem 0.7rem; border-radius: 4px; background: #f0f0f0; text-decoration: none; color: #333; }
 	.btn.export { background: #dbeafe; color: #1e40af; }
+	.btn.refresh { background: #dcfce7; color: #166534; border: none; cursor: pointer; font-family: inherit; }
+	.btn.refresh:disabled { opacity: 0.6; cursor: default; }
 	.btn:hover { filter: brightness(0.93); }
+	.updated { font-size: 0.8rem; color: #6b7280; align-self: center; }
 	.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
 	.wide { grid-column: 1 / -1; }
 	.card-note { margin: -0.25rem 0 0.75rem; font-size: 0.8rem; color: #6b7280; }

@@ -8,7 +8,10 @@
 		if (e.key === 'Escape') onclose();
 	}
 
-	let existingUsernames = $state<string[]>([]);
+	interface UserCounts { include: number; exclude: number; uncertain: number; total: number; }
+	interface UserRow { name: string; counts: UserCounts; }
+
+	let users = $state<UserRow[]>([]);
 	let newName = $state('');
 	let loading = $state(true);
 	let error = $state<string | null>(null);
@@ -16,9 +19,16 @@
 	$effect(() => {
 		fetch('/api/users')
 			.then((r) => r.json())
-			.then((d) => { existingUsernames = d.usernames ?? []; })
+			.then((d) => { users = d.users ?? []; })
 			.catch(() => {})
 			.finally(() => { loading = false; });
+	});
+
+	// Whether the typed name would create a new reviewer (drives Δημιουργία vs Επιλογή).
+	const isNewUser = $derived.by(() => {
+		const trimmed = newName.trim().toLowerCase();
+		if (!trimmed) return false;
+		return !users.some((u) => u.name.toLowerCase() === trimmed);
 	});
 
 	function pick(name: string) {
@@ -45,11 +55,14 @@
 
 		{#if loading}
 			<p class="hint">Φόρτωση...</p>
-		{:else if existingUsernames.length > 0}
+		{:else if users.length > 0}
 			<ul class="existing">
-				{#each existingUsernames as name}
+				{#each users as u}
 					<li>
-						<button class="name-btn" onclick={() => pick(name)}>{name}</button>
+						<button class="name-btn" onclick={() => pick(u.name)}>
+							<span class="name">{u.name}</span>
+							<span class="count" title="Αξιολογήσεις (include/exclude/uncertain)">{u.counts.total.toLocaleString('el-GR')}</span>
+						</button>
 					</li>
 				{/each}
 			</ul>
@@ -65,7 +78,7 @@
 					aria-invalid={error !== null}
 					autofocus
 				/>
-				<button type="submit" class="primary">Επιλογή</button>
+				<button type="submit" class="primary">{isNewUser ? 'Δημιουργία' : 'Επιλογή'}</button>
 			</div>
 			{#if error}<span class="error">{error}</span>{/if}
 		</form>
@@ -83,20 +96,29 @@
 		position: relative;
 	}
 	.close {
-		position: absolute; top: 0.5rem; right: 0.6rem;
-		background: transparent; border: 0; cursor: pointer;
-		font-size: 1rem; color: #94a3b8; padding: 0.2rem 0.45rem;
-		border-radius: 4px;
+		position: absolute; top: 0.75rem; right: 0.75rem;
+		display: inline-flex; align-items: center; justify-content: center;
+		width: 1.9rem; height: 1.9rem;
+		background: #f1f5f9; border: 0; cursor: pointer;
+		font-size: 0.95rem; line-height: 1; color: #64748b;
+		border-radius: 50%;
+		transition: color 0.12s, background 0.12s;
 	}
-	.close:hover { color: #0f172a; background: #f1f5f9; }
+	.close:hover { color: #0f172a; background: #e2e8f0; }
 	h2 { margin: 0 0 0.25rem; font-size: 1.15rem; }
 	.sub { margin: 0 0 1.1rem; font-size: 0.82rem; color: #64748b; }
 	.existing { list-style: none; padding: 0; margin: 0 0 0.5rem; display: flex; flex-wrap: wrap; gap: 0.4rem; }
 	.name-btn {
-		padding: 0.35rem 0.8rem; border: 1px solid #e2e8f0; border-radius: 20px;
+		display: inline-flex; align-items: center; gap: 0.4rem;
+		padding: 0.35rem 0.5rem 0.35rem 0.8rem; border: 1px solid #e2e8f0; border-radius: 20px;
 		background: #f8fafc; cursor: pointer; font-size: 0.9rem;
 	}
 	.name-btn:hover { background: #e0f2fe; border-color: #38bdf8; }
+	.name-btn .count {
+		font-size: 0.72rem; font-variant-numeric: tabular-nums;
+		background: #e2e8f0; color: #475569; border-radius: 999px;
+		padding: 0.05rem 0.45rem; min-width: 1.4rem; text-align: center;
+	}
 	.divider { font-size: 0.75rem; color: #94a3b8; margin: 0.6rem 0; text-align: center; }
 	.row { display: flex; gap: 0.5rem; }
 	input {

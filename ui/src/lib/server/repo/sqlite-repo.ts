@@ -196,6 +196,10 @@ export class SqliteRepo {
 		return this.sidecar.listUsernames();
 	}
 
+	userCounts() {
+		return this.sidecar.userCounts();
+	}
+
 	allLabels(): ReadonlyMap<string, GroupLabel> {
 		return this.sidecar.all();
 	}

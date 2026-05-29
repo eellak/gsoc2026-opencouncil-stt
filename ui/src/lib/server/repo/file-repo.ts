@@ -125,6 +125,10 @@ export class FileRepo {
 		return this.sidecar.listUsernames();
 	}
 
+	userCounts() {
+		return this.sidecar.userCounts();
+	}
+
 	allLabels(): ReadonlyMap<string, GroupLabel> {
 		return this.sidecar.all();
 	}
