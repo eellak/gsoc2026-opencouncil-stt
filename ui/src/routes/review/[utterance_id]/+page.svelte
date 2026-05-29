@@ -692,6 +692,13 @@
 					</label>
 				</div>
 			{/snippet}
+			{#snippet decisionButtons()}
+				<StatusButtons
+					status={item.label.include_status}
+					saving={saveStatus === 'saving'}
+					onchange={(s) => patchStatus(s)}
+				/>
+			{/snippet}
 			<Diff
 				before={beforeText}
 				after={afterText}
@@ -700,6 +707,7 @@
 				errorCategoryIds={item.label.error_categories}
 				lang={getLang()}
 				playSlot={playButton}
+				actionsSlot={decisionButtons}
 			/>
 		{/snippet}
 
@@ -797,18 +805,6 @@
 			</div>
 		</section>
 	</main>
-
-	<footer class="action-footer">
-		<StatusButtons
-			status={item.label.include_status}
-			saving={saveStatus === 'saving'}
-			onchange={(s) => patchStatus(s)}
-		/>
-		<div class="footer-nav">
-			{#if prevHref}<a href={prevHref} class="footer-nav-btn">{t('prev')} <kbd>k</kbd></a>{/if}
-			{#if nextHref}<a href={nextHref} class="footer-nav-btn primary" onclick={(e) => { e.preventDefault(); goNext(); }}>{t('next')} <kbd>j</kbd></a>{/if}
-		</div>
-	</footer>
 
 	<CategoryPalette
 		open={paletteOpen}
@@ -1046,9 +1042,9 @@
 		.utt-chevron.right { right: -8px; }
 		.utt-chevron { background: rgba(255, 255, 255, 0.92); }
 	}
-	@media (max-width: 640px) {
-		.utt-chevron { display: none; }
-	}
+	/* Chevrons stay visible on every breakpoint (including mobile) — the
+	   reviewer asked for always-available prev/next arrows. On phones they sit
+	   just inside the card edges via the 960px rule above. */
 	.chain-toggle {
 		display: flex; align-items: center; gap: 0.4rem;
 		font-size: 0.8rem; color: var(--text-2, #475569);
@@ -1074,20 +1070,4 @@
 		padding: 0.05rem 0.32rem; font-family: monospace;
 		color: var(--text-2, #475569);
 	}
-	.action-footer {
-		position: fixed; bottom: 0; left: 0; right: 0; z-index: 20;
-		background: var(--surface, #fff); border-top: 1px solid var(--border, #e2e8f0);
-		box-shadow: 0 -2px 12px rgba(0,0,0,.08);
-		display: flex; align-items: center; justify-content: space-between;
-		padding: 0.6rem max(1rem, calc(50vw - 430px)); gap: 1rem;
-	}
-	.footer-nav { display: flex; gap: 0.4rem; }
-	.footer-nav-btn {
-		font-size: 0.82rem; padding: 0.35rem 0.8rem;
-		border-radius: var(--radius-sm, 6px);
-		background: var(--surface-3, #f1f5f9);
-		border: 1px solid var(--border, #e2e8f0);
-		text-decoration: none; color: var(--text-2, #475569);
-	}
-	.footer-nav-btn.primary { background: var(--accent, #2563eb); color: #fff; border-color: transparent; }
 </style>

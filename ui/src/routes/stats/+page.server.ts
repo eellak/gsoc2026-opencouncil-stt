@@ -23,7 +23,9 @@ export async function load({ fetch }) {
 
 	try {
 		const stats = (await resp.json()) as StatsResponse;
-		return { stats };
+		const computedAtHeader = resp.headers.get('X-Stats-Computed-At');
+		const computedAt = computedAtHeader ? Number(computedAtHeader) : null;
+		return { stats, computedAt };
 	} catch (err) {
 		console.error('[stats] parse failed', err);
 		throw error(502, 'stats payload invalid');

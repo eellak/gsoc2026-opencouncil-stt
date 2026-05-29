@@ -14,6 +14,8 @@
 		lang?: Lang;
 		/** Snippet rendered in the centre of the header (play button). */
 		playSlot?: Snippet;
+		/** Snippet rendered as a full-width row below the diff (decision buttons). */
+		actionsSlot?: Snippet;
 	}
 	const {
 		before = '',
@@ -22,7 +24,8 @@
 		speakerLoading = false,
 		errorCategoryIds = [],
 		lang = 'el',
-		playSlot
+		playSlot,
+		actionsSlot
 	}: Props = $props();
 
 	const dmp = new DiffMatchPatch();
@@ -43,7 +46,7 @@
 	);
 </script>
 
-<div class="diff has-header">
+<div class="diff has-header" class:has-actions={actionsSlot}>
 	<div class="diff-header">
 		<div
 			class="diff-speaker"
@@ -97,6 +100,9 @@
 			{/if}
 		{/each}
 	</div>
+	{#if actionsSlot}
+		<div class="diff-actions">{@render actionsSlot()}</div>
+	{/if}
 </div>
 
 <style>
@@ -111,9 +117,24 @@
 	.diff.has-header {
 		grid-template-areas: 'header header' 'before after';
 	}
+	.diff.has-header.has-actions {
+		grid-template-areas: 'header header' 'before after' 'actions actions';
+	}
 	.diff.has-header .diff-header { grid-area: header; }
 	.diff.has-header .diff-block.before { grid-area: before; }
 	.diff.has-header .diff-block.after { grid-area: after; }
+	.diff-actions {
+		grid-area: actions;
+		display: flex;
+		justify-content: center;
+		margin-top: 0.4rem;
+	}
+	/* Constrain the decision buttons so they sit as a tidy centred group
+	   rather than stretching the full card width. */
+	.diff-actions :global(.status-buttons) {
+		width: 100%;
+		max-width: 460px;
+	}
 
 	.diff-header {
 		display: flex;
@@ -274,6 +295,9 @@
 		}
 		.diff.has-header {
 			grid-template-areas: 'header' 'before' 'after';
+		}
+		.diff.has-header.has-actions {
+			grid-template-areas: 'header' 'before' 'after' 'actions';
 		}
 		.diff-categories { margin-left: 0; width: 100%; }
 	}

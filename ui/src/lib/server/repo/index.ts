@@ -20,6 +20,7 @@ import type {
 	QueueResponse
 } from '$lib/domain/groups';
 import type { IncludeStatus } from '$lib/domain/types';
+import type { UserCounts } from '../state/sidecar';
 
 export interface ReviewRepo {
 	readonly hash: string;
@@ -31,6 +32,7 @@ export interface ReviewRepo {
 	patchLabel(utterance_id: string, patch: GroupPatchBody, username?: string): Promise<GroupLabel | null>;
 	patchLabelExt(utterance_id: string, patch: GroupPatchBody, source: string): Promise<GroupLabel | null>;
 	listUsernames(): string[];
+	userCounts(): Record<string, UserCounts>;
 	allLabels(): ReadonlyMap<string, GroupLabel>;
 	allGroups(): Group[];
 	iterGroups(): IterableIterator<Group>;

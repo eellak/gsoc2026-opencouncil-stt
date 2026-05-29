@@ -243,6 +243,16 @@ export class StatsCache {
 		return () => this.stopBackgroundRefresh();
 	}
 
+	/**
+	 * Force a fresh recompute now, regardless of TTL. Backs the manual
+	 * "refresh" button on /stats so a reviewer can confirm their labels
+	 * registered without waiting up to 5 minutes for the background tick.
+	 * Dedupes with any in-flight compute via `recompute`.
+	 */
+	async forceRecompute(repo: ReviewRepo): Promise<CachedStats> {
+		return this.recompute(repo);
+	}
+
 	stopBackgroundRefresh(): void {
 		if (this.intervalHandle) {
 			clearInterval(this.intervalHandle);
