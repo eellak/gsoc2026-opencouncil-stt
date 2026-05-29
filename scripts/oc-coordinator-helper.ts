@@ -243,8 +243,7 @@ async function stats() {
     const activeWorkers = Object.values(state.workers).filter(w => w.status === 'running').length;
     logCoordinator(`Stats: remaining=${currentStats.remaining}, labeled=${currentStats.labeled}/${currentStats.total}, active_workers=${activeWorkers}, totals_processed=${JSON.stringify(state.totals)}`);
 
-    // Check progress stop condition
-    const activeWorkers = Object.values(state.workers).filter(w => w.status === 'running').length;
+    // Check progress stop condition (reuse activeWorkers computed above)
     if (currentStats.remaining === prevRemaining) {
       if (activeWorkers === 0) {
         state.empty_streak++;

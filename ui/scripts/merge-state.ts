@@ -75,9 +75,21 @@ function sourceKey(source: ReviewEventLike['source']): string {
 	return typeof source === 'string' ? source : `${source.kind}:${source.username ?? ''}`;
 }
 
+/** Deterministic JSON: sort object keys recursively so two patches with the
+ *  same content but different key order serialize identically. */
+function stableStringify(value: unknown): string {
+	if (value === null || typeof value !== 'object') return JSON.stringify(value);
+	if (Array.isArray(value)) return `[${value.map(stableStringify).join(',')}]`;
+	const keys = Object.keys(value as Record<string, unknown>).sort();
+	const body = keys
+		.map((k) => `${JSON.stringify(k)}:${stableStringify((value as Record<string, unknown>)[k])}`)
+		.join(',');
+	return `{${body}}`;
+}
+
 /** Content identity ignoring `id` — used to drop exact duplicates. */
 function contentKey(ev: ReviewEventLike): string {
-	return `${ev.ts}|${ev.utterance_id}|${sourceKey(ev.source)}|${JSON.stringify(ev.patch)}`;
+	return `${ev.ts}|${ev.utterance_id}|${sourceKey(ev.source)}|${stableStringify(ev.patch)}`;
 }
 
 /**
