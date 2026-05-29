@@ -39,6 +39,7 @@
 	}
 
 	function submit() {
+		error = null; // clear stale validation state before re-validating
 		const trimmed = newName.trim();
 		if (!trimmed) { error = 'Γράψε ένα όνομα.'; return; }
 		pick(trimmed);
@@ -75,6 +76,7 @@
 					type="text"
 					placeholder="π.χ. christos"
 					bind:value={newName}
+					oninput={() => { if (error) error = null; }}
 					aria-invalid={error !== null}
 					autofocus
 				/>
