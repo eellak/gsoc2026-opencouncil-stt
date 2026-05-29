@@ -177,8 +177,6 @@
 	// effects below. Each derived only emits when its string value really
 	// changes — i.e. when the user navigates to a new utterance.
 	const currentId = $derived(item.utterance_id);
-	const currentCityId = $derived(item.city_id);
-	const currentMeetingId = $derived(item.meeting_id);
 
 	// Wire the pool to our visible slot. The pool moves elements in/out as
 	// the active id changes. Cleanup on unmount so a navigation away from
@@ -287,8 +285,13 @@
 			const headerH = topBarEl?.getBoundingClientRect().height ?? 70;
 			const rect = utteranceAnchor.getBoundingClientRect();
 			const offset = headerH + 12;
-			const target = window.scrollY + rect.top - offset;
-			window.scrollTo({ top: Math.max(0, target), behavior: 'smooth' });
+			const target = Math.max(0, window.scrollY + rect.top - offset);
+			// Instant jump, not smooth: the per-navigation scroll was distracting
+			// on mobile (everything visibly sliding on each "next"). Snap so the
+			// eye doesn't track it. Skip entirely when we're already close to
+			// avoid a pointless 1-2px nudge.
+			if (Math.abs(window.scrollY - target) < 4) return;
+			window.scrollTo({ top: target, behavior: 'auto' });
 		});
 	});
 
@@ -337,21 +340,20 @@
 	$effect(() => {
 		const id = currentId;
 		untrack(() => {
-			const seenMeetings = new Set<string>();
+			// Prefetch context for upcoming utterances so the panel is warm on
+			// arrival. Each context payload is a few KB (per-utterance endpoint),
+			// so prefetching individual neighbours is cheap.
 			for (const g of queue.neighborsAround(id, 10)) {
-				if (!g.city_id || !g.meeting_id) continue;
-				const k = `${g.city_id}|${g.meeting_id}`;
-				if (seenMeetings.has(k)) continue;
-				seenMeetings.add(k);
-				meetingCtx.prefetch(g.city_id, g.meeting_id);
+				meetingCtx.prefetch(g.utterance_id);
 			}
 		});
 	});
 
-	// Surrounding-utterance context, fetched client-side from the LRU cache
-	// in `meeting-context.svelte`. The cache transparently relays the meeting
-	// JSON through /api/oc-meeting/... (a CORS bridge — no slicing happens
-	// server-side) and slices ±5 around the current utterance here.
+	// Surrounding-utterance context, fetched client-side via
+	// `meeting-context.svelte`, which calls the per-utterance OpenCouncil
+	// endpoint through the /api/oc-context/{id} CORS bridge (before=prevRadius,
+	// after=nextRadius). Only the needed neighbours come over the wire — no
+	// whole-meeting download. Speaker names aren't available from this endpoint.
 	let contextState = $state<'loading' | 'ready' | 'error' | 'empty'>('loading');
 	let contextData = $state<MeetingContext | null>(null);
 	let prevRadius = $state(5);
@@ -366,25 +368,22 @@
 
 	$effect(() => {
 		const id = currentId;
-		const cityId = currentCityId;
-		const meetingId = currentMeetingId;
 		const pr = prevRadius;
 		const nr = nextRadius;
 		let cancelled = false;
 
-		// Avoid the "loading…" flicker when the meeting is already resolved
-		// in the LRU. We still call getContext so the slice can change
-		// (different utterance in the same meeting), but we keep the old
-		// contextData visible until the new slice lands — synchronously, in
-		// the .then handler that resolves the same tick from the LRU.
-		const wasCached = meetingCtx.hasMeeting(cityId, meetingId);
+		// Avoid the "loading…" flicker when this exact context window is already
+		// resolved in the cache. We still call getContext (the .then resolves
+		// synchronously from cache) and keep the old contextData visible until
+		// the new data lands.
+		const wasCached = meetingCtx.hasContext(id, pr, nr);
 		if (!wasCached) {
 			contextState = 'loading';
 			contextData = null;
 		}
 
 		meetingCtx
-			.getContext(cityId, meetingId, id, Math.max(pr, nr))
+			.getContext(id, pr, nr)
 			.then((data) => {
 				if (cancelled) return;
 				contextData = data;
@@ -404,9 +403,10 @@
 		};
 	});
 
-	// Speaker for the current utterance — pulled from the context payload
-	// once it lands. Falls back to the SPEAKER_N label when the meeting JSON
-	// has no person record for the tag.
+	// Speaker for the current utterance. The per-utterance context endpoint
+	// doesn't return the anchor or any speaker names, so this is null and the
+	// Diff header shows its neutral placeholder. Kept as a derived so it lights
+	// up automatically if a name source is wired in later.
 	const currentSpeakerName = $derived(
 		contextData?.current?.speaker_name ?? contextData?.current?.speaker_label ?? null
 	);
