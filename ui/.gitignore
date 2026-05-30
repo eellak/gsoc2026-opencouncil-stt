@@ -1,0 +1,36 @@
+node_modules
+
+# Output
+.output
+.vercel
+.netlify
+.wrangler
+/.svelte-kit
+/build
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.*
+!.env.example
+!.env.test
+
+# Vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+
+# Local data
+/data/*.sqlite
+/data/*.jsonl
+
+# File-backed review prototype (codex/file-backed-review-ui)
+/.cache
+/.state
+local.db
+
+# Playwright
+/playwright-report
+/test-results

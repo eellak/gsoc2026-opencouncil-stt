@@ -9,7 +9,7 @@ timeline
             : Current state, decisions, roadmap, logs
     Phase 1 : Data joining and local state
             : CSV + meeting JSON matching
-            : SQLite state and JSONL history
+            : Review DB state and audit history
     Phase 2 : Exploration UI prototype
             : Diff, audio, context, labels, include/exclude
     Phase 3 : LLM pre-classification
@@ -71,12 +71,14 @@ Goal: combine CSV corrections with OpenCouncil meeting JSON.
 Tasks:
 
 - [ ] Define correction-to-utterance matching rules.
-- [ ] Identify meeting JSON URLs for a representative subset of CSV rows.
+- [ ] Identify meeting JSON URLs for a representative subset of v2 CSV rows.
 - [x] Restore or replace full CSV ingest.
 - [ ] Cache meeting JSON files locally.
 - [ ] Build a matched records table with confidence flags.
-- [x] Decide final local label storage: SQLite plus JSONL history.
-- [x] Ingest raw CSV corrections into local SQLite with content categorisation.
+- [x] Decide review-label storage.
+- [x] Ingest raw CSV corrections with content categorisation.
+- [x] Ingest v2 CSV corrections into Supabase Postgres with normalised meetings.
+- [x] Reduce live DB to latest edit per utterance while preserving the CSV as source of truth.
 - [x] Generate basic stats from local correction/review-label records.
 - [ ] Generate matched/ambiguous/unmatched stats from meeting JSON matches.
 
@@ -91,6 +93,8 @@ Acceptance criteria:
 - [ ] Ambiguous and unmatched rows are preserved for review, not silently dropped.
 - [x] Local labels can be updated without rewriting the large source CSV.
 - [x] A history trail exists for review-label changes.
+
+Experimental side-track (branch `codex/file-backed-review-ui`, 2026-05-20): the runtime DB dependency is removed in favour of a generated `ui/.cache/groups.v1.json` (built by `bun ui/scripts/build-cache.ts`) and sidecar `ui/.state/review-{events.jsonl,labels.snapshot.json}`. Review unit becomes the **utterance group**. Local-only — incompatible with serverless deploy. See [decisions/storage.md](decisions/storage.md#2026-05-20---file-backed-prototype-on-codexfile-backed-review-ui-experimental-local-only) and [specs/local-data-model.md](specs/local-data-model.md#file-backed-prototype-codexfile-backed-review-ui-2026-05-20).
 
 ## Phase 2 - Exploration UI Prototype
 

@@ -35,8 +35,32 @@ data/decode-failures.jsonl
 !**/.env.example
 !**/.env.test
 
+# SSH keys and other secrets — must never be committed
+**/*.pem
+**/*.key
+**/id_rsa
+**/id_ed25519
+
 # Build artifacts and dependencies
 **/node_modules/
 **/.svelte-kit/
 **/build/
 **/.vercel/
+
+# Generated data outputs and local agent dirs (kept local, not pushed)
+data/
+.claude/
+
+# LLM batch / categorization scratch outputs (generated, never committed)
+batch_*.json
+prompt_*.txt
+responses/
+scratch/
+ui/tmp/
+ui/.temp_*
+ui/batch*
+ui/BATCH_*
+ui/output-*.json
+ui/response.json
+ui/15a4ef.json
+ui/e9e1d5.json

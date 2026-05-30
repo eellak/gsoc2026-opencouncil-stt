@@ -161,6 +161,24 @@ rtk <command>
 
 Use `rtk` before shell commands when working in this vault.
 
+## Post-Change Review
+
+After a complex change (multiple files touched, new dependencies, schema migrations, refactors that cross module boundaries, or anything beyond a trivial fix), run:
+
+```bash
+coderabbit review --prompt-only
+```
+
+Then:
+
+- Read the findings.
+- Categorise each as `critical` (security, data loss, broken build, regression in production code paths), `important` (correctness, type safety, missing fallbacks, perf cliffs), or `nit` (style, naming, comments).
+- **Auto-fix `critical` and `important` findings before declaring the task done**, unless the fix conflicts with a user instruction — in that case, surface the conflict and ask.
+- Leave `nit` findings as notes in the response; do not silently apply them.
+- Do not skip this step on "complex" changes by claiming they are simple. If in doubt, run it.
+
+Do not run on trivial typo/comment edits — it wastes time.
+
 ## Editing Rules
 
 - Keep docs in plain Markdown.

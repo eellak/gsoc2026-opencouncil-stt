@@ -16,12 +16,18 @@ This is the working structure for the OpenCouncil ASR dataset exploration projec
 - [Meetings index](meetings/_index.md)
 - [2026-05-08 - First sync](meetings/2026-05-08-first-sync.md)
 - [2026-05-12 - Dataset exploration sync](meetings/2026-05-12-dataset-exploration-sync.md)
+- [2026-05-19 - Notes](meetings/2026-05-19.md): midterm target, v2 CSV, nearby utterances API, seeded review order.
 
 ## Specs
 
 - [Exploration UI spec](specs/exploration-ui.md): prototype UI behavior, local labels, and stats.
 - [Local data model](specs/local-data-model.md): local records/tables for CSV corrections, cached JSON, matches, labels, and history.
-- [UI prototype](../ui/README.md): implemented SvelteKit review app, CSV ingest, dummy seed command, local/Turso SQLite-compatible state, and export behavior.
+- [UI prototype](../ui/README.md): implemented SvelteKit review app, CSV ingest, Supabase-backed review state, and export behavior.
+
+## Runbooks
+
+- [Claude parallel LLM categorization](runbooks/claude-parallel-llm-categorization.md): token-efficient subagent loop for categorizing remaining edit groups.
+- [Self-host file-backed UI on Fly.io](runbooks/self-host-fly.md): deploy the local-only file-backed review UI on one persistent Fly machine.
 
 ## Reference Notes
 
@@ -29,6 +35,7 @@ This is the working structure for the OpenCouncil ASR dataset exploration projec
 - [Error taxonomy and routing](reference/error-taxonomy.md): how correction pairs should be split between ASR fine-tuning, LLM post-correction, rules, and review.
 - [UI error categories](reference/ui-error-categories.md): proposed dropdown values for the exploration UI (Greek labels + English IDs + examples).
 - [Audio segmentation](reference/audio-segmentation.md): how `audio_url`, timestamps, and corrected text can become training examples.
+- [Latest-per-utterance report](../data/reports/latest-per-utterance.md): why the live DB keeps one correction per utterance.
 - [Dynamic vocabulary and entities](reference/dynamic-vocabulary-and-entities.md): how municipal names, people, places, acronyms, and legal terms should feed the post-correction stage.
 - [Mentor meeting questions](mentor-meeting-questions.md): concrete questions to resolve before implementation.
 - [OpenCouncil meeting JSON](reference/opencouncil-meeting-json.md): shape of the large meeting JSON endpoint and how it can be used to match CSV corrections to utterances.
@@ -53,7 +60,7 @@ Older daily-normalization entries (May 13–18) are archived under [`archive/log
 
 1. Keep [Current state](../CURRENT.md) updated.
 2. Use [Roadmap](roadmap.md), [Progress](progress.md), and the [Decisions index](decisions/_index.md) to avoid losing context.
-3. Use the implemented [UI prototype](../ui/README.md) to ingest and review raw CSV correction pairs.
+3. Use the implemented [UI prototype](../ui/README.md) to review v2 CSV correction pairs.
 4. Extend the [local data model](specs/local-data-model.md) with cached meeting JSON and matched utterances.
-5. Match the May 12 CSV rows to utterances from the large meeting JSON.
+5. Match the v2 CSV rows to utterances from the large meeting JSON.
 6. Then run dataset profiling and taxonomy validation with the UI-backed labels.
