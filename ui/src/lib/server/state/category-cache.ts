@@ -18,6 +18,7 @@
 import { promises as fs } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import type { ReviewRepo } from '../repo';
+import { runExclusiveScan } from './scan-lock';
 
 // Yield to the event loop every this many groups so the one-time index build
 // (~17 s over ~287 k groups) doesn't freeze concurrent requests.
@@ -108,7 +109,9 @@ export class CategoryCache {
 	private async recompute(repo: ReviewRepo): Promise<CategoryIndex> {
 		if (this.inFlight) return this.inFlight;
 		const task = (async () => {
-			const snap = await this.build(repo);
+			// Serialise against the stats build (see scan-lock) — concurrent
+			// large scans OOM the 1 GB VM.
+			const snap = await runExclusiveScan(() => this.build(repo));
 			this.current = snap;
 			try {
 				await this.persist(snap);
