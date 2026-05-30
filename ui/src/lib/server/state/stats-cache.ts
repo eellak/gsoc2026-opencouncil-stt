@@ -22,6 +22,7 @@ import { dirname, resolve } from 'node:path';
 import type { Group } from '$lib/domain/groups';
 import type { IncludeStatus, StatsResponse } from '$lib/domain/types';
 import type { ReviewRepo } from '../repo';
+import { runExclusiveScan } from './scan-lock';
 
 const TTL_MS = 10 * 60 * 1000;
 
@@ -168,7 +169,9 @@ export class StatsCache {
 	private async recompute(repo: ReviewRepo): Promise<CachedStats> {
 		if (this.inFlight) return this.inFlight;
 		const task = (async () => {
-			const stats = await computeStats(repo);
+			// Serialise against the category build so the two large scans never
+			// allocate concurrently (OOM on the 1 GB VM).
+			const stats = await runExclusiveScan(() => computeStats(repo));
 			const snap: CachedStats = { stats, computedAt: Date.now() };
 			this.current = snap;
 			try {

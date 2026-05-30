@@ -14,19 +14,19 @@
 
 import { getRepo } from '$lib/server/repo';
 import { getStatsCache } from '$lib/server/state/stats-cache';
-import { getCategoryCache } from '$lib/server/state/category-cache';
 
 if (process.env.NODE_ENV !== 'test') {
 	try {
+		// Only the stats snapshot is refreshed at boot. The category index is
+		// built lazily on first /category visit instead — building both at boot
+		// doubled peak memory and OOM'd the 1 GB VM. Both scans yield to the
+		// event loop and are serialised (see scan-lock), so neither freezes
+		// requests nor allocates concurrently.
 		getStatsCache().startBackgroundRefresh(() => getRepo());
-		// Precompute the category index too, so the first /category visit
-		// doesn't pay the ~17 s build inside a page load. Both builds yield to
-		// the event loop, so they don't freeze concurrent requests.
-		getCategoryCache().startBackgroundBuild(() => getRepo());
 	} catch (err) {
 		// Don't fail server startup on an init error — pages still serve, just
 		// paying the aggregation cost on first request.
-		console.error('[hooks] background precompute init failed', err);
+		console.error('[hooks] background refresh init failed', err);
 	}
 }
 
