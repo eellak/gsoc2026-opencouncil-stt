@@ -36,6 +36,13 @@ export interface ReviewRepo {
 	allLabels(): ReadonlyMap<string, GroupLabel>;
 	allGroups(): Group[];
 	iterGroups(): IterableIterator<Group>;
+	/**
+	 * All utterance ids in canonical order. Lets long scans fetch groups one at
+	 * a time via getGroup() (a point query) instead of holding a single
+	 * better-sqlite3 cursor open — the latter throws "statement is busy" if the
+	 * scan yields to the event loop and another scan/request touches the DB.
+	 */
+	allOrderedIds(): readonly string[];
 	utteranceIdForEdit(edit_id: string): string | null;
 	groupsByErrorCategory(category: string): Group[];
 	idsByStatus(status: IncludeStatus): string[];

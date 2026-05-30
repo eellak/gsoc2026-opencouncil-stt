@@ -78,9 +78,13 @@ export class CategoryCache {
 
 	private async build(repo: ReviewRepo): Promise<CategoryIndex> {
 		const byCategory: Record<string, EditRow[]> = {};
+		// Point queries (getGroup), not a long-lived iterGroups() cursor: the
+		// cursor can't survive the yields (better-sqlite3 "statement is busy").
 		let n = 0;
-		for (const g of repo.iterGroups()) {
+		for (const id of repo.allOrderedIds()) {
 			if (++n % YIELD_EVERY === 0) await yieldToEventLoop();
+			const g = repo.getGroup(id);
+			if (!g) continue;
 			for (const e of g.edits) {
 				const key = e.ingest_category ?? '';
 				let list = byCategory[key];

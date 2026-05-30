@@ -67,9 +67,16 @@ export async function computeStats(repo: ReviewRepo): Promise<ExtendedStats> {
 		{ meeting_name: string | null; meeting_date: string | null; count: number }
 	>();
 
-	for (const g of repo.iterGroups() as IterableIterator<Group>) {
+	// Fetch one group at a time via getGroup (a point query) rather than holding
+	// a single iterGroups() cursor open — that cursor can't survive the yields
+	// below (better-sqlite3 throws "statement is busy" if another scan/request
+	// touches the DB mid-iteration).
+	let scanned = 0;
+	for (const id of repo.allOrderedIds()) {
+		if (++scanned % YIELD_EVERY === 0) await yieldToEventLoop();
+		const g = repo.getGroup(id);
+		if (!g) continue;
 		groupCount += 1;
-		if (groupCount % YIELD_EVERY === 0) await yieldToEventLoop();
 		if (g.edits.length > 1) multiEditGroups++;
 		byStatus[g.label.include_status] += 1;
 		const cats = g.label.error_categories;

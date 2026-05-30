@@ -213,6 +213,10 @@ export class SqliteRepo {
 		return [...this.iterGroups()];
 	}
 
+	allOrderedIds(): readonly string[] {
+		return this.orderedIds;
+	}
+
 	/**
 	 * Stream groups in `ord` order without materialising the full array.
 	 * Synchronous because better-sqlite3 is synchronous — callers must NOT
