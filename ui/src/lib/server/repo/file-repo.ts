@@ -181,6 +181,16 @@ export class FileRepo {
 		return out;
 	}
 
+	/** Ids whose label.error_categories contains `category`, canonical order.
+	 *  Cheap: in-memory label scan, no group materialisation. */
+	idsByErrorCategory(category: string): string[] {
+		const out: string[] = [];
+		for (const id of this.orderedIds) {
+			if (this.sidecar.get(id).error_categories.includes(category)) out.push(id);
+		}
+		return out;
+	}
+
 	/** Groups whose label.error_categories array contains `category`. */
 	groupsByErrorCategory(category: string): Group[] {
 		const out: Group[] = [];

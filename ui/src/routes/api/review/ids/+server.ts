@@ -55,7 +55,7 @@ export const GET: RequestHandler = async ({ url }) => {
 	} else if (errorCategory) {
 		const norm = normalizeTaxonomyId(errorCategory) ?? errorCategory;
 		filter = `errorCategory:${norm}`;
-		computeIds = () => repo.groupsByErrorCategory(norm).map((g) => g.utterance_id);
+		computeIds = () => repo.idsByErrorCategory(norm);
 	} else {
 		throw error(400, 'one of status, category, errorCategory is required');
 	}

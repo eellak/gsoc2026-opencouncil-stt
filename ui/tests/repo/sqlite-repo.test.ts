@@ -233,6 +233,22 @@ describe('SqliteRepo — groupsByErrorCategory', () => {
 		const ids = repo.groupsByErrorCategory('homophone').map((g) => g.utterance_id);
 		expect(new Set(ids)).toEqual(new Set(['u0001', 'u0003']));
 	});
+
+	it('idsByErrorCategory matches groupsByErrorCategory but materialises nothing', async () => {
+		const repo = await openRepo();
+		await repo.patchLabel('u0001', { error_categories: ['homophone'] });
+		await repo.patchLabel('u0003', { error_categories: ['homophone', 'punctuation'] });
+		await repo.flush();
+
+		const ids = repo.idsByErrorCategory('homophone');
+		expect(new Set(ids)).toEqual(new Set(['u0001', 'u0003']));
+		// Same match set as the materialising variant.
+		expect(new Set(ids)).toEqual(
+			new Set(repo.groupsByErrorCategory('homophone').map((g) => g.utterance_id))
+		);
+		// Canonical (orderedIds) order: u0001 before u0003.
+		expect(ids).toEqual(['u0001', 'u0003']);
+	});
 });
 
 describe('SqliteRepo — iterGroups parity with FileRepo.allGroups', () => {

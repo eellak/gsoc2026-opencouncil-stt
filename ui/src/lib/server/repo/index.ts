@@ -45,6 +45,10 @@ export interface ReviewRepo {
 	allOrderedIds(): readonly string[];
 	utteranceIdForEdit(edit_id: string): string | null;
 	groupsByErrorCategory(category: string): Group[];
+	/** Just the ids whose label carries `category`, in canonical order — cheap
+	 *  (in-memory label scan, no group materialisation). Use for paged listings
+	 *  and the review filter queue. */
+	idsByErrorCategory(category: string): string[];
 	idsByStatus(status: IncludeStatus): string[];
 	flush(): Promise<void>;
 }
