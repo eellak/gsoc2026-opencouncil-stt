@@ -1,18 +1,24 @@
 /**
- * GET /api/review/ids?status=include|exclude|uncertain|unreviewed
+ * GET /api/review/ids — id list for a filtered review queue, plus cache hash
+ * and label revision so clients can detect staleness before walking it.
  *
- * Returns the full id list for a given review status, plus the cache hash and
- * label revision so clients can detect staleness before walking the queue.
+ * Exactly one filter must be given:
+ *   ?status=include|exclude|uncertain|unreviewed   (by review decision)
+ *   ?category=<ingest_category>                      (by CSV ingest classifier)
+ *   ?errorCategory=<taxonomy_id>                     (by human-assigned category)
  *
- * Response: { status, ids: string[], cache_hash, revision }
+ * Response: { filter, ids: string[], cache_hash, revision }
+ * `filter` is the canonical key, e.g. "status:include" / "category:akronymio".
  *
- * The result is memoised per (status, cache_hash, revision) so repeat hits
- * during a review session are O(1). Cache invalidates the moment the sidecar
- * appends a new event.
+ * Results are memoised per (filter, cache_hash, revision), so repeat hits in a
+ * review session are O(1). The memo invalidates the moment the sidecar appends
+ * a new event (revision bumps).
  */
 
 import { json, error } from '@sveltejs/kit';
 import { getRepo } from '$lib/server/repo';
+import { getCategoryCache } from '$lib/server/state/category-cache';
+import { normalizeTaxonomyId } from '$lib/shared/taxonomy';
 import type { IncludeStatus } from '$lib/domain/types';
 import type { RequestHandler } from './$types';
 
@@ -23,35 +29,51 @@ const STATUSES: ReadonlySet<IncludeStatus> = new Set([
 	'unreviewed'
 ]);
 
-type CacheKey = string; // `${status}|${cache_hash}|${revision}`
-const memo = new Map<CacheKey, { ids: string[] }>();
-const MEMO_MAX = 8;
+const memo = new Map<string, { ids: string[] }>();
+const MEMO_MAX = 12;
 
 export const GET: RequestHandler = async ({ url }) => {
-	const status = url.searchParams.get('status') as IncludeStatus | null;
-	if (!status || !STATUSES.has(status)) {
-		throw error(400, 'status must be one of include|exclude|uncertain|unreviewed');
-	}
+	const status = url.searchParams.get('status');
+	const category = url.searchParams.get('category');
+	const errorCategory = url.searchParams.get('errorCategory');
+
 	const repo = await getRepo();
 	const revision = repo.labelsRevision;
 	const cacheHash = repo.hash;
-	const key: CacheKey = `${status}|${cacheHash}|${revision}`;
+
+	let filter: string;
+	let computeIds: () => string[] | Promise<string[]>;
+	if (status) {
+		if (!STATUSES.has(status as IncludeStatus)) {
+			throw error(400, 'status must be one of include|exclude|uncertain|unreviewed');
+		}
+		filter = `status:${status}`;
+		computeIds = () => repo.idsByStatus(status as IncludeStatus);
+	} else if (category) {
+		filter = `category:${category}`;
+		computeIds = () => getCategoryCache().ids(repo, category);
+	} else if (errorCategory) {
+		const norm = normalizeTaxonomyId(errorCategory) ?? errorCategory;
+		filter = `errorCategory:${norm}`;
+		computeIds = () => repo.groupsByErrorCategory(norm).map((g) => g.utterance_id);
+	} else {
+		throw error(400, 'one of status, category, errorCategory is required');
+	}
+
+	const key = `${filter}|${cacheHash}|${revision}`;
 	let entry = memo.get(key);
 	if (!entry) {
-		entry = { ids: repo.idsByStatus(status) };
-		// Tiny bounded LRU — we don't expect more than 4 keys per revision.
+		entry = { ids: await computeIds() };
+		// Tiny bounded FIFO — a handful of filters per revision at most.
 		if (memo.size >= MEMO_MAX) {
 			const oldest = memo.keys().next().value;
 			if (oldest !== undefined) memo.delete(oldest);
 		}
 		memo.set(key, entry);
 	}
+
 	return json(
-		{ status, ids: entry.ids, cache_hash: cacheHash, revision },
-		{
-			headers: {
-				'Cache-Control': 'no-store'
-			}
-		}
+		{ filter, ids: entry.ids, cache_hash: cacheHash, revision },
+		{ headers: { 'Cache-Control': 'no-store' } }
 	);
 };

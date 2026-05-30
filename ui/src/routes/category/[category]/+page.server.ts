@@ -16,5 +16,5 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	const repo = await getRepo();
 	const { items, total } = await getCategoryCache().getPage(repo, cat, page, page_size);
 
-	return { meta, items, total, page, page_size };
+	return { meta, items, total, page, page_size, category: cat };
 };

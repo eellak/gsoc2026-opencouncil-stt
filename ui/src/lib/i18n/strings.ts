@@ -174,7 +174,12 @@ export const strings = {
 		en: '{n} edit{plural}',
 		el: '{n} αλλαγ{plural}'
 	},
-	filteredQueueLabel: { en: 'Filtered: {status}', el: 'Φίλτρο: {status}' }
+	filteredQueueLabel: { en: 'Filtered: {status}', el: 'Φίλτρο: {status}' },
+	playThroughLabel: { en: 'Review these', el: 'Αξιολόγηση αυτών' },
+	playThroughTitle: {
+		en: 'Open in the review queue — with autoplay you hear them one after another',
+		el: 'Άνοιγμα στη ροή αξιολόγησης — με autoplay τα ακούς το ένα μετά το άλλο'
+	}
 } as const satisfies Record<string, { en: string; el: string }>;
 
 export type StringKey = keyof typeof strings;
