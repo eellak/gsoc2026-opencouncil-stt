@@ -255,6 +255,16 @@ export class SqliteRepo {
 		return out;
 	}
 
+	/** Ids whose label.error_categories contains `category`, canonical order.
+	 *  Cheap: in-memory label scan only, no SQLite/group materialisation. */
+	idsByErrorCategory(category: string): string[] {
+		const out: string[] = [];
+		for (const id of this.orderedIds) {
+			if (this.sidecar.get(id).error_categories.includes(category)) out.push(id);
+		}
+		return out;
+	}
+
 	groupsByErrorCategory(category: string): Group[] {
 		// Labels live in memory; filter there first and only hit SQLite for
 		// the matching ids. Avoids parsing the full 432 MB payload to find
