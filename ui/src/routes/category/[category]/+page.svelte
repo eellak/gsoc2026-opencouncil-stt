@@ -27,6 +27,13 @@
 				<code class="key">{data.meta.key}</code>
 			</h1>
 			<span class="count">{data.total.toLocaleString('el-GR')} εγγραφές</span>
+			{#if data.items.length > 0}
+				<a
+					class="play-through"
+					href="/review/{encodeURIComponent(data.items[0].utterance_id)}?category={encodeURIComponent(data.category)}"
+					title="Άνοιγμα στη ροή αξιολόγησης — με autoplay τα ακούς το ένα μετά το άλλο"
+				>▶ Αξιολόγηση αυτών</a>
+			{/if}
 		</div>
 		<p class="reason">{data.meta.reason_el}</p>
 	</header>
@@ -76,6 +83,11 @@
 	.badge.rejected { background: #fee2e2; color: #b91c1c; }
 	.key { font-size: 0.8rem; color: #6b7280; background: #f3f4f6; padding: 0.1rem 0.4rem; border-radius: 4px; }
 	.count { color: #6b7280; font-size: 0.9rem; margin-left: auto; }
+	.play-through {
+		font-size: 0.85rem; font-weight: 600; padding: 0.3rem 0.7rem;
+		border-radius: 6px; background: #dcfce7; color: #166534; text-decoration: none;
+	}
+	.play-through:hover { background: #bbf7d0; }
 	.reason { margin: 0.5rem 0 0; color: #374151; font-size: 0.9rem; line-height: 1.5; max-width: 700px; }
 
 	.rows { list-style: none; padding: 0; margin: 1rem 0 0; display: flex; flex-direction: column; gap: 0.5rem; }

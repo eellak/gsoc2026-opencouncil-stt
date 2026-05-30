@@ -146,6 +146,21 @@ export class CategoryCache {
 		return { items, total: list.length, computedAt: index.computedAt };
 	}
 
+	/** Distinct utterance_ids for an ingest category, in stable build order.
+	 *  Backs the "play through this category" review queue. */
+	async ids(repo: ReviewRepo, category: string): Promise<string[]> {
+		const index = await this.ensure(repo);
+		const list = index.byCategory[category] ?? [];
+		const seen = new Set<string>();
+		const out: string[] = [];
+		for (const e of list) {
+			if (seen.has(e.utterance_id)) continue;
+			seen.add(e.utterance_id);
+			out.push(e.utterance_id);
+		}
+		return out;
+	}
+
 	private bgStarted = false;
 	/**
 	 * Precompute the index in the background at startup (idempotent) so the

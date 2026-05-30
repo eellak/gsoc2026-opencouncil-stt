@@ -14,7 +14,6 @@
 
 import { SvelteMap } from 'svelte/reactivity';
 import type { Group, QueueResponse, GroupPatchBody } from '$lib/domain/groups';
-import type { IncludeStatus } from '$lib/domain/types';
 
 const TARGET_AHEAD = 11; // keep ±5 neighbours warm around the current item
 const MAX_CACHE = 256;
@@ -27,7 +26,9 @@ let cacheHash = $state<string | null>(null);
 let nextCursor = $state<number | null>(null);
 let currentSeed = $state<number>(1);
 let mode = $state<Mode>('seeded');
-let filterStatus = $state<IncludeStatus | null>(null);
+// Canonical filter identity, e.g. "status:include" / "category:akronymio" /
+// "errorCategory:homophone". Null in seeded mode.
+let filterKey = $state<string | null>(null);
 let filterRevision = $state<number | null>(null);
 
 const inFlight = new Map<string, Promise<void>>();
@@ -117,40 +118,40 @@ export function currentMode(): Mode {
 	return mode;
 }
 
-export function currentFilterStatus(): IncludeStatus | null {
-	return filterStatus;
+export function currentFilter(): string | null {
+	return filterKey;
 }
 
 export function setSeed(s: number) {
 	if (mode === 'seeded' && s === currentSeed) return;
 	currentSeed = s;
 	mode = 'seeded';
-	filterStatus = null;
+	filterKey = null;
 	filterRevision = null;
 	resetQueue();
 }
 
 /**
  * Switch to filter mode with an explicit id list. The caller is responsible
- * for fetching the list (see fetchStatusIds). A no-op if status + revision
+ * for fetching the list (see fetchFilterIds). A no-op if filter + revision
  * matches the current state.
  */
-export function setStatusOrder(
-	status: IncludeStatus,
+export function setFilterOrder(
+	key: string,
 	ids: readonly string[],
 	revision: number,
 	hash: string
 ): void {
 	if (
 		mode === 'filter' &&
-		filterStatus === status &&
+		filterKey === key &&
 		filterRevision === revision &&
 		cacheHash === hash
 	) {
 		return;
 	}
 	mode = 'filter';
-	filterStatus = status;
+	filterKey = key;
 	filterRevision = revision;
 	cacheHash = hash;
 	// Reset cache so we don't mix entries from the previous mode/revision.
@@ -266,43 +267,30 @@ export function topUp(currentId: string): Promise<void> | void {
 }
 
 /**
- * Fetch (or reuse a cached) ids list for a given status. Stores it in
- * sessionStorage keyed by (status, cache_hash, revision) so a page reload
- * within the same revision serves the list synchronously. Returns the array
- * plus the revision so callers can detect staleness.
+ * Fetch the id list for a filtered queue. `query` is the /api/review/ids query
+ * string, e.g. "status=include", "category=akronymio", "errorCategory=homophone".
+ * Returns the canonical filter key, the ids, plus cache hash + revision so
+ * callers can detect staleness. The result is mirrored to sessionStorage keyed
+ * by (filter, cache_hash, revision) so a reload within the same revision is fast.
  */
 const SS_PREFIX = 'oc.ids.';
 
 interface IdsResponse {
-	status: IncludeStatus;
+	filter: string;
 	ids: string[];
 	cache_hash: string;
 	revision: number;
 }
 
-export async function fetchStatusIds(status: IncludeStatus): Promise<IdsResponse> {
-	const resp = await fetch(`/api/review/ids?status=${status}`);
-	if (!resp.ok) throw new Error(`fetchStatusIds: HTTP ${resp.status}`);
+export async function fetchFilterIds(query: string): Promise<IdsResponse> {
+	const resp = await fetch(`/api/review/ids?${query}`);
+	if (!resp.ok) throw new Error(`fetchFilterIds: HTTP ${resp.status}`);
 	const data = (await resp.json()) as IdsResponse;
 	try {
-		const key = `${SS_PREFIX}${status}|${data.cache_hash}|${data.revision}`;
+		const key = `${SS_PREFIX}${data.filter}|${data.cache_hash}|${data.revision}`;
 		sessionStorage.setItem(key, JSON.stringify(data.ids));
 	} catch {
 		/* quota exceeded — fine, it's a perf-only cache */
 	}
 	return data;
-}
-
-export function peekCachedStatusIds(
-	status: IncludeStatus,
-	hash: string,
-	revision: number
-): string[] | null {
-	try {
-		const raw = sessionStorage.getItem(`${SS_PREFIX}${status}|${hash}|${revision}`);
-		if (!raw) return null;
-		return JSON.parse(raw) as string[];
-	} catch {
-		return null;
-	}
 }

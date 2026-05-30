@@ -32,6 +32,13 @@
 				<code class="key">{data.category}</code>
 			</h1>
 			<span class="count">{t('totalItems', { n: data.total.toLocaleString(lang === 'el' ? 'el-GR' : 'en-US') })}</span>
+			{#if data.items.length > 0}
+				<a
+					class="play-through"
+					href="/review/{encodeURIComponent(data.items[0].utterance_id)}?errorCategory={encodeURIComponent(data.category)}"
+					title={t('playThroughTitle')}
+				>▶ {t('playThroughLabel')}</a>
+			{/if}
 		</div>
 		{#if data.taxonomy}
 			<p class="example">
@@ -92,6 +99,11 @@
 	.badge { padding: 0.2rem 0.6rem; border-radius: 999px; background: #dbeafe; color: #1e40af; font-size: 0.9rem; font-weight: 600; }
 	.key { font-size: 0.8rem; color: #6b7280; background: #f3f4f6; padding: 0.1rem 0.4rem; border-radius: 4px; }
 	.count { color: #6b7280; font-size: 0.9rem; margin-left: auto; }
+	.play-through {
+		font-size: 0.85rem; font-weight: 600; padding: 0.3rem 0.7rem;
+		border-radius: 6px; background: #dcfce7; color: #166534; text-decoration: none;
+	}
+	.play-through:hover { background: #bbf7d0; }
 	.example { margin: 0.5rem 0 0; font-size: 0.85rem; color: #374151; font-family: serif; }
 	.ex-before { color: #7f1d1d; }
 	.ex-after { color: #14532d; }

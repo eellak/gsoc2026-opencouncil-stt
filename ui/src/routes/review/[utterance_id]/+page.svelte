@@ -16,7 +16,6 @@
 	import { audioPool } from '$lib/client/audio-pool.svelte';
 	import * as meetingCtx from '$lib/client/meeting-context.svelte';
 	import { reviewHref } from '$lib/shared/urls';
-	import { page } from '$app/state';
 	import type { PageData } from './$types';
 	import { userStore } from '$lib/client/user-store.svelte';
 	import { playbackPrefs } from '$lib/client/playback-prefs.svelte';
@@ -32,30 +31,31 @@
 
 	const { data }: { data: PageData } = $props();
 
-	const STATUS_SET: ReadonlySet<IncludeStatus> = new Set([
-		'include',
-		'exclude',
-		'uncertain'
-	]);
-	const statusFilter = $derived.by((): IncludeStatus | null => {
-		const raw = page.url.searchParams.get('status');
-		return raw && STATUS_SET.has(raw as IncludeStatus) ? (raw as IncludeStatus) : null;
+	// Active queue filter (status / category / errorCategory), resolved by the
+	// load function. Drives the filter badge and keeps the filter in nav URLs.
+	const filter = $derived(data.filter);
+	// Status labels are i18n keys (translate them); category ids are raw.
+	const STATUS_KEYS = new Set<IncludeStatus>(['include', 'exclude', 'uncertain', 'unreviewed']);
+	const filterLabel = $derived.by(() => {
+		const f = filter;
+		if (!f) return '';
+		return STATUS_KEYS.has(f.label as IncludeStatus) ? t(f.label as IncludeStatus) : f.label;
 	});
 
-	// In status-filter mode, populate the client queue from /api/review/ids
-	// once per (status, revision) so j/k walks only items matching the filter.
-	// Mutually exclusive with seed mode; seed param is ignored when status is set.
+	// In filter mode, (re)populate the client queue from /api/review/ids so j/k
+	// and autoplay walk only the matching items. The load function does this on
+	// navigation; this effect keeps it correct if the filter changes in place.
 	$effect(() => {
-		const sf = statusFilter;
-		if (!sf) return;
+		const f = filter;
+		if (!f) return;
 		let cancelled = false;
 		(async () => {
 			try {
-				const resp = await queue.fetchStatusIds(sf);
+				const resp = await queue.fetchFilterIds(f.query);
 				if (cancelled) return;
-				queue.setStatusOrder(sf, resp.ids, resp.revision, resp.cache_hash);
+				queue.setFilterOrder(resp.filter, resp.ids, resp.revision, resp.cache_hash);
 			} catch (e) {
-				console.warn('[review] fetchStatusIds failed', e);
+				console.warn('[review] fetchFilterIds failed', e);
 			}
 		})();
 		return () => {
@@ -450,9 +450,9 @@
 
 	function navHref(targetId: string | undefined | null): string | null {
 		if (!targetId) return null;
-		if (statusFilter) {
-			// Preserve status in the URL so the next page stays in filter mode.
-			return `/review/${encodeURIComponent(targetId)}?status=${statusFilter}`;
+		if (filter) {
+			// Preserve the filter in the URL so the next page stays in filter mode.
+			return `/review/${encodeURIComponent(targetId)}?${filter.query}`;
 		}
 		return reviewHref({ utterance_id: targetId, seed: data.seed });
 	}
@@ -591,8 +591,8 @@
 		</div>
 		<div class="bottom-row">
 			<div class="meta">
-				{#if statusFilter}
-					<span class="badge filter {statusFilter}">{t('filteredQueueLabel', { status: t(statusFilter) })}</span>
+				{#if filter}
+					<span class="badge filter">{t('filteredQueueLabel', { status: filterLabel })}</span>
 				{/if}
 				<span class="badge edits" title="Number of edits in this utterance group">
 					{item.edits.length} edit{item.edits.length === 1 ? '' : 's'}
