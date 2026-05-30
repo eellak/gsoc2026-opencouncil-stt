@@ -81,4 +81,10 @@
 
 	.btn.yellow { border-color: #ca8a04; }
 	.btn.yellow.active { background: #ca8a04; color: white; }
+
+	/* On phones the three Greek labels + shortcut keys don't fit in one row
+	   without overflowing the viewport, so stack them. */
+	@media (max-width: 640px) {
+		.status-buttons { flex-direction: column; }
+	}
 </style>

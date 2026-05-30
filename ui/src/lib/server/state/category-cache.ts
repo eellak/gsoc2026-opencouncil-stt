@@ -19,6 +19,11 @@ import { promises as fs } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import type { ReviewRepo } from '../repo';
 
+// Yield to the event loop every this many groups so the one-time index build
+// (~17 s over ~287 k groups) doesn't freeze concurrent requests.
+const YIELD_EVERY = 5_000;
+const yieldToEventLoop = () => new Promise<void>((r) => setImmediate(r));
+
 export interface EditRow {
 	edit_id: string;
 	utterance_id: string;
@@ -71,9 +76,11 @@ export class CategoryCache {
 		await fs.rename(tmp, this.snapshotPath);
 	}
 
-	private build(repo: ReviewRepo): CategoryIndex {
+	private async build(repo: ReviewRepo): Promise<CategoryIndex> {
 		const byCategory: Record<string, EditRow[]> = {};
+		let n = 0;
 		for (const g of repo.iterGroups()) {
+			if (++n % YIELD_EVERY === 0) await yieldToEventLoop();
 			for (const e of g.edits) {
 				const key = e.ingest_category ?? '';
 				let list = byCategory[key];
@@ -97,7 +104,7 @@ export class CategoryCache {
 	private async recompute(repo: ReviewRepo): Promise<CategoryIndex> {
 		if (this.inFlight) return this.inFlight;
 		const task = (async () => {
-			const snap = this.build(repo);
+			const snap = await this.build(repo);
 			this.current = snap;
 			try {
 				await this.persist(snap);
@@ -139,6 +146,26 @@ export class CategoryCache {
 		return { items, total: list.length, computedAt: index.computedAt };
 	}
 
+	private bgStarted = false;
+	/**
+	 * Precompute the index in the background at startup (idempotent) so the
+	 * first /category/[category] visit serves from cache instead of paying the
+	 * ~17 s build synchronously inside a page load. The build yields, so this
+	 * doesn't block requests while it runs.
+	 */
+	startBackgroundBuild(repoFactory: () => Promise<ReviewRepo>): void {
+		if (this.bgStarted) return;
+		this.bgStarted = true;
+		void (async () => {
+			try {
+				const repo = await repoFactory();
+				await this.ensure(repo);
+			} catch (err) {
+				console.warn('[category-cache] background build failed', err);
+			}
+		})();
+	}
+
 	/** Test hooks. */
 	_peek(): CategoryIndex | null {
 		return this.current;
@@ -146,6 +173,7 @@ export class CategoryCache {
 	_reset(): void {
 		this.current = null;
 		this.inFlight = null;
+		this.bgStarted = false;
 	}
 }
 

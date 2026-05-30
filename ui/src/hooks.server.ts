@@ -14,14 +14,19 @@
 
 import { getRepo } from '$lib/server/repo';
 import { getStatsCache } from '$lib/server/state/stats-cache';
+import { getCategoryCache } from '$lib/server/state/category-cache';
 
 if (process.env.NODE_ENV !== 'test') {
 	try {
 		getStatsCache().startBackgroundRefresh(() => getRepo());
+		// Precompute the category index too, so the first /category visit
+		// doesn't pay the ~17 s build inside a page load. Both builds yield to
+		// the event loop, so they don't freeze concurrent requests.
+		getCategoryCache().startBackgroundBuild(() => getRepo());
 	} catch (err) {
-		// Don't fail server startup on a stats-refresh init error — the page
-		// will still serve, just paying the aggregation cost on first request.
-		console.error('[hooks] startBackgroundRefresh failed', err);
+		// Don't fail server startup on an init error — pages still serve, just
+		// paying the aggregation cost on first request.
+		console.error('[hooks] background precompute init failed', err);
 	}
 }
 
