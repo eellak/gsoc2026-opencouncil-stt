@@ -641,6 +641,17 @@
 			{/if}
 		</div>
 
+		<!-- Decision controls live in their own bar directly below the card so
+		     they never widen the diff grid (which broke the mobile layout). On
+		     phones the three buttons stack so they fit the viewport. -->
+		<div class="decision-bar">
+			<StatusButtons
+				status={item.label.include_status}
+				saving={saveStatus === 'saving'}
+				onchange={(s) => patchStatus(s)}
+			/>
+		</div>
+
 		{#snippet diffCardBody()}
 			{#if prevHref}
 				<a href={prevHref} class="utt-chevron left" title={t('prev') + ' (k)'} aria-label={t('prevAria')}>
@@ -692,13 +703,6 @@
 					</label>
 				</div>
 			{/snippet}
-			{#snippet decisionButtons()}
-				<StatusButtons
-					status={item.label.include_status}
-					saving={saveStatus === 'saving'}
-					onchange={(s) => patchStatus(s)}
-				/>
-			{/snippet}
 			<Diff
 				before={beforeText}
 				after={afterText}
@@ -707,7 +711,6 @@
 				errorCategoryIds={item.label.error_categories}
 				lang={getLang()}
 				playSlot={playButton}
-				actionsSlot={decisionButtons}
 			/>
 		{/snippet}
 
@@ -1024,6 +1027,8 @@
 	}
 	.diff-section { position: relative; min-width: 0; overflow: hidden; }
 	.utt-anchor { scroll-margin-top: calc(var(--top-bar-h, 80px) + 12px); min-width: 0; }
+	.decision-bar { margin-top: 0.6rem; min-width: 0; }
+	.decision-bar :global(.status-buttons) { max-width: 460px; margin: 0 auto; }
 	.utt-chevron {
 		position: absolute; top: 50%; transform: translateY(-50%);
 		width: 30px; height: 30px;

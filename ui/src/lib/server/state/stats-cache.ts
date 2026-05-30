@@ -7,8 +7,10 @@
  *
  * Invalidation is intentionally time-based, not write-based. Label PATCHes
  * happen many times per second during an active review; recomputing on each
- * would turn the server into a slideshow. The 5-minute lag is the explicit
- * trade-off requested by the project's primary reviewer.
+ * would turn the server into a slideshow. The lag (TTL_MS, 10 min) is the
+ * explicit trade-off; the /stats page also has a manual "refresh now" button
+ * for when you need it sooner. The scan yields to the event loop so it never
+ * freezes concurrent requests.
  *
  * Single-process assumption: snapshot file is the single source of truth
  * across restarts, and there is no cross-process coordination. See
@@ -21,7 +23,13 @@ import type { Group } from '$lib/domain/groups';
 import type { IncludeStatus, StatsResponse } from '$lib/domain/types';
 import type { ReviewRepo } from '../repo';
 
-const TTL_MS = 5 * 60 * 1000;
+const TTL_MS = 10 * 60 * 1000;
+
+// Yield to the event loop every this many groups during the full-corpus scan
+// so the ~17 s aggregation doesn't block other requests (e.g. a reviewer
+// navigating /review while a recompute runs). ~287 k groups ≈ 57 yields.
+const YIELD_EVERY = 5_000;
+const yieldToEventLoop = () => new Promise<void>((r) => setImmediate(r));
 
 export interface ExtendedStats extends StatsResponse {
 	groups: number;
@@ -43,7 +51,7 @@ function bucketFor(seconds: number): string {
 	return '30s+';
 }
 
-export function computeStats(repo: ReviewRepo): ExtendedStats {
+export async function computeStats(repo: ReviewRepo): Promise<ExtendedStats> {
 	let groupCount = 0;
 	let totalEdits = 0;
 	let multiEditGroups = 0;
@@ -61,6 +69,7 @@ export function computeStats(repo: ReviewRepo): ExtendedStats {
 
 	for (const g of repo.iterGroups() as IterableIterator<Group>) {
 		groupCount += 1;
+		if (groupCount % YIELD_EVERY === 0) await yieldToEventLoop();
 		if (g.edits.length > 1) multiEditGroups++;
 		byStatus[g.label.include_status] += 1;
 		const cats = g.label.error_categories;
@@ -152,7 +161,7 @@ export class StatsCache {
 	private async recompute(repo: ReviewRepo): Promise<CachedStats> {
 		if (this.inFlight) return this.inFlight;
 		const task = (async () => {
-			const stats = computeStats(repo);
+			const stats = await computeStats(repo);
 			const snap: CachedStats = { stats, computedAt: Date.now() };
 			this.current = snap;
 			try {

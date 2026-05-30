@@ -70,7 +70,7 @@ afterEach(async () => {
 describe('computeStats', () => {
 	it('aggregates groups, edits, status, editors, meetings', async () => {
 		const repo = await FileRepo.load({ cacheDir: fx.cacheDir, stateDir: fx.stateDir });
-		const stats = computeStats(repo);
+		const stats = await computeStats(repo);
 		expect(stats.total).toBe(20);
 		expect(stats.groups).toBe(20);
 		expect(stats.total_edits).toBe(20);
@@ -110,7 +110,7 @@ describe('StatsCache', () => {
 		const repo = await FileRepo.load({ cacheDir: fx.cacheDir, stateDir: fx.stateDir });
 		// Pre-seed the on-disk snapshot directly.
 		const synthetic = {
-			stats: { ...computeStats(repo), total: 42 },
+			stats: { ...(await computeStats(repo)), total: 42 },
 			computedAt: Date.now()
 		};
 		await fs.writeFile(join(fx.stateDir, 'stats.snapshot.json'), JSON.stringify(synthetic));
@@ -124,7 +124,7 @@ describe('StatsCache', () => {
 	it('rejects snapshots whose cache_hash no longer matches the repo', async () => {
 		const repo = await FileRepo.load({ cacheDir: fx.cacheDir, stateDir: fx.stateDir });
 		const stale = {
-			stats: { ...computeStats(repo), cache_hash: 'old-hash' },
+			stats: { ...(await computeStats(repo)), cache_hash: 'old-hash' },
 			computedAt: Date.now()
 		};
 		await fs.writeFile(join(fx.stateDir, 'stats.snapshot.json'), JSON.stringify(stale));
@@ -141,7 +141,7 @@ describe('StatsCache', () => {
 
 		// Seed an old-but-valid snapshot.
 		const seeded = {
-			stats: { ...computeStats(repo), total: 999 },
+			stats: { ...(await computeStats(repo)), total: 999 },
 			computedAt: Date.now() - 60 * 60 * 1000 // 1 h ago — way past TTL
 		};
 		await fs.writeFile(join(fx.stateDir, 'stats.snapshot.json'), JSON.stringify(seeded));
