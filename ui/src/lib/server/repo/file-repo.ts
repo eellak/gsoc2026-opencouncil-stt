@@ -137,6 +137,10 @@ export class FileRepo {
 		return this.orderedIds.map((id) => this.getGroup(id)!);
 	}
 
+	allOrderedIds(): readonly string[] {
+		return this.orderedIds;
+	}
+
 	*iterGroups(): IterableIterator<Group> {
 		for (const id of this.orderedIds) {
 			const g = this.getGroup(id);
