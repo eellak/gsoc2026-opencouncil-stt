@@ -20,6 +20,8 @@
 		{ keys: ['/'], label: t('shortcutPalette') },
 		{ keys: ['a'], label: t('shortcutAutoplay') },
 		{ keys: ['l'], label: t('shortcutLoop') },
+		{ keys: ['[', ']'], label: t('shortcutNudgeStart') },
+		{ keys: ['{', '}'], label: t('shortcutNudgeEnd') },
 		...(showChain ? [{ keys: ['c'], label: t('shortcutChain') }] : []),
 		{ keys: ['?'], label: t('shortcutHelp') }
 	]);

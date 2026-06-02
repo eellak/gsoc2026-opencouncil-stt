@@ -53,6 +53,21 @@
 						<small class="hint">{t('settingsLoopGapHint')}</small>
 					</label>
 				{/if}
+				<label class="row slider-row">
+					<span class="rlabel">{t('settingsNudgeStep')}</span>
+					<span class="slider-wrap">
+						<input
+							type="range"
+							min="100"
+							max="500"
+							step="50"
+							value={playbackPrefs.nudgeStepMs}
+							oninput={(e) => playbackPrefs.setNudgeStepMs(Number((e.target as HTMLInputElement).value))}
+						/>
+						<span class="slider-value">{playbackPrefs.nudgeStepMs}ms</span>
+					</span>
+					<small class="hint">{t('settingsNudgeStepHint')}</small>
+				</label>
 			</section>
 
 			<section>
