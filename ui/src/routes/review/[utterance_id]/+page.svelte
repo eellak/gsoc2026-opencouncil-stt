@@ -578,8 +578,9 @@
 		if (e.key === '?') { e.preventDefault(); shortcutsOpen = !shortcutsOpen; return; }
 		if (shortcutsOpen) return;
 		const k = normalizeShortcut(e.key);
-		if ((e.key === 'ArrowLeft' || k === 'k') && prevHref) { e.preventDefault(); goPrev(); }
-		if ((e.key === 'ArrowRight' || k === 'j') && nextHref) { e.preventDefault(); goNext(); }
+		// Spatial mapping: left key (j) → previous, right key (k) → next.
+		if ((e.key === 'ArrowLeft' || k === 'j') && prevHref) { e.preventDefault(); goPrev(); }
+		if ((e.key === 'ArrowRight' || k === 'k') && nextHref) { e.preventDefault(); goNext(); }
 		if (k === 'i') patchStatus('include');
 		if (k === 'x') patchStatus('exclude');
 		if (k === 'u') patchStatus('uncertain');
@@ -670,8 +671,8 @@
 				{/if}
 			</div>
 			<div class="nav-links">
-				{#if prevHref}<a href={prevHref} class="nav-btn" title="k / ←" aria-label={t('prevAria')}>{t('prev')} <kbd>k</kbd></a>{/if}
-				{#if nextHref}<a href={nextHref} class="nav-btn" title="j / →" aria-label={t('nextAria')} onclick={(e) => { e.preventDefault(); goNext(); }}>{t('next')} <kbd>j</kbd></a>{/if}
+				{#if prevHref}<a href={prevHref} class="nav-btn" title="j / ←" aria-label={t('prevAria')}>{t('prev')} <kbd>j</kbd></a>{/if}
+				{#if nextHref}<a href={nextHref} class="nav-btn" title="k / →" aria-label={t('nextAria')} onclick={(e) => { e.preventDefault(); goNext(); }}>{t('next')} <kbd>k</kbd></a>{/if}
 			</div>
 		</div>
 	</header>
@@ -722,12 +723,12 @@
 
 		{#snippet diffCardBody()}
 			{#if prevHref}
-				<a href={prevHref} class="utt-chevron left" title={t('prev') + ' (k)'} aria-label={t('prevAria')}>
+				<a href={prevHref} class="utt-chevron left" title={t('prev') + ' (j)'} aria-label={t('prevAria')}>
 					<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 6 9 12 15 18"/></svg>
 				</a>
 			{/if}
 			{#if nextHref}
-				<a href={nextHref} class="utt-chevron right" title={t('next') + ' (j)'} aria-label={t('nextAria')} onclick={(e) => { e.preventDefault(); goNext(); }}>
+				<a href={nextHref} class="utt-chevron right" title={t('next') + ' (k)'} aria-label={t('nextAria')} onclick={(e) => { e.preventDefault(); goNext(); }}>
 					<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 6 15 12 9 18"/></svg>
 				</a>
 			{/if}
@@ -886,7 +887,7 @@
 			{/if}
 			<div class="shortcuts">
 				<kbd>Space</kbd> play/pause
-				<kbd>j</kbd><kbd>k</kbd> next/prev
+				<kbd>j</kbd><kbd>k</kbd> prev/next
 				<kbd>i</kbd><kbd>x</kbd><kbd>u</kbd> include/exclude/uncertain
 				<kbd>1</kbd>…<kbd>0</kbd> category
 				<kbd>/</kbd> palette
