@@ -62,7 +62,10 @@
 					<li>
 						<button class="name-btn" onclick={() => pick(u.name)}>
 							<span class="name">{u.name}</span>
-							<span class="count" title="Αξιολογήσεις (include/exclude/uncertain)">{u.counts.total.toLocaleString('el-GR')}</span>
+							<span class="count" title="Συμπεριλήψεις (σύνολο επεξεργασμένων)">
+								{u.counts.include.toLocaleString('el-GR')}
+								<span class="count-total">({u.counts.total.toLocaleString('el-GR')})</span>
+							</span>
 						</button>
 					</li>
 				{/each}
@@ -121,6 +124,7 @@
 		background: #e2e8f0; color: #475569; border-radius: 999px;
 		padding: 0.05rem 0.45rem; min-width: 1.4rem; text-align: center;
 	}
+	.name-btn .count-total { color: #94a3b8; font-weight: 400; }
 	.divider { font-size: 0.75rem; color: #94a3b8; margin: 0.6rem 0; text-align: center; }
 	.row { display: flex; gap: 0.5rem; }
 	input {
