@@ -833,8 +833,8 @@
 					<span>{t('nudgeStepLabel')}</span>
 					<input
 						type="number"
-						step="50"
-						min="50"
+						step="10"
+						min="10"
 						max="1000"
 						value={playbackPrefs.nudgeStepMs}
 						onchange={(e) => playbackPrefs.setNudgeStepMs(Number((e.target as HTMLInputElement).value))}

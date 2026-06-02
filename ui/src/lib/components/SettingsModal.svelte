@@ -58,9 +58,9 @@
 					<span class="slider-wrap">
 						<input
 							type="range"
-							min="50"
+							min="10"
 							max="1000"
-							step="50"
+							step="10"
 							value={playbackPrefs.nudgeStepMs}
 							oninput={(e) => playbackPrefs.setNudgeStepMs(Number((e.target as HTMLInputElement).value))}
 						/>
