@@ -448,6 +448,43 @@
 		patch({ adjusted_start: start, adjusted_end: end });
 	}
 
+	// Manual fine-sync of the segment boundaries. Each press moves one
+	// boundary by the configured step (the "delay", in ms). Persists through
+	// the same adjusted_start/adjusted_end fields commitTimestamps writes.
+	const NUDGE_PREVIEW_SEC = 0.8;
+	function roundMs(sec: number): number {
+		return Math.round(sec * 1000) / 1000;
+	}
+	const stepSec = $derived(playbackPrefs.nudgeStepMs / 1000);
+	// Disable controls that would invert/collapse the region or push start
+	// below zero, so a precise click never silently no-ops.
+	const canStartBack = $derived(regionStart > 0);
+	const canStartFwd = $derived(roundMs(regionStart + stepSec) < regionEnd);
+	const canEndBack = $derived(roundMs(regionEnd - stepSec) > regionStart);
+	const canEndFwd = $derived(true);
+
+	function nudge(which: 'start' | 'end', dir: -1 | 1) {
+		const deltaSec = (dir * playbackPrefs.nudgeStepMs) / 1000;
+		let s = regionStart;
+		let e = regionEnd;
+		if (which === 'start') {
+			s = roundMs(Math.max(0, regionStart + deltaSec));
+		} else {
+			e = roundMs(regionEnd + deltaSec);
+			const dur = audioEl?.duration;
+			if (typeof dur === 'number' && Number.isFinite(dur)) e = Math.min(roundMs(dur), e);
+		}
+		if (s >= e) return; // boundary would invert — handled visually by disabled buttons
+		commitTimestamps(s, e);
+		// Audible/visual feedback: drop the playhead onto the boundary being
+		// tuned (a hair before the new end so its tail is what plays back).
+		const el = audioEl;
+		if (el) {
+			const target = which === 'start' ? s : Math.max(s, e - NUDGE_PREVIEW_SEC);
+			try { el.currentTime = target; } catch { /* element may be mid-swap */ }
+		}
+	}
+
 	function navHref(targetId: string | undefined | null): string | null {
 		if (!targetId) return null;
 		if (filter) {
@@ -526,6 +563,10 @@
 		if (k === 'a') { e.preventDefault(); playbackPrefs.toggleAutoplay(); }
 		if (k === 'l') { e.preventDefault(); playbackPrefs.toggleLoop(); }
 		if (e.key === '/') { e.preventDefault(); paletteOpen = true; return; }
+		// Segment fine-sync. Use physical key codes so the brackets work on the
+		// Greek layout too (where e.key would differ). Shift targets the end.
+		if (e.code === 'BracketLeft') { e.preventDefault(); nudge(e.shiftKey ? 'end' : 'start', -1); return; }
+		if (e.code === 'BracketRight') { e.preventDefault(); nudge(e.shiftKey ? 'end' : 'start', 1); return; }
 		if (k === 'c' && item.edits.length > 1) { e.preventDefault(); showFullChain = !showFullChain; }
 		const catId = DIGIT_SHORTCUTS.get(e.key);
 		if (catId) { e.preventDefault(); toggleCategory(catId); }
@@ -732,8 +773,9 @@
 				3-hour meeting MP3.
 			-->
 			<div class="audio-toolbar">
-				<label>
-					<span>start</span>
+				<div class="boundary">
+					<span class="boundary-label">start</span>
+					<button type="button" class="nudge" disabled={!canStartBack} onclick={() => nudge('start', -1)} title={t('nudgeStartBack')} aria-label={t('nudgeStartBack')}>−<kbd>[</kbd></button>
 					<input
 						type="number"
 						step="0.1"
@@ -741,9 +783,11 @@
 						value={regionStart}
 						onchange={(e) => commitTimestamps(Number((e.target as HTMLInputElement).value), regionEnd)}
 					/>
-				</label>
-				<label>
-					<span>end</span>
+					<button type="button" class="nudge" disabled={!canStartFwd} onclick={() => nudge('start', 1)} title={t('nudgeStartFwd')} aria-label={t('nudgeStartFwd')}>+<kbd>]</kbd></button>
+				</div>
+				<div class="boundary">
+					<span class="boundary-label">end</span>
+					<button type="button" class="nudge" disabled={!canEndBack} onclick={() => nudge('end', -1)} title={t('nudgeEndBack')} aria-label={t('nudgeEndBack')}>−<kbd>{'{'}</kbd></button>
 					<input
 						type="number"
 						step="0.1"
@@ -751,6 +795,19 @@
 						value={regionEnd}
 						onchange={(e) => commitTimestamps(regionStart, Number((e.target as HTMLInputElement).value))}
 					/>
+					<button type="button" class="nudge" disabled={!canEndFwd} onclick={() => nudge('end', 1)} title={t('nudgeEndFwd')} aria-label={t('nudgeEndFwd')}>+<kbd>{'}'}</kbd></button>
+				</div>
+				<label class="step-ctl" title={t('nudgeStepTitle')}>
+					<span>{t('nudgeStepLabel')}</span>
+					<input
+						type="number"
+						step="50"
+						min="100"
+						max="500"
+						value={playbackPrefs.nudgeStepMs}
+						onchange={(e) => playbackPrefs.setNudgeStepMs(Number((e.target as HTMLInputElement).value))}
+					/>
+					<span class="unit">ms</span>
 				</label>
 				<span class="hint">segment: {(regionEnd - regionStart).toFixed(2)}s of {item.end.toFixed(1)}s</span>
 			</div>
@@ -803,6 +860,8 @@
 				<kbd>/</kbd> palette
 				<kbd>a</kbd> autoplay
 				<kbd>l</kbd> loop
+				<kbd>[</kbd><kbd>]</kbd> {t('shortcutNudgeStart')}
+				<kbd>{'{'}</kbd><kbd>{'}'}</kbd> {t('shortcutNudgeEnd')}
 				<kbd>?</kbd> {t('shortcutsModalTitle')}
 				{#if item.edits.length > 1}<kbd>c</kbd> {t('chainToggleHint')}{/if}
 			</div>
@@ -906,6 +965,25 @@
 		border-radius: var(--radius-sm, 6px);
 		font-size: 0.85rem; background: var(--surface, #fff);
 	}
+	.boundary { display: inline-flex; align-items: center; gap: 0.3rem; }
+	.boundary-label { color: var(--text-2, #475569); }
+	.boundary input[type="number"] { width: 4.6rem; }
+	.nudge {
+		display: inline-flex; align-items: center; gap: 0.18rem;
+		padding: 0.2rem 0.4rem; line-height: 1;
+		border: 1px solid var(--border, #e2e8f0);
+		border-radius: var(--radius-sm, 6px);
+		background: var(--surface, #fff); color: var(--text-2, #475569);
+		cursor: pointer; font-size: 0.85rem; font-family: inherit;
+	}
+	.nudge:hover:not(:disabled) { background: var(--surface-3, #f1f5f9); }
+	.nudge:active:not(:disabled) { transform: scale(0.95); }
+	.nudge:disabled { opacity: 0.4; cursor: default; }
+	.nudge kbd { font-size: 0.62rem; padding: 0 0.22rem; }
+	.step-ctl .unit { color: var(--text-3, #94a3b8); font-size: 0.78rem; }
+	.step-ctl input[type="number"] { width: 4rem; }
+	:global(body.mobile-mode) .nudge kbd { display: none; }
+	@media (max-width: 540px) { .nudge kbd { display: none; } }
 	.play-controls {
 		display: inline-flex; align-items: center; gap: 0.5rem;
 		flex-wrap: nowrap; min-width: 0;
