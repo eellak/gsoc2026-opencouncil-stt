@@ -8,9 +8,9 @@ const LOOP_GAP_MAX = 3000;
 const LOOP_GAP_DEFAULT = 100;
 
 // Manual segment fine-sync step ("delay"): how far each nudge moves a
-// boundary. Stored/rounded to the nearest 50ms within [100, 500].
-const NUDGE_STEP_MIN = 100;
-const NUDGE_STEP_MAX = 500;
+// boundary. Stored/rounded to the nearest 50ms within [50, 1000].
+const NUDGE_STEP_MIN = 50;
+const NUDGE_STEP_MAX = 1000;
 const NUDGE_STEP_DEFAULT = 200;
 const NUDGE_STEP_GRID = 50;
 
