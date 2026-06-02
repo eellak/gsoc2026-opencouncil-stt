@@ -595,6 +595,9 @@
 		// Shift + < / > (physical comma/period) slides the whole utterance window.
 		if (e.code === 'Comma' && e.shiftKey) { e.preventDefault(); shiftWhole(-1); return; }
 		if (e.code === 'Period' && e.shiftKey) { e.preventDefault(); shiftWhole(1); return; }
+		// ↑ / ↓ adjust the nudge step itself (one 10ms grid notch each press).
+		if (e.key === 'ArrowUp') { e.preventDefault(); playbackPrefs.setNudgeStepMs(playbackPrefs.nudgeStepMs + 10); return; }
+		if (e.key === 'ArrowDown') { e.preventDefault(); playbackPrefs.setNudgeStepMs(playbackPrefs.nudgeStepMs - 10); return; }
 		if (k === 'c' && item.edits.length > 1) { e.preventDefault(); showFullChain = !showFullChain; }
 		const catId = DIGIT_SHORTCUTS.get(e.key);
 		if (catId) { e.preventDefault(); toggleCategory(catId); }
@@ -841,6 +844,7 @@
 						onchange={(e) => playbackPrefs.setNudgeStepMs(Number((e.target as HTMLInputElement).value))}
 					/>
 					<span class="unit">ms</span>
+					<kbd>↑</kbd><kbd>↓</kbd>
 				</label>
 				<span class="hint">segment: {(regionEnd - regionStart).toFixed(2)}s of {item.end.toFixed(1)}s</span>
 			</div>
@@ -896,6 +900,7 @@
 				<kbd>[</kbd><kbd>]</kbd> {t('shortcutNudgeStart')}
 				<kbd>{'{'}</kbd><kbd>{'}'}</kbd> {t('shortcutNudgeEnd')}
 				<kbd>{'<'}</kbd><kbd>{'>'}</kbd> {t('shortcutNudgeMove')}
+				<kbd>↑</kbd><kbd>↓</kbd> {t('shortcutStep')}
 				<kbd>?</kbd> {t('shortcutsModalTitle')}
 				{#if item.edits.length > 1}<kbd>c</kbd> {t('chainToggleHint')}{/if}
 			</div>
@@ -1014,8 +1019,12 @@
 	.nudge:active:not(:disabled) { transform: scale(0.95); }
 	.nudge:disabled { opacity: 0.4; cursor: default; }
 	.nudge kbd { font-size: 0.62rem; padding: 0 0.22rem; }
+	.step-ctl { display: inline-flex; align-items: center; gap: 0.3rem; }
 	.step-ctl .unit { color: var(--text-3, #94a3b8); font-size: 0.78rem; }
 	.step-ctl input[type="number"] { width: 4rem; }
+	.step-ctl kbd { font-size: 0.62rem; padding: 0 0.22rem; }
+	:global(body.mobile-mode) .step-ctl kbd { display: none; }
+	@media (max-width: 540px) { .step-ctl kbd { display: none; } }
 	:global(body.mobile-mode) .nudge kbd { display: none; }
 	@media (max-width: 540px) { .nudge kbd { display: none; } }
 	.play-controls {

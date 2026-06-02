@@ -127,6 +127,7 @@ export const strings = {
 	shortcutNudgeStart: { en: 'Nudge start back / forward', el: 'Μετακίνηση αρχής πίσω / μπροστά' },
 	shortcutNudgeEnd: { en: 'Nudge end back / forward', el: 'Μετακίνηση τέλους πίσω / μπροστά' },
 	shortcutNudgeMove: { en: 'Move whole utterance back / forward', el: 'Μετακίνηση όλου του utterance πίσω / μπροστά' },
+	shortcutStep: { en: 'Increase / decrease step', el: 'Αύξηση / μείωση βήματος' },
 	nudgeStepLabel: { en: 'step', el: 'βήμα' },
 	nudgeStepTitle: { en: 'Nudge step (ms) — how far each ± button moves a boundary', el: 'Βήμα μετακίνησης (ms) — πόσο μετακινεί κάθε κουμπί ± ένα όριο' },
 	nudgeStartBack: { en: 'Move start earlier', el: 'Μετακίνηση αρχής νωρίτερα' },

@@ -23,6 +23,7 @@
 		{ keys: ['[', ']'], label: t('shortcutNudgeStart') },
 		{ keys: ['{', '}'], label: t('shortcutNudgeEnd') },
 		{ keys: ['<', '>'], label: t('shortcutNudgeMove') },
+		{ keys: ['↑', '↓'], label: t('shortcutStep') },
 		...(showChain ? [{ keys: ['c'], label: t('shortcutChain') }] : []),
 		{ keys: ['?'], label: t('shortcutHelp') }
 	]);
