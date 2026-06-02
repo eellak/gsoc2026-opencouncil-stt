@@ -22,6 +22,7 @@
 		{ keys: ['l'], label: t('shortcutLoop') },
 		{ keys: ['[', ']'], label: t('shortcutNudgeStart') },
 		{ keys: ['{', '}'], label: t('shortcutNudgeEnd') },
+		{ keys: ['<', '>'], label: t('shortcutNudgeMove') },
 		...(showChain ? [{ keys: ['c'], label: t('shortcutChain') }] : []),
 		{ keys: ['?'], label: t('shortcutHelp') }
 	]);

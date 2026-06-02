@@ -462,6 +462,10 @@
 	const canStartFwd = $derived(roundMs(regionStart + stepSec) < regionEnd);
 	const canEndBack = $derived(roundMs(regionEnd - stepSec) > regionStart);
 	const canEndFwd = $derived(true);
+	// Whole-utterance move can always go forward (clamped to duration); going
+	// back is only possible while the start is above zero.
+	const canMoveBack = $derived(regionStart > 0);
+	const canMoveFwd = $derived(true);
 
 	function nudge(which: 'start' | 'end', dir: -1 | 1) {
 		const deltaSec = (dir * playbackPrefs.nudgeStepMs) / 1000;
@@ -482,6 +486,26 @@
 		if (el) {
 			const target = which === 'start' ? s : Math.max(s, e - NUDGE_PREVIEW_SEC);
 			try { el.currentTime = target; } catch { /* element may be mid-swap */ }
+		}
+	}
+
+	// Shift the whole utterance window (start AND end) by one step, keeping its
+	// duration fixed. The applied delta is clamped so start never goes below 0
+	// and end never passes the audio duration — the window slides, never squashes.
+	function shiftWhole(dir: -1 | 1) {
+		let delta = (dir * playbackPrefs.nudgeStepMs) / 1000;
+		if (regionStart + delta < 0) delta = -regionStart;
+		const dur = audioEl?.duration;
+		if (typeof dur === 'number' && Number.isFinite(dur) && regionEnd + delta > dur) {
+			delta = dur - regionEnd;
+		}
+		if (delta === 0) return;
+		const s = roundMs(regionStart + delta);
+		const e = roundMs(regionEnd + delta);
+		commitTimestamps(s, e);
+		const el = audioEl;
+		if (el) {
+			try { el.currentTime = s; } catch { /* element may be mid-swap */ }
 		}
 	}
 
@@ -567,6 +591,9 @@
 		// Greek layout too (where e.key would differ). Shift targets the end.
 		if (e.code === 'BracketLeft') { e.preventDefault(); nudge(e.shiftKey ? 'end' : 'start', -1); return; }
 		if (e.code === 'BracketRight') { e.preventDefault(); nudge(e.shiftKey ? 'end' : 'start', 1); return; }
+		// Shift + < / > (physical comma/period) slides the whole utterance window.
+		if (e.code === 'Comma' && e.shiftKey) { e.preventDefault(); shiftWhole(-1); return; }
+		if (e.code === 'Period' && e.shiftKey) { e.preventDefault(); shiftWhole(1); return; }
 		if (k === 'c' && item.edits.length > 1) { e.preventDefault(); showFullChain = !showFullChain; }
 		const catId = DIGIT_SHORTCUTS.get(e.key);
 		if (catId) { e.preventDefault(); toggleCategory(catId); }
@@ -797,13 +824,18 @@
 					/>
 					<button type="button" class="nudge" disabled={!canEndFwd} onclick={() => nudge('end', 1)} title={t('nudgeEndFwd')} aria-label={t('nudgeEndFwd')}>+<kbd>{'}'}</kbd></button>
 				</div>
+				<div class="boundary">
+					<span class="boundary-label">{t('nudgeMoveLabel')}</span>
+					<button type="button" class="nudge" disabled={!canMoveBack} onclick={() => shiftWhole(-1)} title={t('nudgeMoveBack')} aria-label={t('nudgeMoveBack')}>◀<kbd>{'<'}</kbd></button>
+					<button type="button" class="nudge" disabled={!canMoveFwd} onclick={() => shiftWhole(1)} title={t('nudgeMoveFwd')} aria-label={t('nudgeMoveFwd')}>▶<kbd>{'>'}</kbd></button>
+				</div>
 				<label class="step-ctl" title={t('nudgeStepTitle')}>
 					<span>{t('nudgeStepLabel')}</span>
 					<input
 						type="number"
 						step="50"
-						min="100"
-						max="500"
+						min="50"
+						max="1000"
 						value={playbackPrefs.nudgeStepMs}
 						onchange={(e) => playbackPrefs.setNudgeStepMs(Number((e.target as HTMLInputElement).value))}
 					/>
@@ -862,6 +894,7 @@
 				<kbd>l</kbd> loop
 				<kbd>[</kbd><kbd>]</kbd> {t('shortcutNudgeStart')}
 				<kbd>{'{'}</kbd><kbd>{'}'}</kbd> {t('shortcutNudgeEnd')}
+				<kbd>{'<'}</kbd><kbd>{'>'}</kbd> {t('shortcutNudgeMove')}
 				<kbd>?</kbd> {t('shortcutsModalTitle')}
 				{#if item.edits.length > 1}<kbd>c</kbd> {t('chainToggleHint')}{/if}
 			</div>
