@@ -24,6 +24,14 @@
 	import SettingsModal from '$lib/components/SettingsModal.svelte';
 	import MobileSwipeCard from '$lib/components/MobileSwipeCard.svelte';
 	import { reviewPrefs } from '$lib/client/review-prefs.svelte';
+	import {
+		autoSkip,
+		rememberDirection,
+		lastNavDirection,
+		noteSuccessfulLoad,
+		allowSkip,
+		resumeAutoSkip
+	} from '$lib/client/auto-skip.svelte';
 
 	const DIGIT_SHORTCUTS: ReadonlyMap<string, TaxonomyId> = new Map(
 		TAXONOMY.filter((c) => c.shortcut).map((c) => [c.shortcut!, c.id as TaxonomyId])
@@ -388,20 +396,43 @@
 				if (cancelled) return;
 				contextData = data;
 				if (data.error) {
-					contextState = 'error';
+					// Unavailable (401/403/404 — private meeting OR a removed
+					// utterance) → auto-skip just this utterance, showing 'loading'
+					// (not a flashed error) while we navigate; fall back to 'error'
+					// if the skip can't fire (cap/queue edge). Transient errors
+					// (5xx/timeout/network) stay on screen for the reviewer to retry.
+					if (data.error_kind === 'private') {
+						contextState = autoSkipPrivate() ? 'loading' : 'error';
+					} else {
+						contextState = 'error';
+					}
 				} else if (data.prev.length === 0 && data.next.length === 0) {
 					contextState = 'empty';
+					noteSuccessfulLoad();
 				} else {
 					contextState = 'ready';
+					noteSuccessfulLoad();
 				}
 			})
 			.catch(() => {
+				// Network/abort — transient, never auto-skip.
 				if (!cancelled) contextState = 'error';
 			});
 		return () => {
 			cancelled = true;
 		};
 	});
+
+	// Advance past a private meeting in the last navigation direction. Terminal
+	// rule: no candidate that way (queue edge) → stop, don't wrap. Returns true
+	// when it actually navigates (cap not hit and a candidate exists).
+	function autoSkipPrivate(): boolean {
+		const href = lastNavDirection() === 'prev' ? prevHref : nextHref;
+		if (!href) return false;
+		if (!allowSkip()) return false;
+		goto(href);
+		return true;
+	}
 
 	// Speaker for the current utterance. The per-utterance context endpoint
 	// doesn't return the anchor or any speaker names, so this is null and the
@@ -520,8 +551,8 @@
 	const prevHref = $derived(navHref(prev?.utterance_id ?? prevId ?? null));
 	const nextHref = $derived(navHref(next?.utterance_id ?? nextId ?? null));
 
-	function goNext() { if (nextHref) goto(nextHref); }
-	function goPrev() { if (prevHref) goto(prevHref); }
+	function goNext() { rememberDirection('next'); if (nextHref) goto(nextHref); }
+	function goPrev() { rememberDirection('prev'); if (prevHref) goto(prevHref); }
 
 	// Touch swipe nav — touch only (no mouse), so Mac trackpad swipe-back
 	// keeps working. Threshold 60px horizontal, must be mostly horizontal.
@@ -619,6 +650,12 @@
 <svelte:window onkeydown={onKeydown} />
 
 <div class="review-page">
+	{#if autoSkip.paused}
+		<div class="auto-skip-banner" role="status">
+			<span>{t('autoSkipPaused', { n: autoSkip.skipped })}</span>
+			<button type="button" onclick={resumeAutoSkip}>{t('autoSkipResume')}</button>
+		</div>
+	{/if}
 	<header class="top-bar" bind:this={topBarEl}>
 		<div class="top-row">
 			<div class="meeting-info">
@@ -924,6 +961,18 @@
 
 <style>
 	.review-page { max-width: 860px; margin: 0 auto; padding: 1rem 1rem 5rem; }
+	.auto-skip-banner {
+		display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;
+		background: #fffbeb; border: 1px solid #fcd34d; color: #92400e;
+		border-radius: 8px; padding: 0.5rem 0.75rem; margin-bottom: 0.75rem;
+		font-size: 0.85rem;
+	}
+	.auto-skip-banner button {
+		flex-shrink: 0; font-family: inherit; font-size: 0.8rem; cursor: pointer;
+		background: #92400e; color: #fff; border: none; border-radius: 6px;
+		padding: 0.3rem 0.7rem;
+	}
+	.auto-skip-banner button:hover { background: #78350f; }
 	.top-bar {
 		position: sticky; top: 0; z-index: 10;
 		background: #ffffff;

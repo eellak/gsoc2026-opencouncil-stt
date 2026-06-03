@@ -91,13 +91,21 @@ async function fetchContext(
 		current: null,
 		prev: [],
 		next: [],
-		error: null
+		error: null,
+		error_kind: null
 	};
 	const url = `/api/oc-context/${encodeURIComponent(utteranceId)}?before=${before}&after=${after}`;
 	try {
 		const resp = await fetch(url);
 		if (!resp.ok) {
 			ctx.error = resp.status === 404 ? 'utterance not found' : 'upstream context fetch failed';
+			// The bridge passes through 401/403/404 only for genuine upstream
+			// auth/not-found responses; treat those as "private" (skippable) and
+			// everything else (502/timeout/network) as transient.
+			ctx.error_kind =
+				resp.status === 401 || resp.status === 403 || resp.status === 404
+					? 'private'
+					: 'transient';
 			return ctx;
 		}
 		const json = (await resp.json()) as OcContextResponse;
@@ -109,7 +117,9 @@ async function fetchContext(
 		ctx.next = (json.after ?? []).map(toCtx);
 		return ctx;
 	} catch {
+		// Network error / abort — never private; let the user retry.
 		ctx.error = 'upstream context fetch failed';
+		ctx.error_kind = 'transient';
 		return ctx;
 	}
 }
@@ -117,7 +127,7 @@ async function fetchContext(
 function loadOnce(utteranceId: string, before: number, after: number): Promise<MeetingContext> {
 	if (!utteranceId) {
 		return Promise.resolve({
-			city_id: '', meeting_id: '', current: null, prev: [], next: [], error: 'missing utterance id'
+			city_id: '', meeting_id: '', current: null, prev: [], next: [], error: 'missing utterance id', error_kind: 'transient'
 		});
 	}
 	const b = clampRadius(before);
