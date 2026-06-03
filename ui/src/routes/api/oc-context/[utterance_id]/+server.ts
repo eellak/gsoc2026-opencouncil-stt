@@ -49,7 +49,13 @@ export const GET: RequestHandler = async ({ params, url, fetch }) => {
 
 	if (!resp.ok) {
 		console.warn('[oc-context] upstream', resp.status, upstream);
-		throw error(resp.status === 404 ? 404 : 502, `upstream ${resp.status}`);
+		// Pass through the auth/not-found statuses the client uses to classify a
+		// "private" meeting (auto-skip) vs a transient failure (show + retry).
+		// Everything else — and the network/timeout catch above — stays 502 so
+		// infra hiccups never get mistaken for private data.
+		const passthrough =
+			resp.status === 401 || resp.status === 403 || resp.status === 404;
+		throw error(passthrough ? resp.status : 502, `upstream ${resp.status}`);
 	}
 
 	// Context windows are small (≤100 short utterances); 2 MB is a generous

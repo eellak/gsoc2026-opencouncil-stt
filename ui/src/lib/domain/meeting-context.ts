@@ -25,4 +25,11 @@ export interface MeetingContext {
 	prev: ContextUtterance[];
 	next: ContextUtterance[];
 	error: string | null;
+	/**
+	 * Why the fetch failed, when `error` is set.
+	 * - 'private': upstream 401/403/404 — the meeting isn't publicly readable, so
+	 *   the review UI auto-skips it.
+	 * - 'transient': network/timeout/5xx — show the error and let the user retry.
+	 */
+	error_kind?: 'private' | 'transient' | null;
 }

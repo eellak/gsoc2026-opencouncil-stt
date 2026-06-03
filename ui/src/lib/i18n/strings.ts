@@ -86,6 +86,11 @@ export const strings = {
 	contextAfter: { en: 'After', el: 'Επόμενα' },
 	loadingContext: { en: 'Loading transcript…', el: 'Φόρτωση απομαγνητοφώνησης…' },
 	contextUnavailable: { en: 'Context unavailable', el: 'Μη διαθέσιμο πλαίσιο' },
+	autoSkipPaused: {
+		en: 'Paused after skipping {n} unavailable utterances in a row — network issue?',
+		el: 'Παύση μετά από {n} συνεχόμενα μη διαθέσιμα utterances — πρόβλημα δικτύου;'
+	},
+	autoSkipResume: { en: 'Resume skipping', el: 'Συνέχεια προσπέρασης' },
 	noContext: { en: 'No surrounding utterances', el: 'Καμία γύρω εκφορά' },
 
 	// Category palette
