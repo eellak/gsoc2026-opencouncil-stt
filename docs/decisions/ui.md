@@ -4,6 +4,14 @@ Exploration-vs-training stance and prototype UI choices.
 
 ## Accepted
 
+### 2026-06-03 - Auto-skip unavailable utterances in review (branch `codex/file-backed-review-ui`)
+
+An utterance whose OpenCouncil context can't be fetched can't be reviewed, so the UI auto-skips it. We learn this when the per-utterance context bridge (`/api/oc-context`) returns a non-OK status. The bridge passes through upstream `401/403/404` (classified client-side as `error_kind: 'private'`); `5xx`/timeout/network stay `502` (`'transient'`). On a `'private'` error the review page auto-advances **one utterance** in the last navigation direction. A consecutive-skip cap (25) pauses the loop with a banner so a run of failures can't sweep the queue; an available load resets the streak. No label is written — skip is navigation only.
+
+**Empirically verified status (2026-06-03):** the live `…/api/utterance/{id}/context` endpoint returns **`404 {"error":"Utterance not found"}`** for unavailable utterances and `200` for available ones — there is no distinct `403`. We skip **per utterance** on its own fetch rather than marking a whole meeting unavailable, for two reasons: (1) `meeting_id` slugs collide across cities (see data.md — `feb26_2025` is both a private Athens meeting that 404s and a public Chania one that 200s under the same slug), so a meeting-level memo keyed loosely would mis-skip; and (2) per-utterance skip is robust regardless of whether a meeting is uniformly available. In the default seeded (shuffled) order a meeting's utterances aren't adjacent anyway, so a per-meeting memo would buy almost nothing. Transient `502` never auto-skips — conservative by design.
+
+Files: `ui/src/lib/client/auto-skip.svelte.ts`, `meeting-context.svelte.ts`, `routes/api/oc-context/[utterance_id]/+server.ts`, `routes/review/[utterance_id]/+page.svelte`.
+
 ### 2026-05-20 - Multi-category labels, seed UX, direct-CDN audio (branch `codex/file-backed-review-ui`)
 
 Five small UX changes shipped together so the prototype is share-link friendly and exercises more of the taxonomy.
