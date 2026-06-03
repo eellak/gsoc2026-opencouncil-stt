@@ -51,7 +51,15 @@ export const GET: RequestHandler = async ({ url }) => {
 		computeIds = () => repo.idsByStatus(status as IncludeStatus);
 	} else if (category) {
 		filter = `category:${category}`;
-		computeIds = () => getCategoryCache().ids(repo, category);
+		// The ingest-category index spans the whole corpus; intersect it with the
+		// eligible universe so the category review queue can't navigate into a
+		// meeting that's been filtered out (status/errorCategory paths are already
+		// scoped inside the repo).
+		computeIds = async () => {
+			const eligible = new Set(repo.eligibleOrderedIds());
+			const ids = await getCategoryCache().ids(repo, category);
+			return ids.filter((id) => eligible.has(id));
+		};
 	} else if (errorCategory) {
 		const norm = normalizeTaxonomyId(errorCategory) ?? errorCategory;
 		filter = `errorCategory:${norm}`;
