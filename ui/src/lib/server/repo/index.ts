@@ -43,6 +43,13 @@ export interface ReviewRepo {
 	 * scan yields to the event loop and another scan/request touches the DB.
 	 */
 	allOrderedIds(): readonly string[];
+	/**
+	 * Navigation universe after the meeting-eligibility filter (meetings with
+	 * ≥ MEETING_MIN_HUMAN_UTTERANCES human-corrected utterances), canonical
+	 * order. The seeded queue, status/category filters, and stats all scope to
+	 * this set; `getGroup(id)` stays unfiltered so direct links still resolve.
+	 */
+	eligibleOrderedIds(): readonly string[];
 	utteranceIdForEdit(edit_id: string): string | null;
 	groupsByErrorCategory(category: string): Group[];
 	/** Just the ids whose label carries `category`, in canonical order — cheap

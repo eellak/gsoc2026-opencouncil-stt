@@ -7,6 +7,7 @@ export default defineConfig({
 		include: ['tests/**/*.test.ts'],
 		environment: 'node',
 		pool: 'vmThreads',
-		fileParallelism: false
+		fileParallelism: false,
+		setupFiles: ['tests/setup.ts']
 	}
 });

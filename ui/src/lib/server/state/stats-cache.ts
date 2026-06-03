@@ -73,7 +73,9 @@ export async function computeStats(repo: ReviewRepo): Promise<ExtendedStats> {
 	// below (better-sqlite3 throws "statement is busy" if another scan/request
 	// touches the DB mid-iteration).
 	let scanned = 0;
-	for (const id of repo.allOrderedIds()) {
+	// Scope stats to the eligible navigation universe so "aggregate over selected
+	// corrections" excludes meetings filtered out of review (see meeting-eligibility).
+	for (const id of repo.eligibleOrderedIds()) {
 		if (++scanned % YIELD_EVERY === 0) await yieldToEventLoop();
 		const g = repo.getGroup(id);
 		if (!g) continue;

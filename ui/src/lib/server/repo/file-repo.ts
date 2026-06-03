@@ -14,6 +14,11 @@ import { resolve } from 'node:path';
 import type { Group, GroupLabel, GroupPatchBody, CacheMeta, QueueResponse } from '$lib/domain/groups';
 import type { IncludeStatus } from '$lib/domain/types';
 import { SidecarStore } from '../state/sidecar';
+import {
+	loadOrComputeEligibleMeetings,
+	meetingEligibilityThreshold,
+	meetingKey
+} from '../state/meeting-eligibility';
 
 // Same convention as SqliteRepo: defaults resolve from `process.cwd()` so the
 // bundled adapter-node output picks up the operator's working directory.
@@ -26,11 +31,19 @@ export interface RepoOptions {
 	cacheDir?: string;
 	stateDir?: string;
 	audioCdnMapPath?: string;
+	/** Overrides MEETING_MIN_HUMAN_UTTERANCES (tests pass this explicitly). */
+	meetingMinHumanUtterances?: number;
 }
 
 export class FileRepo {
 	/** edit_id → utterance_id index. Built lazily on first use. */
 	private editToUtteranceIndex: Map<string, string> | null = null;
+
+	// Navigation universe after the meeting-eligibility filter (see
+	// meeting-eligibility.ts). `eligibleIdSet` is null when the filter is
+	// disabled (threshold ≤ 0), meaning "everything is eligible".
+	private eligibleIds: string[];
+	private eligibleIdSet: Set<string> | null = null;
 
 	private constructor(
 		private groupsById: Map<string, Group>,
@@ -38,7 +51,43 @@ export class FileRepo {
 		private cacheHash: string,
 		private sidecar: SidecarStore,
 		private audioCdnMap: Map<string, string>
-	) {}
+	) {
+		this.eligibleIds = orderedIds;
+	}
+
+	/** True when `utterance_id` survives the meeting-eligibility filter. */
+	private isEligible(utterance_id: string): boolean {
+		return this.eligibleIdSet ? this.eligibleIdSet.has(utterance_id) : true;
+	}
+
+	/**
+	 * Narrow the navigation universe to utterances whose meeting clears the
+	 * human-correction threshold. Runs once during load(). Threshold ≤ 0
+	 * disables it. Shares the same snapshot as SqliteRepo (keyed by cache_hash +
+	 * threshold), so the two repos agree on the eligible set for the same data.
+	 */
+	private async applyMeetingEligibility(stateDir: string, thresholdOverride?: number): Promise<void> {
+		const threshold = thresholdOverride ?? meetingEligibilityThreshold();
+		if (threshold <= 0) {
+			this.eligibleIds = this.orderedIds;
+			this.eligibleIdSet = null;
+			return;
+		}
+		const eligibleMeetings = await loadOrComputeEligibleMeetings(this, stateDir, threshold);
+		const elig: string[] = [];
+		for (const id of this.orderedIds) {
+			const g = this.groupsById.get(id);
+			if (g?.meeting_id && eligibleMeetings.has(meetingKey(g.city_id, g.meeting_id))) {
+				elig.push(id);
+			}
+		}
+		this.eligibleIds = elig;
+		this.eligibleIdSet = new Set(elig);
+		console.log(
+			`[file-repo] meeting-eligibility: ${elig.length.toLocaleString()}/` +
+				`${this.orderedIds.length.toLocaleString()} utterances eligible (threshold=${threshold})`
+		);
+	}
 
 	static async load(opts: RepoOptions = {}): Promise<FileRepo> {
 		const cacheDir = opts.cacheDir ?? process.env.REVIEW_CACHE_DIR ?? DEFAULT_CACHE_DIR();
@@ -79,7 +128,9 @@ export class FileRepo {
 				`cache_hash=${meta.source_hash}; sidecar_labels=${sidecar.all().size}`
 		);
 
-		return new FileRepo(groupsById, orderedIds, meta.source_hash, sidecar, cdnMap);
+		const repo = new FileRepo(groupsById, orderedIds, meta.source_hash, sidecar, cdnMap);
+		await repo.applyMeetingEligibility(stateDir, opts.meetingMinHumanUtterances);
+		return repo;
 	}
 
 	get hash(): string {
@@ -87,7 +138,12 @@ export class FileRepo {
 	}
 
 	get total(): number {
-		return this.orderedIds.length;
+		return this.eligibleIds.length;
+	}
+
+	/** Navigation universe after the meeting-eligibility filter, canonical order. */
+	eligibleOrderedIds(): readonly string[] {
+		return this.eligibleIds;
 	}
 
 	getGroup(utterance_id: string): Group | null {
@@ -169,14 +225,14 @@ export class FileRepo {
 		const out: string[] = [];
 		if (status === 'unreviewed') {
 			const labels = this.sidecar.all();
-			for (const id of this.orderedIds) {
+			for (const id of this.eligibleIds) {
 				const lbl = labels.get(id);
 				if (!lbl || lbl.include_status === 'unreviewed') out.push(id);
 			}
 			return out;
 		}
 		for (const [id, lbl] of this.sidecar.all()) {
-			if (lbl.include_status === status) out.push(id);
+			if (lbl.include_status === status && this.isEligible(id)) out.push(id);
 		}
 		return out;
 	}
@@ -185,7 +241,7 @@ export class FileRepo {
 	 *  Cheap: in-memory label scan, no group materialisation. */
 	idsByErrorCategory(category: string): string[] {
 		const out: string[] = [];
-		for (const id of this.orderedIds) {
+		for (const id of this.eligibleIds) {
 			if (this.sidecar.get(id).error_categories.includes(category)) out.push(id);
 		}
 		return out;
@@ -194,7 +250,7 @@ export class FileRepo {
 	/** Groups whose label.error_categories array contains `category`. */
 	groupsByErrorCategory(category: string): Group[] {
 		const out: Group[] = [];
-		for (const id of this.orderedIds) {
+		for (const id of this.eligibleIds) {
 			const lbl = this.sidecar.get(id);
 			if (lbl.error_categories.includes(category)) {
 				const g = this.getGroup(id);
@@ -217,7 +273,7 @@ export class FileRepo {
 			this.orderCache.set(seed, cached);
 			return cached;
 		}
-		const arr = [...this.orderedIds];
+		const arr = [...this.eligibleIds];
 		let state = (seed >>> 0) || 1;
 		for (let i = arr.length - 1; i > 0; i--) {
 			state = (state + 0x6d2b79f5) >>> 0;

@@ -28,6 +28,11 @@ import type {
 } from '$lib/domain/groups';
 import type { IncludeStatus } from '$lib/domain/types';
 import { SidecarStore } from '../state/sidecar';
+import {
+	loadOrComputeEligibleMeetings,
+	meetingEligibilityThreshold,
+	meetingKey
+} from '../state/meeting-eligibility';
 
 // Defaults are resolved from `process.cwd()` so the bundled adapter-node
 // output picks up the operator's working directory at start time. Tests pass
@@ -42,6 +47,8 @@ export interface SqliteRepoOptions {
 	cacheDir?: string;
 	stateDir?: string;
 	audioCdnMapPath?: string;
+	/** Overrides MEETING_MIN_HUMAN_UTTERANCES (tests pass this explicitly). */
+	meetingMinHumanUtterances?: number;
 }
 
 interface MetaRow {
@@ -55,6 +62,13 @@ export class SqliteRepo {
 	private editToUtteranceStmt: Statement<[string]>;
 	private iterAllStmt: Statement<[]>;
 
+	// Navigation universe after the meeting-eligibility filter. Starts as the
+	// full corpus (filter inactive) and is narrowed by applyMeetingEligibility()
+	// during load(). `eligibleIdSet` is null when filtering is disabled
+	// (threshold ≤ 0), meaning "everything is eligible" without a 287 k-entry Set.
+	private eligibleIds: string[];
+	private eligibleIdSet: Set<string> | null = null;
+
 	private constructor(
 		private db: DB,
 		private orderedIds: string[],
@@ -67,7 +81,47 @@ export class SqliteRepo {
 			'SELECT utterance_id FROM edits WHERE edit_id = ?'
 		);
 		this.iterAllStmt = db.prepare('SELECT json FROM groups ORDER BY ord');
+		this.eligibleIds = orderedIds;
 		void this.audioCdnMap; // currently unused by sqlite path; surfaces via /api/audio
+	}
+
+	/** True when `utterance_id` survives the meeting-eligibility filter. */
+	private isEligible(utterance_id: string): boolean {
+		return this.eligibleIdSet ? this.eligibleIdSet.has(utterance_id) : true;
+	}
+
+	/**
+	 * Narrow the navigation universe to utterances whose meeting clears the
+	 * human-correction threshold. Runs once during load(): loads the snapshot
+	 * when it matches, else pays the one-time scan. Threshold ≤ 0 disables it.
+	 */
+	private async applyMeetingEligibility(stateDir: string, thresholdOverride?: number): Promise<void> {
+		const threshold = thresholdOverride ?? meetingEligibilityThreshold();
+		if (threshold <= 0) {
+			this.eligibleIds = this.orderedIds;
+			this.eligibleIdSet = null;
+			return;
+		}
+		const eligibleMeetings = await loadOrComputeEligibleMeetings(this, stateDir, threshold);
+		// Build the eligible order by streaming ordered (utterance_id, city_id,
+		// meeting_id) rows — both are columns, so no JSON parse. utterance_id is
+		// the PK, so rows are 1:1 with `orderedIds`; ORDER BY ord keeps canonical
+		// order. Keyed by (city, meeting) since meeting_id slugs collide.
+		const rows = this.db
+			.prepare('SELECT utterance_id, city_id, meeting_id FROM groups ORDER BY ord')
+			.all() as Array<{ utterance_id: string; city_id: string | null; meeting_id: string | null }>;
+		const elig: string[] = [];
+		for (const r of rows) {
+			if (r.meeting_id && eligibleMeetings.has(meetingKey(r.city_id, r.meeting_id))) {
+				elig.push(r.utterance_id);
+			}
+		}
+		this.eligibleIds = elig;
+		this.eligibleIdSet = new Set(elig);
+		console.log(
+			`[sqlite-repo] meeting-eligibility: ${elig.length.toLocaleString()}/` +
+				`${this.orderedIds.length.toLocaleString()} utterances eligible (threshold=${threshold})`
+		);
 	}
 
 	static async load(opts: SqliteRepoOptions = {}): Promise<SqliteRepo> {
@@ -125,7 +179,9 @@ export class SqliteRepo {
 				`cache_hash=${sourceHash}; sidecar_labels=${sidecar.all().size}`
 		);
 
-		return new SqliteRepo(db, orderedIds, sourceHash, sidecar, cdnMap);
+		const repo = new SqliteRepo(db, orderedIds, sourceHash, sidecar, cdnMap);
+		await repo.applyMeetingEligibility(stateDir, opts.meetingMinHumanUtterances);
+		return repo;
 	}
 
 	get hash(): string {
@@ -133,7 +189,12 @@ export class SqliteRepo {
 	}
 
 	get total(): number {
-		return this.orderedIds.length;
+		return this.eligibleIds.length;
+	}
+
+	/** Navigation universe after the meeting-eligibility filter, canonical order. */
+	eligibleOrderedIds(): readonly string[] {
+		return this.eligibleIds;
 	}
 
 	getGroup(utterance_id: string): Group | null {
@@ -243,14 +304,18 @@ export class SqliteRepo {
 		const out: string[] = [];
 		if (status === 'unreviewed') {
 			const labels = this.sidecar.all();
-			for (const id of this.orderedIds) {
+			// Iterate the eligible universe directly — ineligible meetings are
+			// never offered for review, reviewed or not.
+			for (const id of this.eligibleIds) {
 				const lbl = labels.get(id);
 				if (!lbl || lbl.include_status === 'unreviewed') out.push(id);
 			}
 			return out;
 		}
+		// Reviewed buckets enumerate the (smaller) sidecar label map, but a label
+		// on an ineligible meeting must not leak back into the queue.
 		for (const [id, lbl] of this.sidecar.all()) {
-			if (lbl.include_status === status) out.push(id);
+			if (lbl.include_status === status && this.isEligible(id)) out.push(id);
 		}
 		return out;
 	}
@@ -259,7 +324,7 @@ export class SqliteRepo {
 	 *  Cheap: in-memory label scan only, no SQLite/group materialisation. */
 	idsByErrorCategory(category: string): string[] {
 		const out: string[] = [];
-		for (const id of this.orderedIds) {
+		for (const id of this.eligibleIds) {
 			if (this.sidecar.get(id).error_categories.includes(category)) out.push(id);
 		}
 		return out;
@@ -271,7 +336,7 @@ export class SqliteRepo {
 		// "homophone".
 		const matchingIds: string[] = [];
 		for (const [id, lbl] of this.sidecar.all()) {
-			if (lbl.error_categories.includes(category)) matchingIds.push(id);
+			if (lbl.error_categories.includes(category) && this.isEligible(id)) matchingIds.push(id);
 		}
 		if (matchingIds.length === 0) return [];
 
@@ -311,7 +376,7 @@ export class SqliteRepo {
 	// Intentionally NOT memoised: a public `?seed=` parameter could otherwise
 	// be used to cause unbounded memory growth on a small VM.
 	private computeSeededOrder(seed: number): string[] {
-		const arr = [...this.orderedIds];
+		const arr = [...this.eligibleIds];
 		let state = (seed >>> 0) || 1;
 		for (let i = arr.length - 1; i > 0; i--) {
 			state = (state + 0x6d2b79f5) >>> 0;
