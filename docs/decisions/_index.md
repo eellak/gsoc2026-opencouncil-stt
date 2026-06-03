@@ -14,6 +14,8 @@ Accepted decisions and open questions, one file per theme. Keep entries short �
 
 ### Accepted
 
+- [Exclude meetings with < 10 human-corrected utterances from review](data.md#2026-06-03---exclude-meetings-with--10-human-corrected-utterances-from-review) — 2026-06-03
+- [Auto-skip unavailable utterances in review](ui.md#2026-06-03---auto-skip-unavailable-utterances-in-review-branch-codexfile-backed-review-ui) — 2026-06-03
 - [Exploration before training](ui.md#2026-05-12---exploration-before-training) — 2026-05-12
 - [Use the large meeting JSON for the first prototype](matching.md#2026-05-12---use-the-large-meeting-json-for-the-first-prototype) — 2026-05-12
 - [Do not block on the CSV export query](data.md#2026-05-12---do-not-block-on-the-csv-export-query) — 2026-05-12

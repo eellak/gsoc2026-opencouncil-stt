@@ -4,6 +4,18 @@ CSV ingest, content categorisation, stable IDs, task version.
 
 ## Accepted
 
+### 2026-06-03 - Exclude meetings with < 10 human-corrected utterances from review
+
+The review queue, filters, and stats now only include meetings with at least **10 human-corrected utterances** — distinct utterances carrying ≥1 edit with `edited_by === 'user'`. Applied as a query-time eligibility filter, **not** a DB rewrite: a one-time scan computes the eligible meeting set, persists `ui/.state/meeting-eligibility.snapshot.json` (keyed by `cache_hash` + `threshold`), and the repo derives `eligibleOrderedIds` from it. `getGroup(id)` stays unfiltered so direct links still resolve; nothing is deleted and labels/flags in `.state/` are untouched — fully reversible (set `MEETING_MIN_HUMAN_UTTERANCES=0` to disable). Threshold default 10 via `MEETING_MIN_HUMAN_UTTERANCES`.
+
+**`meeting_id` is not unique — key by (city_id, meeting_id).** The `meeting_id` slug (e.g. `feb26_2025`) is reused across cities; the corpus has **105** such collisions, so there are **411** real meetings under only 242 distinct slugs. Eligibility counts (and the eligible set) are therefore keyed by the `(city_id, meeting_id)` pair via `meetingKey()` — keying by the slug alone merged distinct meetings and **kept** ones that should be excluded (e.g. Athens `feb26_2025` "6η Ειδική Συνεδρίαση Λογοδοσίας", 9 human utterances, was wrongly retained because it shares the slug with the eligible Chania `feb26_2025`).
+
+On the live corpus (correct keying): **384/411 meetings eligible, 27 excluded, 18 123 utterances removed** (269 482 / 287 605 remain). The 27 excluded include 14 fully task-only meetings (0 human corrections) and 13 with 1–9.
+
+Reason: meetings whose edits are essentially all task-generated, with few human corrections, aren't useful review/training targets. Filtering them at query time keeps reviewer effort on corrected meetings without re-uploading the 579 MB SQLite index or losing any labeling already done.
+
+Files: `ui/src/lib/server/state/meeting-eligibility.ts` (incl. `meetingKey`), `repo/{sqlite,file}-repo.ts`, `state/stats-cache.ts`, `routes/api/review/ids/+server.ts`.
+
 ### 2026-05-12 - Do not block on the CSV export query
 
 The exact external query that produced `utterance-edits-may12-26.csv` is not required before we can proceed.

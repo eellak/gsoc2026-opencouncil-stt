@@ -28,6 +28,7 @@ This is the working structure for the OpenCouncil ASR dataset exploration projec
 
 - [Claude parallel LLM categorization](runbooks/claude-parallel-llm-categorization.md): token-efficient subagent loop for categorizing remaining edit groups.
 - [Self-host file-backed UI on Fly.io](runbooks/self-host-fly.md): deploy the local-only file-backed review UI on one persistent Fly machine.
+- [Disaster recovery](reference/disaster-recovery.md): what's critical vs derivable, and how to rebuild the review UI on a fresh host if the Oracle VM is lost. Covers the flags backup (`oc_review_log`), the corpus-CSV gap, and the systemd/Caddy config.
 
 ## Reference Notes
 
