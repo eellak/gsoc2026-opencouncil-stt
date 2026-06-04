@@ -70,16 +70,17 @@ describe('seeded skip navigation', () => {
 		expect(prevUnreviewedId('C')).toBe(undefined);
 	});
 
-	// Regression guard for the 404 auto-skip path: when everything ahead in the
-	// loaded window is already classified, the skip-aware target is undefined,
-	// but the immediate neighbour must still exist so auto-skip-private has a
-	// guaranteed-progress fallback and never stalls on an unavailable utterance.
-	it('immediate neighbour stays available when no unreviewed item is ahead', () => {
+	// The loaded-window skip (drives href/gating) is distinct from the raw
+	// neighbour: when everything ahead is classified, the skip-aware target is
+	// undefined while the raw neighbour still exists. The 404 auto-skip relies on
+	// the async paging walk (nextUnreviewedId), NOT on the raw neighbour, so it
+	// never lands on a classified item — see autoSkipPrivate / resolveAutoSkipTargetId.
+	it('loaded-window skip is empty while the raw neighbour still exists', () => {
 		_loadSeededForTest(
 			[g('A', 'unreviewed'), g('B', 'include'), g('C', 'exclude')],
 			null
 		);
 		expect(nextUnreviewedIdLoaded('A')).toBe(undefined);
-		expect(nextIdOf('A')).toBe('B'); // fallback target for auto-skip
+		expect(nextIdOf('A')).toBe('B'); // raw neighbour — deliberately NOT used by auto-skip
 	});
 });
