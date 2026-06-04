@@ -115,7 +115,7 @@
 		// Only auto-advance for terminal decisions, not 'unreviewed' reverts.
 		if (status === 'unreviewed') return;
 		const shouldAdvance = opts.advance ?? reviewPrefs.autoAdvance;
-		if (shouldAdvance && nextHref) {
+		if (shouldAdvance && canNext) {
 			// Tiny delay so the status flash is visible before navigation.
 			setTimeout(() => goNext(), 120);
 		}
@@ -221,6 +221,16 @@
 	$effect(() => {
 		currentId; // dep
 		untrack(() => { usingFallback = false; });
+	});
+
+	// Remember the last item viewed per seed so re-entering the same seed can
+	// resume here. Seeded mode only — filter queues don't carry a seed.
+	$effect(() => {
+		if (filter) return;
+		const seed = data.seed;
+		const id = currentId;
+		if (typeof localStorage === 'undefined') return;
+		try { localStorage.setItem(`oc:resume:${seed}`, id); } catch { /* quota — fine */ }
 	});
 
 	// Listener wiring: when the pool hands us a new active <audio>, attach
@@ -548,11 +558,48 @@
 		}
 		return reviewHref({ utterance_id: targetId, seed: data.seed });
 	}
-	const prevHref = $derived(navHref(prev?.utterance_id ?? prevId ?? null));
-	const nextHref = $derived(navHref(next?.utterance_id ?? nextId ?? null));
+	// Skip-aware navigation: when the pref is on (seeded mode only), next/prev
+	// jump over already-classified items so re-entering with the same seed
+	// resumes past finished work instead of re-showing it.
+	const skipNav = $derived(reviewPrefs.skipClassified && !filter);
+	const nextTargetId = $derived(
+		skipNav
+			? (queue.nextUnreviewedIdLoaded(data.item.utterance_id) ?? null)
+			: (next?.utterance_id ?? nextId ?? null)
+	);
+	const prevTargetId = $derived(
+		skipNav
+			? (queue.prevUnreviewedId(data.item.utterance_id) ?? null)
+			: (prev?.utterance_id ?? prevId ?? null)
+	);
+	const prevHref = $derived(navHref(prevTargetId));
+	const nextHref = $derived(navHref(nextTargetId));
+	// The real next target can sit past the warm window, so allow "next" while
+	// more pages exist even if the loaded target is null — goNext pages to it.
+	const canNext = $derived(
+		skipNav ? nextTargetId !== null || queue.hasMoreSeeded() : nextTargetId !== null
+	);
+	const canPrev = $derived(prevTargetId !== null);
 
-	function goNext() { rememberDirection('next'); if (nextHref) goto(nextHref); }
-	function goPrev() { rememberDirection('prev'); if (prevHref) goto(prevHref); }
+	// Bumped on every nav request so a slower skip-walk can't navigate after a
+	// newer click/key press has already moved on.
+	let navSeq = 0;
+	async function goNext() {
+		rememberDirection('next');
+		const seq = ++navSeq;
+		let target = nextTargetId;
+		if (skipNav) {
+			const found = await queue.nextUnreviewedId(data.item.utterance_id);
+			if (seq !== navSeq) return; // superseded by a newer navigation
+			target = found ?? null; // exhausted → no nav, never a classified neighbour
+		}
+		const href = navHref(target);
+		if (href) goto(href);
+	}
+	function goPrev() {
+		rememberDirection('prev');
+		if (prevHref) goto(prevHref);
+	}
 
 	// Touch swipe nav — touch only (no mouse), so Mac trackpad swipe-back
 	// keeps working. Threshold 60px horizontal, must be mostly horizontal.
@@ -573,8 +620,8 @@
 		if (Math.abs(dx) < 60) return;
 		if (Math.abs(dy) > Math.abs(dx) * 0.6) return;
 		if (dt > 600) return;
-		if (dx < 0 && nextHref) goNext();
-		else if (dx > 0 && prevHref) goPrev();
+		if (dx < 0 && canNext) goNext();
+		else if (dx > 0 && canPrev) goPrev();
 	}
 
 	async function copyShareLink() {
@@ -610,8 +657,8 @@
 		if (shortcutsOpen) return;
 		const k = normalizeShortcut(e.key);
 		// Spatial mapping: left key (j) → previous, right key (k) → next.
-		if ((e.key === 'ArrowLeft' || k === 'j') && prevHref) { e.preventDefault(); goPrev(); }
-		if ((e.key === 'ArrowRight' || k === 'k') && nextHref) { e.preventDefault(); goNext(); }
+		if ((e.key === 'ArrowLeft' || k === 'j') && canPrev) { e.preventDefault(); goPrev(); }
+		if ((e.key === 'ArrowRight' || k === 'k') && canNext) { e.preventDefault(); goNext(); }
 		if (k === 'i') patchStatus('include');
 		if (k === 'x') patchStatus('exclude');
 		if (k === 'u') patchStatus('uncertain');
@@ -711,8 +758,8 @@
 				{/if}
 			</div>
 			<div class="nav-links">
-				{#if prevHref}<a href={prevHref} class="nav-btn" title="j / ←" aria-label={t('prevAria')}>{t('prev')} <kbd>j</kbd></a>{/if}
-				{#if nextHref}<a href={nextHref} class="nav-btn" title="k / →" aria-label={t('nextAria')} onclick={(e) => { e.preventDefault(); goNext(); }}>{t('next')} <kbd>k</kbd></a>{/if}
+				{#if canPrev}<a href={prevHref} class="nav-btn" title="j / ←" aria-label={t('prevAria')} onclick={(e) => { e.preventDefault(); goPrev(); }}>{t('prev')} <kbd>j</kbd></a>{/if}
+				{#if canNext}<a href={nextHref} class="nav-btn" title="k / →" aria-label={t('nextAria')} onclick={(e) => { e.preventDefault(); goNext(); }}>{t('next')} <kbd>k</kbd></a>{/if}
 			</div>
 		</div>
 	</header>
@@ -762,12 +809,12 @@
 		</div>
 
 		{#snippet diffCardBody()}
-			{#if prevHref}
-				<a href={prevHref} class="utt-chevron left" title={t('prev') + ' (j)'} aria-label={t('prevAria')}>
+			{#if canPrev}
+				<a href={prevHref} class="utt-chevron left" title={t('prev') + ' (j)'} aria-label={t('prevAria')} onclick={(e) => { e.preventDefault(); goPrev(); }}>
 					<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 6 9 12 15 18"/></svg>
 				</a>
 			{/if}
-			{#if nextHref}
+			{#if canNext}
 				<a href={nextHref} class="utt-chevron right" title={t('next') + ' (k)'} aria-label={t('nextAria')} onclick={(e) => { e.preventDefault(); goNext(); }}>
 					<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 6 15 12 9 18"/></svg>
 				</a>
