@@ -156,6 +156,8 @@ export const strings = {
 	settingsWorkflowHeading: { en: 'Workflow', el: 'Ροή εργασίας' },
 	settingsAutoAdvance: { en: 'Auto-advance after include / exclude / uncertain', el: 'Αυτόματη μετάβαση μετά από συμπερίληψη / αποκλεισμό / αβέβαιο' },
 	settingsAutoAdvanceHint: { en: 'Marking a decision also moves to the next item.', el: 'Όταν χαρακτηρίζεις, πας αυτόματα στο επόμενο.' },
+	settingsSkipClassified: { en: 'Skip already-classified items while navigating', el: 'Παράλειψη ήδη χαρακτηρισμένων κατά την πλοήγηση' },
+	settingsSkipClassifiedHint: { en: 'Next / prev jump over items you already decided, so the same seed resumes where you left off.', el: 'Το επόμενο / προηγούμενο προσπερνά όσα έχεις ήδη χαρακτηρίσει, ώστε το ίδιο seed να συνεχίζει από εκεί που έμεινες.' },
 	settingsMobileMode: { en: 'Mobile mode (Tinder-style swipes)', el: 'Mobile mode (Tinder swipes)' },
 	settingsMobileModeHint: { en: 'Swipe right = include, left = exclude, tap = next. Works on touch and mouse.', el: 'Δεξιά = include, αριστερά = exclude, tap = επόμενο. Λειτουργεί σε touch και ποντίκι.' },
 	settingsTapAdvances: { en: 'Tap on the swipe card advances to next', el: 'Tap στο swipe card πάει στο επόμενο' },

@@ -1,6 +1,7 @@
 const AUTO_ADVANCE_KEY = 'oc:review:autoAdvance';
 const MOBILE_MODE_KEY = 'oc:review:mobileMode';
 const TAP_NEXT_KEY = 'oc:review:tapAdvances';
+const SKIP_CLASSIFIED_KEY = 'oc:review:skipClassified';
 
 function getBool(key: string, fallback: boolean): boolean {
 	if (typeof localStorage === 'undefined') return fallback;
@@ -25,11 +26,15 @@ function createReviewPrefs() {
 	let autoAdvance = $state(getBool(AUTO_ADVANCE_KEY, false));
 	let mobileMode = $state(getBool(MOBILE_MODE_KEY, detectMobile()));
 	let tapAdvances = $state(getBool(TAP_NEXT_KEY, true));
+	// Skip already-classified items during next/prev so re-entering with the
+	// same seed resumes past yesterday's work instead of re-showing it.
+	let skipClassified = $state(getBool(SKIP_CLASSIFIED_KEY, true));
 
 	return {
 		get autoAdvance() { return autoAdvance; },
 		get mobileMode() { return mobileMode; },
 		get tapAdvances() { return tapAdvances; },
+		get skipClassified() { return skipClassified; },
 		toggleAutoAdvance() {
 			autoAdvance = !autoAdvance;
 			persist(AUTO_ADVANCE_KEY, autoAdvance);
@@ -41,6 +46,10 @@ function createReviewPrefs() {
 		toggleTapAdvances() {
 			tapAdvances = !tapAdvances;
 			persist(TAP_NEXT_KEY, tapAdvances);
+		},
+		toggleSkipClassified() {
+			skipClassified = !skipClassified;
+			persist(SKIP_CLASSIFIED_KEY, skipClassified);
 		}
 	};
 }

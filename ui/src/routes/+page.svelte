@@ -33,7 +33,17 @@
 			seed = parsed;
 		}
 		const params = new URLSearchParams({ seed: String(seed) });
-		if (skipClassified) params.set('skip', '1');
+		if (skipClassified) {
+			params.set('skip', '1');
+			// Resume at the last item viewed under this seed, if we have one.
+			// The server validates it still belongs to the eligible universe.
+			try {
+				const resume = localStorage.getItem(`oc:resume:${seed}`);
+				if (resume) params.set('resume', resume);
+			} catch {
+				/* localStorage blocked — fall back to first-unreviewed walk */
+			}
+		}
 		goto(`/?${params.toString()}`);
 	}
 

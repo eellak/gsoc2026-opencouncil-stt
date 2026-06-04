@@ -95,6 +95,72 @@ export function prevIdOf(id: string): string | undefined {
 	return order[idx - 1];
 }
 
+/** A group is "classified" once it carries a terminal review decision. */
+function isClassified(g: Group | undefined): boolean {
+	return !!g && g.label.include_status !== 'unreviewed';
+}
+
+/** True while the seeded queue still has unpaged items behind `nextCursor`. */
+export function hasMoreSeeded(): boolean {
+	return mode === 'seeded' && nextCursor !== null;
+}
+
+/**
+ * Next unreviewed id using only the currently-loaded window — synchronous, no
+ * fetch. Drives the nav-button href/gating. In seeded mode `order` and `cache`
+ * are evicted together (see evictIfNeeded), so every id in `order` has a cached
+ * group; an unknown lookup therefore can't happen mid-window. Filter-mode lists
+ * are already pre-filtered, so we just hand back the immediate neighbour.
+ */
+export function nextUnreviewedIdLoaded(id: string): string | undefined {
+	if (mode !== 'seeded') return nextIdOf(id);
+	const start = order.indexOf(id);
+	if (start < 0) return undefined;
+	for (let i = start + 1; i < order.length; i++) {
+		if (!isClassified(cache.get(order[i]))) return order[i];
+	}
+	return undefined;
+}
+
+/**
+ * Next unreviewed id, paging forward through the seeded order as needed so the
+ * search isn't bounded by the warm window. Returns undefined when the queue is
+ * exhausted — callers must NOT fall back to the immediate (classified)
+ * neighbour, or the skip is defeated at the tail.
+ */
+export async function nextUnreviewedId(id: string): Promise<string | undefined> {
+	if (mode !== 'seeded') return nextIdOf(id);
+	let idx = order.indexOf(id);
+	if (idx < 0) return undefined;
+	// Guard against a pathological loop; the real bound is order.length.
+	for (let guard = 0; guard < 1_000_000; guard++) {
+		if (idx + 1 >= order.length) {
+			if (nextCursor === null) return undefined;
+			const before = order.length;
+			await fetchSlice(nextCursor, 50);
+			if (order.length === before) return undefined; // no growth → give up
+		}
+		idx += 1;
+		if (!isClassified(cache.get(order[idx]))) return order[idx];
+	}
+	return undefined;
+}
+
+/**
+ * Previous unreviewed id within the retained window. Prev never pages backward
+ * (the seeded cursor only walks forward), so this skips only as far back as the
+ * cache still holds — acceptable: you came forward through those items.
+ */
+export function prevUnreviewedId(id: string): string | undefined {
+	if (mode !== 'seeded') return prevIdOf(id);
+	const start = order.indexOf(id);
+	if (start < 0) return undefined;
+	for (let i = start - 1; i >= 0; i--) {
+		if (!isClassified(cache.get(order[i]))) return order[i];
+	}
+	return undefined;
+}
+
 export function neighborsAround(id: string, radius: number): Group[] {
 	const idx = order.indexOf(id);
 	if (idx < 0) return [];
@@ -280,6 +346,27 @@ interface IdsResponse {
 	ids: string[];
 	cache_hash: string;
 	revision: number;
+}
+
+/** Test-only: reset all module state to a clean seeded queue. */
+export function _resetForTest(): void {
+	mode = 'seeded';
+	filterKey = null;
+	filterRevision = null;
+	cacheHash = null;
+	currentSeed = 1;
+	resetQueue();
+}
+
+/**
+ * Test-only: load an explicit seeded order + cached groups without hitting the
+ * network. `nextCursor` controls whether the queue looks paged-out (null) or
+ * has more behind it (a number, though fetchSlice is never called in tests).
+ */
+export function _loadSeededForTest(groups: Group[], cursor: number | null): void {
+	mode = 'seeded';
+	for (const g of groups) insert(g);
+	nextCursor = cursor;
 }
 
 export async function fetchFilterIds(query: string): Promise<IdsResponse> {

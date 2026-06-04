@@ -43,6 +43,13 @@ export const load: PageServerLoad = async ({ url }) => {
 	if (seedParam !== null) {
 		const repo = await getRepo();
 		const skipClassified = url.searchParams.get('skip') === '1';
+		// Resume at a specific item if the client passed one and it still
+		// belongs to the eligible (navigable) universe for this dataset.
+		// Falls through to the skip walk when it's stale/ineligible.
+		const resume = url.searchParams.get('resume');
+		if (resume && repo.getGroup(resume) && repo.eligibleOrderedIds().includes(resume)) {
+			throw redirect(302, reviewHref({ utterance_id: resume, seed: seedParam }));
+		}
 		if (skipClassified) {
 			// Walk the seeded order and pick the first unreviewed group.
 			// Caps the scan at 5000 to stay cheap; falls back to the first.

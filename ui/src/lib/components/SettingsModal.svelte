@@ -78,6 +78,11 @@
 					<small class="hint">{t('settingsAutoAdvanceHint')}</small>
 				</label>
 				<label class="row">
+					<input type="checkbox" checked={reviewPrefs.skipClassified} onchange={() => reviewPrefs.toggleSkipClassified()} />
+					<span class="rlabel">{t('settingsSkipClassified')}</span>
+					<small class="hint">{t('settingsSkipClassifiedHint')}</small>
+				</label>
+				<label class="row">
 					<input type="checkbox" checked={reviewPrefs.mobileMode} onchange={() => reviewPrefs.toggleMobileMode()} />
 					<span class="rlabel">{t('settingsMobileMode')}</span>
 					<small class="hint">{t('settingsMobileModeHint')}</small>
