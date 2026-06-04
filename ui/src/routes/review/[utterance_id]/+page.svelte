@@ -412,7 +412,12 @@
 					// if the skip can't fire (cap/queue edge). Transient errors
 					// (5xx/timeout/network) stay on screen for the reviewer to retry.
 					if (data.error_kind === 'private') {
-						contextState = autoSkipPrivate() ? 'loading' : 'error';
+						// Optimistically show 'loading' while we resolve an escape target
+						// (resolution may page); drop to 'error' only if the skip can't fire.
+						contextState = 'loading';
+						void autoSkipPrivate(id).then((skipped) => {
+							if (!cancelled && !skipped) contextState = 'error';
+						});
 					} else {
 						contextState = 'error';
 					}
@@ -433,19 +438,39 @@
 		};
 	});
 
-	// Advance past a private meeting in the last navigation direction. Terminal
-	// rule: no candidate that way (queue edge) → stop, don't wrap. Returns true
-	// when it actually navigates (cap not hit and a candidate exists).
-	function autoSkipPrivate(): boolean {
-		// Skipping a 404/private item is a low-level "step off this broken item"
-		// move and must always make progress. Prefer the skip-aware target (so we
-		// land on the next unreviewed item), but fall back to the immediate
-		// neighbour — otherwise an all-classified forward window would leave the
-		// skip-aware href null and strand the reviewer on the unavailable item.
-		const targetId =
-			lastNavDirection() === 'prev'
-				? (prevTargetId ?? prevId ?? null)
-				: (nextTargetId ?? nextId ?? null);
+	// Resolve where a 404/private auto-skip should jump. This is a SEPARATE
+	// concern from "what work item should I see next" (skip-classified): the 404
+	// skip only needs an escape off a broken item. When skip-classified is on we
+	// must NOT land on a classified item (it would re-show corrected work), so we
+	// page forward to the next unreviewed; for prev (which can't page back) we
+	// fall back to a forward escape rather than stall. Without skip-classified we
+	// use the raw immediate neighbour.
+	async function resolveAutoSkipTargetId(
+		direction: 'next' | 'prev',
+		fromId: string
+	): Promise<string | null> {
+		if (!skipNav) {
+			return direction === 'prev' ? (prevId ?? null) : (nextId ?? null);
+		}
+		if (direction === 'next') {
+			return (await queue.nextUnreviewedId(fromId)) ?? null;
+		}
+		const back = queue.prevUnreviewedId(fromId);
+		if (back) return back;
+		// Backward skip found nothing in the retained window — escape forward so we
+		// never strand the reviewer, still without showing a classified item.
+		return (await queue.nextUnreviewedId(fromId)) ?? null;
+	}
+
+	// Advance past a private/unavailable item. Async because skip-aware resolution
+	// may page. Guarded by navSeq + a same-item check so a stale context fetch (or
+	// a newer manual nav that fired meanwhile) can't navigate after the fact.
+	async function autoSkipPrivate(fromId: string): Promise<boolean> {
+		const seq = ++navSeq;
+		const direction = lastNavDirection() === 'prev' ? 'prev' : 'next';
+		const targetId = await resolveAutoSkipTargetId(direction, fromId);
+		if (seq !== navSeq) return false; // a newer navigation superseded us
+		if (data.item.utterance_id !== fromId) return false; // already moved on
 		const href = navHref(targetId);
 		if (!href) return false;
 		if (!allowSkip()) return false;
@@ -607,6 +632,7 @@
 	}
 	function goPrev() {
 		rememberDirection('prev');
+		++navSeq; // invalidate any in-flight async skip so it can't navigate after us
 		if (prevHref) goto(prevHref);
 	}
 
