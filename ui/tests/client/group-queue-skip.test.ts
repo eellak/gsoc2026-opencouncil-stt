@@ -12,6 +12,7 @@ import {
 	nextUnreviewedId,
 	nextUnreviewedIdLoaded,
 	prevUnreviewedId,
+	nextIdOf,
 	_resetForTest,
 	_loadSeededForTest
 } from '../../src/lib/client/group-queue.svelte';
@@ -67,5 +68,18 @@ describe('seeded skip navigation', () => {
 			null
 		);
 		expect(prevUnreviewedId('C')).toBe(undefined);
+	});
+
+	// Regression guard for the 404 auto-skip path: when everything ahead in the
+	// loaded window is already classified, the skip-aware target is undefined,
+	// but the immediate neighbour must still exist so auto-skip-private has a
+	// guaranteed-progress fallback and never stalls on an unavailable utterance.
+	it('immediate neighbour stays available when no unreviewed item is ahead', () => {
+		_loadSeededForTest(
+			[g('A', 'unreviewed'), g('B', 'include'), g('C', 'exclude')],
+			null
+		);
+		expect(nextUnreviewedIdLoaded('A')).toBe(undefined);
+		expect(nextIdOf('A')).toBe('B'); // fallback target for auto-skip
 	});
 });

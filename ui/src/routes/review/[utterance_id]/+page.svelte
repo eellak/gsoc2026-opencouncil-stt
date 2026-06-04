@@ -437,7 +437,16 @@
 	// rule: no candidate that way (queue edge) → stop, don't wrap. Returns true
 	// when it actually navigates (cap not hit and a candidate exists).
 	function autoSkipPrivate(): boolean {
-		const href = lastNavDirection() === 'prev' ? prevHref : nextHref;
+		// Skipping a 404/private item is a low-level "step off this broken item"
+		// move and must always make progress. Prefer the skip-aware target (so we
+		// land on the next unreviewed item), but fall back to the immediate
+		// neighbour — otherwise an all-classified forward window would leave the
+		// skip-aware href null and strand the reviewer on the unavailable item.
+		const targetId =
+			lastNavDirection() === 'prev'
+				? (prevTargetId ?? prevId ?? null)
+				: (nextTargetId ?? nextId ?? null);
+		const href = navHref(targetId);
 		if (!href) return false;
 		if (!allowSkip()) return false;
 		goto(href);
