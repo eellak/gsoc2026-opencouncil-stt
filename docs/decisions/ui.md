@@ -4,6 +4,14 @@ Exploration-vs-training stance and prototype UI choices.
 
 ## Accepted
 
+### 2026-06-08 - Skip-classified is forward-only (branch `codex/file-backed-review-ui`)
+
+The `skipClassified` pref lets a reviewer re-enter a seed and resume past finished work: next/prev jumped over already-classified (non-`unreviewed`) items. The backward half backfired — when you navigate **back** to fix something you already classified, the skip jumped over exactly that item and stranded you, so you had to fall back on the browser's native back button.
+
+Decision: skip-classified is **forward-only**. Forward nav (`goNext`, `nextTargetId`) still pages ahead to the next *unreviewed* item. Backward nav (`prevTargetId`, `goPrev`) always lands on the immediate previous neighbour — classified is fine, because going back almost always means you want to revisit/fix something. Asymmetric by design ("prev immediate, next skip-aware"). The 404/private auto-skip (`resolveAutoSkipTargetId`) is kept symmetric with manual nav: a `'prev'` escape hops to the immediate previous neighbour (one hop; a neighbour 404 re-triggers on reload), only escaping forward when there is no previous item (unavailable first item).
+
+`prevUnreviewedId` stays in `group-queue.svelte.ts` (still unit-tested) but is no longer called by the page. Files: `ui/src/routes/review/[utterance_id]/+page.svelte`, `ui/src/lib/i18n/strings.ts`.
+
 ### 2026-06-03 - Auto-skip unavailable utterances in review (branch `codex/file-backed-review-ui`)
 
 An utterance whose OpenCouncil context can't be fetched can't be reviewed, so the UI auto-skips it. We learn this when the per-utterance context bridge (`/api/oc-context`) returns a non-OK status. The bridge passes through upstream `401/403/404` (classified client-side as `error_kind: 'private'`); `5xx`/timeout/network stay `502` (`'transient'`). On a `'private'` error the review page auto-advances **one utterance** in the last navigation direction. A consecutive-skip cap (25) pauses the loop with a banner so a run of failures can't sweep the queue; an available load resets the streak. No label is written — skip is navigation only.

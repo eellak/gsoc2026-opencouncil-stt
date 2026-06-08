@@ -113,7 +113,7 @@ export const strings = {
 	seedInvalid: { en: 'Invalid seed.', el: 'Μη έγκυρο seed.' },
 	startReview: { en: 'Start review', el: 'Έναρξη αξιολόγησης' },
 	skipClassifiedLabel: { en: 'Skip already-classified items', el: 'Παράλειψη ήδη χαρακτηρισμένων' },
-	skipClassifiedHint: { en: 'Jump straight to the next unreviewed item.', el: 'Πήγαινε κατευθείαν στο επόμενο που δεν έχει αξιολογηθεί.' },
+	skipClassifiedHint: { en: 'Moving forward jumps to the next unreviewed item; going back still reaches classified items.', el: 'Προς τα μπροστά πας στο επόμενο που δεν έχει αξιολογηθεί· προς τα πίσω φτάνεις και σε ήδη χαρακτηρισμένα.' },
 	shareSeed: { en: 'share', el: 'κοινοποίηση' },
 	shareSeedTitle: { en: 'Copy a link with this seed to the clipboard', el: 'Αντιγραφή συνδέσμου με αυτό το seed στο πρόχειρο' },
 	shareCopied: { en: '✓ Copied!', el: '✓ Αντιγράφηκε!' },
