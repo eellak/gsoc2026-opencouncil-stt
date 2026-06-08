@@ -440,25 +440,24 @@
 
 	// Resolve where a 404/private auto-skip should jump. This is a SEPARATE
 	// concern from "what work item should I see next" (skip-classified): the 404
-	// skip only needs an escape off a broken item. When skip-classified is on we
-	// must NOT land on a classified item (it would re-show corrected work), so we
-	// page forward to the next unreviewed; for prev (which can't page back) we
-	// fall back to a forward escape rather than stall. Without skip-classified we
-	// use the raw immediate neighbour.
+	// skip only needs an escape off a broken item. Forward escapes page ahead to
+	// the next *unreviewed* item (skip on) so we don't re-show corrected work.
+	// Backward escapes stay symmetric with manual prev: land on the immediate
+	// previous neighbour (classified is fine — prev never skips). If the broken
+	// item is also a neighbour 404, the reload re-triggers another one-hop escape.
 	async function resolveAutoSkipTargetId(
 		direction: 'next' | 'prev',
 		fromId: string
 	): Promise<string | null> {
-		if (!skipNav) {
-			return direction === 'prev' ? (prevId ?? null) : (nextId ?? null);
-		}
-		if (direction === 'next') {
+		if (direction === 'prev') {
+			const back = queue.prevIdOf(fromId);
+			if (back) return back;
+			// No previous item (unavailable first item) — escape forward so we never
+			// strand the reviewer; honour skip-classified on the forward hop.
+			if (!skipNav) return nextId ?? null;
 			return (await queue.nextUnreviewedId(fromId)) ?? null;
 		}
-		const back = queue.prevUnreviewedId(fromId);
-		if (back) return back;
-		// Backward skip found nothing in the retained window — escape forward so we
-		// never strand the reviewer, still without showing a classified item.
+		if (!skipNav) return nextId ?? null;
 		return (await queue.nextUnreviewedId(fromId)) ?? null;
 	}
 
@@ -601,11 +600,11 @@
 			? (queue.nextUnreviewedIdLoaded(data.item.utterance_id) ?? null)
 			: (next?.utterance_id ?? nextId ?? null)
 	);
-	const prevTargetId = $derived(
-		skipNav
-			? (queue.prevUnreviewedId(data.item.utterance_id) ?? null)
-			: (prev?.utterance_id ?? prevId ?? null)
-	);
+	// Backward nav never skips classified items, even when skip-classified is on:
+	// going back almost always means the reviewer wants to revisit/fix something
+	// they already classified. Skip is forward-only (resume past finished work);
+	// prev always lands on the immediate previous neighbour. Asymmetric by design.
+	const prevTargetId = $derived(prev?.utterance_id ?? prevId ?? null);
 	const prevHref = $derived(navHref(prevTargetId));
 	const nextHref = $derived(navHref(nextTargetId));
 	// The real next target can sit past the warm window, so allow "next" while
