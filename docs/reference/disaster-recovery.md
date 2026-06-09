@@ -11,7 +11,7 @@ them on first boot.
 
 | Artifact | Where it lives | Backed up? | If lost… |
 |---|---|---|---|
-| **Code** | GitHub `eellak/gsoc2026-opencouncil-stt`, branch `codex/file-backed-review-ui` | ✅ git | re-clone |
+| **Code** | GitHub `eellak/gsoc2026-opencouncil-stt`, branch `main` | ✅ git | re-clone |
 | **Flags / labels** (`ui/.state/review-events.jsonl`, append-only, source of truth) | VM only at runtime | ✅ daily → private repo `angelospk/oc_review_log` (gzip) + ad-hoc copy on the Mac (`~/opencouncil-flag-backups/`) | restore from `oc_review_log` |
 | **Corpus source** (`data-1779206108158.csv`, ~235 MB) | Mac (`/Users/harold/projects/opencouncil-fine-tuning/`) — gitignored, NOT on the VM | ✅ gzip (~34 MB) in `oc_review_log` under `corpus/` | restore from `oc_review_log/corpus/` |
 | Built SQLite (`ui/.cache/groups.v1.sqlite`, ~580 MB) | VM only | ➖ derivable from the CSV via `build-cache` | rebuild from CSV |
@@ -49,7 +49,7 @@ a re-export from OpenCouncil is needed.
 2. **Code:**
    ```bash
    cd ~ && git clone https://github.com/eellak/gsoc2026-opencouncil-stt.git opencouncil-fine-tuning
-   cd opencouncil-fine-tuning && git checkout codex/file-backed-review-ui
+   cd opencouncil-fine-tuning && git checkout main
    ```
 
 3. **Corpus → SQLite.** Copy the source CSV up (from the Mac), then build:

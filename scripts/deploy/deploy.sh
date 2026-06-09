@@ -11,7 +11,7 @@
 set -euo pipefail
 
 REPO_DIR="$HOME/opencouncil-fine-tuning"
-BRANCH="codex/file-backed-review-ui"
+BRANCH="main"
 BUN="$HOME/.bun/bin/bun"
 
 cd "$REPO_DIR"

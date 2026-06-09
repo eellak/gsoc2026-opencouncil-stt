@@ -2,7 +2,7 @@ name: deploy to oracle vm
 on:
   push:
     branches:
-      - codex/file-backed-review-ui
+      - main
   workflow_dispatch: {}
 
 concurrency:
