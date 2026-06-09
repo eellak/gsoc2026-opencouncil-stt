@@ -6,6 +6,12 @@ Status: `not started` · `in progress` · `done` · `blocked`.
 
 GSoC weeks 1–12 are the coding-period weeks. Pre-coding work (vault setup, dataset exploration, review UI) runs before week 1 and is tracked separately below.
 
+**Review progress (2026-06-09):** ~700 utterances reviewed. Revised target
+**~6k by mid-July** (the May-26 cadence aimed at ~2k by Jun 12; we are behind it
+but the mid-July dataset target is the binding one). Finetuning background and
+plan: [reference/finetuning-101.md](reference/finetuning-101.md). Split, baseline,
+and GPU decisions: [decisions/data.md](decisions/data.md).
+
 ## Pre-coding (community bonding / preparation)
 
 | Focus                                                                                                  | Status        | Evidence                                                                                                                                |

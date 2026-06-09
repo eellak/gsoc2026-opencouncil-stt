@@ -1,8 +1,42 @@
 # Data decisions
 
-CSV ingest, content categorisation, stable IDs, task version.
+CSV ingest, content categorisation, stable IDs, task version, dataset split.
 
 ## Accepted
+
+### 2026-06 - Split train/val/test by whole meeting, not by utterance
+
+Team consensus (sync 2026-06-02 + Discord follow-up). The train/val/test split
+unit is the **whole meeting**: every utterance of a meeting belongs entirely to
+one split. Random per-utterance shuffling puts the same speaker and mic in both
+train and test, so a good score would measure memorisation, not generalisation.
+
+Where affordable, go further: hold out specific **speakers** entirely, and hold
+out one entire **municipality** as test (answers "does this work on a council we
+onboard tomorrow?"). Background and rationale:
+[../reference/finetuning-101.md](../reference/finetuning-101.md#our-dataset).
+This is consistent with the GSoC-proposal plan (two held-out municipalities +
+date-based test split).
+
+### 2026-06 - Baseline first, before any finetuning
+
+Measure the baseline before training anything: (1) how **Gladia** (current
+provider) does, and (2) how **zero-shot Whisper** does without finetuning. WER is
+the first metric; richer metrics (NE-WER, per-category WER, corrections/hour)
+come next. Reason (Christos): we can't claim an improvement without a measured
+starting point, and the eval harness is the highest-leverage thing to build
+first. See [finetuning-101 → what to measure](../reference/finetuning-101.md#what-to-measure).
+
+### 2026-06 - GPU strategy: rent for training, mini PC for eval/dev
+
+Real training runs go on **rented GPUs** (Runpod/Vast: 4090 ~$0.34/hr for dev,
+A100 ~$1.50/hr for runs; first LoRA runs ~$10–50). Angelos's mini PC (7840HS /
+780M iGPU / 64 GB) is **not** used for training — the 780M (gfx1103) lacks
+official ROCm support and shared-RAM bandwidth/compute make a training run take
+weeks. It IS used, for free, for the **eval harness + baseline WER** (CPU
+faster-whisper/CTranslate2 INT8), **pipeline smoke tests**, **LoRA dev/debug** on
+tiny subsets, and **data prep**. Optimise for engineering throughput, not GPU
+cost. Details: [finetuning-101 → mini PC](../reference/finetuning-101.md#where-the-mini-pc-fits-local-compute).
 
 ### 2026-06-03 - Exclude meetings with < 10 human-corrected utterances from review
 
@@ -78,3 +112,35 @@ Numbers from the CSV (see [data/reports/latest-per-utterance.md](../../data/repo
 Implication: if at some point we want the full chain for audit or to study reviewer behaviour, we re-ingest `data-1779206108158.csv` into a separate `corrections_history` table — the CSV is the source of truth. The decision is reversible without data loss.
 
 Implementation: `latest_per_utterance` flag computed via window function in `ui/scripts/ingest-csv-v2.ts` follow-up, non-latest rows deleted in batches, table compacted via `VACUUM FULL` to bring DB size from 568 MB to 215 MB.
+
+## Open
+
+### Can we trust "non-corrected" utterances as ground truth?
+
+The dataset plan wants ~50–70% non-corrected utterances from **fully-reviewed**
+meetings as silent positives. Risk: if a reviewer can skip/skim, "non-corrected"
+may just mean "not yet looked at." Before bulk-including them we need to verify
+in the pipeline which meetings were *fully* reviewed (vs partially). Until then,
+treat non-corrected utterances from partially-reviewed meetings as unlabelled.
+
+### Audio normalization (raised 2026-06-02)
+
+Do we normalize loudness in production? Per whole meeting, or per interval too?
+Do we normalize for the finetuning training set as well? Whatever we choose, the
+training feature extraction and inference must match (use HF
+`WhisperFeatureExtractor` consistently). Undecided.
+
+### Benchmark: fixed meetings vs random test set (raised 2026-06-02)
+
+A **fixed** set of held-out meetings gives stable, directly comparable metrics
+across runs. A **random** test set varies run-to-run (e.g. WER 20 → 23 → 16) and
+needs statistics to average out. Leaning toward a fixed held-out set for
+release-defensible numbers, with the meeting-level split from the accepted
+decision above; not finalised.
+
+### Correction-bias mix ratio
+
+Final ratio of corrected vs non-corrected utterances in the training set
+(starting point ~30–50% corrections / ~50–70% non-corrected). To be tuned once
+the eval harness can measure the effect. See
+[finetuning-101 → correction-bias trap](../reference/finetuning-101.md#our-dataset).

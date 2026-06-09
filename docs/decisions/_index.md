@@ -14,6 +14,9 @@ Accepted decisions and open questions, one file per theme. Keep entries short �
 
 ### Accepted
 
+- [Split train/val/test by whole meeting, not by utterance](data.md#2026-06---split-trainvaltest-by-whole-meeting-not-by-utterance) — 2026-06
+- [Baseline first, before any finetuning](data.md#2026-06---baseline-first-before-any-finetuning) — 2026-06
+- [GPU strategy: rent for training, mini PC for eval/dev](data.md#2026-06---gpu-strategy-rent-for-training-mini-pc-for-evaldev) — 2026-06
 - [Exclude meetings with < 10 human-corrected utterances from review](data.md#2026-06-03---exclude-meetings-with--10-human-corrected-utterances-from-review) — 2026-06-03
 - [Auto-skip unavailable utterances in review](ui.md#2026-06-03---auto-skip-unavailable-utterances-in-review-branch-codexfile-backed-review-ui) — 2026-06-03
 - [Exploration before training](ui.md#2026-05-12---exploration-before-training) — 2026-05-12
@@ -43,6 +46,10 @@ Accepted decisions and open questions, one file per theme. Keep entries short �
 - [Error taxonomy](matching.md#error-taxonomy)
 - [Include/exclude semantics](matching.md#includeexclude-semantics)
 - [Training/evaluation pair](matching.md#trainingevaluation-pair)
+- [Can we trust "non-corrected" utterances as ground truth?](data.md#can-we-trust-non-corrected-utterances-as-ground-truth) — finetuning data
+- [Audio normalization](data.md#audio-normalization-raised-2026-06-02) — finetuning data
+- [Benchmark: fixed meetings vs random test set](data.md#benchmark-fixed-meetings-vs-random-test-set-raised-2026-06-02) — evaluation
+- [Correction-bias mix ratio](data.md#correction-bias-mix-ratio) — finetuning data
 - [Diagram maintenance](#diagram-maintenance) (meta — see below)
 
 ## Meta
