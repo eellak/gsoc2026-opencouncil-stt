@@ -14,6 +14,8 @@ Accepted decisions and open questions, one file per theme. Keep entries short �
 
 ### Accepted
 
+- [Split mechanics: temporal test set + seeded automated train/val](data.md#2026-06-16---split-mechanics-temporal-test-set--seeded-automated-trainval) — 2026-06-16
+- [Cost is not a deciding factor for the provider (Scribe best)](data.md#2026-06-16---cost-is-not-a-deciding-factor-for-the-provider) — 2026-06-16
 - [Split train/val/test by whole meeting, not by utterance](data.md#2026-06---split-trainvaltest-by-whole-meeting-not-by-utterance) — 2026-06
 - [Baseline first, before any finetuning](data.md#2026-06---baseline-first-before-any-finetuning) — 2026-06
 - [GPU strategy: rent for training, mini PC for eval/dev](data.md#2026-06---gpu-strategy-rent-for-training-mini-pc-for-evaldev) — 2026-06
@@ -48,7 +50,8 @@ Accepted decisions and open questions, one file per theme. Keep entries short �
 - [Training/evaluation pair](matching.md#trainingevaluation-pair)
 - [Can we trust "non-corrected" utterances as ground truth?](data.md#can-we-trust-non-corrected-utterances-as-ground-truth) — finetuning data
 - [Audio normalization](data.md#audio-normalization-raised-2026-06-02) — finetuning data
-- [Benchmark: fixed meetings vs random test set](data.md#benchmark-fixed-meetings-vs-random-test-set-raised-2026-06-02) — evaluation
+- [Benchmark: fixed meetings vs random test set](data.md#benchmark-fixed-meetings-vs-random-test-set-raised-2026-06-02) — **resolved 2026-06-16**
+- [Human-edit threshold for eligible meetings: 10 → 20](data.md#human-edit-threshold-for-eligible-meetings-10--20-resolved-2026-06-16) — **resolved 2026-06-16 (use 20)**
 - [Correction-bias mix ratio](data.md#correction-bias-mix-ratio) — finetuning data
 - [Diagram maintenance](#diagram-maintenance) (meta — see below)
 

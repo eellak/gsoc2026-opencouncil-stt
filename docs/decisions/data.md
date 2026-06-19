@@ -4,6 +4,73 @@ CSV ingest, content categorisation, stable IDs, task version, dataset split.
 
 ## Accepted
 
+### 2026-06-19 - Drop degenerate ingest bins from review + export (query-time)
+
+The corpus carries ~10.5k utterances whose **latest edit** falls in a
+content-problematic `ingest_category` (tagged at build time by `categorise()` in
+`scripts/lib/csv-clean.ts`). Three of those bins are degenerate — they hold no
+real correction signal — and are now excluded from the review queue **and** the
+export so the final dataset is clean:
+
+- **Dropped by default** (`DROP_INGEST_CATEGORIES`, default `noop_edit,empty_after,whitespace_only`): **8,121** utterances (2.82%).
+- **Kept** (likely legit): `empty_before` (1,731 — insertion from nothing, may be a real ASR miss), `multiline_text` (623), `embedded_reasoning` (20 — already cleaned at ingest).
+
+Applied as a **query-time view filter**, the same reversible posture as
+[meeting-eligibility](#2026-06-03---exclude-meetings-with--10-human-corrected-utterances-from-review)
+— **not** a rebuild of the 579 MB SQLite index. Both repos subtract degenerate
+ids from `eligibleOrderedIds()` after the meeting filter; `/api/export` applies
+the same policy independently (Codex review: two layers, one shared policy).
+`getGroup(id)` still resolves dropped utterances and nothing in `.state/` is
+touched, so it is fully reversible (`DROP_INGEST_CATEGORIES=""` disables it).
+Unknown categories fail closed (throw) rather than silently shipping unfiltered.
+
+Of the 8,121 dropped, only **2** carried a human decision — both `whitespace_only`
+already marked `exclude`, so hiding them is consistent with the reviewer. The
+`.state/` review work was backed up first to
+`ui/.state-backups/state-2026-06-19.tar.gz` (302,501 events + labels, verified).
+
+Files: `ui/src/lib/server/state/ingest-filter.ts`, `repo/{sqlite,file}-repo.ts`
+(`applyIngestCategoryFilter`), `routes/api/export/+server.ts`. Audit report +
+machine-readable sidecar: `data/reports/ingest-filter-2026-06-19.{md,json}`
+(regenerate via `bun scripts/report-ingest-filter.ts`).
+
+This is distinct from the runtime **skip** mechanism (private/404 + below-threshold
+meetings) discussed for the prefetch bug — degenerate bins were never the cause of
+the audio latency, and this change does not touch the prefetch/audio path.
+
+### 2026-06-16 - Split mechanics: temporal test set + seeded automated train/val
+
+Refines [Split by whole meeting](#2026-06---split-trainvaltest-by-whole-meeting-not-by-utterance)
+with the concrete mechanics agreed in the [2026-06-16 sync](../meetings/2026-06-16.md):
+
+- **Test set = meetings/cities reviewed from 1 Jun 2026 onward.** A temporal
+  hold-out: training never touches current review work, so it is naturally
+  uncontaminated, and it includes newly-onboarded cities and unseen speakers —
+  which answers the business question "does it work on a council we onboard
+  tomorrow?".
+- **Train/Val = pre-June data, split by a seeded, automated program** that reads
+  the data and assigns whole meetings + whole speakers to a set. **No human
+  picking** of speakers or meetings (Christos): letting reviewers nominate "hard"
+  speakers biases the set; we want objective metrics. Reproducible via seed.
+- Hold out **entire jurisdictions** where affordable (e.g. all speakers of one
+  city) into the held-out set; take train from what remains.
+- Target ratio **~30/70**; the program must ensure **both sets have sufficient
+  data** (enough hours to validate/test on).
+
+Open detail: whether 30/70 is train/val or val/test, and the exact speaker/meeting
+membership, is specified next week. See [open questions](#open).
+
+### 2026-06-16 - Cost is not a deciding factor for the provider
+
+Christos: optimise for transcription **quality**, not price. On the
+[`2026-06-10-oc-benchmark`](../meetings/2026-06-16.md) run, **Scribe v2 (13.4%
+WER)** is the best provider and stays the current choice; Gladia (14.7%, best CER)
+is what runs on prod today; zero-shot **whisper-large-v3 (15.0%)** is the finetune
+baseline to beat. Soniox landed between Gladia and Scribe, so being cheaper does
+not change the choice. A naive Greek finetune on HF (sam8000) scored 48.7% — 3×
+worse than zero-shot — evidence that careful data, not just "finetune on Greek",
+is what matters.
+
 ### 2026-06 - Split train/val/test by whole meeting, not by utterance
 
 Team consensus (sync 2026-06-02 + Discord follow-up). The train/val/test split
@@ -132,11 +199,25 @@ training feature extraction and inference must match (use HF
 
 ### Benchmark: fixed meetings vs random test set (raised 2026-06-02)
 
-A **fixed** set of held-out meetings gives stable, directly comparable metrics
-across runs. A **random** test set varies run-to-run (e.g. WER 20 → 23 → 16) and
-needs statistics to average out. Leaning toward a fixed held-out set for
-release-defensible numbers, with the meeting-level split from the accepted
-decision above; not finalised.
+**Resolved 2026-06-16.** Two distinct things, not one:
+
+- The `2026-06-10-oc-benchmark` run is a **provider comparison** on a frozen
+  random sample across all meetings — kept as a scoreboard, never used as the
+  finetune test set (its windows leak across train/test).
+- The **finetune test set is a fixed temporal hold-out** (post-June meetings),
+  per [2026-06-16 split mechanics](#2026-06-16---split-mechanics-temporal-test-set--seeded-automated-trainval).
+  A separate benchmark restricted to those meetings gives release-defensible
+  numbers, re-run at the end to compare baseline → finetuned.
+
+### Human-edit threshold for eligible meetings: 10 → 20 (resolved 2026-06-16)
+
+**Resolved: use 20.** The review tool previously treated a meeting as reviewable
+at **≥10** human-edited utterances (`MEETING_MIN_HUMAN_UTTERANCES`, see
+[exclude meetings with < 10](#2026-06-03---exclude-meetings-with--10-human-corrected-utterances-from-review)),
+while the `2026-06-10-oc-benchmark` used **20**. Aligning on **20**: the cleaned
+SQLite index (prefetch-bug fix) keeps only public meetings from the 10 public
+cities with **≥20** human-edited utterances; private edits and below-threshold
+meetings are dropped so no runtime skip is needed.
 
 ### Correction-bias mix ratio
 
