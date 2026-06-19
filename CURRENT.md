@@ -12,6 +12,15 @@ Last updated: 2026-05-20
 > clickable stats categories landed.
 > See [decisions/ui.md](docs/decisions/ui.md#2026-05-20---multi-category-labels-seed-ux-direct-cdn-audio-branch-codexfile-backed-review-ui).
 
+> **2026-06-16 update — finetuning prep now in scope alongside the review UI.**
+> The provider benchmark (`bench.opencouncil.gr`) ran: Scribe v2 best (13.4% WER),
+> zero-shot whisper-large-v3 (15.0%) is the finetune baseline to beat. Agreed
+> split mechanics (temporal test set from 1 Jun, seeded automated train/val by
+> meeting+speaker) and the path to a first end-to-end smoke finetune by mid-July.
+> See [meeting 2026-06-16](docs/meetings/2026-06-16.md) and
+> [decisions/data.md](docs/decisions/data.md). Review throughput continues (~1.4k
+> reviewed; target ~6k by mid-July); the prefetch bug is the immediate fix.
+
 This is the human and LLM entry point. Read this first, then follow links only as needed.
 
 ## Goal Right Now
