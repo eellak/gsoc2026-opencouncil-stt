@@ -100,7 +100,7 @@ export async function buildSqlite(input: BuildSqliteInput): Promise<void> {
 					speaker_tag  TEXT,
 					PRIMARY KEY (city_id, meeting_id, utterance_id)
 				);
-				CREATE UNIQUE INDEX idx_transcript_meeting_seq ON transcript(meeting_id, seq);
+				CREATE UNIQUE INDEX idx_transcript_meeting_seq ON transcript(city_id, meeting_id, seq);
 				CREATE INDEX idx_transcript_utterance ON transcript(utterance_id);
 
 				CREATE TABLE transcript_meeting (
