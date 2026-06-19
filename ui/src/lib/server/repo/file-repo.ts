@@ -304,7 +304,7 @@ export class FileRepo {
 	 * The file-repo prototype doesn't carry a transcript index — always defer to
 	 * the live upstream /context proxy. (Production context lives on sqlite.)
 	 */
-	getContext(): null {
+	getContext(_utterance_id: string, _before: number, _after: number): null {
 		return null;
 	}
 
