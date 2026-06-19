@@ -80,12 +80,21 @@ function toCtx(n: OcNeighbour): ContextUtterance {
 	};
 }
 
+// Transient failures (502/timeout/network) are usually a momentary upstream
+// hiccup under a navigation burst and self-heal within ~1s (verified: a 502'd
+// context returns 200 on the next fetch). Auto-retry a couple of times with a
+// short backoff so the panel loads instead of flashing "context unavailable".
+// A 404/401/403 (private) is permanent — return immediately, never retry.
+const CONTEXT_MAX_ATTEMPTS = 3; // 1 try + 2 retries
+const CONTEXT_RETRY_BASE_MS = 200;
+const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+
 async function fetchContext(
 	utteranceId: string,
 	before: number,
 	after: number
 ): Promise<MeetingContext> {
-	const ctx: MeetingContext = {
+	const base: MeetingContext = {
 		city_id: '',
 		meeting_id: '',
 		current: null,
@@ -95,33 +104,41 @@ async function fetchContext(
 		error_kind: null
 	};
 	const url = `/api/oc-context/${encodeURIComponent(utteranceId)}?before=${before}&after=${after}`;
-	try {
-		const resp = await fetch(url);
-		if (!resp.ok) {
-			ctx.error = resp.status === 404 ? 'utterance not found' : 'upstream context fetch failed';
-			// The bridge passes through 401/403/404 only for genuine upstream
-			// auth/not-found responses; treat those as "private" (skippable) and
-			// everything else (502/timeout/network) as transient.
-			ctx.error_kind =
-				resp.status === 401 || resp.status === 403 || resp.status === 404
-					? 'private'
-					: 'transient';
-			return ctx;
+
+	for (let attempt = 0; attempt < CONTEXT_MAX_ATTEMPTS; attempt++) {
+		if (attempt > 0) await sleep(CONTEXT_RETRY_BASE_MS * attempt);
+		try {
+			const resp = await fetch(url);
+			if (!resp.ok) {
+				// The bridge passes through 401/403/404 only for genuine upstream
+				// auth/not-found responses — those are "private" (skippable) and must
+				// NOT be retried. Everything else (502/timeout/network) is transient.
+				const isPrivate = resp.status === 401 || resp.status === 403 || resp.status === 404;
+				if (isPrivate) {
+					return {
+						...base,
+						error: resp.status === 404 ? 'utterance not found' : 'upstream context fetch failed',
+						error_kind: 'private'
+					};
+				}
+				continue; // transient → retry
+			}
+			const json = (await resp.json()) as OcContextResponse;
+			return {
+				...base,
+				city_id: json.meeting?.cityId ?? '',
+				meeting_id: json.meeting?.id ?? '',
+				// `before`/`after` arrive chronological (oldest→newest); map straight
+				// to prev/next around the (locally-known) current utterance.
+				prev: (json.before ?? []).map(toCtx),
+				next: (json.after ?? []).map(toCtx)
+			};
+		} catch {
+			// Network error / abort — never private; fall through to retry.
 		}
-		const json = (await resp.json()) as OcContextResponse;
-		ctx.city_id = json.meeting?.cityId ?? '';
-		ctx.meeting_id = json.meeting?.id ?? '';
-		// `before`/`after` arrive chronological (oldest→newest); map straight to
-		// prev/next around the (locally-known) current utterance.
-		ctx.prev = (json.before ?? []).map(toCtx);
-		ctx.next = (json.after ?? []).map(toCtx);
-		return ctx;
-	} catch {
-		// Network error / abort — never private; let the user retry.
-		ctx.error = 'upstream context fetch failed';
-		ctx.error_kind = 'transient';
-		return ctx;
 	}
+	// Exhausted retries — transient failure, evicted by loadOnce so it stays retryable.
+	return { ...base, error: 'upstream context fetch failed', error_kind: 'transient' };
 }
 
 function loadOnce(utteranceId: string, before: number, after: number): Promise<MeetingContext> {

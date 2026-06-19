@@ -149,24 +149,50 @@ describe('getContext (per-utterance endpoint)', () => {
 		expect(hasContext('u-target', 5, 5)).toBe(true);
 	});
 
-	it('evicts a failed lookup so it stays retryable', async () => {
-		let calls = 0;
-		installFetch(async () => {
-			calls++;
-			// First call fails, second succeeds.
-			return calls === 1
+	it('evicts a persistently-failed lookup so it stays retryable', async () => {
+		let mode: 'fail' | 'ok' = 'fail';
+		installFetch(async () =>
+			mode === 'fail'
 				? new Response('boom', { status: 502 })
-				: new Response(JSON.stringify(FAKE_CONTEXT), { status: 200 });
-		});
+				: new Response(JSON.stringify(FAKE_CONTEXT), { status: 200 })
+		);
 		const first = await getContext('u-target', 1, 1);
-		expect(first.error).toMatch(/upstream/);
+		expect(first.error).toMatch(/upstream/); // gave up after auto-retries
+		expect(first.error_kind).toBe('transient');
 		expect(hasContext('u-target', 1, 1)).toBe(false);
 		expect(_stats().size).toBe(0); // failed entry evicted, not cached
 		expect(_stats().resolved).toBe(0);
-		// Retry refetches and succeeds.
+		// Once the upstream recovers, a fresh lookup succeeds.
+		mode = 'ok';
 		const second = await getContext('u-target', 1, 1);
 		expect(second.error).toBeNull();
-		expect(calls).toBe(2);
+	});
+
+	it('auto-retries a transient 502 and recovers within one getContext call', async () => {
+		let calls = 0;
+		installFetch(async () => {
+			calls++;
+			// Two transient failures, then success — all inside a single getContext.
+			return calls < 3
+				? new Response('boom', { status: 502 })
+				: new Response(JSON.stringify(FAKE_CONTEXT), { status: 200 });
+		});
+		const ctx = await getContext('u-target', 2, 2);
+		expect(ctx.error).toBeNull();
+		expect(ctx.prev).toHaveLength(2);
+		expect(calls).toBe(3); // retried past the two 502s without the caller noticing
+	});
+
+	it('does NOT retry a private 404 — fails fast', async () => {
+		let calls = 0;
+		installFetch(async () => {
+			calls++;
+			return new Response('nope', { status: 404 });
+		});
+		const ctx = await getContext('no-such-id', 2, 2);
+		expect(ctx.error).toMatch(/not found/);
+		expect(ctx.error_kind).toBe('private');
+		expect(calls).toBe(1); // private is permanent — no retry burst
 	});
 
 	it('LRU cap evicts both maps in lockstep', async () => {

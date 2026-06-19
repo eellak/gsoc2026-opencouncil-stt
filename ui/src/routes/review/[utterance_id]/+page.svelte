@@ -186,6 +186,23 @@
 	// changes — i.e. when the user navigates to a new utterance.
 	const currentId = $derived(item.utterance_id);
 
+	// Warm-window radius for audio + transcript prefetch. Forward-biased and
+	// skip-aware (see queue.prefetchWindow): the old raw ±10 fired ~20 CDN range
+	// requests per hop, saturating the browser's ~6 conn/host limit on fast/
+	// consecutive nav (the >10s "not ready" symptom). 6 ahead / 2 behind cuts the
+	// volume and follows the actual nav path so we warm what we land on.
+	const PREFETCH_FORWARD = 6;
+	const PREFETCH_BACK = 2;
+
+	// Context (transcript) prefetch uses a SMALLER window than audio. Each hop
+	// fires one /api/oc-context request per warmed neighbour through our proxy;
+	// a wide window under fast j/k bursts momentarily overloads the proxy/upstream
+	// → transient 502s ("context unavailable"). 2 ahead / 1 behind keeps the panel
+	// warm without the burst. (Audio bytes come straight from the CDN, so the audio
+	// window can stay wider.)
+	const CONTEXT_PREFETCH_FORWARD = 2;
+	const CONTEXT_PREFETCH_BACK = 1;
+
 	// Wire the pool to our visible slot. The pool moves elements in/out as
 	// the active id changes. Cleanup on unmount so a navigation away from
 	// /review doesn't strand the audio element in a destroyed slot.
@@ -204,11 +221,13 @@
 		const url = activeAudioUrl;
 		untrack(() => {
 			if (!usingFallback) usingFallback = false; // no-op; reset happens when id changes below
-			const audioNeighbours = queue.neighborsAround(id, 10).map((g) => ({
-				utterance_id: g.utterance_id,
-				url: resolveAudioUrls(g.audio_url).direct,
-				start: g.label.adjusted_start ?? g.start
-			}));
+			const audioNeighbours = queue
+				.prefetchWindow(id, PREFETCH_FORWARD, PREFETCH_BACK, skipNav)
+				.map((g) => ({
+					utterance_id: g.utterance_id,
+					url: resolveAudioUrls(g.audio_url).direct,
+					start: g.label.adjusted_start ?? g.start
+				}));
 			audioPool.setActive(
 				{ utterance_id: id, url, start: regionStart },
 				audioNeighbours
@@ -361,7 +380,7 @@
 			// Prefetch context for upcoming utterances so the panel is warm on
 			// arrival. Each context payload is a few KB (per-utterance endpoint),
 			// so prefetching individual neighbours is cheap.
-			for (const g of queue.neighborsAround(id, 10)) {
+			for (const g of queue.prefetchWindow(id, CONTEXT_PREFETCH_FORWARD, CONTEXT_PREFETCH_BACK, skipNav)) {
 				meetingCtx.prefetch(g.utterance_id);
 			}
 		});
