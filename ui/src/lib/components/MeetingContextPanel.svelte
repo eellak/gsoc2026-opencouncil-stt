@@ -8,11 +8,24 @@
 		utterances: ContextUtterance[];
 		label: string;
 		state: 'loading' | 'ready' | 'error' | 'empty';
+		/** Distinguishes a permanent private/not-found error from a transient one. */
+		errorKind?: 'private' | 'transient' | null;
+		/** Offered only for transient errors — lets the reviewer re-fetch in place. */
+		onRetry?: () => void;
 		onLoadMore?: () => void;
 		hasMore?: boolean;
 		loadMoreAtTop?: boolean;
 	}
-	const { utterances, label, state, onLoadMore, hasMore, loadMoreAtTop }: Props = $props();
+	const {
+		utterances,
+		label,
+		state,
+		errorKind = null,
+		onRetry,
+		onLoadMore,
+		hasMore,
+		loadMoreAtTop
+	}: Props = $props();
 
 	const runs = $derived(mergeBySpeaker(utterances));
 
@@ -28,7 +41,16 @@
 	{#if state === 'loading'}
 		<div class="status loading">{t('loadingContext')}</div>
 	{:else if state === 'error'}
-		<div class="status error">{t('contextUnavailable')}</div>
+		{#if errorKind === 'private'}
+			<div class="status error">{t('contextPrivate')}</div>
+		{:else}
+			<div class="status error">
+				{t('contextProblem')}
+				{#if onRetry}
+					<button type="button" class="retry-btn" onclick={onRetry}>{t('contextRetry')}</button>
+				{/if}
+			</div>
+		{/if}
 	{:else if state === 'empty' || runs.length === 0}
 		<div class="status muted">{t('noContext')}</div>
 	{:else}
@@ -74,6 +96,18 @@
 	}
 	.status.error { color: #b91c1c; font-style: normal; }
 	.status.muted { font-size: 0.78rem; }
+	.retry-btn {
+		margin-left: 0.5rem;
+		padding: 0.05rem 0.45rem;
+		font-size: 0.72rem;
+		font-family: inherit;
+		color: #b91c1c;
+		background: none;
+		border: 1px solid currentColor;
+		border-radius: 4px;
+		cursor: pointer;
+	}
+	.retry-btn:hover { background: rgba(185, 28, 28, 0.08); }
 
 	ol {
 		list-style: none;

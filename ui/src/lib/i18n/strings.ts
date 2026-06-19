@@ -86,6 +86,15 @@ export const strings = {
 	contextAfter: { en: 'After', el: 'Επόμενα' },
 	loadingContext: { en: 'Loading transcript…', el: 'Φόρτωση απομαγνητοφώνησης…' },
 	contextUnavailable: { en: 'Context unavailable', el: 'Μη διαθέσιμο πλαίσιο' },
+	contextPrivate: {
+		en: 'Private session — no surrounding context available',
+		el: 'Ιδιωτική συνεδρίαση — δεν υπάρχει διαθέσιμο πλαίσιο'
+	},
+	contextProblem: {
+		en: "Couldn't load context — connection problem",
+		el: 'Αποτυχία φόρτωσης πλαισίου — πρόβλημα σύνδεσης'
+	},
+	contextRetry: { en: 'Retry', el: 'Επανάληψη' },
 	autoSkipPaused: {
 		en: 'Paused after skipping {n} unavailable utterances in a row — network issue?',
 		el: 'Παύση μετά από {n} συνεχόμενα μη διαθέσιμα utterances — πρόβλημα δικτύου;'
