@@ -300,6 +300,14 @@ export class FileRepo {
 		return out;
 	}
 
+	/**
+	 * The file-repo prototype doesn't carry a transcript index — always defer to
+	 * the live upstream /context proxy. (Production context lives on sqlite.)
+	 */
+	getContext(): null {
+		return null;
+	}
+
 	flush(): Promise<void> {
 		return this.sidecar.flush();
 	}

@@ -28,6 +28,8 @@ import type {
 } from '$lib/domain/groups';
 import type { IncludeStatus } from '$lib/domain/types';
 import { SidecarStore } from '../state/sidecar';
+import { TRANSCRIPT_SCHEMA_VERSION } from '../cache/transcript-extract';
+import type { ContextNeighbour, LocalContextResult } from '../cache/transcript-extract';
 import {
 	loadOrComputeEligibleMeetings,
 	meetingEligibilityThreshold,
@@ -84,6 +86,93 @@ export class SqliteRepo {
 		this.iterAllStmt = db.prepare('SELECT json FROM groups ORDER BY ord');
 		this.eligibleIds = orderedIds;
 		void this.audioCdnMap; // currently unused by sqlite path; surfaces via /api/audio
+		this.initTranscript();
+	}
+
+	// --- Surrounding-context index (optional table; null when absent/stale) ---
+	private ctxAnchorStmt: Statement<[string]> | null = null;
+	private ctxMeetingStmt: Statement<[string, string]> | null = null;
+	private ctxSliceStmt: Statement<[string, number, number]> | null = null;
+
+	/**
+	 * Wire up the transcript-context statements iff the table exists AND its
+	 * schema version matches. Any mismatch leaves the statements null, so
+	 * getContext() returns null and the bridge falls back to live upstream.
+	 */
+	private initTranscript(): void {
+		const meta = new Map(
+			(this.db.prepare('SELECT key, value FROM meta').all() as MetaRow[]).map((r) => [
+				r.key,
+				r.value
+			])
+		);
+		const hasTable =
+			(
+				this.db
+					.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='transcript'")
+					.get() as { name: string } | undefined
+			)?.name === 'transcript';
+		const versionOk = Number(meta.get('transcript_schema_version')) === TRANSCRIPT_SCHEMA_VERSION;
+		const hashPresent = !!meta.get('transcript_manifest_hash');
+		if (!hasTable || !versionOk || !hashPresent) return;
+
+		this.ctxAnchorStmt = this.db.prepare(
+			'SELECT city_id, meeting_id, seq FROM transcript WHERE utterance_id = ? LIMIT 1'
+		);
+		this.ctxMeetingStmt = this.db.prepare(
+			'SELECT 1 FROM transcript_meeting WHERE city_id = ? AND meeting_id = ?'
+		);
+		// Inclusive window around the anchor seq; anchor row excluded by the caller
+		// (by seq, not id, so a duplicate id can't slip through). ORDER BY seq keeps
+		// both before/after chronological ascending — matches the upstream contract.
+		this.ctxSliceStmt = this.db.prepare(
+			`SELECT utterance_id, text, start, "end", speaker_tag, seq
+			 FROM transcript WHERE meeting_id = ? AND seq >= ? AND seq <= ? ORDER BY seq`
+		);
+	}
+
+	/**
+	 * Local surrounding context for an utterance, or null to signal "fall back to
+	 * live upstream". Null covers: transcript table absent / stale version /
+	 * meeting not indexed (per-meeting manifest miss) / utterance unknown.
+	 * `before`/`after` are chronological ascending, same shape as upstream.
+	 */
+	getContext(utterance_id: string, before: number, after: number): LocalContextResult | null {
+		if (!this.ctxAnchorStmt || !this.ctxMeetingStmt || !this.ctxSliceStmt) return null;
+		const anchor = this.ctxAnchorStmt.get(utterance_id) as
+			| { city_id: string; meeting_id: string; seq: number }
+			| undefined;
+		if (!anchor) return null;
+		// Per-meeting presence: a partial build may lack this meeting.
+		if (!this.ctxMeetingStmt.get(anchor.city_id, anchor.meeting_id)) return null;
+
+		const b = Math.max(0, Math.floor(Number.isFinite(before) ? before : 0));
+		const a = Math.max(0, Math.floor(Number.isFinite(after) ? after : 0));
+		const rows = this.ctxSliceStmt.all(
+			anchor.meeting_id,
+			anchor.seq - b,
+			anchor.seq + a
+		) as Array<{
+			utterance_id: string;
+			text: string;
+			start: number | null;
+			end: number | null;
+			speaker_tag: string | null;
+			seq: number;
+		}>;
+
+		const toNeighbour = (r: (typeof rows)[number]): ContextNeighbour => ({
+			id: r.utterance_id,
+			text: r.text,
+			start: r.start,
+			end: r.end,
+			speakerTagId: r.speaker_tag
+		});
+		return {
+			meeting: { id: anchor.meeting_id, cityId: anchor.city_id },
+			before: rows.filter((r) => r.seq < anchor.seq).map(toNeighbour),
+			after: rows.filter((r) => r.seq > anchor.seq).map(toNeighbour)
+		};
 	}
 
 	/** True when `utterance_id` survives the meeting-eligibility filter. */
