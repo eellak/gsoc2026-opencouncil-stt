@@ -152,7 +152,7 @@ lines.push('');
 lines.push(`- **Index:** \`${dbPath}\``);
 lines.push(`- **Drop set (\`DROP_INGEST_CATEGORIES\`):** ${drop.size ? [...drop].map((c) => `\`${c}\``).join(', ') : '_(none — filter disabled)_'}`);
 lines.push(`- **Total utterances:** ${fmt(total)}`);
-lines.push(`- **Dropped from review + export:** ${fmt(droppedTotal)} (${((droppedTotal / total) * 100).toFixed(2)}%)`);
+lines.push(`- **Dropped from review + export:** ${fmt(droppedTotal)} (${total > 0 ? ((droppedTotal / total) * 100).toFixed(2) : '0.00'}%)`);
 lines.push(`- **Of those, already carrying a human decision:** ${fmt(droppedLabeled)}`);
 lines.push('');
 lines.push(`## Per-category breakdown (by latest edit)`);
