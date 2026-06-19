@@ -161,6 +161,44 @@ export function prevUnreviewedId(id: string): string | undefined {
 	return undefined;
 }
 
+/**
+ * Forward-biased, skip-aware warm window for prefetch (audio + transcript).
+ *
+ * Unlike `neighborsAround` (raw ±radius), this mirrors the actual navigation
+ * path so prefetch warms the items the reviewer will really land on:
+ *   - forward: walk ahead filling up to `forward` CACHED groups, scanning past
+ *     cache holes and — when `skipClassified` — past already-classified items
+ *     (same `isClassified` predicate the nav resolver uses). Walk-to-fill, not
+ *     stop-at-N, so a run of classified/uncached ids can't shrink the window.
+ *   - back: up to `back` cached groups, NEVER skipping classified (prev never
+ *     skips — going back means revisiting finished work).
+ * Cached-only by design: the audio warm needs each group's url/start, and we
+ * never want prefetch selection to trigger fetches.
+ */
+export function prefetchWindow(
+	id: string,
+	forward: number,
+	back: number,
+	skipClassified: boolean
+): Group[] {
+	const idx = order.indexOf(id);
+	if (idx < 0) return [];
+	const out: Group[] = [];
+	for (let i = idx + 1; i < order.length && out.length < forward; i++) {
+		const g = cache.get(order[i]);
+		if (!g) continue; // cache hole — keep walking
+		if (skipClassified && isClassified(g)) continue; // skip finished work, keep walking
+		out.push(g);
+	}
+	for (let i = idx - 1, added = 0; i >= 0 && added < back; i--) {
+		const g = cache.get(order[i]);
+		if (!g) continue;
+		out.push(g);
+		added++;
+	}
+	return out;
+}
+
 export function neighborsAround(id: string, radius: number): Group[] {
 	const idx = order.indexOf(id);
 	if (idx < 0) return [];
@@ -367,6 +405,18 @@ export function _loadSeededForTest(groups: Group[], cursor: number | null): void
 	mode = 'seeded';
 	for (const g of groups) insert(g);
 	nextCursor = cursor;
+}
+
+/**
+ * Test-only: set an explicit seeded `order` plus a (possibly partial) set of
+ * cached groups, so tests can construct cache holes (ids in `order` with no
+ * cached body) that don't arise from the normal helpers.
+ */
+export function _setSeededOrderAndCacheForTest(orderIds: string[], cached: Group[]): void {
+	mode = 'seeded';
+	resetQueue();
+	for (const id of orderIds) order.push(id);
+	for (const g of cached) cache.set(g.utterance_id, g);
 }
 
 export async function fetchFilterIds(query: string): Promise<IdsResponse> {
