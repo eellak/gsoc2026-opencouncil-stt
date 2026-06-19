@@ -35,6 +35,8 @@ import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import { buildGroups, type V2CsvRow } from '../src/lib/server/cache/build';
 import { buildSqlite } from '../src/lib/server/cache/build-sqlite';
+import { buildTranscriptIndex, type MeetingRef } from '../src/lib/server/cache/build-transcript';
+import { TRANSCRIPT_SCHEMA_VERSION } from '../src/lib/server/cache/transcript-extract';
 import { fingerprintFile } from '../src/lib/server/cache/fingerprint';
 import { degenerateCategories } from '../src/lib/server/state/ingest-filter';
 import { SidecarStore } from '../src/lib/server/state/sidecar';
@@ -69,6 +71,35 @@ const metaPath = resolve(outDir, 'meta.json');
 const dataPath = resolve(outDir, 'groups.v1.json');
 const sqlitePath = resolve(outDir, 'groups.v1.sqlite');
 const force = process.env.REBUILD === '1';
+// Transcript context index applies to the sqlite output only; opt out for
+// emergency/constrained builds (runtime then falls back to live upstream).
+const wantTranscript =
+	process.env.SKIP_TRANSCRIPT_INDEX !== '1' && (format === 'sqlite' || format === 'both');
+
+/** True iff an existing sqlite already carries a current-version transcript table. */
+async function sqliteHasCurrentTranscript(path: string): Promise<boolean> {
+	try {
+		const Database = (await import('better-sqlite3')).default;
+		const db = new Database(path, { readonly: true, fileMustExist: true });
+		try {
+			const hasTable = (
+				db
+					.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='transcript'")
+					.get() as { name: string } | undefined
+			)?.name;
+			const ver = (
+				db.prepare("SELECT value FROM meta WHERE key='transcript_schema_version'").get() as
+					| { value: string }
+					| undefined
+			)?.value;
+			return hasTable === 'transcript' && Number(ver) === TRANSCRIPT_SCHEMA_VERSION;
+		} finally {
+			db.close();
+		}
+	} catch {
+		return false;
+	}
+}
 
 console.log(`Source CSV: ${csvPath}`);
 console.log(`Cache dir : ${outDir}`);
@@ -143,11 +174,15 @@ if (!force) {
 	try {
 		const existing = JSON.parse(await fs.readFile(metaPath, 'utf8')) as CacheMeta;
 		const exclMatch = (existing.exclusions?.exclusions_hash ?? null) === exclusionsHash;
+		// A wanted-but-missing transcript index must NOT be skipped — otherwise an
+		// up-to-date CSV/exclusions hash would suppress adding context to an old index.
+		const transcriptOk = !wantTranscript || (await sqliteHasCurrentTranscript(sqlitePath));
 		if (
 			existing.cache_version === CACHE_VERSION &&
 			existing.source_hash === fp.hash &&
 			existing.source_size === fp.size &&
-			exclMatch
+			exclMatch &&
+			transcriptOk
 		) {
 			console.log(`Cache is up to date (hash=${fp.hash}, exclusions=${exclusionsHash}). Use REBUILD=1 to force.`);
 			process.exit(0);
@@ -284,9 +319,45 @@ if (format === 'json' || format === 'both') {
 	console.log(`Wrote ${dataPath}.`);
 }
 
+// ── Surrounding-context (transcript) index ─────────────────────────────────
+// Fetch the full meeting JSON once per distinct meeting present in the kept
+// groups (private meetings are already excluded), so review context is served
+// locally instead of live per hop. Resumable via .cache/meetings blobs.
+let transcript: Awaited<ReturnType<typeof buildTranscriptIndex>> | undefined;
+if (wantTranscript) {
+	const seen = new Set<string>();
+	const meetings: MeetingRef[] = [];
+	for (const g of groups) {
+		if (!g.city_id || !g.meeting_id) continue;
+		const k = `${g.city_id}/${g.meeting_id}`;
+		if (seen.has(k)) continue;
+		seen.add(k);
+		meetings.push({ city_id: g.city_id, meeting_id: g.meeting_id });
+	}
+	const blobDir = resolve(outDir, 'meetings');
+	console.log(`Transcript index: fetching ${meetings.length} meetings → ${blobDir} …`);
+	transcript = await buildTranscriptIndex({
+		meetings,
+		blobDir,
+		concurrency: Number(process.env.TRANSCRIPT_CONCURRENCY ?? 5),
+		log: (m) => console.log(m)
+	});
+	console.log(
+		`Transcript index: status=${transcript.manifest.build_status}, ` +
+			`indexed=${transcript.manifest.meetings.length}/${meetings.length}, ` +
+			`failed=${transcript.manifest.failed_count}, rows=${transcript.rows.length.toLocaleString()}, ` +
+			`hash=${transcript.manifest.manifest_hash}`
+	);
+}
+
 if (format === 'sqlite' || format === 'both') {
 	console.log(`Building SQLite cache at ${sqlitePath} …`);
-	await buildSqlite({ groups, meta, outPath: sqlitePath });
+	await buildSqlite({
+		groups,
+		meta,
+		outPath: sqlitePath,
+		transcript: transcript && transcript.manifest.build_status !== 'absent' ? transcript : undefined
+	});
 	// Post-build validation: row count must match the in-memory dataset.
 	const Database = (await import('better-sqlite3')).default;
 	const db = new Database(sqlitePath, { readonly: true, fileMustExist: true });
