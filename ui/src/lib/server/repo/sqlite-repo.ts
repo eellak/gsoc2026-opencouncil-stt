@@ -19,7 +19,7 @@
 import Database, { type Database as DB, type Statement } from 'better-sqlite3';
 import { existsSync, promises as fs } from 'node:fs';
 import { resolve } from 'node:path';
-import { CACHE_VERSION } from '$lib/domain/groups';
+import { CACHE_VERSION, cacheHashWithExclusions } from '$lib/domain/groups';
 import type {
 	Group,
 	GroupLabel,
@@ -33,6 +33,7 @@ import {
 	meetingEligibilityThreshold,
 	meetingKey
 } from '../state/meeting-eligibility';
+import { degenerateCategories } from '../state/ingest-filter';
 
 // Defaults are resolved from `process.cwd()` so the bundled adapter-node
 // output picks up the operator's working directory at start time. Tests pass
@@ -124,6 +125,43 @@ export class SqliteRepo {
 		);
 	}
 
+	/**
+	 * Second eligibility layer: drop utterances whose LATEST edit is a degenerate
+	 * ingest bin (no real correction signal). Runs after applyMeetingEligibility,
+	 * so it narrows whatever set that left. A no-op when the drop set is empty
+	 * (DROP_INGEST_CATEGORIES=""). Reversible: only the navigation set shrinks —
+	 * getGroup() still resolves dropped ids. The degenerate ids are computed in
+	 * one SQL pass via json_extract on the last edit (no JS group parsing).
+	 */
+	private applyIngestCategoryFilter(): void {
+		const drop = degenerateCategories();
+		if (drop.size === 0) return;
+		const cats = [...drop];
+		const placeholders = cats.map(() => '?').join(',');
+		// json_array_length(...)-1 indexes the last edit; matches build.ts ordering
+		// (edits sorted ascending, latest is last) and the dataset's final_after_text.
+		const rows = this.db
+			.prepare(
+				`SELECT utterance_id FROM groups
+				 WHERE json_extract(
+				   json,
+				   '$.edits[' || (json_array_length(json, '$.edits') - 1) || '].ingest_category'
+				 ) IN (${placeholders})`
+			)
+			.all(...cats) as Array<{ utterance_id: string }>;
+		const degenerate = new Set(rows.map((r) => r.utterance_id));
+		if (degenerate.size === 0) return;
+		const before = this.eligibleIds.length;
+		const kept = this.eligibleIds.filter((id) => !degenerate.has(id));
+		this.eligibleIds = kept;
+		this.eligibleIdSet = new Set(kept);
+		console.log(
+			`[sqlite-repo] ingest-filter: dropped ${(before - kept.length).toLocaleString()} ` +
+				`degenerate-latest-edit utterances (categories: ${cats.join(',')}); ` +
+				`${kept.length.toLocaleString()} remain`
+		);
+	}
+
 	static async load(opts: SqliteRepoOptions = {}): Promise<SqliteRepo> {
 		const cacheDir = opts.cacheDir ?? process.env.REVIEW_CACHE_DIR ?? DEFAULT_CACHE_DIR();
 		const stateDir = opts.stateDir ?? process.env.REVIEW_STATE_DIR ?? DEFAULT_STATE_DIR();
@@ -155,6 +193,10 @@ export class SqliteRepo {
 			db.close();
 			throw new Error('SqliteRepo: missing source_hash in meta — corrupt cache');
 		}
+		// Filtered rebuild: fold the exclusion digest into the runtime cache_hash
+		// so dependent snapshots invalidate when exclusions change (the CSV hash
+		// alone can't distinguish a filtered index from the full one).
+		const cacheHash = cacheHashWithExclusions(sourceHash, meta.get('exclusions_hash'));
 
 		const orderedIds = (
 			db.prepare('SELECT utterance_id FROM groups ORDER BY ord').all() as Array<{
@@ -176,11 +218,12 @@ export class SqliteRepo {
 
 		console.log(
 			`[sqlite-repo] mounted ${orderedIds.length.toLocaleString()} groups; ` +
-				`cache_hash=${sourceHash}; sidecar_labels=${sidecar.all().size}`
+				`cache_hash=${cacheHash}; sidecar_labels=${sidecar.all().size}`
 		);
 
-		const repo = new SqliteRepo(db, orderedIds, sourceHash, sidecar, cdnMap);
+		const repo = new SqliteRepo(db, orderedIds, cacheHash, sidecar, cdnMap);
 		await repo.applyMeetingEligibility(stateDir, opts.meetingMinHumanUtterances);
+		repo.applyIngestCategoryFilter();
 		return repo;
 	}
 

@@ -109,6 +109,12 @@ export async function buildSqlite(input: BuildSqliteInput): Promise<void> {
 			['edit_count', String(meta.edit_count)],
 			['missing_utterance_id_count', String(meta.missing_utterance_id_count)]
 		];
+		// Filtered rebuild: persist the exclusion digest so the runtime cache_hash
+		// reflects the index CONTENT (not just the source CSV), forcing dependent
+		// snapshots (stats/category/eligibility) to invalidate when exclusions change.
+		if (meta.exclusions) {
+			metaRows.push(['exclusions_hash', meta.exclusions.exclusions_hash]);
+		}
 		const metaTx = db.transaction((rows: Array<[string, string]>) => {
 			for (const [k, v] of rows) insertMeta.run(k, v);
 		});

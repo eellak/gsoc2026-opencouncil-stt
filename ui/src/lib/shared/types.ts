@@ -39,7 +39,13 @@ export interface ListResponse {
 export interface StatsResponse {
 	total: number;
 	by_status: Record<IncludeStatus, number>;
-	by_category: Array<{ category: string | null; count: number }>;
+	by_category: Array<{
+		category: string | null;
+		count: number;
+		include?: number;
+		exclude?: number;
+		uncertain?: number;
+	}>;
 	by_editor: Array<{ edited_by: string | null; count: number }>;
 	by_duration_bucket: Array<{ bucket: string; count: number }>;
 	by_meeting: Array<{ meeting_name: string | null; meeting_date: string | null; count: number }>;

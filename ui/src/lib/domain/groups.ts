@@ -70,6 +70,23 @@ export interface CacheMeta {
 	group_count: number;
 	edit_count: number;
 	missing_utterance_id_count: number;
+	/**
+	 * Hard-exclusion provenance (present only on a filtered rebuild). The index
+	 * physically omits these utterances; the CSV remains the source of truth.
+	 * `exclusions_hash` digests the exact exclusion inputs so the build's
+	 * skip-check invalidates when they change even if the source CSV does not.
+	 */
+	exclusions?: {
+		exclusions_hash: string;
+		availability_report_file: string | null;
+		availability_generated_at: string | null;
+		private_meeting_keys: string[];
+		drop_categories: string[];
+		excluded_private_utterances: number;
+		excluded_degenerate_utterances: number;
+		excluded_both: number;
+		excluded_total: number;
+	};
 }
 
 export interface QueueResponse {
@@ -102,3 +119,18 @@ export const DEFAULT_LABEL: GroupLabel = {
 };
 
 export const CACHE_VERSION = 1;
+
+/**
+ * Runtime cache identity. For an unfiltered index this is just the source CSV
+ * fingerprint. For a FILTERED rebuild the index content no longer maps 1:1 to
+ * the CSV (same CSV, different exclusion set ⇒ different served dataset), so the
+ * exclusion digest is folded in. This is what stats/category/eligibility caches
+ * key on, so they invalidate correctly when exclusions change. Kept as a
+ * human-debuggable `${source}+x${excl}` string rather than a re-hash.
+ */
+export function cacheHashWithExclusions(
+	sourceHash: string,
+	exclusionsHash: string | null | undefined
+): string {
+	return exclusionsHash ? `${sourceHash}+x${exclusionsHash}` : sourceHash;
+}

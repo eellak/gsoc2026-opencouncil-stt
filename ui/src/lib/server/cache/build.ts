@@ -8,6 +8,7 @@
 import { categorise, type RawCsvRow } from '../../../../scripts/lib/csv-clean';
 import type { Group, GroupEdit } from '$lib/domain/groups';
 import { DEFAULT_LABEL } from '$lib/domain/groups';
+import { meetingKey } from '../state/meeting-eligibility';
 
 export interface V2CsvRow extends RawCsvRow {
 	utterance_id: string;
@@ -15,18 +16,49 @@ export interface V2CsvRow extends RawCsvRow {
 	city_id: string;
 }
 
+/**
+ * Hard exclusions applied at build time (filtered rebuild). A group is dropped
+ * if its meeting is private OR its latest edit is a degenerate ingest bin.
+ * Dropped utterances are physically absent from the index (getGroup → null);
+ * the CSV stays the source of truth. Omit/empty → no exclusions (full corpus).
+ */
+export interface BuildExclusions {
+	/** `meetingKey(city, meeting)` of private meetings (from the availability probe). */
+	excludeMeetingKeys?: ReadonlySet<string>;
+	/** Degenerate ingest categories to drop by a group's LATEST edit. */
+	dropCategories?: ReadonlySet<string>;
+}
+
+export interface DroppedGroup {
+	utterance_id: string;
+	/** Any of: 'private', 'degenerate'. Both when a private meeting's group is also degenerate. */
+	reasons: string[];
+}
+
 export interface BuildResult {
 	groups: Group[];
 	missingUtteranceIds: number;
 	invalidTimestamps: number;
 	editCount: number;
+	excluded: {
+		total: number;
+		private: number;
+		degenerate: number;
+		both: number;
+		dropped: DroppedGroup[];
+	};
 }
 
 /**
  * Build groups from an in-memory array of CSV rows. The cache script streams
  * rows in batches and concatenates; tests pass small arrays directly.
  */
-export function buildGroups(rows: Array<V2CsvRow & { csv_row: number }>): BuildResult {
+export function buildGroups(
+	rows: Array<V2CsvRow & { csv_row: number }>,
+	exclusions: BuildExclusions = {}
+): BuildResult {
+	const excludeMeetingKeys = exclusions.excludeMeetingKeys ?? new Set<string>();
+	const dropCategories = exclusions.dropCategories ?? new Set<string>();
 	const byUtterance = new Map<string, Array<GroupEdit & { _meeting: MeetingFields }>>();
 	let missingUtteranceIds = 0;
 	let invalidTimestamps = 0;
@@ -71,6 +103,10 @@ export function buildGroups(rows: Array<V2CsvRow & { csv_row: number }>): BuildR
 	}
 
 	const groups: Group[] = [];
+	const dropped: DroppedGroup[] = [];
+	let droppedPrivate = 0;
+	let droppedDegenerate = 0;
+	let droppedBoth = 0;
 	for (const [utterance_id, edits] of byUtterance) {
 		// Deterministic sort: by edit_timestamp asc, then csv_row asc (handles
 		// equal/missing timestamps without flakiness across runs).
@@ -94,6 +130,23 @@ export function buildGroups(rows: Array<V2CsvRow & { csv_row: number }>): BuildR
 		// Latest meeting metadata + audio wins (an utterance shouldn't move
 		// meetings, but if it does, "latest CSV row wins" is the least surprising rule).
 		const meeting = last._meeting;
+
+		// Hard exclusions (filtered rebuild). Judge by the same signals the repos
+		// would: meeting privacy (key) and the latest edit's ingest category. A
+		// group can hit both reasons — count it once per reason, drop it once.
+		const isPrivate = excludeMeetingKeys.has(meetingKey(meeting.city_id, meeting.meeting_id));
+		const isDegenerate = dropCategories.has(last.ingest_category);
+		if (isPrivate || isDegenerate) {
+			const reasons: string[] = [];
+			if (isPrivate) reasons.push('private');
+			if (isDegenerate) reasons.push('degenerate');
+			dropped.push({ utterance_id, reasons });
+			if (isPrivate && isDegenerate) droppedBoth++;
+			else if (isPrivate) droppedPrivate++;
+			else droppedDegenerate++;
+			continue;
+		}
+
 		groups.push({
 			utterance_id,
 			meeting_id: meeting.meeting_id,
@@ -116,7 +169,19 @@ export function buildGroups(rows: Array<V2CsvRow & { csv_row: number }>): BuildR
 	// Stable ordering of groups by utterance_id so the on-disk cache is diffable.
 	groups.sort((a, b) => (a.utterance_id < b.utterance_id ? -1 : a.utterance_id > b.utterance_id ? 1 : 0));
 
-	return { groups, missingUtteranceIds, invalidTimestamps, editCount };
+	return {
+		groups,
+		missingUtteranceIds,
+		invalidTimestamps,
+		editCount,
+		excluded: {
+			total: dropped.length,
+			private: droppedPrivate,
+			degenerate: droppedDegenerate,
+			both: droppedBoth,
+			dropped
+		}
+	};
 }
 
 interface MeetingFields {

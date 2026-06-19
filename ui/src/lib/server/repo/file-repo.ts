@@ -12,6 +12,7 @@
 import { promises as fs } from 'node:fs';
 import { resolve } from 'node:path';
 import type { Group, GroupLabel, GroupPatchBody, CacheMeta, QueueResponse } from '$lib/domain/groups';
+import { cacheHashWithExclusions } from '$lib/domain/groups';
 import type { IncludeStatus } from '$lib/domain/types';
 import { SidecarStore } from '../state/sidecar';
 import {
@@ -19,6 +20,11 @@ import {
 	meetingEligibilityThreshold,
 	meetingKey
 } from '../state/meeting-eligibility';
+import {
+	degenerateCategories,
+	filterDegenerateIds,
+	latestEditCategory
+} from '../state/ingest-filter';
 
 // Same convention as SqliteRepo: defaults resolve from `process.cwd()` so the
 // bundled adapter-node output picks up the operator's working directory.
@@ -89,6 +95,35 @@ export class FileRepo {
 		);
 	}
 
+	/**
+	 * Second eligibility layer: drop utterances whose LATEST edit is a degenerate
+	 * ingest bin. Mirrors SqliteRepo.applyIngestCategoryFilter; runs after the
+	 * meeting filter and narrows whatever it left. No-op when the drop set is
+	 * empty. Reversible — getGroup() still resolves dropped ids. Groups are
+	 * already in memory here, so the latest-edit category is a cheap lookup.
+	 */
+	private applyIngestCategoryFilter(): void {
+		const drop = degenerateCategories();
+		if (drop.size === 0) return;
+		const before = this.eligibleIds.length;
+		const { kept } = filterDegenerateIds(
+			this.eligibleIds,
+			(id) => {
+				const g = this.groupsById.get(id);
+				return g ? latestEditCategory(g) : null;
+			},
+			drop
+		);
+		if (kept.length === before) return;
+		this.eligibleIds = kept;
+		this.eligibleIdSet = new Set(kept);
+		console.log(
+			`[file-repo] ingest-filter: dropped ${(before - kept.length).toLocaleString()} ` +
+				`degenerate-latest-edit utterances (categories: ${[...drop].join(',')}); ` +
+				`${kept.length.toLocaleString()} remain`
+		);
+	}
+
 	static async load(opts: RepoOptions = {}): Promise<FileRepo> {
 		const cacheDir = opts.cacheDir ?? process.env.REVIEW_CACHE_DIR ?? DEFAULT_CACHE_DIR();
 		const stateDir = opts.stateDir ?? process.env.REVIEW_STATE_DIR ?? DEFAULT_STATE_DIR();
@@ -123,13 +158,18 @@ export class FileRepo {
 
 		const sidecar = await SidecarStore.load(stateDir);
 
+		// Filtered rebuild: fold the exclusion digest into the runtime cache_hash
+		// (see cacheHashWithExclusions) so dependent snapshots invalidate.
+		const cacheHash = cacheHashWithExclusions(meta.source_hash, meta.exclusions?.exclusions_hash);
+
 		console.log(
 			`[file-repo] loaded ${groups.length.toLocaleString()} groups; ` +
-				`cache_hash=${meta.source_hash}; sidecar_labels=${sidecar.all().size}`
+				`cache_hash=${cacheHash}; sidecar_labels=${sidecar.all().size}`
 		);
 
-		const repo = new FileRepo(groupsById, orderedIds, meta.source_hash, sidecar, cdnMap);
+		const repo = new FileRepo(groupsById, orderedIds, cacheHash, sidecar, cdnMap);
 		await repo.applyMeetingEligibility(stateDir, opts.meetingMinHumanUtterances);
+		repo.applyIngestCategoryFilter();
 		return repo;
 	}
 

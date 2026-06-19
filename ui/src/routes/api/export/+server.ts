@@ -7,6 +7,7 @@
  */
 
 import { getRepo } from '$lib/server/repo';
+import { degenerateCategories, isDegenerate } from '$lib/server/state/ingest-filter';
 import type { Group } from '$lib/domain/groups';
 
 function encodeGroup(g: Group, cacheHash: string): string {
@@ -45,6 +46,10 @@ function encodeGroup(g: Group, cacheHash: string): string {
 export async function GET() {
 	const repo = await getRepo();
 	const cacheHash = repo.hash;
+	// Export layer of the ingest filter (independent of review navigation): the
+	// final dataset must never carry a group whose latest edit is a degenerate
+	// bin, even if it somehow holds an `include` label. Same policy as the repos.
+	const drop = degenerateCategories();
 	// better-sqlite3's prepared-statement iterator is synchronous and tied to
 	// the DB connection — we run the whole loop inside `start()` so the
 	// cursor opens and closes within one tick, without yielding mid-iteration.
@@ -56,6 +61,7 @@ export async function GET() {
 			try {
 				for (const g of iter) {
 					if (g.label.include_status !== 'include') continue;
+						if (isDegenerate(g, drop)) continue;
 					controller.enqueue(encoder.encode(encodeGroup(g, cacheHash)));
 				}
 				controller.close();
