@@ -70,7 +70,15 @@ export interface ListResponse {
 export interface StatsResponse {
 	total: number;
 	by_status: Record<IncludeStatus, number>;
-	by_category: Array<{ category: string | null; count: number }>;
+	// include/exclude/uncertain are per-category review-decision counts; optional
+	// because snapshots persisted by older builds lack them until a recompute.
+	by_category: Array<{
+		category: string | null;
+		count: number;
+		include?: number;
+		exclude?: number;
+		uncertain?: number;
+	}>;
 	by_ingest_category: Array<{
 		ingest_category: string | null;
 		label_el: string | null;

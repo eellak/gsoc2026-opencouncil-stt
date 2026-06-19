@@ -70,10 +70,19 @@
 			<StatusDistribution counts={stats.by_status} variant="full" />
 		</section>
 
-		<section class="card">
+		<section class="card wide">
 			<h2>{t('statsCategoryAssignments')}</h2>
-			<p class="card-note">{t('statsCategoryAssignmentsHint')}</p>
+			<p class="card-note">{t('statsCategoryAssignmentsHint')} {t('statsCategoryDecisionsHint')}</p>
 			<table>
+				<thead>
+					<tr>
+						<th></th>
+						<th class="count st-include" title={t('include')}>✓</th>
+						<th class="count st-exclude" title={t('exclude')}>✗</th>
+						<th class="count st-uncertain" title={t('uncertain')}>?</th>
+						<th class="count">{t('statsCategoryTotal')}</th>
+					</tr>
+				</thead>
 				<tbody>
 					{#each stats.by_category as row}
 						<tr>
@@ -84,6 +93,9 @@
 									<span class="cat-none">{categoryDisplay(null)}</span>
 								{/if}
 							</td>
+							<td class="count st-include">{row.include !== undefined ? row.include.toLocaleString('el-GR') : '—'}</td>
+							<td class="count st-exclude">{row.exclude !== undefined ? row.exclude.toLocaleString('el-GR') : '—'}</td>
+							<td class="count st-uncertain">{row.uncertain !== undefined ? row.uncertain.toLocaleString('el-GR') : '—'}</td>
 							<td class="count">{row.count.toLocaleString('el-GR')}</td>
 						</tr>
 					{/each}
@@ -175,6 +187,12 @@
 	.wide { grid-column: 1 / -1; }
 	.card-note { margin: -0.25rem 0 0.75rem; font-size: 0.8rem; color: #6b7280; }
 	.cat-row.rejected td:first-child { color: #b91c1c; }
+	thead th { font-size: 0.75rem; font-weight: 600; color: #6b7280; padding: 0.2rem 0; border-bottom: 1px solid #e5e7eb; text-align: left; }
+	thead th.count { text-align: right; }
+	.st-include { color: #166534; }
+	.st-exclude { color: #b91c1c; }
+	.st-uncertain { color: #b45309; }
+	td.st-include, td.st-exclude, td.st-uncertain { padding-left: 0.75rem; }
 	.cat-link { color: #1e40af; text-decoration: none; font-weight: 500; }
 	.cat-link:hover { text-decoration: underline; }
 	.cat-none { color: #94a3b8; font-style: italic; }

@@ -179,6 +179,11 @@ export const strings = {
 		en: 'One utterance can carry multiple categories — totals will exceed the number of reviewed utterances.',
 		el: 'Ένα utterance μπορεί να φέρει πολλές κατηγορίες — τα σύνολα ξεπερνούν τον αριθμό των αξιολογημένων utterances.'
 	},
+	statsCategoryDecisionsHint: {
+		en: '✓/✗/? = include / exclude / uncertain decisions per category.',
+		el: '✓/✗/? = αποφάσεις συμπερίληψης / αποκλεισμού / αβεβαιότητας ανά κατηγορία.'
+	},
+	statsCategoryTotal: { en: 'Total', el: 'Σύνολο' },
 	uncategorized: { en: '— uncategorized —', el: '— χωρίς κατηγορία —' },
 	openInReview: { en: 'Open', el: 'Άνοιγμα' },
 	openInQueue: { en: 'Open queue for this category', el: 'Άνοιγμα queue για αυτή την κατηγορία' },

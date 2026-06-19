@@ -29,6 +29,7 @@ vite.config.ts.timestamp-*
 # File-backed review prototype (codex/file-backed-review-ui)
 /.cache
 /.state
+/.state-backups
 local.db
 
 # Playwright

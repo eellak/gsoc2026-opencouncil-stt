@@ -59,7 +59,10 @@ export async function computeStats(repo: ReviewRepo): Promise<ExtendedStats> {
 	const byStatus: Record<IncludeStatus, number> = {
 		unreviewed: 0, include: 0, exclude: 0, uncertain: 0
 	};
-	const byCategory = new Map<string | null, number>();
+	const byCategory = new Map<
+		string | null,
+		{ count: number; include: number; exclude: number; uncertain: number }
+	>();
 	const byIngestCategory = new Map<string | null, number>();
 	const byEditor = new Map<string | null, number>();
 	const byDuration = new Map<string, number>();
@@ -82,11 +85,21 @@ export async function computeStats(repo: ReviewRepo): Promise<ExtendedStats> {
 		groupCount += 1;
 		if (g.edits.length > 1) multiEditGroups++;
 		byStatus[g.label.include_status] += 1;
+		const status = g.label.include_status;
+		const bumpCategory = (c: string | null) => {
+			let row = byCategory.get(c);
+			if (!row) {
+				row = { count: 0, include: 0, exclude: 0, uncertain: 0 };
+				byCategory.set(c, row);
+			}
+			row.count += 1;
+			if (status !== 'unreviewed') row[status] += 1;
+		};
 		const cats = g.label.error_categories;
 		if (cats.length === 0) {
-			byCategory.set(null, (byCategory.get(null) ?? 0) + 1);
+			bumpCategory(null);
 		} else {
-			for (const c of cats) byCategory.set(c, (byCategory.get(c) ?? 0) + 1);
+			for (const c of cats) bumpCategory(c);
 		}
 		const mkey = `${g.meeting_id ?? ''}|${g.meeting_name ?? ''}|${g.meeting_date ?? ''}`;
 		const cur = byMeeting.get(mkey);
@@ -114,8 +127,8 @@ export async function computeStats(repo: ReviewRepo): Promise<ExtendedStats> {
 		cache_hash: repo.hash,
 		by_status: byStatus,
 		by_category: [...byCategory.entries()]
-			.sort((a, b) => b[1] - a[1])
-			.map(([category, count]) => ({ category, count })),
+			.sort((a, b) => b[1].count - a[1].count)
+			.map(([category, c]) => ({ category, ...c })),
 		by_ingest_category: [...byIngestCategory.entries()]
 			.sort((a, b) => b[1] - a[1])
 			.map(([ingest_category, count]) => ({
