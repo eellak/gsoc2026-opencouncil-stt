@@ -14,8 +14,9 @@
  * cached.
  */
 
-import { error } from '@sveltejs/kit';
+import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { getRepo } from '$lib/server/repo';
 
 const OPENCOUNCIL_BASE = 'https://opencouncil.gr/api/utterance';
 const FETCH_TIMEOUT_MS = 8_000;
@@ -33,6 +34,19 @@ export const GET: RequestHandler = async ({ params, url, fetch }) => {
 
 	const before = clampParam(url.searchParams.get('before'), 10);
 	const after = clampParam(url.searchParams.get('after'), 10);
+
+	// Local-first: serve from the cached transcript index when this meeting is
+	// indexed. Same shape as upstream. null → fall through to the live proxy.
+	const local = (await getRepo()).getContext(id, before, after);
+	if (local) {
+		return json(local, {
+			headers: {
+				'cache-control': 'public, max-age=3600, s-maxage=3600',
+				'x-oc-source': 'local-index'
+			}
+		});
+	}
+
 	const upstream = `${OPENCOUNCIL_BASE}/${encodeURIComponent(id)}/context?before=${before}&after=${after}`;
 
 	const ctrl = new AbortController();

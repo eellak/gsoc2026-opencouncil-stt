@@ -26,16 +26,37 @@
 import Database from 'better-sqlite3';
 import { promises as fs } from 'node:fs';
 import type { CacheMeta, Group } from '$lib/domain/groups';
+import type { TranscriptRow } from './transcript-extract';
+
+/** Per-meeting presence + the separate transcript versioning, written to meta. */
+export interface TranscriptManifest {
+	/** Successfully-indexed meetings (drives per-meeting local-vs-fallback). */
+	meetings: Array<{ city_id: string; meeting_id: string; utt_count: number }>;
+	/** Independent of the CSV/label snapshot hashing — see context-in-index spec. */
+	schema_version: number;
+	manifest_hash: string;
+	build_status: 'complete' | 'partial' | 'absent';
+	failed_count: number;
+}
 
 export interface BuildSqliteInput {
 	groups: Group[];
 	meta: CacheMeta;
 	/** Final on-disk path (the file we'll `fs.rename` into at the end). */
 	outPath: string;
+	/**
+	 * Optional surrounding-context index. When present, rows + manifest are
+	 * written to the `transcript`/`transcript_meeting` tables and transcript meta
+	 * keys. Absent → no transcript tables (runtime falls back to live upstream).
+	 */
+	transcript?: {
+		rows: TranscriptRow[];
+		manifest: TranscriptManifest;
+	};
 }
 
 export async function buildSqlite(input: BuildSqliteInput): Promise<void> {
-	const { groups, meta, outPath } = input;
+	const { groups, meta, outPath, transcript } = input;
 	const tmpPath = `${outPath}.tmp`;
 
 	// Clean any leftover tmp from a previous failed build before opening.
@@ -65,6 +86,31 @@ export async function buildSqlite(input: BuildSqliteInput): Promise<void> {
 
 			CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
 		`);
+
+		if (transcript) {
+			db.exec(`
+				CREATE TABLE transcript (
+					utterance_id TEXT NOT NULL,
+					city_id      TEXT NOT NULL,
+					meeting_id   TEXT NOT NULL,
+					seq          INTEGER NOT NULL,
+					text         TEXT NOT NULL,
+					start        REAL,
+					"end"        REAL,
+					speaker_tag  TEXT,
+					PRIMARY KEY (city_id, meeting_id, utterance_id)
+				);
+				CREATE UNIQUE INDEX idx_transcript_meeting_seq ON transcript(meeting_id, seq);
+				CREATE INDEX idx_transcript_utterance ON transcript(utterance_id);
+
+				CREATE TABLE transcript_meeting (
+					city_id    TEXT NOT NULL,
+					meeting_id TEXT NOT NULL,
+					utt_count  INTEGER NOT NULL,
+					PRIMARY KEY (city_id, meeting_id)
+				);
+			`);
+		}
 
 		const insertGroup = db.prepare(
 			'INSERT INTO groups (utterance_id, meeting_id, city_id, ord, json) VALUES (?, ?, ?, ?, ?)'
@@ -115,10 +161,48 @@ export async function buildSqlite(input: BuildSqliteInput): Promise<void> {
 		if (meta.exclusions) {
 			metaRows.push(['exclusions_hash', meta.exclusions.exclusions_hash]);
 		}
+		// Transcript versioning is intentionally SEPARATE from the CSV source_hash /
+		// exclusions_hash so it never invalidates the (CSV-derived) label snapshots.
+		if (transcript) {
+			const m = transcript.manifest;
+			metaRows.push(
+				['transcript_schema_version', String(m.schema_version)],
+				['transcript_manifest_hash', m.manifest_hash],
+				['transcript_build_status', m.build_status],
+				['transcript_failed_count', String(m.failed_count)]
+			);
+		}
 		const metaTx = db.transaction((rows: Array<[string, string]>) => {
 			for (const [k, v] of rows) insertMeta.run(k, v);
 		});
 		metaTx(metaRows);
+
+		if (transcript) {
+			const insertTranscript = db.prepare(
+				'INSERT INTO transcript (utterance_id, city_id, meeting_id, seq, text, start, "end", speaker_tag) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+			);
+			const insertTrMeeting = db.prepare(
+				'INSERT INTO transcript_meeting (city_id, meeting_id, utt_count) VALUES (?, ?, ?)'
+			);
+			const trTx = db.transaction(() => {
+				for (const r of transcript.rows) {
+					insertTranscript.run(
+						r.utterance_id,
+						r.city_id,
+						r.meeting_id,
+						r.seq,
+						r.text,
+						r.start,
+						r.end,
+						r.speaker_tag
+					);
+				}
+				for (const mm of transcript.manifest.meetings) {
+					insertTrMeeting.run(mm.city_id, mm.meeting_id, mm.utt_count);
+				}
+			});
+			trTx();
+		}
 
 		// Force a full checkpoint so WAL/SHM are merged before close.
 		// Runtime opens read-only and any leftover -wal/-shm files would be

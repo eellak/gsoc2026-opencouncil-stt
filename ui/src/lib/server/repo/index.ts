@@ -21,6 +21,7 @@ import type {
 } from '$lib/domain/groups';
 import type { IncludeStatus } from '$lib/domain/types';
 import type { UserCounts } from '../state/sidecar';
+import type { LocalContextResult } from '../cache/transcript-extract';
 
 export interface ReviewRepo {
 	readonly hash: string;
@@ -57,6 +58,12 @@ export interface ReviewRepo {
 	 *  and the review filter queue. */
 	idsByErrorCategory(category: string): string[];
 	idsByStatus(status: IncludeStatus): string[];
+	/**
+	 * Local surrounding context for an utterance, or null to fall back to the
+	 * live upstream /context proxy. sqlite serves it from the transcript table
+	 * when present + current; file-repo always returns null.
+	 */
+	getContext(utterance_id: string, before: number, after: number): LocalContextResult | null;
 	flush(): Promise<void>;
 }
 
