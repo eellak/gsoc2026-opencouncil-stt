@@ -395,6 +395,12 @@
 	let contextData = $state<MeetingContext | null>(null);
 	let prevRadius = $state(5);
 	let nextRadius = $state(5);
+	// Bumped by the in-panel "Retry" button to re-run the context effect. Failed
+	// lookups are evicted from the cache, so the re-run actually re-fetches.
+	let retryNonce = $state(0);
+	function retryContext() {
+		retryNonce++;
+	}
 
 	// Reset context radii when navigating to a new utterance
 	$effect(() => {
@@ -407,6 +413,7 @@
 		const id = currentId;
 		const pr = prevRadius;
 		const nr = nextRadius;
+		retryNonce; // re-run this effect when the reviewer clicks "Retry"
 		let cancelled = false;
 
 		// Avoid the "loading…" flicker when this exact context window is already
@@ -822,6 +829,8 @@
 			utterances={contextData?.prev.slice(-prevRadius) ?? []}
 			label={t('contextBefore')}
 			state={contextState}
+			errorKind={contextData?.error_kind ?? null}
+			onRetry={retryContext}
 			hasMore={!!contextData && contextData.prev.length >= prevRadius}
 			onLoadMore={() => (prevRadius += 5)}
 			loadMoreAtTop
@@ -927,6 +936,8 @@
 			utterances={contextData?.next.slice(0, nextRadius) ?? []}
 			label={t('contextAfter')}
 			state={contextState}
+			errorKind={contextData?.error_kind ?? null}
+			onRetry={retryContext}
 			hasMore={!!contextData && contextData.next.length >= nextRadius}
 			onLoadMore={() => (nextRadius += 5)}
 		/>
