@@ -150,3 +150,86 @@ describe('SqliteRepo.getContext — no transcript table', () => {
 		expect(repo.getContext('u2', 2, 2)).toBeNull();
 	});
 });
+
+// meeting_id slugs collide across cities — context must be scoped by (city, meeting).
+describe('SqliteRepo.getContext — colliding meeting_id across cities', () => {
+	async function setupCollision(): Promise<Fixture> {
+		const root = await mkdtemp(join(tmpdir(), 'tr-collide-'));
+		const cacheDir = join(root, 'cache');
+		const stateDir = join(root, 'state');
+		await fs.mkdir(cacheDir, { recursive: true });
+		await fs.mkdir(stateDir, { recursive: true });
+
+		const mk = (city: string, n: number): TranscriptRow => ({
+			utterance_id: `${city}-${n}`,
+			city_id: city,
+			meeting_id: 'shared', // SAME slug in both cities
+			seq: n,
+			text: `${city}-text-${n}`,
+			start: n,
+			end: n + 1,
+			speaker_tag: 't'
+		});
+		const rows = [mk('athens', 0), mk('athens', 1), mk('patra', 0), mk('patra', 1)];
+
+		const csv = (city: string): V2CsvRow & { csv_row: number } => ({
+			edit_id: `e-${city}`,
+			utterance_id: `${city}-1`,
+			edit_timestamp: '2026-05-01T00:00:00Z',
+			edit_updated_at: '',
+			before_text: 'x',
+			after_text: 'y',
+			edited_by: 'user',
+			utterance_start: '1',
+			utterance_end: '2',
+			audio_url: 'https://example.com/a.mp3',
+			youtube_url: '',
+			meeting_name: 'm',
+			meeting_date: '2026-05-01',
+			meeting_id: 'shared',
+			city_id: city,
+			csv_row: 0
+		});
+		const { groups } = buildGroups([csv('athens'), csv('patra')]);
+		const meta: CacheMeta = {
+			cache_version: 1,
+			source_csv_path: 'synthetic.csv',
+			source_size: 0,
+			source_mtime_ms: 0,
+			source_hash: 'collide-hash',
+			generated_at: new Date().toISOString(),
+			group_count: groups.length,
+			edit_count: groups.length,
+			missing_utterance_id_count: 0
+		};
+		await buildSqlite({
+			groups,
+			meta,
+			outPath: join(cacheDir, 'groups.v1.sqlite'),
+			transcript: {
+				rows,
+				manifest: {
+					meetings: [
+						{ city_id: 'athens', meeting_id: 'shared', utt_count: 2 },
+						{ city_id: 'patra', meeting_id: 'shared', utt_count: 2 }
+					],
+					schema_version: TRANSCRIPT_SCHEMA_VERSION,
+					manifest_hash: 'collide',
+					build_status: 'complete',
+					failed_count: 0
+				}
+			}
+		});
+		return { cacheDir, stateDir };
+	}
+
+	it('builds (no UNIQUE collision) and scopes context to the right city', async () => {
+		fx = await setupCollision();
+		const repo = await load(fx);
+		const ctx = repo.getContext('athens-1', 2, 2)!;
+		expect(ctx.meeting).toEqual({ id: 'shared', cityId: 'athens' });
+		// Only athens-0 — never patra-0, which shares meeting_id 'shared' + seq 0.
+		expect(ctx.before.map((u) => u.id)).toEqual(['athens-0']);
+		expect(ctx.after).toEqual([]);
+	});
+});

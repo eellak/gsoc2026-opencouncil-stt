@@ -92,7 +92,7 @@ export class SqliteRepo {
 	// --- Surrounding-context index (optional table; null when absent/stale) ---
 	private ctxAnchorStmt: Statement<[string]> | null = null;
 	private ctxMeetingStmt: Statement<[string, string]> | null = null;
-	private ctxSliceStmt: Statement<[string, number, number]> | null = null;
+	private ctxSliceStmt: Statement<[string, string, number, number]> | null = null;
 
 	/**
 	 * Wire up the transcript-context statements iff the table exists AND its
@@ -125,9 +125,10 @@ export class SqliteRepo {
 		// Inclusive window around the anchor seq; anchor row excluded by the caller
 		// (by seq, not id, so a duplicate id can't slip through). ORDER BY seq keeps
 		// both before/after chronological ascending — matches the upstream contract.
+		// Scoped by (city_id, meeting_id): meeting_id slugs collide across cities.
 		this.ctxSliceStmt = this.db.prepare(
 			`SELECT utterance_id, text, start, "end", speaker_tag, seq
-			 FROM transcript WHERE meeting_id = ? AND seq >= ? AND seq <= ? ORDER BY seq`
+			 FROM transcript WHERE city_id = ? AND meeting_id = ? AND seq >= ? AND seq <= ? ORDER BY seq`
 		);
 	}
 
@@ -149,6 +150,7 @@ export class SqliteRepo {
 		const b = Math.max(0, Math.floor(Number.isFinite(before) ? before : 0));
 		const a = Math.max(0, Math.floor(Number.isFinite(after) ? after : 0));
 		const rows = this.ctxSliceStmt.all(
+			anchor.city_id,
 			anchor.meeting_id,
 			anchor.seq - b,
 			anchor.seq + a
