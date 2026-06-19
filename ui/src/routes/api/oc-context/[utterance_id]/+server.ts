@@ -36,15 +36,20 @@ export const GET: RequestHandler = async ({ params, url, fetch }) => {
 	const after = clampParam(url.searchParams.get('after'), 10);
 
 	// Local-first: serve from the cached transcript index when this meeting is
-	// indexed. Same shape as upstream. null → fall through to the live proxy.
-	const local = (await getRepo()).getContext(id, before, after);
-	if (local) {
-		return json(local, {
-			headers: {
-				'cache-control': 'public, max-age=3600, s-maxage=3600',
-				'x-oc-source': 'local-index'
-			}
-		});
+	// indexed. Same shape as upstream. null OR any repo/DB error → fall through to
+	// the live proxy, so a local-index problem can never break context entirely.
+	try {
+		const local = (await getRepo()).getContext(id, before, after);
+		if (local) {
+			return json(local, {
+				headers: {
+					'cache-control': 'public, max-age=3600, s-maxage=3600',
+					'x-oc-source': 'local-index'
+				}
+			});
+		}
+	} catch (err) {
+		console.warn('[oc-context] local lookup failed, falling back to upstream', err);
 	}
 
 	const upstream = `${OPENCOUNCIL_BASE}/${encodeURIComponent(id)}/context?before=${before}&after=${after}`;

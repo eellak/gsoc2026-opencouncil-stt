@@ -72,7 +72,13 @@ async function liveFetchMeeting(m: MeetingRef): Promise<FetchOutcome> {
 		if (!resp.ok) return { ok: false, status: resp.status };
 		const cl = resp.headers.get('content-length');
 		if (cl && Number(cl) > MAX_BODY_BYTES) return { ok: false, status: 413 };
-		return { ok: true, status: 200, json: await resp.json() };
+		// Malformed JSON on a 200 is a PERMANENT error (don't retry) — distinct
+		// from the network/timeout failures the outer catch handles as transient.
+		try {
+			return { ok: true, status: 200, json: await resp.json() };
+		} catch {
+			return { ok: false, status: 422 };
+		}
 	} catch {
 		return { ok: false, status: 0 }; // network/timeout → transient
 	} finally {
@@ -112,7 +118,13 @@ async function loadMeetingJson(
 		}
 		const out = await fetchMeeting(m);
 		if (out.ok && out.json !== undefined) {
-			await fs.writeFile(blobPath, JSON.stringify(out.json));
+			// Blob caching is an optimisation — a write failure (disk full, perms)
+			// must NOT abort the whole build, just lose resumability for this one.
+			try {
+				await fs.writeFile(blobPath, JSON.stringify(out.json));
+			} catch (err) {
+				log(`[transcript] ${m.city_id}/${m.meeting_id} blob write failed (non-fatal): ${err}`);
+			}
 			return out.json;
 		}
 		if (isPermanent(out.status)) {
