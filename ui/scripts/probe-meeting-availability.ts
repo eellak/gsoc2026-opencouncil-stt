@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env tsx
 /**
  * Probe each meeting against the live OpenCouncil API to flag PRIVATE meetings.
  *
