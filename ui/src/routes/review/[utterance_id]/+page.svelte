@@ -187,11 +187,14 @@
 	const currentId = $derived(item.utterance_id);
 
 	// Warm-window radius for audio + transcript prefetch. Forward-biased and
-	// skip-aware (see queue.prefetchWindow): the old raw ±10 fired ~20 CDN range
-	// requests per hop, saturating the browser's ~6 conn/host limit on fast/
-	// consecutive nav (the >10s "not ready" symptom). 6 ahead / 2 behind cuts the
-	// volume and follows the actual nav path so we warm what we land on.
-	const PREFETCH_FORWARD = 6;
+	// skip-aware (see queue.prefetchWindow) so we warm what we actually land on.
+	// The audio pool heavy-preloads only current + the immediate next target
+	// (preload="auto"); the rest of this window is kept as cheap metadata-only
+	// elements. Each "auto" element downloads its whole multi-hour meeting mp3, so
+	// a wide window saturated slow links (the production "prefetch not working /
+	// loads on nav" symptom was actually over-prefetch starvation). 3 ahead / 2
+	// behind covers the next landing while keeping background bandwidth bounded.
+	const PREFETCH_FORWARD = 3;
 	const PREFETCH_BACK = 2;
 
 	// Context (transcript) prefetch uses a SMALLER window than audio. Each hop
