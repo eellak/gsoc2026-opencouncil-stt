@@ -31,6 +31,8 @@
  *     element is reused later.
  */
 
+import { computePoolPolicy } from './audio-pool-policy';
+
 export interface Neighbour {
 	utterance_id: string;
 	url: string;
@@ -44,9 +46,13 @@ interface PoolItem {
 	start: number;
 }
 
-// Cap. Big enough to hold current + 2×radius neighbours with headroom.
-// At radius=10 that's 21 elements; 24 keeps a small buffer against churn.
-const MAX_POOL = 24;
+// How many of the highest-priority slots (current + first N forward-ordered
+// neighbours) get the bandwidth-heavy preload="auto". The page passes
+// neighbours forward-first, so neighbour[0] is the resolved next target. Keep
+// this small: on a slow link every "auto" element downloads its whole
+// multi-hour meeting mp3, and more than ~current+next starves the visible
+// player. Everything else kept is metadata-only.
+const AUTO_NEIGHBOURS = 1;
 
 class AudioPool {
 	private items = new Map<string, PoolItem>();
@@ -87,18 +93,20 @@ class AudioPool {
 	}
 
 	/**
-	 * Make `current` the visible/active audio. Ensure pool elements exist
-	 * for every neighbour. Evict beyond MAX_POOL.
+	 * Make `current` the visible/active audio, warm the resolved neighbours, and
+	 * evict everything else. Retention + preload tiers come from
+	 * `computePoolPolicy` — see audio-pool-policy.ts for why we keep only
+	 * current+neighbours and heavy-preload just current+next on slow links.
 	 */
 	setActive(current: Neighbour, neighbours: Neighbour[]): void {
 		this.ensureHiddenHost();
 		const host = this.hiddenHost;
 		if (!host) return;
 
-		// (1) Get-or-create the element for `current`.
+		// (1) Get-or-create the element for `current` (always preload="auto").
 		let active = this.items.get(current.utterance_id);
 		if (!active) {
-			active = this.createItem(current.url, current.start);
+			active = this.createItem(current.url, current.start, 'auto');
 			this.items.set(current.utterance_id, active);
 		} else if (active.url !== current.url) {
 			// The URL changed for this id (rare — e.g. mirror reassignment). Reset.
@@ -107,38 +115,72 @@ class AudioPool {
 			active.start = current.start;
 		}
 
-		// (2) Demote the previously-active element if it's a different one.
+		// (2) Retention + preload-tier policy. The page passes neighbours
+		// forward-first, so neighbour[0] is the resolved next target → it (plus
+		// current) earns the bandwidth-heavy preload="auto"; everything else kept
+		// is metadata-only so background warms can't saturate a slow link. The
+		// policy protects exactly the resolved set, so we never evict the element
+		// we're about to land on.
+		const neighbourIds = neighbours
+			.map((n) => n.utterance_id)
+			.filter((id) => id !== current.utterance_id);
+		const policy = computePoolPolicy(
+			current.utterance_id,
+			neighbourIds,
+			[...this.items.keys()],
+			AUTO_NEIGHBOURS
+		);
+
+		// (3) Ensure neighbour elements exist, created at their policy tier.
+		for (const n of neighbours) {
+			if (n.utterance_id === current.utterance_id) continue;
+			if (this.items.has(n.utterance_id)) continue;
+			const preload = policy.auto.has(n.utterance_id) ? 'auto' : 'metadata';
+			this.items.set(n.utterance_id, this.createItem(n.url, n.start, preload));
+		}
+
+		// (4) Demote the previously-active element if it's a different one, then
+		// promote the new active. Moving an element across the DOM keeps its
+		// loaded bytes and readyState.
 		if (this.activeId && this.activeId !== current.utterance_id) {
 			const prev = this.items.get(this.activeId);
 			if (prev) this.demote(prev.el);
 		}
-
-		// (3) Promote the new active. The element keeps its loaded bytes and
-		// readyState — moving it across the DOM doesn't reset the media.
 		this.promote(active.el);
 		this.activeId = current.utterance_id;
 		this.state.activeEl = active.el;
 		this.state.activeId = current.utterance_id;
 		this.state.generation += 1;
 		// Test hook: e2e measures latency by waiting for this counter to
-		// bump after a j press. The visible <audio> doesn't always fire a
-		// fresh `loadstart` (when the pool already had the element loaded,
-		// promotion is just class+host shuffle), so a DOM event isn't
-		// reliable — the generation counter is.
+		// bump after a nav. The visible <audio> doesn't always fire a fresh
+		// `loadstart` (when the pool already had the element loaded, promotion is
+		// just class+host shuffle), so a DOM event isn't reliable — the
+		// generation counter is.
 		if (typeof window !== 'undefined') {
 			(window as unknown as { __audioPoolGeneration?: number }).__audioPoolGeneration = this.state.generation;
 		}
 
-		// (4) Ensure neighbour elements exist (warm side).
-		for (const n of neighbours) {
-			if (n.utterance_id === current.utterance_id) continue;
-			if (this.items.has(n.utterance_id)) continue;
-			const item = this.createItem(n.url, n.start);
-			this.items.set(n.utterance_id, item);
+		// (5) Apply preload tiers idempotently to kept neighbours. Skip current —
+		// promote() already pinned it to "auto" and it must never be downgraded.
+		for (const id of policy.keep) {
+			if (id === current.utterance_id) continue;
+			const it = this.items.get(id);
+			if (!it) continue;
+			const want = policy.auto.has(id) ? 'auto' : 'metadata';
+			if (it.el.preload !== want) it.el.preload = want;
 		}
 
-		// (5) Evict.
-		this.evict(current.utterance_id, neighbours);
+		// (6) Evict everything not kept — passed/stale elements that would
+		// otherwise keep downloading whole meeting files in the background.
+		for (const id of policy.evict) {
+			const it = this.items.get(id);
+			if (!it) continue;
+			it.el.src = '';
+			it.el.removeAttribute('src');
+			it.el.load(); // cancels in-flight Range requests
+			it.el.remove();
+			this.items.delete(id);
+		}
 	}
 
 	/** Read-only accessor for the active element (used by .ts callers without rune support). */
@@ -161,9 +203,9 @@ class AudioPool {
 		this.hiddenHost = div;
 	}
 
-	private createItem(url: string, start: number): PoolItem {
+	private createItem(url: string, start: number, preload: 'auto' | 'metadata'): PoolItem {
 		const el = document.createElement('audio');
-		el.preload = 'auto';
+		el.preload = preload;
 		// crossOrigin is intentionally NOT set — see audio-source.ts for the
 		// no-CORS rationale; opencouncil's CDN doesn't return ACAO.
 		if (url) el.src = url;
@@ -185,6 +227,9 @@ class AudioPool {
 	}
 
 	private promote(el: HTMLAudioElement): void {
+		// The visible player is always heavy-preloaded; pin it so a prior
+		// metadata tier (it may have been a warm neighbour) is upgraded.
+		el.preload = 'auto';
 		el.classList.add('native-player');
 		el.controls = true;
 		el.style.display = '';
@@ -197,26 +242,15 @@ class AudioPool {
 		} catch {
 			/* ignore */
 		}
+		// No longer the visible player → drop to metadata so a passed clip stops
+		// downloading its whole meeting file. setActive's tier pass re-promotes it
+		// to auto if it's still the resolved next target.
+		el.preload = 'metadata';
 		el.classList.remove('native-player');
 		el.controls = false;
 		// Keep the element alive — its bytes are why we're here. Just park
 		// it back in the hidden host.
 		if (this.hiddenHost) this.hiddenHost.appendChild(el);
-	}
-
-	private evict(currentId: string, neighbours: Neighbour[]): void {
-		const keep = new Set<string>([currentId, ...neighbours.map((n) => n.utterance_id)]);
-		// Walk insertion order — Map preserves it, so oldest non-keep first.
-		for (const [id, item] of [...this.items.entries()]) {
-			if (this.items.size <= MAX_POOL) break;
-			if (keep.has(id)) continue;
-			if (id === this.activeId) continue;
-			item.el.src = '';
-			item.el.removeAttribute('src');
-			item.el.load(); // cancels in-flight Range requests
-			item.el.remove();
-			this.items.delete(id);
-		}
 	}
 
 	/** Test/debug only. */
