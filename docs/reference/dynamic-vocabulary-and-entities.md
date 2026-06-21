@@ -25,12 +25,32 @@ Stable domain terms can help both Whisper fine-tuning and LLM correction. Volati
 
 ## Current OpenCouncil Behavior
 
-The transcription request already sends dynamic hints to Gladia:
+Confirmed 2026-06-20 via `deepwiki-research` against `schemalabz/opencouncil`:
+
+The transcription request already sends dynamic hints to Gladia
+(`src/lib/tasks/transcribe.ts`):
 
 - `customVocabulary`: `city.name`, person names, and party names, split into words.
 - `customPrompt`: Greek prompt containing the municipality name and meeting date.
 
-There is no separate glossary file today. The vocabulary source is the live OpenCouncil DB.
+The same DB-derived context (`cityName`, `administrativeBodyName`,
+`partiesWithPeople`, `topicLabels`) is also forwarded to the **fixTranscript LLM**
+via `getRequestOnTranscriptRequestBody()`.
+
+**The gap (the feature to build):** there is **no dedicated glossary / acronym /
+custom-vocabulary Prisma model**, and **no admin UI** to manage per-city terms.
+Vocabulary is derived *implicitly* from `Person` / `Party` / `City` names only.
+Acronyms (ΕΕΤΑ, ΚΕΔΕ, ΔΕΥΑΟ…), toponyms beyond agenda titles, organisations, and
+legal terms are **not** captured anywhere — so the fix LLM never sees them.
+
+**Scope for us (decided 2026-06-20):** the value we invest in is feeding a
+curated global + per-city term store into the
+[fix-task prompt](fix-task-prompt-v2.md#key-finding-for-our-work) and measuring
+whether it catches more errors. The STT-side path (`customVocabulary`/Gladia) is
+**out of scope** — Gladia is being replaced (our own finetuned Whisper later), so
+optimising its custom vocabulary is not worth our time. The glossary store stays
+provider-agnostic, so a future STT can read it too, but we don't wire or measure
+that.
 
 Implication for evaluation: domain WER should distinguish terms already available to Gladia through `customVocabulary` from terms missing from the current DB-derived vocabulary.
 

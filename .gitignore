@@ -64,3 +64,12 @@ ui/output-*.json
 ui/response.json
 ui/15a4ef.json
 ui/e9e1d5.json
+
+# Eval harness (fix-task) — venv, large intermediates, run logs
+.venv-eval/
+data/eval/
+eval/run.log
+eval/run_tmux.log
+__pycache__/
+*.pyc
+eval/run_resume.log

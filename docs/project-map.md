@@ -22,6 +22,8 @@ This is the working structure for the OpenCouncil ASR dataset exploration projec
 
 - [Exploration UI spec](specs/exploration-ui.md): prototype UI behavior, local labels, and stats.
 - [Local data model](specs/local-data-model.md): local records/tables for CSV corrections, cached JSON, matches, labels, and history.
+- [Fix-task improvement loop](specs/fix-task-improvement-loop.md): Karpathy-style auto-research to improve the LLM transcript-fix prompt.
+- [Fix-task eval harness](specs/fix-task-eval-harness.md): text-only eval plan (chains, splits, layered scoring, glossary A/B, routing, mini-PC offload).
 - [UI prototype](../ui/README.md): implemented SvelteKit review app, CSV ingest, Supabase-backed review state, and export behavior.
 
 ## Runbooks
@@ -38,6 +40,7 @@ This is the working structure for the OpenCouncil ASR dataset exploration projec
 - [Audio segmentation](reference/audio-segmentation.md): how `audio_url`, timestamps, and corrected text can become training examples.
 - [Latest-per-utterance report](../data/reports/latest-per-utterance.md): why the live DB keeps one correction per utterance.
 - [Dynamic vocabulary and entities](reference/dynamic-vocabulary-and-entities.md): how municipal names, people, places, acronyms, and legal terms should feed the post-correction stage.
+- [Fix-task prompt v2 (verbatim)](reference/fix-task-prompt-v2.md): the exact current fixTranscript system + user prompt, captured via deepwiki.
 - [Mentor meeting questions](mentor-meeting-questions.md): concrete questions to resolve before implementation.
 - [OpenCouncil meeting JSON](reference/opencouncil-meeting-json.md): shape of the large meeting JSON endpoint and how it can be used to match CSV corrections to utterances.
 
