@@ -93,6 +93,11 @@ def main() -> None:
     cats = sorted({r["category"] for r in recs})
     overall_b = _mean([r["baseline"]["edit_application"] for r in recs]) if recs else 0
     overall_g = _mean([r["glossary"]["edit_application"] for r in recs]) if recs else 0
+    # product metrics: human-intervention rate (1 - normalized exact) and WER
+    hir_b = 1 - _mean([r["baseline"]["normalized_exact"] for r in recs]) if recs else 0
+    hir_g = 1 - _mean([r["glossary"]["normalized_exact"] for r in recs]) if recs else 0
+    wer_b = _mean([r["baseline"].get("wer", 0) for r in recs]) if recs else 0
+    wer_g = _mean([r["glossary"].get("wer", 0) for r in recs]) if recs else 0
 
     # ---- timeline html ----
     kind_color = {"milestone": "#1a7f37", "bugfix": "#bc4c00", "incident": "#cf222e",
@@ -237,6 +242,15 @@ On-box <code>claude -p</code> (sonnet), OAuth. Generated {gen_time}.</p>
   <div class="kpi"><div class="v">{overall_b*100:.1f}%</div><div class="l">overall edit-applied · baseline</div></div>
   <div class="kpi"><div class="v">{overall_g*100:.1f}%</div><div class="l">overall edit-applied · glossary</div></div>
   <div class="kpi"><div class="v" style="color:{'#3fb950' if overall_g>=overall_b else '#f85149'}">{(overall_g-overall_b)*100:+.1f} pp</div><div class="l">glossary lift (overall)</div></div>
+</div>
+
+<p class="muted">Product metrics — <b>HIR</b> = human-intervention rate (fraction of utterances still needing a human edit; lower better); <b>WER</b> = word error rate vs the human-final text.</p>
+<div class="cards">
+  <div class="kpi"><div class="v">{hir_b*100:.1f}%</div><div class="l">HIR · baseline</div></div>
+  <div class="kpi"><div class="v">{hir_g*100:.1f}%</div><div class="l">HIR · glossary</div></div>
+  <div class="kpi"><div class="v" style="color:{'#3fb950' if hir_g<=hir_b else '#f85149'}">{(hir_b-hir_g)*100:+.1f} pp</div><div class="l">HIR reduction (glossary)</div></div>
+  <div class="kpi"><div class="v">{wer_b:.3f}</div><div class="l">WER · baseline</div></div>
+  <div class="kpi"><div class="v">{wer_g:.3f}</div><div class="l">WER · glossary</div></div>
 </div>
 
 <h2>Timeline</h2>

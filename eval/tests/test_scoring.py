@@ -72,3 +72,19 @@ def test_retaining_error_while_adding_fix_is_not_full_credit():
     # model keeps the wrong token AND appends the right one — partial, not 1.0
     s = score_pair(input_raw="να γίνη", model_output="να γίνη γίνει", gold="να γίνει")
     assert s["edit_application"] < 1.0
+
+
+def test_wer_zero_on_match():
+    s = score_pair(input_raw="να γίνη", model_output="να γίνει", gold="να γίνει")
+    assert s["wer"] == pytest.approx(0.0)
+
+
+def test_wer_one_substitution():
+    # 1 substitution over a 3-token reference
+    s = score_pair(input_raw="ο δήμος είναι", model_output="ο δήμος ήταν", gold="ο δήμος είναι")
+    assert s["wer"] == pytest.approx(1 / 3)
+
+
+def test_wer_full_on_empty_output():
+    s = score_pair(input_raw="ναι", model_output="", gold="ναι")
+    assert s["wer"] == pytest.approx(1.0)
