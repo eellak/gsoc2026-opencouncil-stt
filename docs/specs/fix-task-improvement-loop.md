@@ -44,6 +44,8 @@ Model: a **Claude** model for the fix task (simple to wire up).
   removed Apr 2026).
 - The recent change Christos mentioned = commit **`4624bac1`** (2026-06-11),
   *"feat: retune fixTranscript for Scribe v2 clean-read output"* — task version 2.
+- **Verbatim prompt text captured** (2026-06-20):
+  [fix-task-prompt-v2.md](../reference/fix-task-prompt-v2.md).
 - **Structure of the current prompt:**
   - Input: one speaker segment as numbered lines; output the same lines, same
     count, no merge/split/reorder (timestamps ride on boundaries). Up to 3 retries
