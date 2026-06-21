@@ -16,6 +16,8 @@ import re
 import unicodedata
 from collections import Counter
 
+from rapidfuzz.distance import Levenshtein
+
 _PUNCT_RE = re.compile(r"[^\w\s]", flags=re.UNICODE)
 _WS_RE = re.compile(r"\s+", flags=re.UNICODE)
 
@@ -91,9 +93,17 @@ def score_pair(input_raw: str, model_output: str, gold: str) -> dict:
         None, (model_output or "").strip(), (gold or "").strip()
     ).ratio()
 
+    # Word error rate of the corrected output vs the human-final gold (token-level,
+    # on the normalised forms). Lower is better; this is the ASR-style error metric.
+    if ng:
+        wer = Levenshtein.distance(nm, ng) / len(ng)
+    else:
+        wer = 0.0 if not nm else 1.0
+
     return {
         "normalized_exact": normalized_exact,
         "edit_application": edit_application,
         "overcorrection": overcorrection,
         "surface_fidelity": surface_fidelity,
+        "wer": wer,
     }

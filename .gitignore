@@ -73,3 +73,6 @@ eval/run_tmux.log
 __pycache__/
 *.pyc
 eval/run_resume.log
+eval/loop*.log
+eval/pool*.log
+eval/val*.log

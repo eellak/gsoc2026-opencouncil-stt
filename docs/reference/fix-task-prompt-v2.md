@@ -84,5 +84,11 @@ The only term-grounding is the party roster + agenda titles. Acronyms (ΕΕΤΑ,
 
 This is the headroom the [improvement loop](../specs/fix-task-improvement-loop.md)
 targets, and the hook for the
-[dynamic-vocabulary feature](dynamic-vocabulary-and-entities.md): a per-city +
-global glossary block injected here is the highest-leverage prompt change.
+[dynamic-vocabulary feature](dynamic-vocabulary-and-entities.md).
+
+**Caveat from our eval (2026-06-21):** a per-city + global glossary block helps
+**only named_entity** (+9.9pp) and, injected naively (dump-all), is *net-negative*
+on HIR (+1.9pp worse) via retrieval-noise overcorrection. It is leverage **only
+when scoped** — precise per-utterance retrieval + entity-only instruction +
+anti-overcorrection guardrail. See
+[empirical findings](dynamic-vocabulary-and-entities.md#empirical-findings-eval-harness-2026-06-21).

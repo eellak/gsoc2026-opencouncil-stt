@@ -54,6 +54,53 @@ that.
 
 Implication for evaluation: domain WER should distinguish terms already available to Gladia through `customVocabulary` from terms missing from the current DB-derived vocabulary.
 
+## Empirical findings (eval harness, 2026-06-21)
+
+Measured on our text-only fix-task eval (1000-row stratified A/B + 100-row
+segment proxy, sonnet; verbatim task-v2 prompt). See
+[fix-task eval harness](../specs/fix-task-eval-harness.md).
+
+A naively injected global glossary block is **net-negative**:
+
+| effect | result |
+| --- | --- |
+| named_entity (names/orgs/places) | **+9.9pp** correction rate (A/B); **+11pp** in segments (36.8%→47.9%) |
+| acronym_abbreviation | −6.5pp |
+| number_date | −6.0pp |
+| accent/morph | −5.9pp |
+| **HIR overall** | **+1.9pp (worse)** — 60.0% → 61.9% |
+| WER overall | 0.153 → 0.151 (flat) |
+
+On the harder dev split (42 residual rows, sonnet) `v1_glossary` scored **identical**
+to baseline (HIR 0.8095, overcorrection 0.03 both) — no gain.
+
+**Why:** dumping terms into the prompt invites retrieval-noise overcorrection —
+the model bends an unrelated but phonetically-near word toward a glossary entry.
+The named_entity win is real; it is just swamped by harm elsewhere.
+
+### Is it needed? — current verdict
+
+**Conditionally yes, scoped — not as a global dump.** A glossary is worth shipping
+only if it is shaped to keep the named_entity win without the collateral damage:
+
+- **Precise per-utterance retrieval, not dump-all.** Only surface terms that fuzzy-match
+  a token in the current utterance (rapidfuzz; length ≥ 4 guard; high cutoff
+  ~88/90 word/phrase). A whole-list block is what caused the regression.
+- **Scope the instruction to name/entity normalisation only.** The block must say
+  "use ONLY to fix a word that is clearly the same name misspelled — never force an
+  unrelated word to match the list" (the seed `v1_glossary`/`v4_combo` wording).
+- **Pair with an anti-overcorrection guardrail** in the prompt (change as few words
+  as possible) to offset the retrieval-noise harm.
+- **Type the entries** (acronym / toponym / org / legal / person / place) and carry
+  ASR-misspelling aliases — retrieval against aliases is more precise than against
+  surface forms alone.
+
+Open question (pending): whether the *refined* glossary block (precise retrieval +
+guardrail) beats baseline HIR on the production model. Being measured now via the
+[improvement loop](../specs/fix-task-improvement-loop.md) (codex gpt-5.5-low
+selection → sonnet validation). Until that confirms a net HIR drop, treat the
+glossary as an **entity-only** assist, not a global correctness lever.
+
 ## Proposed Vocabulary Layers
 
 1. Global civic vocabulary: terms common across Greek municipal councils.
