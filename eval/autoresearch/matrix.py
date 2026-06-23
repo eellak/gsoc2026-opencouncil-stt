@@ -164,19 +164,48 @@ def extract_fix(raw: str):
     return lines[0] if len(lines) == 1 else None
 
 
-def run_llm_stage(rows, src_hyps, fix_fn):
+def run_llm_stage(rows, src_hyps, fix_fn, cache_path=None, log=None):
     """Apply the LLM fix-task per utterance over src_hyps. fix_fn(city, hyp)->raw.
-    Returns (hyps, failures); unparseable outputs are recorded, never guessed."""
+    Returns (hyps, failures); unparseable outputs are recorded, never guessed.
+
+    If cache_path is given, every result is appended to a JSONL immediately and a
+    restart skips already-done uids. fix_fn may raise (e.g. OAuth quota); whatever
+    was cached survives, the exception propagates, and a re-run resumes."""
+    import json
     hyps, failures = {}, []
-    for row in rows:
-        uid = row["utterance_id"]
-        if uid not in src_hyps or src_hyps[uid] is None:
-            continue
-        cand = extract_fix(fix_fn(row["city"], src_hyps[uid]))
-        if cand is None:
+    done = {}
+    if cache_path is not None and Path(cache_path).exists():
+        for l in Path(cache_path).open():
+            if l.strip():
+                rec = json.loads(l)
+                done[rec["uid"]] = rec
+    for uid, rec in done.items():
+        if rec.get("fail"):
             failures.append(uid)
-        else:
-            hyps[uid] = cand
+        elif rec.get("hyp") is not None:
+            hyps[uid] = rec["hyp"]
+    fout = open(cache_path, "a") if cache_path is not None else None
+    try:
+        n = 0
+        for row in rows:
+            uid = row["utterance_id"]
+            if uid not in src_hyps or src_hyps[uid] is None or uid in done:
+                continue
+            cand = extract_fix(fix_fn(row["city"], src_hyps[uid]))
+            if cand is None:
+                failures.append(uid)
+            else:
+                hyps[uid] = cand
+            if fout:
+                fout.write(json.dumps({"uid": uid, "hyp": cand, "fail": cand is None},
+                                      ensure_ascii=False) + "\n")
+                fout.flush()
+            n += 1
+            if log and n % 20 == 0:
+                log(f"      llm stage: +{n} new calls")
+    finally:
+        if fout:
+            fout.close()
     return hyps, failures
 
 
@@ -319,32 +348,54 @@ def main():
     model = get_peft_model(base, LoraConfig(
         r=8, lora_alpha=16, target_modules=["q_proj", "v_proj"], lora_dropout=0.0, bias="none"))
 
+    CACHE = OUT / "cache"
+    CACHE.mkdir(parents=True, exist_ok=True)
+
+    def cached_transcribe(rows, path, tag):
+        if path.exists():
+            log(f"{tag}: load cached ASR hyps ({path.name})")
+            return json.loads(path.read_text())
+        log(f"{tag}: transcribe")
+        h = _transcribe(model, proc, rows)
+        path.write_text(json.dumps(h, ensure_ascii=False))
+        return h
+
     fix_fn = _default_fix_fn()
-
-    # ---- stage A: zero-shot baseline ASR ----
-    X.reset_lora(model)
-    log("stage A: zero-shot transcribe")
-    hyp_a = _transcribe(model, proc, val_corr)
-    log("stage B: LLM fix over A")
-    hyp_b, fail_b = run_llm_stage(val_corr, hyp_a, fix_fn)
-
-    # ---- stage C/D per seed (composition keeper recipe) ----
     cfg = dict(composition="corr+backbone_1x", sampling="uniform", error_focus="none",
                lr=1e-4, filters="none", steps=args.steps, grad_accum=4, seed=0)
     data = {"train": train, "train_noedit": backbone}
     per_seed = []
-    for sd in args.seeds:
+    try:
+        # ---- stage A/B: zero-shot baseline ASR, then LLM ----
         X.reset_lora(model)
-        rng = np.random.default_rng(sd)
-        items = X.build_train(data["train"], data["train_noedit"], {**cfg, "seed": sd}, rng)
-        log(f"seed {sd}: train C on {len(items)} items")
-        X.train(model, proc, items, {**cfg, "seed": sd}, log)
-        hyp_c = _transcribe(model, proc, val_corr)
-        hyp_d, fail_d = run_llm_stage(val_corr, hyp_c, fix_fn)
-        recs, dropped = build_records(val_corr, hyp_a, hyp_b, hyp_c, hyp_d)
-        per_seed.append({"seed": sd, "records": recs, "dropped": dropped,
-                         "fail": sorted(set(fail_b) | set(fail_d))})
-        log(f"seed {sd}: scored {len(recs)} (dropped {len(dropped)}, llm_fail {len(set(fail_b)|set(fail_d))})")
+        hyp_a = cached_transcribe(val_corr, CACHE / "hyp_A.json", "stage A")
+        log("stage B: LLM fix over A (resumable)")
+        hyp_b, fail_b = run_llm_stage(val_corr, hyp_a, fix_fn, CACHE / "llm_B.jsonl", log)
+
+        # ---- stage C/D per seed (composition keeper recipe) ----
+        for sd in args.seeds:
+            cpath = CACHE / f"hyp_C_s{sd}.json"
+            if cpath.exists():
+                hyp_c = cached_transcribe(val_corr, cpath, f"seed {sd} C")
+            else:
+                X.reset_lora(model)
+                rng = np.random.default_rng(sd)
+                items = X.build_train(data["train"], data["train_noedit"], {**cfg, "seed": sd}, rng)
+                log(f"seed {sd}: train C on {len(items)} items")
+                X.train(model, proc, items, {**cfg, "seed": sd}, log)
+                hyp_c = _transcribe(model, proc, val_corr)
+                cpath.write_text(json.dumps(hyp_c, ensure_ascii=False))
+            log(f"seed {sd} stage D: LLM fix over C (resumable)")
+            hyp_d, fail_d = run_llm_stage(val_corr, hyp_c, fix_fn, CACHE / f"llm_D_s{sd}.jsonl", log)
+            recs, dropped = build_records(val_corr, hyp_a, hyp_b, hyp_c, hyp_d)
+            per_seed.append({"seed": sd, "records": recs, "dropped": dropped,
+                             "fail": sorted(set(fail_b) | set(fail_d))})
+            log(f"seed {sd}: scored {len(recs)} (dropped {len(dropped)}, "
+                f"llm_fail {len(set(fail_b)|set(fail_d))})")
+    except Exception as e:  # noqa: BLE001 — quota / network: keep the cache, resume later
+        log(f"LLM stage interrupted: {type(e).__name__}: {str(e)[:180]}")
+        log(f"partial results cached under {CACHE}; re-run the same command to RESUME.")
+        raise SystemExit(2)
 
     # report seed 0 in full; summarize C/D spread across seeds
     s0 = per_seed[0]
