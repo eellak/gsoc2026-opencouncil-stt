@@ -1,7 +1,31 @@
 # Metric: Human Intervention Rate (HIR)
 
-Status: **proposed** (2026-06-23) — for discussion at the next meeting.
-Computed on real data: `ui/static/coverage.json` (published snapshot), `eval/fetch_speakers.py`.
+Status: **likely NOT adopted** — mentor pushback at the 2026-06-23 sync. WER (+ CER)
+stays the standard metric; HIR is under a final critical review by Angelos this week
+with a current recommendation **not to implement**. See the "Meeting outcome" box
+below before building anything on this. Computed on real data:
+`ui/static/coverage.json` (published snapshot), `eval/fetch_speakers.py`.
+
+> **Meeting outcome (2026-06-23 mentor sync) — see [mentor-sync](../meetings/2026-06-23-mentor-sync.md).**
+> Christos argued against adopting HIR, on several grounds:
+> 1. It also measures the **LLM fix-task pass** (model + prompt dependent), not the
+>    ASR alone.
+> 2. **Utterances are not intrinsic to speech** — Whisper emits them arbitrarily
+>    (we feed it 30-min/hour audio and it self-segments; we do *not* cut per
+>    utterance then transcribe). A different model → different utterance boundaries
+>    → different HIR, with no change in transcript quality. Switching to
+>    speaker-segments doesn't fix it (a meeting with few long speakers almost
+>    always has ≥1 error → ~100%; many short speakers → better — the metric tracks
+>    meeting structure, not quality).
+> 3. It needs an **extra LLM task** to run (cost + time) for a metric that looks
+>    fundamentally flawed.
+> 4. It is **not in the literature** → not comparable; HF/paper readers expect
+>    standard metrics. WER reflects what we want well.
+>
+> **The valid concern to keep (without HIR):** a fine-tune could introduce *new*
+> errors that the fix-task hides, leaving us with a model dependent on the LLM.
+> Track this as a **diagnostic** — compare raw fine-tuned transcript WER vs
+> post-fix-task — not as a headline metric.
 
 ## What it measures
 
