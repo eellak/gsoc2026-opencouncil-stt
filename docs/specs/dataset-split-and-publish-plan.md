@@ -149,18 +149,23 @@ utterance means "nobody looked", not "ASR was right" — so its label is untrust
 - Per-meeting coverage is now browsable in the UI: **`/stats/coverage`** (reads
   `ui/static/coverage.json`).
 
-### Where the gate does / doesn't apply (important)
-The `humanReview` gate is **only for the dataset export + the HIR metric** — NOT
-for the review queue.
-- The **review queue** (`meeting-eligibility.ts`) uses a different, looser rule:
-  a meeting is shown once it has **≥10 human-edited utterances** → **313 eligible
-  meetings** today, and it *correctly still shows* partially-reviewed meetings
-  (incl. `thessaloniki/apr1_2026`, 37 user edits) — that is the queue's whole
-  purpose: to let reviewers *finish* them. We should NOT hide them there.
-- So the two filters are distinct on purpose: **313** worth-reviewing (queue) vs
-  **212** trusted-and-finished (dataset/metric).
-- **TODO:** apply `humanReview=true` at dataset-export time (`eval/build_split.py`),
-  not in the UI queue. Optional: a "needs-finishing" badge in the queue.
+### Where the gate applies — two different granularities (important)
+The review UI does **not** correct transcripts (that happens in OpenCouncil
+production). It is a **curation tool**: it shows already-existing corrections
+(before→after + audio) and the reviewer marks **include / exclude / uncertain**,
+i.e. *which corrections enter the fine-tuning training set*. So:
+- **UI selection = per-CORRECTION** (utterance-level) include/exclude. The
+  `meeting-eligibility.ts` rule (≥10 human-edited utterances → **313 meetings**)
+  just decides which meetings have enough corrections to be worth curating; a
+  partial meeting like `thessaloniki/apr1_2026` can still surface individual
+  corrections to include/exclude.
+- **`humanReview` gate = per-MEETING** (whole-meeting trust). It matters for the
+  parts the UI does *not* curate: the **no-edit backbone** (utterances with no
+  correction — only trustworthy as ground truth if the meeting was fully
+  reviewed) and the **HIR metric denominator**. Applied at dataset-build time
+  (`eval/build_split.py`), not in the UI.
+- So: **313** meetings worth curating (UI) vs **212** fully-reviewed meetings whose
+  no-edit utterances we trust (dataset/metric). Different jobs, different counts.
 
 ---
 
