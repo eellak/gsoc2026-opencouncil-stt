@@ -4,6 +4,44 @@ CSV ingest, content categorisation, stable IDs, task version, dataset split.
 
 ## Accepted
 
+### 2026-06-23 - Exclude 13 unreviewed meetings (<5% human-edit fraction) from our set
+
+13 meetings whose **human-edit fraction** (`user`-edited utterances / total) is
+**below 5%** as of the 2026-06-23 snapshot are dropped from the dataset everywhere.
+Such a meeting was essentially never human-reviewed (a `no-edit` utterance there
+means "nobody looked", not "ASR was right"), so neither its no-edit utterances nor
+its individually-`include`d corrections are trustworthy. Source +
+distribution: [meeting-trust-cutoff-plan](../specs/meeting-trust-cutoff-plan.md),
+`data/reports/meeting-edit-fraction/`.
+
+The `<5%` rule is the **rationale**; it is implemented as an explicit, auditable
+**denylist** (a live rule could silently change membership as `frac_user` is
+recomputed). Canonical source of truth, shared by the TS UI and the Python
+pipeline (no duplicated constants): **`data/exclusions/unreviewed_meetings.json`**,
+keyed strictly by `(city_id, meeting_id)` (slugs collide across cities —
+`rhodes/jul17_2025` is excluded without touching another city's same slug).
+
+The 13: `meganisi/mar23_2026`, `nea-smyrni/jan13_2025`, `peristeri/dec23_2024`,
+`plastiras/apr21_2026`, `vari-voula-vouliagmeni/{jan20_2025,feb24_2025}`,
+`karditsa/apr20_2026`, `argos/jan21_2025`, `argithea/mar26_2026`,
+`thessaloniki/apr1_2026`, `kalamata/feb5_2025`, `dorida/jun6_2025`,
+`rhodes/jul17_2025`.
+
+Enforced at every point that builds "our set", **reversibly** (nothing deleted,
+`getGroup(id)` still resolves; set `DISABLE_UNREVIEWED_MEETING_EXCLUSIONS=1` for a
+raw build):
+- `/api/export` skips them (`ui/.../state/excluded-meetings.ts`) — removes the **51
+  individually-included correction rows** they currently contribute (thessaloniki/apr1
+  18, rhodes 17, dorida 8, …). Those rows stay recoverable via the env override.
+- `meeting-eligibility` drops them from review nav/stats (applied on read, snapshot
+  unaffected).
+- Python build `eval/autoresearch/prepare_asr.py` filters them via `eval/exclusions.py`.
+- Kaggle notebook filters the fetched export against the same canonical list.
+- The frozen manifest already excluded all 13 (the `humanReview` gate did it).
+
+Takes live effect on the VPS export only after a redeploy of the `opencouncil-ui`
+service. Tests: `eval/tests/test_exclusions.py` (incl. the slug-collision guard).
+
 ### 2026-06-19 - Drop degenerate ingest bins from review + export (query-time)
 
 The corpus carries ~10.5k utterances whose **latest edit** falls in a

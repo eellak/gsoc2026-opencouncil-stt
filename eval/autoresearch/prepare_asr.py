@@ -195,6 +195,16 @@ def main() -> None:
         corr.append(r)
     log(f"export rows={len(rows)} unique corrections={len(corr)}")
 
+    # ---- drop denylisted (unreviewed, <5% human-edit) meetings ----
+    sys.path.insert(0, str(ROOT))
+    from eval.exclusions import load_excluded_keys  # noqa: E402
+    excluded = load_excluded_keys()
+    if excluded:
+        before = len(corr)
+        corr = [r for r in corr if (r["city_id"], r["meeting_id"]) not in excluded]
+        log(f"denylist: dropped {before - len(corr)} correction rows from "
+            f"{len(excluded)} excluded meetings")
+
     # ---- pick meetings under the cap ----
     by_mtg = collections.defaultdict(list)
     for r in corr:

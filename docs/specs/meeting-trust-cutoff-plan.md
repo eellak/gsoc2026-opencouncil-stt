@@ -88,8 +88,11 @@ normalizes by meeting size, which is what "was this reviewed?" actually depends 
 
 - [x] Compute `frac_user` per meeting + the flag cross-tab (`eval/meeting_edit_fraction.py`).
 - [x] Confirm the flag is reliable upward, lossy downward (95 rescued).
-- [ ] **Pick the two thresholds at the Thursday meeting:** junk cut (proposed 5%)
-      and backbone-trust (proposed 15% OR flag). Numbers above support both.
+- [x] **Junk cut decided 2026-06-23: drop `frac_user < 5%`** → the 13 meetings are
+      denylisted in `data/exclusions/unreviewed_meetings.json` and enforced
+      everywhere (see [data.md](../decisions/data.md#2026-06-23---exclude-13-unreviewed-meetings-5-human-edit-fraction-from-our-set)).
+- [ ] **Pick the backbone-trust threshold at the Thursday meeting** (proposed 15%
+      OR `humanReview=true`). Numbers above support it.
 - [ ] Wire the chosen cut into the dataset build (`eval/build_split.py` /
       `prepare_asr.py`) and, if we keep the review filter, into
       `meeting-eligibility.ts` as a fraction option alongside the count.

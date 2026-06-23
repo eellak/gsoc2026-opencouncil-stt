@@ -1,0 +1,113 @@
+{
+  "_comment": "Canonical denylist of council meetings excluded from our dataset everywhere. Rationale: human-edit fraction (user-edited utterances / total) < 5% as of the 2026-06-23 snapshot => meeting was essentially never human-reviewed, so its transcripts (and even individually-included corrections) are untrustworthy. Implemented as an explicit list (auditable/reversible), not a live rule. Key strictly by (city_id, meeting_id) - meeting_id slugs collide across cities. Disable via env DISABLE_UNREVIEWED_MEETING_EXCLUSIONS=1.",
+  "source": "data/reports/meeting-edit-fraction/ (eval/meeting_edit_fraction.py)",
+  "metric": "human_edit_fraction = user-edited utterances / total utterances",
+  "threshold": 0.05,
+  "decided_at": "2026-06-23",
+  "meetings": [
+    {
+      "city_id": "meganisi",
+      "meeting_id": "mar23_2026",
+      "human_edit_fraction": 0.0,
+      "n_utt": 1642,
+      "n_user": 0,
+      "reason": "human_edit_fraction_below_5_percent"
+    },
+    {
+      "city_id": "nea-smyrni",
+      "meeting_id": "jan13_2025",
+      "human_edit_fraction": 0.0,
+      "n_utt": 4264,
+      "n_user": 0,
+      "reason": "human_edit_fraction_below_5_percent"
+    },
+    {
+      "city_id": "peristeri",
+      "meeting_id": "dec23_2024",
+      "human_edit_fraction": 0.0,
+      "n_utt": 1448,
+      "n_user": 0,
+      "reason": "human_edit_fraction_below_5_percent"
+    },
+    {
+      "city_id": "plastiras",
+      "meeting_id": "apr21_2026",
+      "human_edit_fraction": 0.0,
+      "n_utt": 901,
+      "n_user": 0,
+      "reason": "human_edit_fraction_below_5_percent"
+    },
+    {
+      "city_id": "vari-voula-vouliagmeni",
+      "meeting_id": "jan20_2025",
+      "human_edit_fraction": 0.0,
+      "n_utt": 2336,
+      "n_user": 0,
+      "reason": "human_edit_fraction_below_5_percent"
+    },
+    {
+      "city_id": "vari-voula-vouliagmeni",
+      "meeting_id": "feb24_2025",
+      "human_edit_fraction": 0.0004,
+      "n_utt": 5259,
+      "n_user": 2,
+      "reason": "human_edit_fraction_below_5_percent"
+    },
+    {
+      "city_id": "karditsa",
+      "meeting_id": "apr20_2026",
+      "human_edit_fraction": 0.0005,
+      "n_utt": 2014,
+      "n_user": 1,
+      "reason": "human_edit_fraction_below_5_percent"
+    },
+    {
+      "city_id": "argos",
+      "meeting_id": "jan21_2025",
+      "human_edit_fraction": 0.0009,
+      "n_utt": 2319,
+      "n_user": 2,
+      "reason": "human_edit_fraction_below_5_percent"
+    },
+    {
+      "city_id": "argithea",
+      "meeting_id": "mar26_2026",
+      "human_edit_fraction": 0.0014,
+      "n_utt": 1410,
+      "n_user": 2,
+      "reason": "human_edit_fraction_below_5_percent"
+    },
+    {
+      "city_id": "thessaloniki",
+      "meeting_id": "apr1_2026",
+      "human_edit_fraction": 0.004,
+      "n_utt": 9282,
+      "n_user": 37,
+      "reason": "human_edit_fraction_below_5_percent"
+    },
+    {
+      "city_id": "kalamata",
+      "meeting_id": "feb5_2025",
+      "human_edit_fraction": 0.006,
+      "n_utt": 2352,
+      "n_user": 14,
+      "reason": "human_edit_fraction_below_5_percent"
+    },
+    {
+      "city_id": "dorida",
+      "meeting_id": "jun6_2025",
+      "human_edit_fraction": 0.0206,
+      "n_utt": 2422,
+      "n_user": 50,
+      "reason": "human_edit_fraction_below_5_percent"
+    },
+    {
+      "city_id": "rhodes",
+      "meeting_id": "jul17_2025",
+      "human_edit_fraction": 0.025,
+      "n_utt": 5439,
+      "n_user": 136,
+      "reason": "human_edit_fraction_below_5_percent"
+    }
+  ]
+}

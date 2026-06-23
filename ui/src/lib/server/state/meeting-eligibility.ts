@@ -26,6 +26,21 @@ import { promises as fs } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import type { Group } from '$lib/domain/groups';
 import { runExclusiveScan } from './scan-lock';
+import { excludedMeetingKeys } from './excluded-meetings';
+
+/**
+ * Remove denylisted (unreviewed, <5% human-edit) meetings from an eligible set.
+ * Applied on read, not baked into the persisted snapshot, so the denylist can
+ * change without invalidating the expensive eligibility scan.
+ */
+function dropExcluded(eligible: Set<string>): Set<string> {
+	const excluded = excludedMeetingKeys();
+	if (excluded.size === 0) return eligible;
+	let removed = 0;
+	for (const k of excluded) if (eligible.delete(k)) removed++;
+	if (removed > 0) console.log(`[meeting-eligibility] dropped ${removed} denylisted meetings`);
+	return eligible;
+}
 
 const YIELD_EVERY = 5_000;
 const yieldToEventLoop = () => new Promise<void>((r) => setImmediate(r));
@@ -160,10 +175,11 @@ export async function loadOrComputeEligibleMeetings(
 			`[meeting-eligibility] loaded snapshot: ${cached.size} eligible meetings ` +
 				`(threshold=${threshold})`
 		);
-		return cached;
+		return dropExcluded(cached);
 	}
 	const eligible = await runExclusiveScan(() => computeEligibleMeetings(repo, threshold));
 	try {
+		// Persist the full eligibility set; exclusions are applied on read.
 		await persist(stateDir, {
 			cache_hash: repo.hash,
 			threshold,
@@ -173,5 +189,5 @@ export async function loadOrComputeEligibleMeetings(
 	} catch (err) {
 		console.warn('[meeting-eligibility] persist failed', err);
 	}
-	return eligible;
+	return dropExcluded(eligible);
 }
