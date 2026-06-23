@@ -1,0 +1,163 @@
+[15:49:58] == auto-research loop start, budget=36.0min, deadline in 36.0min ==
+[15:49:58] data: train=279 val_corr=56 val_reg=70 backbone=452
+[15:50:03] model loaded + LoRA attached (5s)
+[15:50:03] -- ZERO-SHOT baseline (no fine-tune) --
+[15:50:34]     eval[val_corr] n=56 wer_norm=0.6071 wer_raw=0.6855 cer=0.2689 (31s)
+[15:51:08]     eval[val_reg] n=70 wer_norm=0.6736 wer_raw=0.74 cer=0.3763 (33s)
+[15:51:08] -- [base_ft] cfg={'composition': 'corrections_only', 'sampling': 'uniform', 'error_focus': 'none', 'lr': 0.0001, 'filters': 'none', 'steps': 40, 'grad_accum': 4, 'seed': 0} (remaining 34.8min) --
+[15:51:08]   train items=279 (corr=279 backbone_avail=452)
+[15:51:10]     step 1/40 loss=2.910 (2s)
+[15:51:27]     step 10/40 loss=1.522 (20s)
+[15:51:46]     step 20/40 loss=1.725 (39s)
+[15:52:06]     step 30/40 loss=1.544 (58s)
+[15:52:25]     step 40/40 loss=1.210 (78s)
+[15:52:55]     eval[val_corr] n=56 wer_norm=0.6174 wer_raw=0.6944 cer=0.2741 (29s)
+[15:53:21]     eval[val_reg] n=70 wer_norm=0.4377 wer_raw=0.518 cer=0.188 (26s)
+[15:53:21]     => discard Δval_corr=+0.0103 Δval_reg=-0.2359
+[15:53:21] -- [comp_backbone_1x] cfg={'composition': 'corr+backbone_1x', 'sampling': 'uniform', 'error_focus': 'none', 'lr': 0.0001, 'filters': 'none', 'steps': 40, 'grad_accum': 4, 'seed': 0} (remaining 32.6min) --
+[15:53:21]   train items=558 (corr=279 backbone_avail=452)
+[15:53:23]     step 1/40 loss=2.040 (2s)
+[15:53:41]     step 10/40 loss=1.269 (20s)
+[15:54:00]     step 20/40 loss=1.878 (39s)
+[15:54:19]     step 30/40 loss=1.239 (58s)
+[15:54:39]     step 40/40 loss=1.010 (78s)
+[15:55:09]     eval[val_corr] n=56 wer_norm=0.6056 wer_raw=0.6855 cer=0.2758 (31s)
+[15:55:36]     eval[val_reg] n=70 wer_norm=0.4642 wer_raw=0.5427 cer=0.1943 (27s)
+[15:55:36]     => keep Δval_corr=-0.0015 Δval_reg=-0.2094
+[15:55:36] -- [comp_backbone_3x] cfg={'composition': 'corr+backbone_3x', 'sampling': 'uniform', 'error_focus': 'none', 'lr': 0.0001, 'filters': 'none', 'steps': 40, 'grad_accum': 4, 'seed': 0} (remaining 30.4min) --
+[15:55:36]   train items=731 (corr=279 backbone_avail=452)
+[15:55:38]     step 1/40 loss=1.287 (2s)
+[15:55:57]     step 10/40 loss=1.369 (20s)
+[15:56:16]     step 20/40 loss=1.530 (40s)
+[15:56:35]     step 30/40 loss=1.458 (59s)
+[15:56:54]     step 40/40 loss=0.782 (78s)
+[15:57:24]     eval[val_corr] n=56 wer_norm=0.61 wer_raw=0.6944 cer=0.2748 (30s)
+[15:57:51]     eval[val_reg] n=70 wer_norm=0.4283 wer_raw=0.5123 cer=0.1743 (27s)
+[15:57:51]     => discard Δval_corr=+0.0029 Δval_reg=-0.2453
+[15:57:51] -- [sample_cat_balanced] cfg={'composition': 'corrections_only', 'sampling': 'error_category_balanced', 'error_focus': 'none', 'lr': 0.0001, 'filters': 'none', 'steps': 40, 'grad_accum': 4, 'seed': 0} (remaining 28.1min) --
+[15:57:51]   train items=2600 (corr=279 backbone_avail=452)
+[15:57:54]     step 1/40 loss=1.359 (2s)
+[15:58:12]     step 10/40 loss=1.902 (21s)
+[15:58:32]     step 20/40 loss=1.189 (41s)
+[15:58:52]     step 30/40 loss=1.233 (61s)
+[15:59:13]     step 40/40 loss=1.990 (82s)
+[15:59:44]     eval[val_corr] n=56 wer_norm=0.6145 wer_raw=0.681 cer=0.272 (31s)
+[16:00:11]     eval[val_reg] n=70 wer_norm=0.4509 wer_raw=0.5313 cer=0.194 (27s)
+[16:00:11]     => discard Δval_corr=+0.0074 Δval_reg=-0.2227
+[16:00:11] -- [sample_capped_oversample] cfg={'composition': 'corrections_only', 'sampling': 'capped_oversample', 'error_focus': 'none', 'lr': 0.0001, 'filters': 'none', 'steps': 40, 'grad_accum': 4, 'seed': 0} (remaining 25.8min) --
+[16:00:11]   train items=180 (corr=279 backbone_avail=452)
+[16:00:13]     step 1/40 loss=1.948 (2s)
+[16:00:31]     step 10/40 loss=1.542 (20s)
+[16:00:50]     step 20/40 loss=1.775 (39s)
+[16:01:09]     step 30/40 loss=1.535 (58s)
+[16:01:29]     step 40/40 loss=1.627 (78s)
+[16:01:58]     eval[val_corr] n=56 wer_norm=0.6041 wer_raw=0.6766 cer=0.2729 (30s)
+[16:02:25]     eval[val_reg] n=70 wer_norm=0.4321 wer_raw=0.5161 cer=0.181 (26s)
+[16:02:25]     => keep Δval_corr=-0.0030 Δval_reg=-0.2415
+[16:02:25] -- [focus_acoustic] cfg={'composition': 'corrections_only', 'sampling': 'uniform', 'error_focus': 'acoustic', 'lr': 0.0001, 'filters': 'none', 'steps': 40, 'grad_accum': 4, 'seed': 0} (remaining 23.6min) --
+[16:02:25]   train items=452 (corr=279 backbone_avail=452)
+[16:02:27]     step 1/40 loss=1.818 (2s)
+[16:02:46]     step 10/40 loss=1.667 (21s)
+[16:03:06]     step 20/40 loss=1.450 (41s)
+[16:03:25]     step 30/40 loss=1.896 (60s)
+[16:03:44]     step 40/40 loss=1.665 (79s)
+[16:04:14]     eval[val_corr] n=56 wer_norm=0.6115 wer_raw=0.6914 cer=0.3153 (30s)
+[16:04:41]     eval[val_reg] n=70 wer_norm=0.466 wer_raw=0.5427 cer=0.2032 (27s)
+[16:04:41]     => discard Δval_corr=+0.0044 Δval_reg=-0.2076
+[16:04:41] -- [lr_5e-5] cfg={'composition': 'corrections_only', 'sampling': 'uniform', 'error_focus': 'none', 'lr': 5e-05, 'filters': 'none', 'steps': 40, 'grad_accum': 4, 'seed': 0} (remaining 21.3min) --
+[16:04:41]   train items=279 (corr=279 backbone_avail=452)
+[16:04:43]     step 1/40 loss=2.910 (2s)
+[16:05:00]     step 10/40 loss=1.535 (20s)
+[16:05:20]     step 20/40 loss=1.780 (40s)
+[16:05:40]     step 30/40 loss=1.631 (59s)
+[16:05:59]     step 40/40 loss=1.252 (79s)
+[16:06:31]     eval[val_corr] n=56 wer_norm=0.6588 wer_raw=0.7389 cer=0.3082 (31s)
+[16:07:03]     eval[val_reg] n=70 wer_norm=0.6057 wer_raw=0.6812 cer=0.3197 (32s)
+[16:07:03]     => discard Δval_corr=+0.0517 Δval_reg=-0.0679
+[16:07:03] -- [filters_strict] cfg={'composition': 'corrections_only', 'sampling': 'uniform', 'error_focus': 'none', 'lr': 0.0001, 'filters': 'strict', 'steps': 40, 'grad_accum': 4, 'seed': 0} (remaining 18.9min) --
+[16:07:03]   train items=216 (corr=279 backbone_avail=452)
+[16:07:05]     step 1/40 loss=1.637 (2s)
+[16:07:23]     step 10/40 loss=1.066 (20s)
+[16:07:42]     step 20/40 loss=1.269 (39s)
+[16:08:02]     step 30/40 loss=1.275 (59s)
+[16:08:22]     step 40/40 loss=0.885 (79s)
+[16:08:52]     eval[val_corr] n=56 wer_norm=0.6381 wer_raw=0.7196 cer=0.3096 (30s)
+[16:09:18]     eval[val_reg] n=70 wer_norm=0.4509 wer_raw=0.5313 cer=0.1959 (27s)
+[16:09:18]     => discard Δval_corr=+0.0310 Δval_reg=-0.2227
+[16:09:18] -- finalist = sample_capped_oversample (val_corr wer_norm=0.6041) --
+[16:09:18] -- reseed sample_capped_oversample seed=1 --
+[16:09:18]   train items=180 (corr=279 backbone_avail=452)
+[16:09:20]     step 1/40 loss=1.853 (2s)
+[16:09:39]     step 10/40 loss=2.344 (20s)
+[16:09:58]     step 20/40 loss=1.340 (40s)
+[16:10:18]     step 30/40 loss=1.140 (60s)
+[16:10:38]     step 40/40 loss=1.567 (80s)
+[16:11:08]     eval[val_corr] n=56 wer_norm=0.6086 wer_raw=0.681 cer=0.282 (30s)
+[16:11:34]     eval[val_reg] n=70 wer_norm=0.4415 wer_raw=0.5237 cer=0.1842 (26s)
+[16:11:34] -- reseed sample_capped_oversample seed=2 --
+[16:11:34]   train items=180 (corr=279 backbone_avail=452)
+[16:11:36]     step 1/40 loss=1.446 (2s)
+[16:11:54]     step 10/40 loss=2.114 (20s)
+[16:12:14]     step 20/40 loss=0.993 (39s)
+[16:12:33]     step 30/40 loss=1.874 (59s)
+[16:12:53]     step 40/40 loss=1.045 (78s)
+[16:13:24]     eval[val_corr] n=56 wer_norm=0.6662 wer_raw=0.7344 cer=0.306 (31s)
+[16:13:50]     eval[val_reg] n=70 wer_norm=0.4396 wer_raw=0.5237 cer=0.1877 (26s)
+[16:13:50] report -> /home/harold/opencouncil-fine-tuning/data/reports/finetune-research/report.md
+[16:13:50] == loop done ==
+[16:14:01] == ROUND 2 (combinations) start, budget=13.0min ==
+[16:14:07] model loaded (5s)
+[16:14:07] -- [R2:bb1x_capped] cfg={'composition': 'corr+backbone_1x', 'sampling': 'capped_oversample', 'error_focus': 'none', 'lr': 0.0001, 'filters': 'none', 'steps': 40, 'grad_accum': 4, 'seed': 0} (remaining 12.9min) --
+[16:14:07]   train items=459 (corr=279 backbone_avail=452)
+[16:14:09]     step 1/40 loss=1.652 (2s)
+[16:14:27]     step 10/40 loss=1.755 (20s)
+[16:14:48]     step 20/40 loss=1.461 (41s)
+[16:15:07]     step 30/40 loss=1.004 (61s)
+[16:15:27]     step 40/40 loss=0.975 (80s)
+[16:15:56]     eval[val_corr] n=56 wer_norm=0.6248 wer_raw=0.7047 cer=0.2786 (30s)
+[16:16:23]     eval[val_reg] n=70 wer_norm=0.4434 wer_raw=0.5237 cer=0.1851 (26s)
+[16:16:23]     => discard Δval_corr=+0.0177 Δval_reg=-0.2302
+[16:16:23] -- [R2:bb1x_balanced] cfg={'composition': 'corr+backbone_1x', 'sampling': 'error_category_balanced', 'error_focus': 'none', 'lr': 0.0001, 'filters': 'none', 'steps': 40, 'grad_accum': 4, 'seed': 0} (remaining 10.6min) --
+[16:16:23]   train items=2879 (corr=279 backbone_avail=452)
+[16:16:25]     step 1/40 loss=1.724 (2s)
+[16:16:43]     step 10/40 loss=2.215 (20s)
+[16:17:02]     step 20/40 loss=1.267 (39s)
+[16:17:21]     step 30/40 loss=1.199 (59s)
+[16:17:41]     step 40/40 loss=2.193 (78s)
+[16:18:10]     eval[val_corr] n=56 wer_norm=0.6189 wer_raw=0.6929 cer=0.2715 (29s)
+[16:18:37]     eval[val_reg] n=70 wer_norm=0.4642 wer_raw=0.5522 cer=0.2026 (26s)
+[16:18:37]     => discard Δval_corr=+0.0118 Δval_reg=-0.2094
+[16:18:37] -- [R2:bb1x_acoustic] cfg={'composition': 'corr+backbone_1x', 'sampling': 'uniform', 'error_focus': 'acoustic', 'lr': 0.0001, 'filters': 'none', 'steps': 40, 'grad_accum': 4, 'seed': 0} (remaining 8.4min) --
+[16:18:37]   train items=731 (corr=279 backbone_avail=452)
+[16:18:39]     step 1/40 loss=1.782 (2s)
+[16:18:57]     step 10/40 loss=1.531 (20s)
+[16:19:16]     step 20/40 loss=2.132 (40s)
+[16:19:36]     step 30/40 loss=1.300 (60s)
+[16:19:56]     step 40/40 loss=1.709 (80s)
+[16:20:26]     eval[val_corr] n=56 wer_norm=0.6278 wer_raw=0.7062 cer=0.2765 (29s)
+[16:20:52]     eval[val_reg] n=70 wer_norm=0.4453 wer_raw=0.5256 cer=0.1877 (26s)
+[16:20:52]     => discard Δval_corr=+0.0207 Δval_reg=-0.2283
+[16:20:52] -- [R2:bb1x_capped_acoustic] cfg={'composition': 'corr+backbone_1x', 'sampling': 'capped_oversample', 'error_focus': 'acoustic', 'lr': 0.0001, 'filters': 'none', 'steps': 40, 'grad_accum': 4, 'seed': 0} (remaining 6.2min) --
+[16:20:52]   train items=574 (corr=279 backbone_avail=452)
+[16:20:54]     step 1/40 loss=1.611 (2s)
+[16:21:12]     step 10/40 loss=1.051 (20s)
+[16:21:31]     step 20/40 loss=1.042 (39s)
+[16:21:51]     step 30/40 loss=1.073 (59s)
+[16:22:11]     step 40/40 loss=1.166 (79s)
+[16:22:40]     eval[val_corr] n=56 wer_norm=0.6248 wer_raw=0.7003 cer=0.3013 (29s)
+[16:23:06]     eval[val_reg] n=70 wer_norm=0.4321 wer_raw=0.5142 cer=0.1848 (26s)
+[16:23:06]     => discard Δval_corr=+0.0177 Δval_reg=-0.2415
+[16:23:06] -- [R2:bb1x_lr5e-5] cfg={'composition': 'corr+backbone_1x', 'sampling': 'uniform', 'error_focus': 'none', 'lr': 5e-05, 'filters': 'none', 'steps': 40, 'grad_accum': 4, 'seed': 0} (remaining 3.9min) --
+[16:23:06]   train items=558 (corr=279 backbone_avail=452)
+[16:23:08]     step 1/40 loss=2.040 (2s)
+[16:23:26]     step 10/40 loss=1.282 (20s)
+[16:23:47]     step 20/40 loss=1.976 (40s)
+[16:24:06]     step 30/40 loss=1.396 (60s)
+[16:24:26]     step 40/40 loss=1.202 (79s)
+[16:24:55]     eval[val_corr] n=56 wer_norm=0.6677 wer_raw=0.7433 cer=0.3041 (30s)
+[16:25:25]     eval[val_reg] n=70 wer_norm=0.5377 wer_raw=0.6186 cer=0.258 (30s)
+[16:25:25]     => discard Δval_corr=+0.0606 Δval_reg=-0.1359
+[16:25:25] -- R2 budget nearly exhausted; stopping after 5 combos (skipped 2) --
+[16:25:25] -- R2 best = r2_bb1x_balanced (val_corr=0.6189); reseeding --
+[16:25:25] -- no time to reseed; done --
+[16:25:25] == ROUND 2 done ==

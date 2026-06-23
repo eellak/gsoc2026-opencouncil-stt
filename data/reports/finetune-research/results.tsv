@@ -1,0 +1,15 @@
+label	wer_corr_norm	wer_reg_norm	status	description
+zero_shot	0.6071	0.6736	ref	no fine-tune baseline
+base_ft	0.6174	0.4377	discard	Δcorr=+0.0103 Δreg=-0.2359
+comp_backbone_1x	0.6056	0.4642	keep	Δcorr=-0.0015 Δreg=-0.2094
+comp_backbone_3x	0.61	0.4283	discard	Δcorr=+0.0029 Δreg=-0.2453
+sample_cat_balanced	0.6145	0.4509	discard	Δcorr=+0.0074 Δreg=-0.2227
+sample_capped_oversample	0.6041	0.4321	keep	Δcorr=-0.0030 Δreg=-0.2415
+focus_acoustic	0.6115	0.466	discard	Δcorr=+0.0044 Δreg=-0.2076
+lr_5e-5	0.6588	0.6057	discard	Δcorr=+0.0517 Δreg=-0.0679
+filters_strict	0.6381	0.4509	discard	Δcorr=+0.0310 Δreg=-0.2227
+r2_bb1x_capped	0.6248	0.4434	discard	Δcorr=+0.0177 Δreg=-0.2302
+r2_bb1x_balanced	0.6189	0.4642	discard	Δcorr=+0.0118 Δreg=-0.2094
+r2_bb1x_acoustic	0.6278	0.4453	discard	Δcorr=+0.0207 Δreg=-0.2283
+r2_bb1x_capped_acoustic	0.6248	0.4321	discard	Δcorr=+0.0177 Δreg=-0.2415
+r2_bb1x_lr5e-5	0.6677	0.5377	discard	Δcorr=+0.0606 Δreg=-0.1359

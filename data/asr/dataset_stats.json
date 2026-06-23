@@ -1,0 +1,52 @@
+{
+  "n_clips": 900,
+  "by_split": {
+    "val_corr": 56,
+    "val_reg": 113,
+    "train": 279,
+    "train_noedit": 452
+  },
+  "minutes_by_split": {
+    "val_corr": 4.4,
+    "val_reg": 4.9,
+    "train": 16.9,
+    "train_noedit": 19.5
+  },
+  "train_error_categories": {
+    "substitution_phonetic": 130,
+    "punctuation_capitalization": 57,
+    "semantic_rewrite": 31,
+    "noun_case": 18,
+    "verb_inflection": 18,
+    "homophone": 16,
+    "word_boundary": 16,
+    "insertion": 15,
+    "place_name": 15,
+    "person_name": 12,
+    "deletion": 12,
+    "number_date": 10,
+    "disfluency_cleanup": 8,
+    "article_pronoun": 8,
+    "org_party_name": 7,
+    "acronym_abbreviation": 6,
+    "accent_tonos": 5,
+    "unusable": 2,
+    "legal_admin_term": 1
+  },
+  "val_cities": [
+    "argos",
+    "orestiada"
+  ],
+  "params": {
+    "train_meetings": 14,
+    "val_meetings_per_city": 3,
+    "val_reg_per_city": 40,
+    "train_noedit_cap": 1500
+  },
+  "build_seconds": 706.9,
+  "sr": 16000,
+  "pad_s": 0.2,
+  "min_dur": 1.0,
+  "max_dur": 30.0,
+  "seed": 1234
+}
