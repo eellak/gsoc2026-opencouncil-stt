@@ -232,11 +232,29 @@ resamples by meeting; a missing/reordered LLM line **fails loudly**; the report
 includes `n_clips`, `n_meetings`, and the low-n flags. This proves the mechanics
 before any multi-hour CPU run.
 
+## Results — Design A, first seed (2026-06-24)
+
+Run on 114 categorized held-out corrections (28 meetings, Orestiada+Argos). Full
+write-up: [findings.md](../../data/reports/error-division/findings.md); raw table:
+[matrix_categorized.md](../../data/reports/error-division/matrix_categorized.md).
+
+- **Fine-tune and LLM are additive, not redundant.** Aggregate WER_norm: raw 0.715
+  → fine-tuned 0.613 (−0.10) → +LLM 0.478 (−0.24 total). The LLM removes ~0.135
+  with or without fine-tuning (D−C ≈ B−A); the fine-tune removes ~0.10 with or
+  without the LLM (C−A ≈ D−B). They fix different errors — keep both.
+- **The routing hypothesis holds on the two biggest categories.** `substitution_
+  phonetic` (n=59, the only non-directional cell): fine-tune owns it (0.784 → 0.642,
+  as big a cut as the LLM, and they stack to 0.515). `punctuation_capitalization`
+  (n=27): LLM owns it (fine-tune 0.556 → 0.536 ≈ nothing; LLM → 0.388).
+- Confidence: aggregate + phonetic have usable CIs; everything else directional.
+
 ## To decide / next
 
-- [ ] Enlarge the val set (shared blocker with the auto-research round 2).
-- [ ] Run Design A (2×2 matrix) — highest signal, do first.
-- [ ] Run Design B (composition sweep) once the val set is big enough to rank.
+- [x] Enlarge the val set — done: 119 categorized val_corr + 329 val_reg (frozen
+      `data/asr/val_manifest.jsonl`).
+- [~] Run Design A (2×2 matrix) — done for **1 seed**; seeds 1–2 pending (tighten
+      the fine-tune CI; quota-heavy).
+- [ ] Run Design B (composition sweep: natural / acoustic_focus / balanced).
 - [ ] Fold the resulting routing into the dataset build's category weights and into
       the [error taxonomy](../reference/error-taxonomy.md) `asr_finetune` vs
       `llm_post_correction` buckets.
