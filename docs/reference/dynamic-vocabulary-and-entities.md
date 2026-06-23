@@ -101,6 +101,36 @@ guardrail) beats baseline HIR on the production model. Being measured now via th
 selection → sonnet validation). Until that confirms a net HIR drop, treat the
 glossary as an **entity-only** assist, not a global correctness lever.
 
+## NER-gated deterministic name correction (2026-06-21)
+
+A separate experiment line: can we fix misspelled names **deterministically**
+(without spending LLM quota) by fuzzy-matching ASR tokens against a name list —
+but **only on tokens that are actually names**, so we don't bend unrelated
+phonetically-near words? The gate is a Greek NER model:
+`amichailidis/bert-base-greek-uncased-v1-finetuned-ner` (GreekBERT) or GLiNER
+(`urchade/gliner_multi-v2.1`). Code: `eval/{fuzzy_correct,ner_gate_eval,roster_gate_eval,fetch_rosters}.py`.
+
+The point of the NER gate is exactly the thing plain fuzzy matching gets wrong:
+plain fuzzy "corrects" any token close to a list entry, so it rewrites correct,
+unrelated words. Gating on entity spans should let it touch only names.
+
+**Findings:**
+- **The NER gate alone is not enough.** Against the dense global glossary
+  (~5,894 names), deterministic fuzzy — *even NER-gated* — still corrupts clean
+  text. Too many real words sit phonetically near *some* name in a 5,894-entry list.
+- **The candidate-set size is the real lever.** Swapping the global glossary for a
+  **small per-meeting roster** (the names actually spoken in that meeting, ~tens)
+  raises precision and clean-text retention monotonically.
+- **With the real per-meeting roster** (fetched from
+  `/api/cities/{city}/meetings/{meeting}` `partiesWithPeople`): precision **0.42**,
+  collateral damage **1.2 / 100** utterances, clean-text retention **0.955** (vs
+  **0.855** with the global glossary), recall **~0.12**.
+- **Verdict: not deployable standalone** (~95.5% retention still rewrites ~1 in 20
+  clean utterances, and ~0.12 recall misses most). Its best role is a
+  **conservative first pass alongside the LLM**, not a replacement — and it
+  confirms the same lesson as the glossary A/B: **scope tightly (small per-meeting
+  candidate set), never dump a big list.**
+
 ## Proposed Vocabulary Layers
 
 1. Global civic vocabulary: terms common across Greek municipal councils.
