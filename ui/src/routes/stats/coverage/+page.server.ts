@@ -26,8 +26,25 @@ export interface CoverageMeeting {
 	pct_task?: number;
 }
 
+export interface CoverageSummary {
+	meetings_public: number;
+	meetings_private: number;
+	meetings_reviewed: number;
+	meetings_not_reviewed: number;
+	cities_total: number;
+	total_hours_public: number;
+	hours_reviewed: number;
+	speakers_identified: number;
+	backbone_noedit_reviewed_h: number;
+	human_verified_reviewed_h: number;
+	task_final_reviewed_h: number;
+	untrusted_notreviewed_h: number;
+	hir_micro: number;
+	hir_ci95: [number, number];
+}
+
 export interface CoveragePayload {
-	summary: Record<string, number | number[]>;
+	summary: CoverageSummary;
 	cities: CoverageCity[];
 	meetings: CoverageMeeting[];
 }
@@ -45,7 +62,10 @@ export async function load({ fetch }) {
 		throw error(502, 'coverage snapshot unreachable');
 	}
 	if (!resp.ok) {
-		throw error(404, 'coverage snapshot missing (run eval/fetch_speakers.py)');
+		if (resp.status === 404) {
+			throw error(404, 'coverage snapshot missing (run eval/fetch_speakers.py)');
+		}
+		throw error(502, `coverage snapshot returned ${resp.status}`);
 	}
 	try {
 		const coverage = (await resp.json()) as CoveragePayload;

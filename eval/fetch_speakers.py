@@ -39,7 +39,7 @@ def _fetch(city: str, meeting: str) -> dict:
 
 
 def _rows(d: dict, city: str, meeting: str):
-    people = {p["id"]: p for p in (d.get("people") or [])}
+    people = {p["id"]: p for p in (d.get("people") or []) if p.get("id")}
     for seg in d.get("transcript") or []:
         tag = seg.get("speakerTag") or {}
         pid = tag.get("personId")
@@ -121,7 +121,7 @@ def main() -> None:
         "meetings_skipped_private": skipped,
         "n_utterances": len(df),
         "total_minutes": round(df["min"].sum(), 1),
-        "n_persons_identified": int(df.person_id.notna().sum() and by_person.shape[0]),
+        "n_persons_identified": int(by_person.shape[0]),
         "minutes_unidentified": round(df[df.person_id.isna()]["min"].sum(), 1),
         "last_modified_by_counts": df.last_modified_by.fillna("__none__").value_counts().to_dict(),
         "persons_with_ge_10min": int((by_person.minutes >= 10).sum()),
