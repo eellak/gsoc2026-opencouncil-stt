@@ -21,6 +21,17 @@ Last updated: 2026-05-20
 > [decisions/data.md](docs/decisions/data.md). Review throughput continues (~1.4k
 > reviewed; target ~6k by mid-July); the prefetch bug is the immediate fix.
 
+> **2026-06-23 mentor sync — get concrete on training before midterm.**
+> Priority #1: produce the **canonical split CSV** (meeting/speaker → train/val/test;
+> TEST = June 2026+, VAL = orestiada + argos whole, TRAIN = the other 8 cities).
+> **HIR metric likely dropped** — mentor pushback; WER (+CER) stays standard
+> ([metric-hir](docs/decisions/metric-hir.md)). New open questions: training-unit
+> granularity (utterances vs speaker segments), `humanReview` flag is unreliable
+> (use edit-fraction distribution + threshold), reviewer curation bias. No-edit
+> backbone ~50% confirmed. See [mentor-sync](docs/meetings/2026-06-23-mentor-sync.md)
+> and [decisions/data.md](docs/decisions/data.md#open). Next calls: Thu 11:30 (team),
+> Fri 13:00 (check-in).
+
 This is the human and LLM entry point. Read this first, then follow links only as needed.
 
 ## Goal Right Now

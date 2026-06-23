@@ -182,6 +182,35 @@ Implementation: `latest_per_utterance` flag computed via window function in `ui/
 
 ## Open
 
+### Training-unit granularity: utterances vs larger / speaker segments (raised 2026-06-23)
+
+New question from the [mentor sync](../meetings/2026-06-23-mentor-sync.md). Edits
+arrive **per utterance** from the review UI, so the obvious unit is the utterance.
+But many ASR errors come from the audio being cut slightly before/after the
+utterance (missing words at the start/end that are clear if you shift the boundary)
+— Whisper self-segments 30-min/hour audio, the utterance boundaries are arbitrary.
+So a larger unit may train better: a context window (±neighbouring utterances) or
+the **whole speaker segment** the utterance belongs to, with **duplicate avoidance**
+(if utterance −3 is also in the set, don't double-count). Decide from the
+literature + what others do + Claude. Affects dataset build and the manifest.
+
+### Meeting-trust cutoff: `humanReview` flag is unreliable (raised 2026-06-23)
+
+Christos: `taskStatus.humanReview` is a "fake" status — some meetings lack it yet
+are corrected (old / 2025 ones), so the flag alone over- and under-counts. Refine
+the [humanReview gate](metric-hir.md): combine the flag with a **distribution of
+the human-edit *fraction* (edits/total) per meeting** and pick a **threshold**
+below which a meeting is not trusted (expect a cluster ~20–30% and a tail <5% to
+drop — and don't sample "no-edit as ground truth" from the low-fraction ones).
+Supersedes relying solely on the flag; complements the ≥20 human-edit count gate.
+
+### Reviewer curation subjectivity (raised 2026-06-23)
+
+Angelos rejects ~3 of 4 corrections during review. Different reviewers judge "worth
+training on" differently, which biases the included set. Discuss with the whole team
+(Eliza, Thanos) — calendar item. Relates to the 2026-06-16 "no human picking of
+speakers/meetings" principle: the same bias concern applies to per-correction curation.
+
 ### Can we trust "non-corrected" utterances as ground truth?
 
 The dataset plan wants ~50–70% non-corrected utterances from **fully-reviewed**
