@@ -111,3 +111,19 @@ of silently dropping rows.
 - **P3:** run the one-axis sweeps → leaderboard.
 - **P4:** combine winners, ≥3 seeds, write `report.md` + the "transfers to large-v3"
   summary.
+
+## Results — first dry run (2026-06-23)
+
+Implemented in `eval/autoresearch/{prepare_asr,experiment,loop,round2}.py`; full
+write-up in [`data/reports/finetune-research/report.md`](../../data/reports/finetune-research/report.md).
+16 fine-tune runs, ~1 h wall-clock, whisper-base CPU. Headline:
+
+- Fine-tuning on ~17 min of corrections drops ordinary-speech WER reliably
+  (`val_reg` 0.674 → ~0.43, ~24 pts on every run) — domain adaptation works and
+  does **not** degrade general ASR (the correction-bias worry didn't materialise).
+- The hard residual cases (`val_corr`) are noise-limited: cross-config spread
+  (0.064) ≈ single-config seed spread (0.062) on 56 val clips → **no data-mixture
+  axis is statistically separable yet.** Composition (corrections + no-edit
+  backbone) is the transferable lever; lr/steps are not.
+- **Blocker for the next round:** enlarge `val_corr` (full ~9.9k orestiada+argos
+  pool, not 56) + bootstrap CIs before trusting any mixture ranking.
