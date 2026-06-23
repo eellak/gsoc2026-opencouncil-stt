@@ -90,17 +90,31 @@ not have before:
 - **Speaker floors:** 254 speakers ≥10min, 141 ≥30min, 87 ≥60min.
 
 ### Concrete split proposal (data-backed, public-only)
-- **Unseen-city stratum (val + test):** hold out a few mid-size public cities
-  *entirely* — e.g. `orestiada` (~17h), `samothraki` (~19h), `argos` (~17h).
-  Automatically speaker+meeting disjoint; tests city/acoustic generalization.
-  (Replaces "Vrilissia" — which is mostly private — with public cities.)
-- **Unseen-speaker / seen-city stratum (val):** inside the big cities
-  (`chania`, `athens`, `sparta`), hold out ~30% of **speakers** (with a ≥10min
-  floor) → tests speaker generalization with the acoustic domain seen.
-- **Train backbone:** `chania` + `athens` remainder + the rest, with the no-edit
-  corpus as the bulk and human-verified corrections upweighted.
-- **Future-temporal test:** rolling, **currently empty** (no post-Jun-1 data);
-  freeze the policy, accumulate.
+- **TEST — unseen city (chosen): `orestiada`** held out *entirely* (~17h reviewed,
+  14 meetings, 26 speakers, HIR 25.6%). Why orestiada: mid-size (enough for a
+  stable WER/HIR, but ~7% of the 254h reviewed so it doesn't starve training),
+  HIR close to the 28% global mean (representative, *not* an outlier), and a whole
+  city is **automatically speaker- and meeting-disjoint** (0 cross-city speakers).
+  Alternate: `argos` (HIR 28.5%, ~10h). **Avoid `samothraki`** (HIR 37.9% = small
+  atypical island, would bias the test).
+- **TEST — future temporal:** rolling, **currently empty** by design (June data
+  added later); freeze policy, accumulate, join orestiada once adequate.
+- **VAL — unseen speaker / seen city:** inside the *training* cities, hold out
+  **~12% of speaker-minutes** (speakers ≥10min, deterministic hash on `person_id`,
+  stratified per city) → model selection only. **Not** 30%, and **by minutes, not
+  speaker count** (see §below). ~26h.
+- **TRAIN:** everything else reviewed+public (~210h) — no-edit corpus as the bulk,
+  human-verified corrections upweighted.
+
+> **Why not the Notion split (Argos+Vrilissia whole→val, 30% of speakers):**
+> (1) **Vrilissia is mostly private** → a val built on it isn't publishable/
+> reproducible, and model selection would depend on unavailable data.
+> (2) **Whole-city→val confounds** unseen-speaker / unseen-meeting / unseen-city
+> into one number — unseen-city belongs in TEST, unseen-speaker in VAL.
+> (3) **"30% of speakers" by count is the wrong unit** — speakers are power-law in
+> audio; 30% of *count* can be 5% or 50% of *audio*. Split by **speaker-minutes**
+> with a ≥10min floor. (4) **30% is too much** — val is only for model selection;
+> ~12% suffices and keeps more reviewed audio for training.
 
 ---
 
