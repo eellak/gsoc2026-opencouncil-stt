@@ -53,6 +53,7 @@ Accepted decisions and open questions, one file per theme. Keep entries short �
 - [Benchmark: fixed meetings vs random test set](data.md#benchmark-fixed-meetings-vs-random-test-set-raised-2026-06-02) — **resolved 2026-06-16**
 - [Human-edit threshold for eligible meetings: 10 → 20](data.md#human-edit-threshold-for-eligible-meetings-10--20-resolved-2026-06-16) — **resolved 2026-06-16 (use 20)**
 - [Correction-bias mix ratio](data.md#correction-bias-mix-ratio) — finetuning data
+- [Who fixes what: fine-tune vs LLM, by error type](../specs/error-division.md) — finetuning data (experiment planned)
 - [Diagram maintenance](#diagram-maintenance) (meta — see below)
 
 ## Meta

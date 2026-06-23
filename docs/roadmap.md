@@ -176,6 +176,14 @@ Possible metrics:
 - [ ] Human Intervention Rate
 - [ ] CER if it adds signal
 
+Error-division experiment (which errors the fine-tune owns vs the LLM fix-task),
+see [specs/error-division.md](specs/error-division.md):
+
+- [ ] Enlarge the held-out val set (blocker; ~160 categorized val_corr from export + ~400 no-edit val_reg).
+- [ ] Design A — 2×2 pipeline matrix (baseline/fine-tuned ASR × ±LLM) with per-category WER + meeting-clustered CIs.
+- [ ] Design B — composition sweep (natural / acoustic_focus / balanced) once the val set can rank.
+- [ ] Fold the routing into the dataset build's category weights and the error taxonomy buckets.
+
 Training is intentionally deferred until the dataset quality is understood.
 
 Acceptance criteria:
