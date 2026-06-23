@@ -69,6 +69,18 @@ Sources: HF blog (huggingface.co/blog/fine-tune-whisper); Timmel et al. 2024,
 (ivrit.ai/en/2025/02/13/training-whisper); WhisperX (arXiv 2303.00747); Whisper
 paper (arXiv 2212.04356).
 
+## Grok live-search cross-check (2026-06-23)
+
+Ran the question through `grok-research`; it converged on the same recommendation
+independently: **concatenate to ~20–30s segments, don't train on bare short
+utterances** — short-only fine-tuning loses timestamp prediction and worsens
+long-form (higher SubER, more hallucinations), while the per-clip short-form score
+improves (arXiv 2412.15726). Practical prep references it surfaced: VAD-based
+chunking with `whisper-prep` (github.com/i4Ds/whisper-prep), the Trelis "Whisper
+data preparation and fine-tuning" guide (trelis.substack.com), and the HF
+fine-tuning thread (discuss.huggingface.co/t/28211). Keep `return_timestamps=True`
+and segment on natural pauses. Nothing contradicted the recommendation above.
+
 ## How this maps onto our data
 
 Our corrections arrive **per utterance** from the review UI — that's the unit a

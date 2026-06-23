@@ -81,6 +81,36 @@ errors (phonetic, homophone, boundary, names-for-phonetic-closeness), down-weigh
 punctuation/caps/number/accent/grammar corrections, and keep a ~50% no-edit
 backbone.** The experiment below is to prove it instead of asserting it.
 
+## Grok live-search cross-check (2026-06-23)
+
+Ran the two core claims through `grok-research`. Both came back well-supported,
+with sharper numbers:
+
+- **Targeting the FT data at specific error types works — measurably.** A
+  contextual-biasing fine-tune (Whisper, ~670h Common Voice, focused on
+  mis-transcribed rare words) reported **+45.6% rare-word WER** and **+60.8%
+  OOV-word WER** across 11 datasets (arXiv 2502.11572). Direct support for
+  oversampling phonetic/entity errors in our mix.
+- **Training only on corrections degrades general speech — with a scary number.**
+  Yoruba-only fine-tuning sent English WER from ~22% to **147%** (catastrophic
+  forgetting); the fix is mixing in unchanged/general data (rehearsal, LoRA,
+  balanced ratios). Confirms the ~50% no-edit backbone is not optional
+  (medium.com/@ccibeekeoc42; arXiv 2412.15726).
+- **Generic LLMs overcorrect already-good ASR**, especially in low-WER regimes —
+  so the post-step should be uncertainty-aware: let the LLM rewrite only
+  **low-confidence / N-best** spans, not everything (arXiv 2405.15216;
+  isca-archive interspeech_2024/manhtienanh24). This is exactly the N-best
+  confidence design in [finetuning-dryrun-plan §6](finetuning-dryrun-plan.md) —
+  the two ideas reinforce each other.
+- **Punctuation/casing are excluded from standard WER** (normalized away before
+  scoring; HEWER is the variant that re-includes them) — so de-prioritizing them
+  in the acoustic FT costs nothing on the headline metric (Apple "Humanizing WER";
+  speechmatics; gladia.io/blog/what-is-wer).
+
+Net: the routing table above is the mainstream position, and the lever we control
+(error-type composition of the FT data + a no-edit backbone + an uncertainty-gated
+LLM) is exactly what the literature recommends.
+
 ## The experiment (mini PC, whisper-base, CPU)
 
 Goal: produce a single table that shows, **per error category, the WER at each
