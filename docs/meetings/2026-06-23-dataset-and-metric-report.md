@@ -5,6 +5,14 @@
 Πηγές: `eval/` harness, `ui/static/coverage.json`, `docs/specs/dataset-split-and-publish-plan.md`,
 `docs/decisions/metric-hir.md`.
 
+> **Ατζέντα παρουσίασης (8 λεπτά, με τη σειρά):**
+> 1. *Δύο artifacts, όχι ένα* (§1) — fix-task vs ASR dataset· το meeting αφορά το 2ο.
+> 2. *Το metric: HIR = 28.1%* (§2) — αυτό θέλουμε να ρίξουμε· FPY = 1−HIR.
+> 3. *Η παγίδα `humanReview`* (§3) — γιατί αποκλείουμε thessaloniki & 115 meetings.
+> 4. *Τι έχουμε* (§4) — 254h reviewed, 544 speakers, 0 cross-city → split εύκολο.
+> 5. *Πρόταση split* (§5) — **TEST=orestiada**, val 12% λεπτών, γιατί όχι το Notion.
+> 6. *Open questions* (§8) — task_only, no-edit audit, normalization → συζήτηση.
+
 ---
 
 ## 1. Two things, not one
@@ -121,25 +129,26 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-    subgraph TRAIN[Train backbone]
-        T1[chania ~115h<br/>+ athens + λοιπά]
+    subgraph TRAIN["Train (~210h)"]
+        T1[reviewed+public<br/>πλην test/val]
         T2[no-edit κορμός<br/>+ upweighted human corrections]
     end
-    subgraph VAL[Validation]
-        V1[unseen-city:<br/>orestiada / samothraki]
-        V2[unseen-speaker σε<br/>chania/athens/sparta<br/>~30% speakers, ≥10min floor]
+    subgraph VAL["Validation (~26h)"]
+        V1[unseen-speaker<br/>~12% speaker-ΛΕΠΤΩΝ<br/>≥10min floor, ανά πόλη<br/>→ model selection]
     end
     subgraph TEST[Test]
-        X1[future-temporal<br/>μετά 1/6/2026<br/>rolling, ΑΔΕΙΟ τώρα]
+        X1[unseen-city:<br/>ORESTIADA ~17h<br/>ολόκληρη]
+        X2[future-temporal<br/>μετά 1/6/2026<br/>rolling, ΑΔΕΙΟ τώρα]
     end
     TRAIN --> VAL --> TEST
-    style X1 fill:#eee,stroke:#999,stroke-dasharray: 4
+    style X2 fill:#eee,stroke:#999,stroke-dasharray: 4
 ```
 
-- **Άλλαξε** σε σχέση με το αρχικό Notion plan: **βγάλαμε Vrilissia** (κυρίως
-  private) → βάζουμε **Chalandri** (συμφωνία) / public πόλεις.
-- **Future-temporal test είναι άδειο επίτηδες** — τα meetings μετά τον Ιούνιο θα
-  προστεθούν αργότερα (επιβεβαιωμένο). Παγώνουμε το policy, μαζεύεται.
+- **TEST = orestiada (ολόκληρη)** — unseen city, ~17h, HIR 25.6% (αντιπροσωπευτικό),
+  αυτόματα speaker+meeting-disjoint. Όχι samothraki (HIR 38% outlier).
+- **Άλλαξε** από το Notion: βγάλαμε **Vrilissia** (private) → **Chalandri**· val
+  με **λεπτά** όχι πλήθος speakers, **~12%** όχι 30%· unseen-city στο TEST όχι val.
+- **Future-temporal test άδειο επίτηδες** — June meetings μπαίνουν αργότερα. Policy παγωμένο.
 - Composition (Grok best-practice): ~**70–80% clean / 20–30% corrected**,
   **exclude/down-weight task-only**, **LoRA** αντί full fine-tune + rehearsal με
   γενικά ελληνικά (HParl) για να μη «ξεχάσει» το μοντέλο.
