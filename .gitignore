@@ -76,3 +76,9 @@ eval/run_resume.log
 eval/loop*.log
 eval/pool*.log
 eval/val*.log
+
+# Track 2 ASR auto-research: large local caches (not committed)
+data/asr/audio/
+data/asr/clips/
+data/asr/meeting_json/
+data/asr/*.out
