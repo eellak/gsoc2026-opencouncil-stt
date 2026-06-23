@@ -5,6 +5,17 @@ mini PC (`data/eval/`, `data/reports/fix-task-eval/`, `data/improve_loop/`) and
 the Notion meeting notes (May 26 → Jun 16). Pressure-tested with Grok + Codex
 (see end). Not yet a decision; the `[?]` items are for the meeting.
 
+> **SUPERSEDED on the split by the [2026-06-23 mentor sync](../meetings/2026-06-23-mentor-sync.md).**
+> This doc's §0c/§5 frame orestiada+argos as the **unseen-city TEST**. The mentor
+> decision moved them to **VALIDATION (exclusive)** and made **TEST = temporal
+> (June 2026+)**. The agreed split is hybrid: Argos + Orestiada whole → val; from
+> the mixed cities (Athens, Chalandri, Zografou, Vrilissia, Sparta, Chania,
+> Xylokastro, Samothraki) hold out ~X% of speaker-minutes → val, tuned to ~80/20
+> total. Read the unseen-city sections below as the *strata rationale*, not the
+> current TEST assignment. Trust-gate now uses the edit-fraction cutoff
+> ([meeting-trust-cutoff-plan](meeting-trust-cutoff-plan.md)), and HIR is likely
+> dropped ([metric-hir](../decisions/metric-hir.md)).
+
 ---
 
 ## 0. Framing — two artifacts, do not conflate them
