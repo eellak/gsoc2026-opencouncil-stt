@@ -1,62 +1,92 @@
 # Tiny-Whisper CPU auto-research — findings (Track 2)
 
-_2026-06-23. whisper-base (72.6M, LoRA r=8 on q/v, encoder frozen), CPU-only on
-the mini PC. Two time-boxed rounds, ~1 h wall-clock total. Method after
-[karpathy/autoresearch](https://github.com/karpathy/autoresearch): vary one
-data/training axis, fine-tune, score val, keep/discard, log, repeat._
+_2026-06-23. A small Whisper model (`whisper-base`, 72M params), fine-tuned on
+CPU on the mini PC, no GPU. About one hour of wall-clock, 16 training runs.
+Method borrowed from [karpathy/autoresearch](https://github.com/karpathy/autoresearch):
+change one thing, train, measure, keep or throw away, log it, repeat._
 
-## TL;DR
+## What we actually did, in one paragraph
 
-1. **Fine-tuning on ~17 min of corrections cuts ordinary-speech WER hard and
-   reliably** — `val_reg` (reviewed-unchanged utterances) drops from **0.674 →
-   ~0.43** normalized WER (~24 pts) on *every* fine-tune. That is real domain
-   adaptation, well outside noise.
-2. **The hard residual correction cases barely move.** `val_corr` sits at
-   **~0.61 ± 0.06** regardless of data mixture — and the seed-to-seed spread of a
-   *single* config (0.062) is as large as the spread across *all* configs
-   (0.064). So **no data axis is statistically distinguishable on `val_corr` at
-   this scale**; the two "keeps" are inside the noise floor.
-3. **What actually transfers to the large-v3 run:** the *composition* lever
-   (corrections + a no-edit backbone) and "don't starve ordinary speech", plus a
-   hard methodological lesson — **we need a bigger, lower-variance validation set
-   before any data-mixture ranking is trustworthy.** lr/steps don't transfer.
+We have ~2,000 human corrections of council-meeting transcripts. The question
+for the real (expensive, GPU) training run later is: **which data choices
+actually make the model better?** Instead of guessing, we let a small model run
+the experiment for us on the CPU we already own. Each run changes a single knob
+(more data of this type, less of that, different learning rate…), fine-tunes,
+and scores the result. The small model is a stand-in: it's too tiny to ship, but
+findings about *data* carry over to the big model, while findings about *model
+size* do not. So we only sweep data.
 
-## What this was
+```mermaid
+flowchart LR
+  A["/api/export corrections<br/>+ meeting JSON no-edit"] --> B["build clips +<br/>frozen manifest"]
+  B --> C["zero-shot baseline<br/>(no fine-tune) WER"]
+  C --> D{"pick next config"}
+  D --> E["LoRA fine-tune<br/>whisper-base on CPU"]
+  E --> F["score val_corr<br/>+ val_reg"]
+  F --> G{"corrections better<br/>AND ordinary speech<br/>not worse?"}
+  G -- yes --> H["keep"]
+  G -- no --> I["discard"]
+  H --> D
+  I --> D
+  D -- "time budget out" --> J["report.md"]
+```
 
-An automated fine-tuning experiment loop on the GPU-less mini PC. The lever is
-the **data/training config**, not the architecture (Codex: data-mixture findings
-transfer to a bigger model; model-rank sweeps do not). The recipe is held fixed
-(whisper-base + LoRA r=8 q/v, encoder frozen, 40 optimizer steps, grad-accum 4,
-greedy `language=el` decoding identical across every run) so val-WER deltas are
-attributable to the data choice.
+## A few terms, in plain words
 
-The point was never a deployable model — 1.8 h of corrections-scale data overfits
-a tiny model. The point was **which knobs move the needle**, to aim the eventual
-large-v3 GPU run.
+- **WER** (word error rate): share of words the model gets wrong. Lower is
+  better. 0.60 means roughly 60% of words are off in some way (these are hard,
+  noisy Greek council clips, so the numbers are high).
+- **val_corr**: our validation set of *corrected* utterances from two held-out
+  cities (Orestiada, Argos). The hard cases, the ones humans had to fix.
+- **val_reg**: a "regression" set of utterances from the same meetings that
+  humans reviewed and *did not* change. Ordinary, already-fine speech. We watch
+  it to make sure fine-tuning on hard cases doesn't quietly make normal speech
+  worse.
+- **LoRA**: a cheap way to fine-tune. Instead of moving all 72M weights, we train
+  a tiny add-on (~0.4% of them). Fast, and easy to reset between runs.
+
+## The three things worth remembering
+
+1. **Fine-tuning on ~17 minutes of corrections makes ordinary speech a lot
+   better, every single time.** `val_reg` drops from 0.674 to about 0.43 (~24
+   points) on every run. The model isn't memorising fixes, it's learning the
+   domain: council vocabulary, names, formatting. That helps the easy majority
+   more than the hard tail.
+2. **The hard corrected cases barely move, and the measurement is too noisy to
+   rank anything.** `val_corr` stays around 0.61 no matter what we feed it. Worse:
+   running the *same* config with different random seeds swings the score by 0.062,
+   which is as much as the spread across *all* the different configs (0.064). So
+   the "best" config winning by 0.003 is a coin flip. With only 56 validation
+   clips, we can't tell data recipes apart yet.
+3. **One worry didn't come true.** The standard fear is that training only on
+   corrections teaches the model that "the obvious transcription is wrong" and
+   degrades normal speech. It didn't. Normal speech got better, not worse.
 
 ## Setup
 
-- **Data (frozen):** `data/asr/manifest.jsonl`, 900 clips / 20 high-yield
-  meetings, built from `/api/export` corrections + meeting-JSON no-edit backbone,
-  no-edit gated on `humanReview=true`. Decode-once-then-slice, 16 kHz mono,
-  ±0.2 s padding, composite-id dedup, clip validation. Splits:
+Data is frozen in `data/asr/manifest.jsonl`: 900 clips from 20 high-yield
+meetings, built from the `/api/export` corrections plus a "no-edit backbone" of
+reviewed-but-unchanged utterances (only from fully human-reviewed meetings).
+Audio is decoded once per meeting, then sliced, 16 kHz mono, with a small
+padding. Splits:
 
-  | split | clips | min | what |
-  |---|---|---|---|
-  | `train` | 279 | 16.9 | corrections, 8 train cities |
-  | `train_noedit` | 452 | 19.5 | no-edit backbone (for the composition axis) |
-  | `val_corr` | 56 | 4.4 | corrections in orestiada+argos (held-out cities) |
-  | `val_reg` | 113→70 | 4.9 | no-edit in the same held-out cities (regression guard) |
+| split | clips | min | what it is |
+|---|---|---|---|
+| `train` | 279 | 16.9 | corrections, 8 training cities |
+| `train_noedit` | 452 | 19.5 | no-edit backbone, for the "add more normal speech" knob |
+| `val_corr` | 56 | 4.4 | corrections in the 2 held-out cities |
+| `val_reg` | 70 | 4.9 | no-edit speech in the same held-out cities |
 
-- **Baseline (zero-shot whisper-base, no FT):** `val_corr` 0.6071 · `val_reg`
-  0.6736 (normalized WER). Every run is compared to this.
-- **Selection rule:** *keep* only if `val_corr` improves **and** `val_reg` does
-  not regress beyond +0.01.
+Recipe held fixed across every run so any change in score comes from the data,
+not the setup: whisper-base, LoRA (rank 8, on the attention q/v projections),
+encoder frozen, 40 steps, greedy decoding forced to Greek. Baseline with no
+fine-tuning: `val_corr` 0.6071, `val_reg` 0.6736. A run is a "keep" only if
+`val_corr` improves and `val_reg` doesn't get worse by more than 0.01.
 
-## Results — all 16 fine-tune runs
+## Results — all 16 runs
 
-Round 1 = one-axis sweep from a corrections-only FT baseline. Round 2 = combine
-the round-1 keepers + remaining axes. Sorted by `val_corr` (lower = better).
+Round 1 changes one knob at a time. Round 2 combines the round-1 keepers. Sorted
+by `val_corr`, lower is better.
 
 | config | n_train | val_corr (Δ) | val_reg (Δ) | status |
 |---|---|---|---|---|
@@ -74,87 +104,69 @@ the round-1 keepers + remaining axes. Sorted by `val_corr` (lower = better).
 | `lr_5e-5` | 279 | 0.6588 (+0.052) | 0.6057 (−0.068) | discard |
 | `r2_bb1x_lr5e-5` | 558 | 0.6677 (+0.061) | 0.5377 (−0.136) | discard |
 
-Finalist reseed (`sample_capped_oversample`, 3 seeds): `val_corr` =
-**[0.6041, 0.6086, 0.6662]**, mean 0.626, spread **0.062**.
+Same config, 3 random seeds (`sample_capped_oversample`): 0.6041, 0.6086, 0.6662.
+That last seed is the whole problem in one number.
 
-## Observations
+## Reading the results
 
-- **`val_reg` is the robust, dominant signal.** Every fine-tune (except the
-  under-trained `lr_5e-5`) improves ordinary-speech WER by 21–25 points, and the
-  differences *between* mixtures (0.428–0.466) are small relative to the gain.
-  Fine-tuning teaches the model the *domain* (council vocabulary, formatting,
-  acoustics); that helps the easy majority far more than the hard tail.
-- **`val_corr` is noise-limited.** Cross-config spread 0.064 ≈ single-config seed
-  spread 0.062. The leaderboard order on `val_corr` is therefore **not
-  trustworthy** — `capped_oversample`'s −0.003 "win" is a coin-flip. This is the
-  single most important methodological takeaway: **56 val_corr clips is too few.**
-- **Combinations did not stack.** Pairing the two round-1 keepers
-  (`bb1x_capped*`) landed at 0.625, *worse* than either alone — exactly what you
-  expect when the underlying differences are noise.
-- **The one unambiguous result is negative:** `lr=5e-5` at 40 steps is clearly
-  worse on both sets (undertrained). It confirms `lr=1e-4` for this step budget —
-  and lr/steps don't transfer to large-v3 anyway, so this is a dead end by design.
-- **No mixture beat the regression guard meaningfully**, but none *failed* it
-  either (except low-LR): fine-tuning here is "safe" for ordinary speech, which
-  was Codex's central worry (correction-bias degrading general ASR). At this
-  scale, **it does not degrade — it helps.**
+The `val_reg` column is the real signal. Every fine-tune (except the
+under-trained low-LR one) cuts ordinary-speech error by 21–25 points, and the
+differences between recipes (0.428 vs 0.466) are small next to that gain.
 
-### Finalist per-category `val_corr` (directional only, tiny n)
+The `val_corr` column is mostly noise. The spread across configs equals the
+spread you get from just changing the random seed, so the ranking doesn't mean
+much yet. Combining the two round-1 "winners" actually did slightly *worse* than
+either alone, which is exactly what you'd expect if the differences were never
+real to begin with.
 
-| category | n | wer_norm |
-|---|---|---|
-| punctuation_capitalization | 12 | 0.577 |
-| homophone | 6 | 0.597 |
-| substitution_phonetic | 27 | 0.601 |
-| place_name | 6 | 0.613 |
-| noun_case | 9 | 0.616 |
-| person_name | 3 | 0.714 |
-| word_boundary | 8 | 0.762 |
-| verb_inflection | 5 | 0.809 |
+The one clear negative: dropping the learning rate to 5e-5 with only 40 steps
+just under-trains the model, and both scores suffer. Good to know, but learning
+rate won't carry over to the big model anyway, so it's a dead end by design.
 
-Phonetic substitutions and punctuation (the bulk of corrections) sit near the
-mean; morphology-heavy categories (verb inflection, word boundary) are hardest —
-but every cell has n ≤ 27, so read this as a hypothesis, not a measurement.
+Per-category on the corrections (directional only, tiny counts): punctuation,
+homophones and phonetic substitutions sit near the average; morphology-heavy
+stuff (verb inflection, word boundaries) is the hardest. Every bucket has at most
+27 clips, so treat this as a hunch, not a finding.
 
-## Direction — what to carry into the large-v3 GPU run
+## What to carry into the big (large-v3 GPU) run
 
-1. **Keep the composition recipe:** corrections **+ a no-edit backbone**. It is
-   the lever with a coherent story (helps `val_reg`, doesn't hurt `val_corr`) and
-   it is exactly the kind of data-mixture choice that transfers to a bigger model.
-   Start at ~1× backbone; 3× pushed ordinary-speech WER lowest but is not needed.
-2. **Capped oversampling of dominant categories** is a reasonable default (it was
-   the nominal best, and it's cheap), but **do not trust its ranking** until the
-   val set is bigger.
-3. **Drop** error-type focus, strict filtering, and low-LR — none helped.
-4. Re-tune lr / steps / epochs on the GPU; they do not transfer from a 40-step
-   CPU run.
+- **Keep the composition idea**: corrections plus a no-edit backbone. It's the
+  one knob with a sensible story (helps ordinary speech, doesn't hurt the hard
+  cases), and data-mixture choices are the kind that transfer to a bigger model.
+  Start around 1× backbone; 3× pushed ordinary-speech error lowest but isn't
+  necessary.
+- Capped oversampling (don't let the most common error type dominate) is a fine
+  default, but don't trust its ranking until the validation set is bigger.
+- Drop the rest: error-type focus, strict filtering, low LR. None helped.
+- Re-tune learning rate and steps on the GPU. They don't transfer from a 40-step
+  CPU run.
 
-## Next steps (in priority order)
+## Next steps, in order
 
-1. **Fix the validation set first — this is the bottleneck.** Use the *full*
-   human-corrected pool in orestiada+argos (~9.9 k utts) for `val_corr`, not 56
-   clips, and add a `val_reg_other_meeting` view (no-edit from held-out-city
-   meetings that contributed no corrections). Target seed-spread < 0.01.
-2. **Add meeting-level bootstrap CIs and ≥3 seeds per config** by default;
-   optionally meeting-level k-fold (3–5) across all cities for a lower-variance
-   read. Then re-run this exact sweep — with a real val, the mixture ranking
-   becomes meaningful.
-3. **Scale the train data** (more meetings + the backbone) toward the 30–50 h
-   "first useful checkpoint" tier before reading mixture effects as real.
-4. **Then** run the large-v3 LoRA on GPU (Track 1 / Kaggle) with the composition
-   recipe, and compare `val_reg`/`val_corr`/per-category to this baseline.
+1. **Fix the validation set first. This is the real blocker.** Use the full
+   human-corrected pool in the two held-out cities (~9,900 utterances) instead of
+   56 clips, and add a second regression set from held-out meetings that
+   contributed no corrections. Goal: get the seed-to-seed swing under 0.01.
+2. **Then ≥3 seeds per config and bootstrap confidence intervals by default**,
+   maybe meeting-level k-fold for a steadier read. With a real validation set,
+   the recipe ranking finally becomes meaningful.
+3. **Add more training data** (more meetings + the backbone) toward the 30–50 h
+   "first useful checkpoint" range before reading mixture effects as real.
+4. **Run large-v3 with LoRA on a GPU** using the composition recipe, and compare
+   back to this baseline.
 
-## Caveats / what was capped for the 1 h budget
+## Caveats
 
-- 20 meetings (not all 272); `val_corr` 56 clips; single seed per axis (finalist
-  reseeded to 3); 40-step CPU runs; `val_reg` drawn from the same meetings as
-  `val_corr` (same-meeting regression view — correlated acoustics, so the
-  `val_reg` gain is partly "same rooms/speakers"). All of this inflates variance
-  and is the reason the `val_corr` signal is inconclusive — by design, to fit the
-  hour. Nothing dropped was silent; see the logs.
-- **Reproducibility:** frozen `manifest.jsonl` (+ `dataset_stats.json`, source
-  mp3 hashes), full traces in `loop.log`, every run in `leaderboard.jsonl`,
-  `results.tsv`. Code: `eval/autoresearch/{prepare_asr,experiment,loop,round2}.py`.
+Everything here was capped to fit one hour: 20 meetings out of 272, 56 validation
+corrections, one seed per config (only the finalist got 3), 40-step CPU runs, and
+`val_reg` drawn from the same meetings as `val_corr` (so part of the ordinary-
+speech gain is "same rooms, same speakers"). All of this inflates the noise and
+is why the `val_corr` ranking is inconclusive. That was the trade for speed.
+Nothing was dropped silently; the logs have the full trail.
+
+Reproducibility: frozen `manifest.jsonl` (+ `dataset_stats.json`, source audio
+hashes), full traces in `loop.log`, every run in `leaderboard.jsonl` and
+`results.tsv`. Code is in `eval/autoresearch/`.
 
 ```
 build:  python eval/autoresearch/prepare_asr.py
