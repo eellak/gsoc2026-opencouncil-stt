@@ -8,6 +8,7 @@
 
 import { getRepo } from '$lib/server/repo';
 import { degenerateCategories, isDegenerate } from '$lib/server/state/ingest-filter';
+import { isExcludedMeeting } from '$lib/server/state/excluded-meetings';
 import type { Group } from '$lib/domain/groups';
 
 function encodeGroup(g: Group, cacheHash: string): string {
@@ -58,12 +59,22 @@ export async function GET() {
 	const stream = new ReadableStream<Uint8Array>({
 		start(controller) {
 			const encoder = new TextEncoder();
+			let excludedRows = 0;
 			try {
 				for (const g of iter) {
 					if (g.label.include_status !== 'include') continue;
 						if (isDegenerate(g, drop)) continue;
+					// Drop rows from denylisted (unreviewed, <5% human-edit) meetings,
+					// even if individually `include`d — keeps "our set excludes
+					// unreviewed meetings" true. Reversible via env (see module).
+					if (isExcludedMeeting(g.city_id, g.meeting_id)) {
+						excludedRows++;
+						continue;
+					}
 					controller.enqueue(encoder.encode(encodeGroup(g, cacheHash)));
 				}
+				if (excludedRows > 0)
+					console.log(`[export] dropped ${excludedRows} rows from denylisted meetings`);
 				controller.close();
 			} catch (e) {
 				controller.error(e);
