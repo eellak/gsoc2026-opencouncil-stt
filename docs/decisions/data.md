@@ -295,3 +295,6 @@ Final ratio of corrected vs non-corrected utterances in the training set
 (starting point ~30–50% corrections / ~50–70% non-corrected). To be tuned once
 the eval harness can measure the effect. See
 [finetuning-101 → correction-bias trap](../reference/finetuning-101.md#our-dataset).
+The *error-type* shape of that mix (which categories the fine-tune should own vs
+leave to the LLM) is being decided by the experiment in
+[specs/error-division.md](../specs/error-division.md).

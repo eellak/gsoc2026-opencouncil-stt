@@ -1,0 +1,105 @@
+{
+  "n_clips": 448,
+  "by_split": {
+    "val_corr_cat": 119,
+    "val_reg": 329
+  },
+  "meetings_by_split": {
+    "val_corr_cat": 29,
+    "val_reg": 27
+  },
+  "val_corr_per_category": {
+    "substitution_phonetic": {
+      "n_clips": 62,
+      "n_meetings": 25,
+      "directional": false
+    },
+    "punctuation_capitalization": {
+      "n_clips": 28,
+      "n_meetings": 16,
+      "directional": true
+    },
+    "homophone": {
+      "n_clips": 14,
+      "n_meetings": 12,
+      "directional": true
+    },
+    "noun_case": {
+      "n_clips": 12,
+      "n_meetings": 8,
+      "directional": true
+    },
+    "word_boundary": {
+      "n_clips": 11,
+      "n_meetings": 7,
+      "directional": true
+    },
+    "verb_inflection": {
+      "n_clips": 11,
+      "n_meetings": 8,
+      "directional": true
+    },
+    "place_name": {
+      "n_clips": 10,
+      "n_meetings": 7,
+      "directional": true
+    },
+    "insertion": {
+      "n_clips": 8,
+      "n_meetings": 5,
+      "directional": true
+    },
+    "article_pronoun": {
+      "n_clips": 6,
+      "n_meetings": 6,
+      "directional": true
+    },
+    "number_date": {
+      "n_clips": 5,
+      "n_meetings": 5,
+      "directional": true
+    },
+    "semantic_rewrite": {
+      "n_clips": 4,
+      "n_meetings": 3,
+      "directional": true
+    },
+    "deletion": {
+      "n_clips": 4,
+      "n_meetings": 3,
+      "directional": true
+    },
+    "person_name": {
+      "n_clips": 4,
+      "n_meetings": 3,
+      "directional": true
+    },
+    "accent_tonos": {
+      "n_clips": 2,
+      "n_meetings": 2,
+      "directional": true
+    },
+    "morphology": {
+      "n_clips": 1,
+      "n_meetings": 1,
+      "directional": true
+    },
+    "disfluency_cleanup": {
+      "n_clips": 1,
+      "n_meetings": 1,
+      "directional": true
+    }
+  },
+  "val_cities": [
+    "argos",
+    "orestiada"
+  ],
+  "params": {
+    "val_reg_target": 400,
+    "val_reg_per_meeting": 20
+  },
+  "build_seconds": 316.6,
+  "sr": 16000,
+  "pad_s": 0.2,
+  "seed": 1234
+}

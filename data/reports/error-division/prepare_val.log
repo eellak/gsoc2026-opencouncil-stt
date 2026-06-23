@@ -1,0 +1,47 @@
+[19:36:59] export corrections in ['argos', 'orestiada']: 160
+[19:36:59] val meetings with corrections: 34 (27 humanReview)
+[19:36:59] train-split keys=731 across 5 cities (disjoint from val: OK)
+[19:37:06] [1/34] argos apr24_2026 hr=True kept=12 (reg=10) dropped=10 reg_budget_left=390 elapsed=7s
+[19:37:12] [2/34] argos apr30_2_2026 hr=True kept=10 (reg=9) dropped=11 reg_budget_left=381 elapsed=13s
+[19:37:18] [3/34] argos apr7_2026 hr=True kept=12 (reg=10) dropped=11 reg_budget_left=371 elapsed=19s
+[19:37:18]   argos aug29_2025: NOT humanReview -> corrections only (no trustworthy no-edit)
+[19:37:25] [4/34] argos aug29_2025 hr=False kept=3 (reg=0) dropped=0 reg_budget_left=371 elapsed=26s
+[19:37:30] [5/34] argos dec18_2025 hr=True kept=14 (reg=8) dropped=14 reg_budget_left=363 elapsed=31s
+[19:37:37] [6/34] argos dec23_2025 hr=True kept=14 (reg=11) dropped=10 reg_budget_left=352 elapsed=38s
+[19:37:37]   argos dec3_2025: NOT humanReview -> corrections only (no trustworthy no-edit)
+[19:37:47] [7/34] argos dec3_2025 hr=False kept=0 (reg=0) dropped=1 reg_budget_left=352 elapsed=47s
+[19:37:47]   argos dec5_2025: NOT humanReview -> corrections only (no trustworthy no-edit)
+[19:37:52] [8/34] argos dec5_2025 hr=False kept=0 (reg=0) dropped=1 reg_budget_left=352 elapsed=53s
+[19:37:59] [9/34] argos dec9_2025 hr=True kept=17 (reg=10) dropped=12 reg_budget_left=342 elapsed=59s
+[19:38:04] [10/34] argos feb26_2026 hr=True kept=18 (reg=15) dropped=5 reg_budget_left=327 elapsed=65s
+[19:38:08] [11/34] argos feb27_2026 hr=True kept=16 (reg=15) dropped=5 reg_budget_left=312 elapsed=68s
+[19:38:17] [12/34] argos feb6_2026 hr=True kept=15 (reg=13) dropped=8 reg_budget_left=299 elapsed=77s
+[19:38:17]   argos jul28_2025: NOT humanReview -> corrections only (no trustworthy no-edit)
+[19:38:24] [13/34] argos jul28_2025 hr=False kept=10 (reg=0) dropped=1 reg_budget_left=299 elapsed=85s
+[19:38:33] [14/34] argos mar10_2026 hr=True kept=13 (reg=13) dropped=8 reg_budget_left=286 elapsed=94s
+[19:38:51] [15/34] argos mar23_2026 hr=True kept=13 (reg=12) dropped=8 reg_budget_left=274 elapsed=112s
+[19:38:53] [16/34] argos mar23_2_2026 hr=True kept=9 (reg=9) dropped=12 reg_budget_left=265 elapsed=114s
+[19:39:10] [17/34] argos may12_2026 hr=True kept=16 (reg=14) dropped=6 reg_budget_left=251 elapsed=131s
+[19:39:10]   argos nov11_2025: NOT humanReview -> corrections only (no trustworthy no-edit)
+[19:39:21] [18/34] argos nov11_2025 hr=False kept=4 (reg=0) dropped=1 reg_budget_left=251 elapsed=142s
+[19:39:31] [19/34] argos nov26_2025 hr=True kept=15 (reg=12) dropped=10 reg_budget_left=239 elapsed=151s
+[19:39:31]   argos oct31_2025: NOT humanReview -> corrections only (no trustworthy no-edit)
+[19:39:32] [20/34] argos oct31_2025 hr=False kept=1 (reg=0) dropped=0 reg_budget_left=239 elapsed=153s
+[19:39:32]   argos oct31__2_2025: NOT humanReview -> corrections only (no trustworthy no-edit)
+[19:39:39] [21/34] argos oct31__2_2025 hr=False kept=3 (reg=0) dropped=3 reg_budget_left=239 elapsed=160s
+[19:39:45] [22/34] argos sep15_2025 hr=True kept=14 (reg=13) dropped=8 reg_budget_left=226 elapsed=165s
+[19:40:07] [23/34] orestiada apr27_2026 hr=True kept=14 (reg=8) dropped=15 reg_budget_left=218 elapsed=188s
+[19:40:14] [24/34] orestiada apr28_2026 hr=True kept=15 (reg=15) dropped=6 reg_budget_left=203 elapsed=195s
+[19:40:21] [25/34] orestiada apr28_3_2026 hr=True kept=15 (reg=12) dropped=9 reg_budget_left=191 elapsed=201s
+[19:40:37] [26/34] orestiada apr7_2026 hr=True kept=25 (reg=17) dropped=5 reg_budget_left=174 elapsed=217s
+[19:40:55] [27/34] orestiada dec11_2025 hr=True kept=17 (reg=12) dropped=9 reg_budget_left=162 elapsed=236s
+[19:41:01] [28/34] orestiada dec11_2025_2 hr=True kept=13 (reg=12) dropped=8 reg_budget_left=150 elapsed=242s
+[19:41:29] [29/34] orestiada feb11_2026 hr=True kept=18 (reg=13) dropped=9 reg_budget_left=137 elapsed=270s
+[19:41:45] [30/34] orestiada feb27_2026 hr=True kept=17 (reg=15) dropped=7 reg_budget_left=122 elapsed=286s
+[19:41:52] [31/34] orestiada jan21_2026 hr=True kept=21 (reg=10) dropped=13 reg_budget_left=112 elapsed=293s
+[19:42:01] [32/34] orestiada mar23_2026 hr=True kept=27 (reg=15) dropped=8 reg_budget_left=97 elapsed=302s
+[19:42:09] [33/34] orestiada mar3_2026 hr=True kept=14 (reg=13) dropped=8 reg_budget_left=84 elapsed=310s
+[19:42:16] [34/34] orestiada mar3_2_2026 hr=True kept=23 (reg=13) dropped=10 reg_budget_left=71 elapsed=317s
+[19:42:16] DONE clips=448 by_split={'val_corr_cat': 119, 'val_reg': 329} meetings={'val_corr_cat': 29, 'val_reg': 27} in 317s
+[19:42:16]   -> /home/harold/opencouncil-fine-tuning/data/asr/val_manifest.jsonl
+  -> /home/harold/opencouncil-fine-tuning/data/asr/val_stats.json
