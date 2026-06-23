@@ -55,6 +55,7 @@
 				{refreshing ? 'Ανανέωση…' : 'Ανανέωση τώρα'}
 			</button>
 			<a href="/" class="btn">Αρχική</a>
+			<a href="/stats/coverage" class="btn">Κάλυψη &amp; HIR</a>
 			<a href="/api/export" class="btn export">Εξαγωγή included</a>
 		</div>
 	</header>
