@@ -182,27 +182,30 @@ Implementation: `latest_per_utterance` flag computed via window function in `ui/
 
 ## Open
 
-### Training-unit granularity: utterances vs larger / speaker segments (raised 2026-06-23)
+### Training-unit granularity: utterances vs larger / speaker segments (answered 2026-06-23)
 
-New question from the [mentor sync](../meetings/2026-06-23-mentor-sync.md). Edits
-arrive **per utterance** from the review UI, so the obvious unit is the utterance.
-But many ASR errors come from the audio being cut slightly before/after the
-utterance (missing words at the start/end that are clear if you shift the boundary)
-— Whisper self-segments 30-min/hour audio, the utterance boundaries are arbitrary.
-So a larger unit may train better: a context window (±neighbouring utterances) or
-the **whole speaker segment** the utterance belongs to, with **duplicate avoidance**
-(if utterance −3 is also in the set, don't double-count). Decide from the
-literature + what others do + Claude. Affects dataset build and the manifest.
+**Answered** in [training-unit-granularity](../reference/training-unit-granularity.md):
+use **~20–30s segments** (concatenate neighbouring utterances within one speaker
+segment, boundaries on silence, small padding, no overlap so no duplicates), not
+bare short utterances — Whisper's input is fixed at 30s and short-only fine-tuning
+degrades long-form (segmentation/timestamps/hallucinations). The corrected utterance
+stays the target; neighbours add context (only trusted if the meeting passes the
+trust cutoff). Open: exact length + short/long mix ratio + whether to keep timestamp
+tokens in the first run — sweep on the mini PC once val is larger.
 
-### Meeting-trust cutoff: `humanReview` flag is unreliable (raised 2026-06-23)
+### Meeting-trust cutoff: `humanReview` flag is unreliable (measured 2026-06-23)
 
-Christos: `taskStatus.humanReview` is a "fake" status — some meetings lack it yet
-are corrected (old / 2025 ones), so the flag alone over- and under-counts. Refine
-the [humanReview gate](metric-hir.md): combine the flag with a **distribution of
-the human-edit *fraction* (edits/total) per meeting** and pick a **threshold**
-below which a meeting is not trusted (expect a cluster ~20–30% and a tail <5% to
-drop — and don't sample "no-edit as ground truth" from the low-fraction ones).
-Supersedes relying solely on the flag; complements the ≥20 human-edit count gate.
+**Measured** — see [meeting-trust-cutoff-plan](../specs/meeting-trust-cutoff-plan.md)
+and `data/reports/meeting-edit-fraction/`. Christos was right: across 327 meetings,
+`humanReview=true` (212) is **reliable upward** (min frac_user 9.6%, no false
+positives) but `humanReview=false` (115) has **95 false negatives** — meetings with
+frac_user ≥15% that are clearly reviewed, just missing the flag (old/2025). Trusting
+only the flag discards ~95 good meetings. There's a clean gap: 13 dead meetings at
+frac_user <3%, then it jumps to ~9%. Proposed rule: **drop junk at frac_user <5%**
+(strictly better than the ≥20 *count* gate — thessaloniki/apr1 has 37 edits but
+frac 0.4%); **trust no-edit backbone where `humanReview=true` OR frac_user ≥15%**,
+with a residual-WER audit on the rescued 95. Final thresholds picked at the Thursday
+meeting. Supersedes relying solely on the flag and the ≥20 count gate.
 
 ### Reviewer curation subjectivity (raised 2026-06-23)
 
