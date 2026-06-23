@@ -1,0 +1,50 @@
+[15:36:53] export rows=1963 unique corrections=1963
+[15:36:53] chosen meetings: 6 val + 14 train = 20
+[15:36:53]   val=[('argos', 'jul28_2025'), ('argos', 'dec9_2025'), ('argos', 'dec18_2025'), ('orestiada', 'mar23_2026'), ('orestiada', 'jan21_2026'), ('orestiada', 'mar3_2_2026')]
+[15:36:53]   train cities=Counter({'athens': 5, 'samothraki': 4, 'chania': 3, 'sparta': 1, 'vrilissia': 1})
+[15:36:53]   argos jul28_2025: NOT humanReview -> corrections only (no trustworthy no-edit)
+[15:37:12]   downloaded argos/jul28_2025 148MB in 19s
+[15:37:19] [1/20] argos jul28_2025 hr=False kept=10 dropped=1 decoded=154min elapsed=26s
+[15:37:40]   downloaded argos/dec9_2025 129MB in 17s
+[15:37:46] [2/20] argos dec9_2025 hr=True kept=34 dropped=15 decoded=134min elapsed=53s
+[15:37:58]   downloaded argos/dec18_2025 106MB in 11s
+[15:38:03] [3/20] argos dec18_2025 hr=True kept=28 dropped=20 decoded=110min elapsed=70s
+[15:38:21]   downloaded orestiada/mar23_2026 180MB in 17s
+[15:38:30] [4/20] orestiada mar23_2026 hr=True kept=32 dropped=23 decoded=125min elapsed=97s
+[15:38:46]   downloaded orestiada/jan21_2026 141MB in 15s
+[15:38:54] [5/20] orestiada jan21_2026 hr=True kept=36 dropped=18 decoded=147min elapsed=121s
+[15:39:06]   downloaded orestiada/mar3_2_2026 126MB in 12s
+[15:39:13] [6/20] orestiada mar3_2_2026 hr=True kept=29 dropped=24 decoded=131min elapsed=140s
+[15:39:50]   downloaded chania/may28_2025 372MB in 34s
+[15:40:09] [7/20] chania may28_2025 hr=True kept=88 dropped=47 decoded=388min elapsed=196s
+[15:40:30]   downloaded athens/apr22_2026 201MB in 19s
+[15:40:41] [8/20] athens apr22_2026 hr=True kept=67 dropped=59 decoded=210min elapsed=228s
+[15:41:03]   downloaded athens/jan19_2026 223MB in 21s
+[15:41:16] [9/20] athens jan19_2026 hr=True kept=64 dropped=54 decoded=232min elapsed=263s
+[15:41:51]   downloaded athens/mar9_1_2026 348MB in 33s
+[15:42:10] [10/20] athens mar9_1_2026 hr=True kept=73 dropped=38 decoded=362min elapsed=317s
+[15:42:52]   downloaded sparta/mar30_2026 427MB in 39s
+[15:43:14] [11/20] sparta mar30_2026 hr=True kept=66 dropped=39 decoded=445min elapsed=381s
+[15:43:37]   downloaded athens/feb9_2_2026 228MB in 21s
+[15:43:50] [12/20] athens feb9_2_2026 hr=True kept=52 dropped=47 decoded=238min elapsed=417s
+[15:44:14]   downloaded athens/apr1_2026 248MB in 23s
+[15:44:27] [13/20] athens apr1_2026 hr=True kept=63 dropped=29 decoded=259min elapsed=454s
+[15:45:01]   downloaded samothraki/apr6_2026 261MB in 31s
+[15:45:15] [14/20] samothraki apr6_2026 hr=True kept=48 dropped=40 decoded=272min elapsed=502s
+[15:45:40]   downloaded samothraki/dec15_2025 206MB in 23s
+[15:45:51] [15/20] samothraki dec15_2025 hr=True kept=45 dropped=37 decoded=214min elapsed=538s
+[15:46:18]   downloaded vrilissia/apr29_2_2026 231MB in 25s
+[15:46:30] [16/20] vrilissia apr29_2_2026 hr=True kept=44 dropped=34 decoded=241min elapsed=577s
+[15:47:02]   downloaded samothraki/may6_2026 265MB in 30s
+[15:47:16] [17/20] samothraki may6_2026 hr=True kept=47 dropped=27 decoded=276min elapsed=622s
+[15:47:33]   downloaded samothraki/nov19_2025 175MB in 16s
+[15:47:42] [18/20] samothraki nov19_2025 hr=True kept=40 dropped=28 decoded=182min elapsed=649s
+[15:47:42]   chania feb26_2025: NOT humanReview -> corrections only (no trustworthy no-edit)
+[15:48:02]   downloaded chania/feb26_2025 214MB in 20s
+[15:48:12] [19/20] chania feb26_2025 hr=False kept=17 dropped=3 decoded=223min elapsed=679s
+[15:48:12]   chania jul28_2025: NOT humanReview -> corrections only (no trustworthy no-edit)
+[15:48:30]   downloaded chania/jul28_2025 201MB in 19s
+[15:48:40] [20/20] chania jul28_2025 hr=False kept=17 dropped=3 decoded=209min elapsed=707s
+[15:48:40] DONE clips=900 by_split={'val_corr': 56, 'val_reg': 113, 'train': 279, 'train_noedit': 452} minutes={'val_corr': 4.4, 'val_reg': 4.9, 'train': 16.9, 'train_noedit': 19.5} in 707s
+[15:48:40]   -> /home/harold/opencouncil-fine-tuning/data/asr/manifest.jsonl
+  -> /home/harold/opencouncil-fine-tuning/data/asr/dataset_stats.json
