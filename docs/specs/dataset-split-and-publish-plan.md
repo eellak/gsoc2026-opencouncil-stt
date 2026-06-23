@@ -89,14 +89,29 @@ not have before:
   argos ~17h, then a long tail of 1-meeting cities (<7h each).
 - **Speaker floors:** 254 speakers ≥10min, 141 ≥30min, 87 ≥60min.
 
+### Test sets: benchmark + strata, all disjoint from train (best practice)
+A test set is valid only if **no test meeting is ever in train/val**. Use several
+test sets together, then subtract their union from the training pool:
+- **Production benchmark** — the existing `bench.opencouncil.gr` random-meeting
+  set. Representative of real production → good *headline* tracking, but random so
+  it can't isolate *where* the model fails. **Action item:** get the exact list of
+  meetings/utterances it used. If it's a fixed set → freeze it as test. If it's
+  ad-hoc/changing → define our own frozen benchmark instead.
+- **Unseen-city** — whole held-out cities (diagnosis: generalizes to a *new*
+  council?).
+- **Future-temporal** — post-Jun-1 (drift), empty now.
+- **Workflow:** define `test = benchmark ∪ unseen-city ∪ future` FIRST, remove from
+  the pool, then split the remainder into train/val. (Resolves "the benchmark also
+  contains training data" — those meetings become a permanent holdout.)
+
 ### Concrete split proposal (data-backed, public-only)
-- **TEST — unseen city (chosen): `orestiada`** held out *entirely* (~17h reviewed,
-  14 meetings, 26 speakers, HIR 25.6%). Why orestiada: mid-size (enough for a
-  stable WER/HIR, but ~7% of the 254h reviewed so it doesn't starve training),
-  HIR close to the 28% global mean (representative, *not* an outlier), and a whole
-  city is **automatically speaker- and meeting-disjoint** (0 cross-city speakers).
-  Alternate: `argos` (HIR 28.5%, ~10h). **Avoid `samothraki`** (HIR 37.9% = small
-  atypical island, would bias the test).
+- **TEST — unseen city (chosen): `orestiada` + `argos`** held out *entirely*
+  (~27h combined; one city alone can be idiosyncratic, so use two). orestiada
+  ~17h / 14 mtgs / 26 spk / HIR 25.6%; argos ~10h / HIR 28.5% — both **mid-size
+  with HIR close to the 28% global mean** (representative, *not* outliers), and a
+  whole city is **automatically speaker- and meeting-disjoint** (0 cross-city
+  speakers). Combined ~11% of the 254h reviewed, so training isn't starved.
+  **Avoid `samothraki`** (HIR 37.9% = small atypical island, would bias the test).
 - **TEST — future temporal:** rolling, **currently empty** by design (June data
   added later); freeze policy, accumulate, join orestiada once adequate.
 - **VAL — unseen speaker / seen city:** inside the *training* cities, hold out
@@ -132,7 +147,20 @@ utterance means "nobody looked", not "ASR was right" — so its label is untrust
 - This gate also makes the **HIR metric** well-defined — see
   [metric-hir.md](../decisions/metric-hir.md). Baseline **HIR = 28.1%** (FPY 71.9%).
 - Per-meeting coverage is now browsable in the UI: **`/stats/coverage`** (reads
-  `data/reports/coverage.json`).
+  `ui/static/coverage.json`).
+
+### Where the gate does / doesn't apply (important)
+The `humanReview` gate is **only for the dataset export + the HIR metric** — NOT
+for the review queue.
+- The **review queue** (`meeting-eligibility.ts`) uses a different, looser rule:
+  a meeting is shown once it has **≥10 human-edited utterances** → **313 eligible
+  meetings** today, and it *correctly still shows* partially-reviewed meetings
+  (incl. `thessaloniki/apr1_2026`, 37 user edits) — that is the queue's whole
+  purpose: to let reviewers *finish* them. We should NOT hide them there.
+- So the two filters are distinct on purpose: **313** worth-reviewing (queue) vs
+  **212** trusted-and-finished (dataset/metric).
+- **TODO:** apply `humanReview=true` at dataset-export time (`eval/build_split.py`),
+  not in the UI queue. Optional: a "needs-finishing" badge in the queue.
 
 ---
 
