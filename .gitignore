@@ -85,3 +85,6 @@ data/asr/*.out
 
 # local CPU finetune venv
 .venv-asr/
+
+# matrix run intermediate caches (resumable)
+data/reports/error-division/cache/
