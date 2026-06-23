@@ -124,7 +124,12 @@ utterance means "nobody looked", not "ASR was right" — so its label is untrust
 
 ## 1. The split — proposal
 
-### Test set (held-out, never touched until the end)
+### Test set (held-out)
+> **Policy (reconciled with reviewer note #1):** the temporal test is a *rolling*
+> benchmark that keeps accumulating until it meets the adequacy minimums, then is
+> **frozen** and never touched again. "Never touched until the end" applies only
+> *after* it is frozen.
+
 - **Temporal holdout: all data after 2026-06-01.** (Notion Jun 16.) This forces
   the test set to contain new meetings + new speakers → measures real
   generalization, not memorization.
@@ -152,9 +157,12 @@ utterance means "nobody looked", not "ASR was right" — so its label is untrust
 - `[?]` The existing `data/eval/split.json` is the **fix-task eval** split
   (per-meeting + per-city, eval cities: argithea, athens, kalamata, sparta,
   zografou) — built to keep the glossary leakage-safe. It is **not** the ASR
-  split. Proposal: define **one canonical meeting/speaker split** and have both
-  the ASR fine-tuning and the fix-task eval consume it, so a meeting is never
-  ASR-train + fix-task-eval at once. Avoids a confusing two-split story in the post.
+  split. Proposal (precise form per reviewer note #7): define **one canonical
+  OUTER partition** (`meeting_id`/`speaker → train|val|test`) and have both the
+  ASR fine-tuning and the fix-task eval consume it, each applying its own
+  *eligibility filters* on top. So a meeting is never ASR-train + fix-task-eval at
+  once, but the two eval *datasets* need not be identical. This is the single
+  contract; "canonical split" everywhere in this doc means this shared partition.
 
 ---
 
@@ -176,7 +184,10 @@ Proposed include/exclude for the **ASR target labels**:
   whole training set.
 - **❌ `task_only`** (LLM-edited, no human sign-off) — labels are unvalidated and
   we measured the task **overcorrects**. Training the acoustic model on these
-  risks baking in the LLM's mistakes. **Exclude** (or at most use cautiously).
+  risks baking in the LLM's mistakes. **Proposed default: exclude from the trusted
+  target set.** Reviewer note #5 refines this to a *weak/down-weighted tier*
+  (possibly only NE/acronym `task_only`); **ablation A is what settles exclude vs
+  weak-keep** — until then, exclude is the working assumption, not a final decision.
 - `[?]` **Acoustic-vs-style filter.** A "user edit" is not always an ASR error.
   For ASR targets we want *acoustic* errors. Use the categories as triage:
   `homophone / word_boundary / named_entity / acronym` ≈ acoustic (keep);

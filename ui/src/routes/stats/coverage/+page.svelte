@@ -2,15 +2,15 @@
 	import type { PageData } from './$types';
 	const { data }: { data: PageData } = $props();
 	const cov = $derived(data.coverage);
-	const s = $derived(cov.summary as Record<string, number | number[]>);
+	const s = $derived(cov.summary);
 
 	const num = (n: number | null | undefined, d = 0) =>
 		n === null || n === undefined ? '—' : n.toLocaleString('el-GR', { maximumFractionDigits: d });
 	const pct = (x: number | null | undefined, d = 1) =>
 		x === null || x === undefined ? '—' : (x * 100).toLocaleString('el-GR', { maximumFractionDigits: d }) + '%';
 
-	const hirMicro = $derived((s.hir_micro as number) ?? null);
-	const ci = $derived((s.hir_ci95 as number[]) ?? null);
+	const hirMicro = $derived(s.hir_micro ?? null);
+	const ci = $derived(s.hir_ci95 ?? null);
 
 	type Filter = 'all' | 'reviewed' | 'not_reviewed' | 'private';
 	let filter = $state<Filter>('reviewed');

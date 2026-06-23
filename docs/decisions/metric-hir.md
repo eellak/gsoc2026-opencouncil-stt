@@ -1,7 +1,7 @@
 # Metric: Human Intervention Rate (HIR)
 
 Status: **proposed** (2026-06-23) — for discussion at the next meeting.
-Computed on real data: `data/reports/coverage.json`, `eval/fetch_speakers.py`.
+Computed on real data: `ui/static/coverage.json` (published snapshot), `eval/fetch_speakers.py`.
 
 ## What it measures
 
@@ -48,7 +48,9 @@ edits over 9,282 utterances — must be excluded.)
 
 ## Current baseline (212 reviewed meetings, 394,742 utterances)
 
-- **Micro HIR = 28.1%** (Wilson 95% CI [28.0%, 28.3%]) → FPY ≈ 71.9%.
+- **Micro HIR = 28.1%** (Wilson 95% CI [28.0%, 28.3%] — *approximate: assumes
+  utterance independence, so it is artificially narrow; the true meeting-clustered
+  bootstrap CI is wider*) → FPY ≈ 71.9%.
 - **Macro HIR = 30.1%** (median 28.0%, p10 18.8%, p90 45.0%).
 - By city (micro): chalandri 21.2%, chania 22.5%, zografou 23.7% (low) …
   athens 33.1%, samothraki 37.9% (high).
