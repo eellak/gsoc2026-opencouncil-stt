@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenCouncil ASR — πού είμαστε (slides)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css" id="theme">
+<style>
+  :root { --acc:#2563eb; --good:#16a34a; --bad:#dc2626; --mut:#6b7280; }
+  .reveal { font-size: 30px; }
+  .reveal h1 { font-size: 1.7em; }
+  .reveal h2 { color:#111827; font-size: 1.25em; margin-bottom:.4em; }
+  .reveal h3 { color:var(--acc); font-size: .85em; }
+  .reveal section { text-align: left; }
+  .reveal section.center { text-align:center; }
+  .reveal table { font-size: .62em; }
+  .reveal table th { background:#f3f4f6; }
+  .reveal .small { font-size:.62em; color:var(--mut); }
+  .reveal .tag { display:inline-block; font-size:.5em; padding:.15em .6em; border-radius:999px;
+                 background:#eff6ff; color:var(--acc); vertical-align:middle; margin-left:.4em; }
+  .reveal .good { color:var(--good); font-weight:600; }
+  .reveal .bad { color:var(--bad); font-weight:600; }
+  .reveal .box { background:#f8fafc; border:1px solid #e5e7eb; border-radius:10px; padding:.5em .8em; }
+  .reveal .note { background:#fffbeb; border:1px solid #fde68a; border-radius:10px; padding:.5em .8em; font-size:.7em; }
+  .reveal ul { margin-left:.4em; }
+  .reveal em.k { color:var(--acc); font-style:normal; font-weight:600; }
+  .reveal .two { display:grid; grid-template-columns:1fr 1fr; gap:1em; }
+  .reveal .foot { position:fixed; bottom:8px; right:14px; font-size:13px; color:var(--mut); }
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+<!-- 1 -->
+<section class="center" data-background-color="#0f172a">
+  <h1 style="color:#fff">OpenCouncil — Greek ASR</h1>
+  <p style="color:#cbd5e1; font-size:.8em">Πού είμαστε στο fine-tuning · τι έδειξαν τα πειράματα · τι προτείνω για το επόμενο dataset</p>
+  <p class="small" style="color:#94a3b8">GSoC 2026 · sync update · 2026-06-25</p>
+  <p class="small" style="color:#64748b">Όλα τα νούμερα είναι preliminary — μικρά δείγματα. Τα λέω ως κατεύθυνση, όχι ως απόδειξη.</p>
+</section>
+
+<!-- 2 -->
+<section>
+  <h2>Δουλεύουμε δύο πράγματα, όχι ένα</h2>
+  <div class="two">
+    <div class="box">
+      <h3>#1 — fix-task (LLM)</h3>
+      <p>Το LLM που καθαρίζει το raw ASR. Ήδη production. Εκεί έτρεξα το glossary A/B.</p>
+    </div>
+    <div class="box">
+      <h3>#2 — ASR fine-tuning dataset</h3>
+      <p>Ζεύγη <code>(audio, σωστό κείμενο)</code> για να εκπαιδεύσουμε το <em class="k">ακουστικό</em> μοντέλο. Αυτό είναι το κυρίως θέμα.</p>
+    </div>
+  </div>
+  <p class="small">Το #1 τροφοδοτεί το #2 ως triage: μας λέει ποια λάθη τα πιάνει ήδη το LLM (χαμηλή αξία για το ακουστικό) vs ποια είναι γνήσια ακουστικά (υψηλή αξία).</p>
+  <p class="small">Στόχος-μετρική: <em class="k">HIR</em> = πόσα utterances χρειάζονται ανθρώπινη διόρθωση. Σήμερα ~28%. Θέλουμε να πέσει.</p>
+</section>
+
+<!-- 3 -->
+<section>
+  <h2>Τι reports έτρεξα</h2>
+  <table>
+    <tr><th>Report</th><th>Τι είναι</th><th>Κύριο μήνυμα</th></tr>
+    <tr><td><b>Track 2</b><br>CPU auto-research</td><td>whisper-base, LoRA, 16 runs σε CPU. Αλλάζω ένα knob τη φορά.</td><td>Ποιες επιλογές dataset βοηθάνε; — και πόσο θόρυβο έχει η μέτρηση.</td></tr>
+    <tr><td><b>Kaggle</b><br>large-v3 dry-run</td><td>Το «κανονικό» μοντέλο (large-v3) + LoRA, σε ~1.8h δεδομένα.</td><td>Validation ότι το pipeline τρέχει end-to-end. Όχι απόδειξη βελτίωσης.</td></tr>
+    <tr><td><b>error-division</b><br>ποιος διορθώνει τι</td><td>A/B/C/D: raw vs LLM vs fine-tune vs και τα δύο, ανά κατηγορία λάθους.</td><td>Fine-tune και LLM διορθώνουν <b>διαφορετικά</b> λάθη.</td></tr>
+    <tr><td><b>fix-task</b><br>glossary A/B</td><td>1000 corrections, on-box Sonnet, με/χωρίς glossary.</td><td>Το glossary δεν βοηθάει συνολικά — μόνο στα ονόματα.</td></tr>
+  </table>
+</section>
+
+<!-- 4 -->
+<section>
+  <h2>Track 2 — τι έδειξε το CPU auto-research</h2>
+  <ul>
+    <li><span class="good">Το καλό:</span> fine-tune σε ~17 λεπτά corrections κάνει την <em class="k">καθημερινή ομιλία</em> σαφώς καλύτερη, <b>σε κάθε run</b>. <code>val_reg</code>: 0.674 → ~0.43 (~24 μονάδες). Μαθαίνει το domain (λεξιλόγιο, ονόματα), δεν αποστηθίζει.</li>
+    <li><span class="bad">Το πρόβλημα:</span> τα <em class="k">δύσκολα corrected</em> cases (<code>val_corr</code>) δεν κουνιούνται — μένουν ~0.61. Και η μέτρηση είναι <b>θόρυβος</b>: ίδιο config με άλλο seed κουνιέται 0.062 — όσο και η διαφορά ανάμεσα σε <i>όλα</i> τα configs (0.064).</li>
+    <li>Ένας φόβος δεν βγήκε αληθινός: το να εκπαιδεύεις μόνο σε λάθη <b>δεν</b> χάλασε την κανονική ομιλία. Έγινε καλύτερη.</li>
+  </ul>
+  <div class="note"><b>Άρα:</b> με μόνο 56 val κλιπ <b>δεν μπορώ να συγκρίνω data recipes ακόμα.</b> Πρώτη δουλειά: φτιάξε το validation set. Αυτό είναι το πραγματικό blocker, όχι η επιλογή μίγματος.</div>
+</section>
+
+<!-- 5 -->
+<section>
+  <h2>Kaggle — large-v3 dry-run</h2>
+  <p>Το έτρεξα στο Kaggle (T4×2, headless) σε ~1.9k εγκεκριμένα corrections (~1.8h ήχου).</p>
+  <ul>
+    <li><b>Τι ήθελα να δείξω:</b> ότι το pipeline δουλεύει end-to-end στο κανονικό μοντέλο — fetch → κόψιμο κλιπ → LoRA → WER στο held-out. Αυτό δούλεψε.</li>
+    <li>Memory-safe build: κάθε meeting mp3 αποκωδικοποιείται μία φορά και ελευθερώνεται (παλιά έσκαγε σε OOM).</li>
+  </ul>
+  <div class="note"><b>Τι ΔΕΝ είναι:</b> δεν είναι απόδειξη ότι βελτιώνει το production. 1.8h είναι λίγα → αναμένεται overfit. Το διαβάζω ως «τρέχει και μαθαίνει κάτι», όχι ως «κερδίσαμε».</div>
+</section>
+
+<!-- 6 -->
+<section>
+  <h2>Kaggle — τι μπορεί να είναι λάθος (το διορθώνω)</h2>
+  <ul>
+    <li><b>Πολύ μικρό & θορυβώδες validation.</b> Τα νούμερα στα δύσκολα cases δεν είναι αξιόπιστα. → Φτιάχνω val από όλο το human-corrected pool στις held-out πόλεις (~9.9k αντί 56).</li>
+    <li><b>Leakage στο <code>val_reg</code>.</b> Τραβιέται από τα <em class="k">ίδια meetings</em> με το <code>val_corr</code> — ίδιες αίθουσες/ομιλητές. Η βελτίωση είναι ενθαρρυντική αλλά μάλλον πιο εύκολη από αληθινό generalization. → Ξεχωριστό regression set από meetings που δεν έδωσαν corrections.</li>
+    <li><b>Ένα μόνο seed.</b> → ≥3 seeds, mean/range, bootstrap CIs ανά meeting.</li>
+    <li><b>Λίγα δεδομένα (1.8h).</b> → προς 30–50h για «πρώτο χρήσιμο checkpoint» πριν διαβάσω mixture effects ως αληθινά.</li>
+    <li>Το learning rate / steps από CPU run <b>δεν μεταφέρονται</b> — re-tune στο GPU.</li>
+  </ul>
+</section>
+
+<!-- 7 -->
+<section>
+  <h2>LLM vs fine-tune — το πείραμα</h2>
+  <p class="small">Ίδιος held-out ήχος, 4 transcripts, ίδιο scoring. 114 κατηγοριοποιημένα κλιπ από πόλεις που δεν είδε το μοντέλο.</p>
+  <table>
+    <tr><th>Στάδιο</th><th>WER (normalized)</th></tr>
+    <tr><td>A — raw ASR</td><td>0.715</td></tr>
+    <tr><td>B — ASR + LLM</td><td>0.578</td></tr>
+    <tr><td>C — fine-tuned ASR</td><td>0.613</td></tr>
+    <tr><td>D — fine-tuned + LLM</td><td class="good"><b>0.478</b></td></tr>
+  </table>
+  <p>Το fine-tune ρίχνει ~0.10. Το LLM ρίχνει ~0.14. Μαζί → ~το άθροισμα. Το LLM ρίχνει ~0.135 <i>είτε</i> έγινε fine-tune <i>είτε</i> όχι (D−C ≈ B−A), και το αντίστροφο. <b>Διορθώνουν διαφορετικά λάθη — κράτα και τα δύο.</b></p>
+  <p class="small">Προσοχή: 114 κλιπ, 1 seed. Το λέω ως κατεύθυνση για το επόμενο πείραμα, όχι «το αποδείξαμε».</p>
+</section>
+
+<!-- 8 -->
+<section>
+  <h2>Ποιος διορθώνει τι</h2>
+  <table>
+    <tr><th>Κατηγορία</th><th>n</th><th>A raw</th><th>C fine-tune</th><th>B LLM</th><th>D και τα δύο</th><th>ποιος</th></tr>
+    <tr><td>substitution_phonetic</td><td>59</td><td>0.784</td><td><b>0.642</b></td><td>0.640</td><td>0.515</td><td class="good">fine-tune</td></tr>
+    <tr><td>punctuation_capitalization</td><td>27</td><td>0.556</td><td>0.536</td><td><b>0.388</b></td><td>0.393</td><td class="bad">LLM</td></tr>
+  </table>
+  <ul>
+    <li><b>Φωνητικά:</b> εδώ το fine-tune αξίζει — πιάνει πράγματα που το LLM δεν μπορεί (χρειάζονται τον ήχο). Είναι η μόνη κατηγορία με σφιχτό CI.</li>
+    <li><b>Στίξη/κεφαλαία:</b> το fine-tune δεν προσφέρει σχεδόν τίποτα· όλη τη δουλειά την κάνει το LLM. Σπατάλη να ξοδέψεις ακουστική χωρητικότητα εδώ.</li>
+  </ul>
+  <p class="small">Οι υπόλοιπες κατηγορίες είναι directional (μικρά n) — υπόνοιες, όχι ευρήματα.</p>
+</section>
+
+<!-- 9 -->
+<section>
+  <h2>Πρόταση #1 — εστίαση στα φωνητικά, λιγότερη στίξη</h2>
+  <div class="box">
+    <p>Για το επόμενο dataset, να δώσουμε βάρος σε <em class="k">φωνητικά / ακουστικά</em> λάθη — εκεί φαίνεται να βοηθά το fine-tune (phonetic, homophones, word boundaries, ονόματα για να πλησιάσει ακουστικά).</p>
+    <p>Να <em class="k">μειώσουμε ή να πετάξουμε τα punctuation-only edits</em> — αυτά τα πιάνει το LLM ούτως ή άλλως, και το fine-tune δεν προσθέτει τίποτα εκεί. Μπορώ να βάλω και φίλτρο που τα κόβει εντελώς.</p>
+  </div>
+  <p class="small">Όχι μόνο στίξη: και τόνοι, αριθμοί/ημερομηνίες, γραμματική — όλα στο LLM. Κρατάμε τον ~50% κορμό χωρίς-edit (γι' αυτό δεν χάλασε η κανονική ομιλία).</p>
+</section>
+
+<!-- 10 -->
+<section>
+  <h2>Πρόταση #2 — ποια edits αξίζουν στο ακουστικό</h2>
+  <table>
+    <tr><th>edit class</th><th>n</th><th>LLM fix rate</th></tr>
+    <tr><td>task_only (μόνο το LLM)</td><td>506</td><td>60.7%</td></tr>
+    <tr><td>task_then_user (LLM + άνθρωπος)</td><td>236</td><td>41.9%</td></tr>
+    <tr><td>user_only (μόνο άνθρωπος)</td><td>258</td><td>47.4%</td></tr>
+  </table>
+  <ul>
+    <li>Τα <em class="k">task_only</em> είναι αυτά που το LLM ήδη διορθώνει πιο εύκολα. Πρόταση: <b>χαμηλότερη προτεραιότητα</b> στο ακουστικό — εμπιστευόμαστε το task να συνεχίσει να τα πιάνει.</li>
+    <li>Πιο ενδιαφέροντα: <em class="k">task_then_user</em> και <em class="k">user_only</em> — εκεί το αυτόματο pipeline δεν έφτασε, τα γνήσια δύσκολα.</li>
+  </ul>
+  <div class="note"><b>Όχι «τα πετάμε όλα»:</b> το 60.7% σημαίνει ότι ~39% μένουν ακόμα άλυτα. Κρατάμε τα task_only edits που έχουν <b>πραγματική ακουστική/φωνητική δυσκολία</b>· τα υπόλοιπα απλώς down-weight.</div>
+</section>
+
+<!-- 11 -->
+<section>
+  <h2>Επόμενα βήματα — με τη σειρά</h2>
+  <ol>
+    <li><b>Φτιάξε πρώτα το validation set.</b> Είναι το πραγματικό blocker. Μεγαλύτερο val_corr + ξεχωριστό, χωρίς-leakage regression set. Στόχος: seed swing < 0.01.</li>
+    <li>≥3 seeds ανά config + bootstrap CIs by default. Τότε το ranking των recipes αποκτά νόημα.</li>
+    <li>Χτίσε το dataset με τα παραπάνω βάρη: φωνητικά ↑, στίξη/task-only ↓.</li>
+    <li>Τρέξε large-v3 + LoRA σε GPU με τη composition recipe, σύγκρινε με το baseline.</li>
+  </ol>
+  <p class="small">Glossary: στοχευμένο μόνο για ονόματα (+9.9pp εκεί), όχι γενικό — συνολικά δεν βοήθησε.</p>
+</section>
+
+<!-- 12 -->
+<section class="center" data-background-color="#0f172a">
+  <h2 style="color:#fff">Σύνοψη</h2>
+  <p style="color:#e2e8f0">Fine-tune και LLM είναι <b>συμπληρωματικά</b> (preliminary). Το fine-tune αξίζει στα <b>φωνητικά</b>· η στίξη μένει στο LLM.</p>
+  <p style="color:#e2e8f0">Δεν διαλέγουμε recipe ακόμα — πρώτα <b>σωστό validation</b>. Μετά: dataset με βάρος στα ακουστικά λάθη.</p>
+  <p class="small" style="color:#94a3b8">Πηγές: data/reports/{finetune-research, error-division, fix-task-eval} · notebooks/whisper_finetune_kaggle.ipynb</p>
+</section>
+
+</div></div>
+<div class="foot">← → για πλοήγηση · <b>Esc</b> overview</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script>
+  Reveal.initialize({ hash:true, slideNumber:'c/t', transition:'slide', width:1180, height:740, margin:0.06 });
+</script>
+</body>
+</html>
