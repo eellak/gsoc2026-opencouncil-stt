@@ -36,3 +36,18 @@ def subsample(records, n, seed):
     rnd = random.Random(seed)
     idx = sorted(rnd.sample(range(len(records)), n))
     return [records[i] for i in idx]
+
+
+def build_leaderboard(rows, baseline):
+    """Return a new list of rows sorted by val_corr_wer_norm ascending, each with
+    reg_delta = val_reg_wer - baseline['val_reg_wer'] (positive = regression).
+
+    Input rows are not mutated.
+    """
+    out = []
+    for r in rows:
+        rr = dict(r)
+        rr["reg_delta"] = round(r["val_reg_wer"] - baseline["val_reg_wer"], 3)
+        out.append(rr)
+    out.sort(key=lambda x: x["val_corr_wer_norm"])
+    return out
