@@ -1,4 +1,4 @@
-from eval.sweep.sweep_utils import make_grid, subsample
+from eval.sweep.sweep_utils import build_leaderboard, make_grid, subsample
 
 
 def test_make_grid_is_full_cartesian_with_stable_ids():
@@ -26,3 +26,23 @@ def test_subsample_returns_all_when_n_none_or_larger():
     records = [{"i": i} for i in range(10)]
     assert subsample(records, n=None, seed=1) == records
     assert subsample(records, n=50, seed=1) == records
+
+
+def test_build_leaderboard_sorts_and_adds_regression_delta():
+    baseline = {"val_corr_wer_norm": 33.0, "val_reg_wer": 27.0}
+    rows = [
+        {"config_id": "a", "lr": 1e-4, "rank": 16, "alpha": 32, "epoch": 2,
+         "val_corr_wer_norm": 26.0, "val_reg_wer": 17.0, "val_corr_cer": 10.0,
+         "train_loss": 0.4, "wall_s": 600},
+        {"config_id": "b", "lr": 2e-4, "rank": 32, "alpha": 64, "epoch": 4,
+         "val_corr_wer_norm": 24.0, "val_reg_wer": 30.0, "val_corr_cer": 9.0,
+         "train_loss": 0.2, "wall_s": 900},
+    ]
+    lb = build_leaderboard(rows, baseline)
+    # sorted ascending by val_corr_wer_norm -> 'b' (24.0) first
+    assert [r["config_id"] for r in lb] == ["b", "a"]
+    # reg_delta = val_reg_wer - baseline val_reg_wer
+    assert lb[0]["reg_delta"] == 3.0    # b regressed: 30 - 27
+    assert lb[1]["reg_delta"] == -10.0  # a improved: 17 - 27
+    # original rows are not mutated
+    assert "reg_delta" not in rows[0]
