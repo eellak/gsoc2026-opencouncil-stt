@@ -15,7 +15,7 @@
 	import { resolveAudioUrls } from '$lib/client/audio-source';
 	import { audioPool } from '$lib/client/audio-pool.svelte';
 	import * as meetingCtx from '$lib/client/meeting-context.svelte';
-	import { reviewHref } from '$lib/shared/urls';
+	import { reviewHref, resumeStorageKey } from '$lib/shared/urls';
 	import type { PageData } from './$types';
 	import { userStore } from '$lib/client/user-store.svelte';
 	import { playbackPrefs } from '$lib/client/playback-prefs.svelte';
@@ -245,14 +245,18 @@
 		untrack(() => { usingFallback = false; });
 	});
 
-	// Remember the last item viewed per seed so re-entering the same seed can
-	// resume here. Seeded mode only — filter queues don't carry a seed.
+	// Remember the last item viewed per (seed, filter) so re-entering the same
+	// seed+filter can resume here. Seeded mode only — status/category filter
+	// queues don't carry a seed. Keyed by the canonical review-filter sig so a
+	// position under one filtered queue can't reopen inside a different one.
 	$effect(() => {
 		if (filter) return;
 		const seed = data.seed;
 		const id = currentId;
 		if (typeof localStorage === 'undefined') return;
-		try { localStorage.setItem(`oc:resume:${seed}`, id); } catch { /* quota — fine */ }
+		try {
+			localStorage.setItem(resumeStorageKey(seed, data.reviewFilter ?? ''), id);
+		} catch { /* quota — fine */ }
 	});
 
 	// Listener wiring: when the pool hands us a new active <audio>, attach
@@ -615,10 +619,13 @@
 	function navHref(targetId: string | undefined | null): string | null {
 		if (!targetId) return null;
 		if (filter) {
-			// Preserve the filter in the URL so the next page stays in filter mode.
+			// Preserve the status/category filter in the URL so the next page stays
+			// in that filter mode.
 			return `/review/${encodeURIComponent(targetId)}?${filter.query}`;
 		}
-		return reviewHref({ utterance_id: targetId, seed: data.seed });
+		// Seeded mode: carry the start-time review filter (punct/src) too, or the
+		// next page would re-seed UNFILTERED and the queue would lose the filter.
+		return reviewHref({ utterance_id: targetId, seed: data.seed, filter: data.reviewFilter });
 	}
 	// Skip-aware navigation: when the pref is on (seeded mode only), next/prev
 	// jump over already-classified items so re-entering with the same seed

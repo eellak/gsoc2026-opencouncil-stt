@@ -2,6 +2,7 @@ import { error } from '@sveltejs/kit';
 import * as queue from '$lib/client/group-queue.svelte';
 import { ensureMirrorMapLoaded } from '$lib/client/audio-source';
 import { parseSeedParam } from '$lib/shared/urls';
+import { parseReviewFilter, serializeReviewFilter } from '$lib/shared/review-filters';
 import type { IncludeStatus } from '$lib/domain/types';
 import type { PageLoad } from './$types';
 
@@ -41,6 +42,9 @@ function readFilter(url: URL): QueueFilter | null {
 export const load: PageLoad = async ({ params, url }) => {
 	const id = params.utterance_id;
 	const filter = readFilter(url);
+	// Canonical review-filter signature from the URL (seeded mode only; empty in
+	// status/category filter mode). Returned so the page can key its resume pointer.
+	const reviewFilter = serializeReviewFilter(parseReviewFilter(url.searchParams));
 
 	if (filter) {
 		// Populate the filter id list up-front so j/k works on the first render.
@@ -53,11 +57,14 @@ export const load: PageLoad = async ({ params, url }) => {
 			console.warn('[review] could not fetch filter ids', e);
 		}
 	} else {
+		// Seeded mode. Start-time review filters (punct/src) compose only here —
+		// status/category queues above take precedence and ignore them. Only an
+		// EXPLICIT seed enters/refreshes seeded mode; we never fabricate one from
+		// client module state. Our own links always carry the seed, so a filtered
+		// queue is always reproducible.
 		const seedParam = url.searchParams.get('seed');
-		if (seedParam) {
-			const s = parseSeedParam(seedParam);
-			if (s !== null) queue.setSeed(s);
-		}
+		const s = seedParam ? parseSeedParam(seedParam) : null;
+		if (s !== null) queue.setSeed(s, reviewFilter);
 	}
 
 	void ensureMirrorMapLoaded();
@@ -67,5 +74,7 @@ export const load: PageLoad = async ({ params, url }) => {
 
 	void queue.topUp(id);
 
-	return { item, seed: queue.seed(), filter };
+	// `reviewFilter` (canonical punct/src sig, '' when none) lets the page scope
+	// its resume pointer to the active filtered queue. Empty in status/category mode.
+	return { item, seed: queue.seed(), filter, reviewFilter };
 };

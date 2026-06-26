@@ -4,6 +4,19 @@ Exploration-vs-training stance and prototype UI choices.
 
 ## Accepted
 
+### 2026-06-26 - Start-time queue filters: drop punct-only + edit-source (branch `codex/file-backed-review-ui`)
+
+Two opt-in filters chosen on the landing page narrow the seeded review queue:
+
+1. **Drop punctuation/capitalization-only** corrections — judged on the net change (`initial_before_text → final_after_text`) by the existing deterministic `classify()` (a group is dropped only when the result is exactly `['punctuation_capitalization']`).
+2. **Edit source** — keep only groups whose edit-chain profile is among the selected of `task` / `both` (task+user, any order) / `user`. Profile comes from the set of `edited_by` over the chain.
+
+Defaults reflect the reviewer's stated priority: punct-only dropped, sources = `both` + `user` (task-only hidden). Defaults live as the landing form's initial state, so they become **explicit URL params** on submit — direct deep-links and stats/export stay unfiltered.
+
+**Why server-side scan-filter, not a separate id queue:** the requirement was that filtered-out corrections must never be fetched or prefetched, *and* the fast seeded paging must not regress. So `/api/review/queue` gained optional `punct`/`src` params and scan-filters the seeded order in whole batches, returning only matching groups (`ui/src/lib/server/state/review-filter-queue.ts`). Filtered-out items are never sent → never prefetched. The reusable `filter` mode (explicit per-id list) was deliberately **not** used here because it prefetches per id. Cursor contract: `next_cursor === null` ⟺ exhausted; a scan cap can advance the cursor with zero matches (not exhaustion), so the client end-condition is the null cursor, not "the window didn't grow". Queue cache + the `oc:resume` pointer are keyed by `(seed, canonical-filter-sig)` so two filter states can't mix.
+
+Shared canonicalization in `ui/src/lib/shared/review-filters.ts` (all three sources selected → no constraint; empty sig ⇒ byte-identical to the pre-filter path).
+
 ### 2026-06-08 - Skip-classified is forward-only (branch `codex/file-backed-review-ui`)
 
 The `skipClassified` pref lets a reviewer re-enter a seed and resume past finished work: next/prev jumped over already-classified (non-`unreviewed`) items. The backward half backfired — when you navigate **back** to fix something you already classified, the skip jumped over exactly that item and stranded you, so you had to fall back on the browser's native back button.
