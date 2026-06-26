@@ -77,13 +77,20 @@
 	const prevId = $derived(queue.prevIdOf(data.item.utterance_id));
 	const nextId = $derived(queue.nextIdOf(data.item.utterance_id));
 
-	let showFullChain = $state(false);
+	let showFullChain = $state(true);
+
+	// Robot for task-authored edits, human for user-authored edits, so the chain
+	// shows who corrected what at a glance. Pencil for unknown/other authors.
+	function editorLabel(by: string | null, i: number): string {
+		const icon = by === 'task' ? '🤖' : by === 'user' ? '👤' : '✎';
+		return `${icon} [edit ${i + 1} · ${by ?? '—'}]`;
+	}
 
 	const beforeText = $derived(showFullChain
-		? item.edits.map((e, i) => `[edit ${i + 1} by ${e.edited_by ?? '—'}]\n${e.before_text}`).join('\n\n')
+		? item.edits.map((e, i) => `${editorLabel(e.edited_by, i)}\n${e.before_text}`).join('\n\n')
 		: item.initial_before_text);
 	const afterText = $derived(showFullChain
-		? item.edits.map((e, i) => `[edit ${i + 1} by ${e.edited_by ?? '—'}]\n${e.after_text}`).join('\n\n')
+		? item.edits.map((e, i) => `${editorLabel(e.edited_by, i)}\n${e.after_text}`).join('\n\n')
 		: item.final_after_text);
 
 	let saveStatus = $state<'idle' | 'saving' | 'saved' | 'error'>('idle');
@@ -929,6 +936,7 @@
 						<input type="checkbox" checked={playbackPrefs.loop} onchange={() => playbackPrefs.toggleLoop()} />
 						<span>loop</span> <kbd>l</kbd>
 					</label>
+					<span class="seg-dur" title="Διάρκεια segment">⏱ {(regionEnd - regionStart).toFixed(1)}s</span>
 				</div>
 			{/snippet}
 			<Diff
@@ -1200,6 +1208,11 @@
 	.play-controls {
 		display: inline-flex; align-items: center; gap: 0.5rem;
 		flex-wrap: nowrap; min-width: 0;
+	}
+	.seg-dur {
+		display: inline-flex; align-items: center; gap: 0.2rem;
+		font-size: 0.78rem; font-variant-numeric: tabular-nums;
+		color: var(--text-2, #475569); white-space: nowrap;
 	}
 	:global(body.mobile-mode) .play-controls kbd { display: none; }
 	:global(body.mobile-mode) .pref-toggle { font-size: 0.7rem; }
