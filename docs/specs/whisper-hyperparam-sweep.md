@@ -137,3 +137,21 @@ These are non-negotiable — they were each a bug that was fixed once:
   baseline row, plus a regression-guarded "best" pick.
 - Reuses the existing data-build and metric code without reintroducing any of the
   fixed bugs listed above.
+
+## How to run (Kaggle)
+
+1. Upload `notebooks/whisper_sweep_kaggle.ipynb` to a new Kaggle notebook.
+2. Accelerator: **GPU T4 x2**. Internet: **On**.
+3. Smoke first: leave `SMOKE = True`, **Save & Run All (Commit)**. Confirm it finishes,
+   `leaderboard.csv` appears in Output, and the table has rows. This proves the harness
+   end-to-end before spending the GPU budget.
+4. Real run: set `SMOKE = False`, Commit again (~3–4h, one session).
+5. Download `leaderboard.csv` / `leaderboard.md` from the notebook Output.
+
+## Reading the leaderboard
+
+- Sort key is `val_corr_wer_norm` (lower better). `reg_delta` is the change in `val_reg`
+  WER vs baseline; positive = ordinary speech got worse.
+- The "Best" line already excludes configs that regress `val_reg` beyond `MAX_REG_DELTA`.
+- Treat differences smaller than the known seed-variance (~a few WER points at this
+  scale) as noise — use the board to reject bad LR/rank, not to crown a 0.1 winner.
