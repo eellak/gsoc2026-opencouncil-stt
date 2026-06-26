@@ -3,19 +3,25 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>OpenCouncil ASR — πού είμαστε (slides)</title>
+<title>OpenCouncil ASR: πού είμαστε (slides)</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css" id="theme">
 <style>
   :root { --acc:#2563eb; --good:#16a34a; --bad:#dc2626; --mut:#6b7280; }
-  .reveal { font-size: 30px; }
+  .reveal { font-size: 29px; }
   .reveal h1 { font-size: 1.7em; }
-  .reveal h2 { color:#111827; font-size: 1.25em; margin-bottom:.4em; }
+  .reveal h2 { color:#111827; font-size: 1.2em; margin-bottom:.45em; }
   .reveal h3 { color:var(--acc); font-size: .85em; }
+  /* top-aligned content on every slide */
+  .reveal .slides { text-align: left; }
   .reveal section { text-align: left; }
-  .reveal section.center { text-align:center; }
-  .reveal table { font-size: .62em; }
+  .reveal .slides > section,
+  .reveal .slides > section > section { top: 0 !important; }
+  /* the two dark title cards stay vertically centered */
+  .reveal .slides section.center { text-align:center; min-height:100%;
+                           display:flex !important; flex-direction:column; justify-content:center; }
+  .reveal table { font-size: .6em; }
   .reveal table th { background:#f3f4f6; }
   .reveal .small { font-size:.62em; color:var(--mut); }
   .reveal .tag { display:inline-block; font-size:.5em; padding:.15em .6em; border-radius:999px;
@@ -24,7 +30,8 @@
   .reveal .bad { color:var(--bad); font-weight:600; }
   .reveal .box { background:#f8fafc; border:1px solid #e5e7eb; border-radius:10px; padding:.5em .8em; }
   .reveal .note { background:#fffbeb; border:1px solid #fde68a; border-radius:10px; padding:.5em .8em; font-size:.7em; }
-  .reveal ul { margin-left:.4em; }
+  .reveal ul, .reveal ol { margin-left:.4em; }
+  .reveal li { margin-bottom:.2em; }
   .reveal em.k { color:var(--acc); font-style:normal; font-weight:600; }
   .reveal .two { display:grid; grid-template-columns:1fr 1fr; gap:1em; }
   .reveal .src { font-size:.5em; color:var(--mut); }
@@ -36,12 +43,12 @@
 <body>
 <div class="reveal"><div class="slides">
 
-<!-- 1 -->
+<!-- 1 cover -->
 <section class="center" data-background-color="#0f172a">
-  <h1 style="color:#fff">OpenCouncil — Greek ASR</h1>
-  <p style="color:#cbd5e1; font-size:.8em">Πού είμαστε στο fine-tuning · τι έδειξαν τα πειράματα · τι προτείνω για το επόμενο dataset</p>
-  <p class="small" style="color:#94a3b8">GSoC 2026 · sync update · 2026-06-25</p>
-  <p class="small" style="color:#64748b">Τα νούμερα είναι από μικρά πειράματα — τα λέω ως κατεύθυνση, όχι ως οριστική απόδειξη.</p>
+  <h1 style="color:#fff">OpenCouncil · Greek ASR</h1>
+  <p style="color:#cbd5e1; font-size:.8em">Πού είμαστε στο fine-tuning, τι έδειξαν τα πειράματα, τι προτείνω για το επόμενο dataset</p>
+  <p class="small" style="color:#94a3b8">GSoC 2026 · sync update · 2026-06-26</p>
+  <p class="small" style="color:#64748b">Τα νούμερα είναι από μικρά πειράματα. Τα λέω ως κατεύθυνση, όχι ως οριστική απόδειξη.</p>
 </section>
 
 <!-- 2 -->
@@ -49,15 +56,15 @@
   <h2>Δουλεύουμε δύο πράγματα</h2>
   <div class="two">
     <div class="box">
-      <h3>#1 — το LLM που καθαρίζει το κείμενο</h3>
+      <h3>#1 το LLM που καθαρίζει το κείμενο</h3>
       <p>Παίρνει το ωμό κείμενο του ASR και το διορθώνει. Είναι ήδη σε χρήση. Εκεί δοκίμασα το glossary.</p>
     </div>
     <div class="box">
-      <h3>#2 — το dataset για το ακουστικό μοντέλο</h3>
+      <h3>#2 το dataset για το ακουστικό μοντέλο</h3>
       <p>Ζεύγη <code>(ήχος, σωστό κείμενο)</code> για να εκπαιδεύσουμε το μοντέλο που <em class="k">ακούει</em>. Αυτό είναι το κυρίως θέμα.</p>
     </div>
   </div>
-  <p class="small">Αυτό που μετράμε είναι το <em class="k">WER</em>: το ποσοστό λέξεων που βγάζει λάθος το μοντέλο. Όσο πιο χαμηλό, τόσο καλύτερα. Στόχος: να το ρίξουμε.</p>
+  <p class="small">Αυτό που μετράμε είναι το <em class="k">WER</em>: το ποσοστό λέξεων που βγάζει λάθος το μοντέλο. Όσο πιο χαμηλό, τόσο καλύτερα. Στόχος μας να το ρίξουμε.</p>
 </section>
 
 <!-- 3 -->
@@ -65,19 +72,19 @@
   <h2>Τι πειράματα έτρεξα</h2>
   <table>
     <tr><th>Πείραμα</th><th>Τι είναι</th><th>Κύριο μήνυμα</th></tr>
-    <tr><td><b>Δοκιμή σε CPU</b></td><td>Μικρό μοντέλο, 16 γρήγορα τρεξίματα στο μίνι PC. Αλλάζω ένα πράγμα τη φορά.</td><td>Ποιες επιλογές dataset βοηθάνε — και πόσο αξιόπιστα τα μετράμε.</td></tr>
+    <tr><td><b>Δοκιμή σε CPU</b></td><td>Μικρό μοντέλο, 16 γρήγορα τρεξίματα στο μίνι PC. Αλλάζω ένα πράγμα τη φορά.</td><td>Ποιες επιλογές dataset βοηθάνε, και πόσο αξιόπιστα τα μετράμε.</td></tr>
     <tr><td><b>Kaggle</b></td><td>Το κανονικό, μεγάλο μοντέλο (large-v3) σε ~1.8 ώρες ήχου, με δωρεάν GPU.</td><td>Ότι όλη η διαδικασία τρέχει από άκρη σε άκρη.</td></tr>
-    <tr><td><b>Ποιος διορθώνει τι</b></td><td>Σύγκριση: ωμό ASR vs LLM vs fine-tune vs και τα δύο, ανά είδος λάθους.</td><td>Fine-tune και LLM διορθώνουν <b>διαφορετικά</b> λάθη.</td></tr>
-    <tr><td><b>Glossary</b></td><td>1000 διορθώσεις, με και χωρίς λίστα όρων στο prompt του LLM.</td><td>Το glossary δεν βοηθάει συνολικά — μόνο στα ονόματα.</td></tr>
+    <tr><td><b>Ποιος διορθώνει τι</b></td><td>Σύγκριση: ωμό ASR, LLM, fine-tune, και τα δύο μαζί, ανά είδος λάθους.</td><td>Fine-tune και LLM διορθώνουν <b>διαφορετικά</b> λάθη.</td></tr>
+    <tr><td><b>Glossary</b></td><td>1000 διορθώσεις, με και χωρίς λίστα όρων στο prompt του LLM.</td><td>Το glossary δεν βοηθάει συνολικά, μόνο στα ονόματα.</td></tr>
   </table>
   <p class="src">Όλα τα reports: <a href="https://github.com/eellak/gsoc2026-opencouncil-stt/tree/main/data/reports">github.com/eellak/gsoc2026-opencouncil-stt → data/reports</a></p>
 </section>
 
 <!-- 4 -->
 <section>
-  <h2>Δοκιμή σε CPU — τι έδειξε</h2>
+  <h2>Δοκιμή σε CPU: τι έδειξε</h2>
   <ul>
-    <li><span class="good">Το καλό:</span> ακόμα και με λίγα δεδομένα (~17 λεπτά διορθώσεων), η <em class="k">κανονική ομιλία</em> γίνεται σαφώς καλύτερη — σε κάθε τρέξιμο. Το μοντέλο μαθαίνει το ύφος και το λεξιλόγιο των συμβουλίων.</li>
+    <li><span class="good">Το καλό:</span> ακόμα και με λίγα δεδομένα (~17 λεπτά διορθώσεων), η <em class="k">κανονική ομιλία</em> γίνεται σαφώς καλύτερη, σε κάθε τρέξιμο. Το μοντέλο μαθαίνει το ύφος και το λεξιλόγιο των συμβουλίων.</li>
     <li><span class="bad">Το πρόβλημα:</span> στις <em class="k">δύσκολες προτάσεις</em> (αυτές που χρειάστηκαν διόρθωση) δεν βλέπουμε βελτίωση. Και το νούμερο είναι αναξιόπιστο: αν τρέξεις το <b>ίδιο</b> πείραμα δεύτερη φορά, αλλάζει τόσο όσο αλλάζει και ανάμεσα σε εντελώς διαφορετικές ρυθμίσεις.</li>
     <li>Ένας φόβος δεν βγήκε αληθινός: το να εκπαιδεύεις μόνο πάνω σε λάθη <b>δεν</b> χάλασε την κανονική ομιλία. Την έκανε καλύτερη.</li>
   </ul>
@@ -87,10 +94,10 @@
 
 <!-- 5 -->
 <section>
-  <h2>Kaggle — η μεγάλη δοκιμή</h2>
+  <h2>Kaggle: η μεγάλη δοκιμή</h2>
   <p>Έτρεξα το κανονικό μοντέλο (large-v3) στο Kaggle, σε ~1.9k εγκεκριμένες διορθώσεις (~1.8 ώρες ήχου), με δωρεάν GPU.</p>
   <ul>
-    <li><b>Τι ήθελα να δω:</b> ότι όλη η αλυσίδα δουλεύει — κατέβασμα ήχου → κόψιμο σε κομμάτια → εκπαίδευση → μέτρηση σε ξεχωριστό σετ που το μοντέλο δεν είδε. Δούλεψε.</li>
+    <li><b>Τι ήθελα να δω:</b> ότι όλη η αλυσίδα δουλεύει. Κατέβασμα ήχου, κόψιμο σε κομμάτια, εκπαίδευση, μέτρηση σε ξεχωριστό σετ που το μοντέλο δεν είδε. Δούλεψε.</li>
     <li>Το train και το σετ μέτρησης ήταν <b>χωριστά</b> (διαφορετικές πόλεις), οπότε η μέτρηση είναι καθαρή.</li>
   </ul>
   <p class="src">Notebook: <a href="https://github.com/eellak/gsoc2026-opencouncil-stt/blob/main/notebooks/whisper_finetune_kaggle.ipynb">notebooks/whisper_finetune_kaggle.ipynb</a></p>
@@ -98,9 +105,9 @@
 
 <!-- 6 -->
 <section>
-  <h2>Kaggle — τι θέλει ακόμα δουλειά</h2>
+  <h2>Kaggle: τι θέλει ακόμα δουλειά</h2>
   <ul>
-    <li><b>Λίγα δεδομένα.</b> 1.8 ώρες είναι μικρό σύνολο — το μοντέλο μαθαίνει εύκολα «απ' έξω» αντί να γενικεύει. Χρειαζόμαστε περισσότερες ώρες ήχου.</li>
+    <li><b>Λίγα δεδομένα.</b> 1.8 ώρες είναι μικρό σύνολο. Το μοντέλο μαθαίνει εύκολα «απ' έξω» αντί να γενικεύει. Χρειαζόμαστε περισσότερες ώρες ήχου.</li>
     <li><b>Ένα μόνο τρέξιμο.</b> Καλό θα ήταν να το τρέξουμε λίγες φορές, για να ξέρουμε αν μια διαφορά είναι αληθινή ή απλώς τύχη.</li>
   </ul>
   <p>Δηλαδή: η διαδικασία είναι έτοιμη. Αυτό που λείπει είναι <em class="k">περισσότερα δεδομένα</em> για να βγάλει αξιόπιστο αποτέλεσμα.</p>
@@ -108,47 +115,99 @@
 
 <!-- 7 -->
 <section>
-  <h2>Ποιος διορθώνει τι — το πείραμα</h2>
+  <h2>Ποιος διορθώνει τι: το πείραμα</h2>
   <p class="small">Ίδιος ήχος, 4 εκδοχές, ίδιος τρόπος μέτρησης. 114 κομμάτια από πόλεις που το μοντέλο δεν είχε δει.</p>
   <table>
     <tr><th>Εκδοχή</th><th>WER (λάθη, χαμηλό = καλό)</th></tr>
-    <tr><td>A — ωμό ASR</td><td>0.715</td></tr>
-    <tr><td>B — ASR + LLM</td><td>0.578</td></tr>
-    <tr><td>C — fine-tuned ASR</td><td>0.613</td></tr>
-    <tr><td>D — fine-tuned + LLM</td><td class="good"><b>0.478</b></td></tr>
+    <tr><td>A. ωμό ASR</td><td>0.715</td></tr>
+    <tr><td>B. ASR + LLM</td><td>0.578</td></tr>
+    <tr><td>C. fine-tuned ASR</td><td>0.613</td></tr>
+    <tr><td>D. fine-tuned + LLM</td><td class="good"><b>0.478</b></td></tr>
   </table>
-  <p>Το fine-tune ρίχνει τα λάθη ~0.10. Το LLM ~0.14. Μαζί → περίπου το άθροισμα. Το ένα δεν κάνει το άλλο περιττό: <b>διορθώνουν διαφορετικά λάθη, οπότε κρατάμε και τα δύο.</b></p>
-  <p class="src">114 κομμάτια, ένα τρέξιμο — κατεύθυνση, όχι οριστικό. Πηγή: <a href="https://github.com/eellak/gsoc2026-opencouncil-stt/blob/main/data/reports/error-division/findings.md">data/reports/error-division/findings.md</a></p>
+  <p>Το fine-tune ρίχνει τα λάθη ~0.10. Το LLM ~0.14. Μαζί πιάνουν περίπου το άθροισμα. Το ένα δεν κάνει το άλλο περιττό: <b>διορθώνουν διαφορετικά λάθη, οπότε κρατάμε και τα δύο.</b></p>
+  <p class="src">114 κομμάτια, ένα τρέξιμο, οπότε κατεύθυνση και όχι οριστικό. Πηγή: <a href="https://github.com/eellak/gsoc2026-opencouncil-stt/blob/main/data/reports/error-division/findings.md">data/reports/error-division/findings.md</a></p>
 </section>
 
 <!-- 8 -->
 <section>
-  <h2>Ποιος διορθώνει τι — ανά είδος λάθους</h2>
+  <h2>Ποιος διορθώνει τι: ανά είδος λάθους</h2>
   <table>
     <tr><th>Είδος λάθους</th><th>A ωμό</th><th>C fine-tune</th><th>B LLM</th><th>D και τα δύο</th><th>ποιος βοηθά</th></tr>
     <tr><td>Φωνητικά (λάθος άκουσμα λέξης)</td><td>0.784</td><td><b>0.642</b></td><td>0.640</td><td>0.515</td><td class="good">fine-tune</td></tr>
     <tr><td>Στίξη / κεφαλαία</td><td>0.556</td><td>0.536</td><td><b>0.388</b></td><td>0.393</td><td class="bad">LLM</td></tr>
   </table>
   <ul>
-    <li><b>Φωνητικά:</b> εδώ αξίζει το fine-tune — πιάνει πράγματα που το LLM δεν μπορεί, γιατί χρειάζονται τον ήχο.</li>
-    <li><b>Στίξη / κεφαλαία:</b> το fine-tune δεν προσφέρει σχεδόν τίποτα· όλη τη δουλειά την κάνει το LLM. Δεν αξίζει να «σπαταλήσουμε» το ακουστικό μοντέλο εδώ.</li>
+    <li><b>Φωνητικά:</b> εδώ αξίζει το fine-tune. Πιάνει πράγματα που το LLM δεν μπορεί, γιατί χρειάζονται τον ήχο.</li>
+    <li><b>Στίξη / κεφαλαία:</b> το fine-tune δεν προσφέρει σχεδόν τίποτα. Όλη τη δουλειά την κάνει το LLM. Δεν αξίζει να «σπαταλήσουμε» το ακουστικό μοντέλο εδώ.</li>
   </ul>
-  <p class="src">Τα φωνητικά είναι το πιο σίγουρο εύρημα· τα υπόλοιπα είδη έχουν λίγα δείγματα. Πηγή: <a href="https://github.com/eellak/gsoc2026-opencouncil-stt/blob/main/data/reports/error-division/findings.md">error-division/findings.md</a></p>
+  <p class="src">Τα φωνητικά είναι το πιο σίγουρο εύρημα. Τα υπόλοιπα είδη έχουν λίγα δείγματα. Πηγή: <a href="https://github.com/eellak/gsoc2026-opencouncil-stt/blob/main/data/reports/error-division/findings.md">error-division/findings.md</a></p>
 </section>
 
-<!-- 9 -->
+<!-- 9 NEW (α) validation split -->
 <section>
-  <h2>Πρόταση #1 — βάρος στα φωνητικά, λιγότερη στίξη</h2>
+  <h2>Πώς χωρίζουμε τι βλέπει το μοντέλο και τι όχι</h2>
+  <ul>
+    <li>Κρατάμε <b>δύο ολόκληρες πόλεις, Ορεστιάδα και Άργος, εντελώς έξω από την εκπαίδευση</b>. Το μοντέλο δεν τις ακούει ποτέ.</li>
+    <li>Έτσι το τεστ απαντά σε μία ερώτηση: «δουλεύει σε δήμο που δεν έχει ξαναδεί;». Οι άλλες 8 πόλεις πάνε στην εκπαίδευση.</li>
+    <li>Το να ελέγχουμε όλες τις ώρες αυτών των δύο πόλεων είναι αργό. Γι' αυτό διαλέγουμε αυτόματα (με σπόρο, όχι στο χέρι) ένα σταθερό υποσύνολο ομιλητών με αρκετό χρόνο, για γρήγορο έλεγχο. Όλη η δεξαμενή μένει για το τελικό νούμερο.</li>
+  </ul>
+  <div class="note">Κατώφλια από τα δεδομένα: ≥3 λεπτά ανά ομιλητή · ~12 ομιλητές και ~60 λεπτά ανά πόλη · κανείς ομιλητής πάνω από ~13% του τεστ. Ελέγξαμε ότι καμία διόρθωση αυτών των πόλεων δεν μπήκε κρυφά στην εκπαίδευση, άρα τα <b>−20% / −36%</b> είναι πραγματικά. Το «καθαρό» νούμερο το παίρνουμε από τυχαία σωστή ομιλία, όχι από τις δύσκολες προτάσεις που διαλέξαμε εμείς.</div>
+</section>
+
+<!-- 10 NEW (β) dataset sufficiency -->
+<section>
+  <h2>Φτάνει το dataset μας;</h2>
+  <p>Ναι, φτάνει. Για ένα ειδικό και δύσκολο domain, οι <b>10-30 ώρες</b> ήχου δίνουν ήδη μεγάλη βελτίωση, και οι <b>30-50 ώρες</b> φτάνουν για χρήσιμο fine-tune.</p>
+  <ul>
+    <li>Εμείς είμαστε εκεί: <b>~5.000</b> διπλο-ελεγμένες διορθώσεις, <b>~5.000</b> ελεγμένες, και <b>~20.000</b> σωστές προτάσεις χωρίς διόρθωση.</li>
+    <li>Η καμπύλη ανεβαίνει απότομα τις πρώτες ~30 ώρες και μετά επιβραδύνει.</li>
+    <li>Άρα μετράει πιο πολύ η ποιότητα παρά ο όγκος. Κι εκεί έχουμε πλεονέκτημα: πραγματικές ανθρώπινες διορθώσεις.</li>
+  </ul>
+</section>
+
+<!-- 11 NEW (δ) correction bias -->
+<section>
+  <h2>Πόσες διορθώσεις, πόση σωστή ομιλία;</h2>
+  <ul>
+    <li>Αν εκπαιδεύσεις <b>μόνο</b> πάνω στις δύσκολες διορθώσεις, το μοντέλο χειροτερεύει στην καθημερινή ομιλία.</li>
+    <li>Γι' αυτό η πλειονότητα της εκπαίδευσης είναι <b>σωστή ομιλία χωρίς διόρθωση (~50-70%)</b>, και οι διορθώσεις μειονότητα (~30-50%).</li>
+    <li>Το πρώτο πείραμα το επιβεβαίωσε: η καθημερινή ομιλία βελτιώθηκε περισσότερο από τις δύσκολες. Η παγίδα δεν έπιασε.</li>
+  </ul>
+</section>
+
+<!-- 12 NEW (γ) augmentation -->
+<section>
+  <h2>Augmentation: με μέτρο</h2>
+  <ul>
+    <li><b>SpecAugment</b>: ασφαλές. Το χρησιμοποίησε και το ίδιο το Whisper.</li>
+    <li>Ελαφριά αλλαγή <b>ταχύτητας ή τόνου</b>: βοηθάει.</li>
+    <li>Πρόσθετο <b>θόρυβο</b> βάζουμε μόνο επειδή το δικό μας υλικό έχει θόρυβο, και με χαμηλή ένταση.</li>
+  </ul>
+  <p class="small">Πάντα μόνο στην εκπαίδευση, ποτέ στο σετ μέτρησης.</p>
+</section>
+
+<!-- 13 NEW (ε) chunk size -->
+<section>
+  <h2>Σε τι μέγεθος κομματιού εκπαιδεύουμε</h2>
+  <ul>
+    <li>Όχι σκέτα κομμένα utterances. Φτιάχνουμε κομμάτια <b>~20-30 δευτερόλεπτα</b>, ενώνοντας γειτονικά utterances του ίδιου ομιλητή, με όρια στη σιωπή.</li>
+    <li>Γιατί: το Whisper βλέπει πάντα παράθυρο <b>30 δευτ.</b> Αν το εκπαιδεύσεις μόνο σε μικρά κομμάτια, χαλάει στις μεγάλες ηχογραφήσεις.</li>
+  </ul>
+</section>
+
+<!-- 14 proposal 1 -->
+<section>
+  <h2>Πρόταση #1: βάρος στα φωνητικά, λιγότερη στίξη</h2>
   <div class="box">
-    <p>Στο επόμενο dataset, να δώσουμε βάρος στα <em class="k">φωνητικά / ακουστικά</em> λάθη — εκεί φαίνεται να βοηθά το fine-tune (λάθος άκουσμα λέξεων, ονόματα, ενώσεις λέξεων).</p>
-    <p>Να <em class="k">πετάξουμε ή να μειώσουμε τις διορθώσεις που αφορούν μόνο στίξη</em> — αυτές τις πιάνει ήδη το LLM, και το fine-tune δεν προσθέτει τίποτα. Μπορώ να βάλω φίλτρο που τις κόβει.</p>
+    <p>Στο επόμενο dataset, να δώσουμε βάρος στα <em class="k">φωνητικά / ακουστικά</em> λάθη. Εκεί φαίνεται να βοηθά το fine-tune (λάθος άκουσμα λέξεων, ονόματα, ενώσεις λέξεων).</p>
+    <p>Να <em class="k">πετάξουμε ή να μειώσουμε τις διορθώσεις που αφορούν μόνο στίξη</em>. Αυτές τις πιάνει ήδη το LLM, και το fine-tune δεν προσθέτει τίποτα. Μπορώ να βάλω φίλτρο που τις κόβει.</p>
   </div>
   <p class="small">Ίδια λογική και για τόνους, αριθμούς, ημερομηνίες, γραμματική: τα αφήνουμε στο LLM. Κρατάμε όμως πολλές «κανονικές» προτάσεις χωρίς διόρθωση, για να μη χαλάσει η καθημερινή ομιλία.</p>
 </section>
 
-<!-- 10 -->
+<!-- 15 proposal 2 -->
 <section>
-  <h2>Πρόταση #2 — ποιες διορθώσεις αξίζουν στο ακουστικό</h2>
+  <h2>Πρόταση #2: ποιες διορθώσεις αξίζουν στο ακουστικό</h2>
   <table>
     <tr><th>Ποιος έκανε τη διόρθωση</th><th>πλήθος</th><th>πόσο καλά τα πιάνει το LLM</th></tr>
     <tr><td>Μόνο το LLM</td><td>506</td><td>60.7%</td></tr>
@@ -156,28 +215,29 @@
     <tr><td>Μόνο άνθρωπος</td><td>258</td><td>47.4%</td></tr>
   </table>
   <ul>
-    <li>Εκεί που <em class="k">μόνο το LLM</em> έκανε τη διόρθωση, είναι λάθη που το LLM ήδη πιάνει πιο εύκολα. Πρόταση: <b>χαμηλότερη προτεραιότητα</b> στο ακουστικό — το εμπιστευόμαστε να συνεχίσει.</li>
+    <li>Εκεί που <em class="k">μόνο το LLM</em> έκανε τη διόρθωση, είναι λάθη που το LLM ήδη πιάνει πιο εύκολα. Πρόταση: <b>χαμηλότερη προτεραιότητα</b> στο ακουστικό, το εμπιστευόμαστε να συνεχίσει.</li>
     <li>Πιο ενδιαφέροντα: εκεί που χρειάστηκε και <em class="k">άνθρωπος</em>. Αυτά είναι τα γνήσια δύσκολα.</li>
   </ul>
-  <div class="note"><b>Όχι «τα πετάμε όλα»:</b> το 60.7% σημαίνει ότι ~4 στα 10 μένουν ακόμα άλυτα. Κρατάμε όσα έχουν πραγματική <b>ακουστική δυσκολία</b>· τα υπόλοιπα απλώς λιγότερο βάρος.</div>
+  <div class="note"><b>Δεν τα πετάμε όλα:</b> το 60.7% σημαίνει ότι ~4 στα 10 μένουν ακόμα άλυτα. Κρατάμε όσα έχουν πραγματική <b>ακουστική δυσκολία</b>. Τα υπόλοιπα απλώς λιγότερο βάρος.</div>
   <p class="src">Πηγή: <a href="https://github.com/eellak/gsoc2026-opencouncil-stt/blob/main/data/reports/fix-task-eval/by_ebclass.md">data/reports/fix-task-eval/by_ebclass.md</a> · <a href="https://github.com/eellak/gsoc2026-opencouncil-stt/blob/main/data/reports/fix-task-eval/SUMMARY.md">SUMMARY.md</a></p>
 </section>
 
-<!-- 11 -->
+<!-- 16 next steps -->
 <section>
   <h2>Επόμενα βήματα</h2>
   <ol>
-    <li><b>Μεγαλύτερο τεστ.</b> Τώρα έχουμε λίγες προτάσεις για μέτρηση και το νούμερο χοροπηδάει. Με περισσότερες, θα μπορούμε να συγκρίνουμε με σιγουριά.</li>
+    <li><b>Μεγαλύτερο τεστ.</b> Τώρα έχουμε λίγες προτάσεις για μέτρηση και το νούμερο χοροπηδάει. Με περισσότερες, θα συγκρίνουμε με σιγουριά.</li>
     <li><b>Περισσότερα δεδομένα εκπαίδευσης.</b> Από ~1.8 ώρες προς αρκετές ώρες, ώστε το αποτέλεσμα να είναι αξιόπιστο.</li>
-    <li><b>Φτιάχνουμε το dataset</b> με βάρος στα φωνητικά λάθη και λιγότερο στη στίξη (Προτάσεις #1 & #2).</li>
+    <li><b>Φτιάχνουμε το dataset</b> με βάρος στα φωνητικά λάθη και λιγότερο στη στίξη (Προτάσεις #1 και #2).</li>
     <li><b>Τρέχουμε το μεγάλο μοντέλο σε GPU</b> και συγκρίνουμε με την αρχική μέτρηση.</li>
   </ol>
 </section>
 
-<!-- 12 -->
+<!-- 17 summary -->
 <section class="center" data-background-color="#0f172a">
   <h2 style="color:#fff">Σύνοψη</h2>
-  <p style="color:#e2e8f0">Fine-tune και LLM είναι <b>συμπληρωματικά</b>. Το fine-tune αξίζει στα <b>φωνητικά</b>· η στίξη μένει στο LLM.</p>
+  <p style="color:#e2e8f0">Fine-tune και LLM είναι <b>συμπληρωματικά</b>. Το fine-tune αξίζει στα <b>φωνητικά</b>, η στίξη μένει στο LLM.</p>
+  <p style="color:#e2e8f0">Κρατάμε δύο πόλεις έξω για καθαρό τεστ. Το dataset μας φτάνει σε όγκο, και η ποιότητα είναι το ατού μας.</p>
   <p style="color:#e2e8f0">Η διαδικασία είναι έτοιμη. Λείπουν <b>περισσότερα δεδομένα</b> και ένα <b>μεγαλύτερο τεστ</b>. Μετά: dataset με βάρος στα ακουστικά λάθη.</p>
   <p class="src" style="color:#94a3b8">Πηγές: <a href="https://github.com/eellak/gsoc2026-opencouncil-stt/tree/main/data/reports">data/reports</a> · <a href="https://github.com/eellak/gsoc2026-opencouncil-stt/blob/main/notebooks/whisper_finetune_kaggle.ipynb">whisper_finetune_kaggle.ipynb</a></p>
 </section>
@@ -187,7 +247,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
 <script>
-  Reveal.initialize({ hash:true, slideNumber:'c/t', transition:'slide', width:1180, height:740, margin:0.06 });
+  Reveal.initialize({ hash:true, center:false, slideNumber:'c/t', transition:'slide', width:1180, height:740, margin:0.06 });
 </script>
 </body>
 </html>
