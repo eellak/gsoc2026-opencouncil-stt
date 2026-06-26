@@ -51,3 +51,34 @@ def build_leaderboard(rows, baseline):
         out.append(rr)
     out.sort(key=lambda x: x["val_corr_wer_norm"])
     return out
+
+
+def pick_best(sorted_rows, max_reg_delta=1.0):
+    """Lowest val_corr_wer_norm row whose reg_delta <= max_reg_delta.
+
+    Returns None if every row regresses val_reg beyond the threshold.
+    """
+    for r in sorted_rows:
+        if r["reg_delta"] <= max_reg_delta:
+            return r
+    return None
+
+
+_COLS = ["config_id", "lr", "rank", "alpha", "epoch",
+         "val_corr_wer_norm", "val_reg_wer", "reg_delta", "val_corr_cer",
+         "train_loss", "wall_s"]
+
+
+def render_markdown(sorted_rows, best):
+    """Render the leaderboard as a Markdown table plus a best-pick line."""
+    header = "| " + " | ".join(_COLS) + " |"
+    sep = "| " + " | ".join("---" for _ in _COLS) + " |"
+    lines = [header, sep]
+    for r in sorted_rows:
+        lines.append("| " + " | ".join(str(r.get(c, "")) for c in _COLS) + " |")
+    best_line = (f"**Best (regression-guarded):** {best['config_id']} "
+                 f"(epoch {best['epoch']}, val_corr_wer_norm {best['val_corr_wer_norm']}, "
+                 f"reg_delta {best['reg_delta']})"
+                 if best else
+                 "**Best (regression-guarded):** none — every config regressed val_reg")
+    return "\n".join(lines) + "\n\n" + best_line + "\n"
