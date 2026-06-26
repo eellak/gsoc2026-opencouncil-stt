@@ -79,6 +79,17 @@ def test_pick_best_returns_none_when_all_regress():
     assert pick_best(lb, max_reg_delta=-100.0) is None
 
 
+def test_reg_delta_is_none_and_best_passes_when_val_reg_missing():
+    # No val_reg set (NaN) -> reg_delta unavailable; the guard must not reject everything.
+    baseline = {"val_corr_wer_norm": 33.0, "val_reg_wer": float("nan")}
+    rows = [{"config_id": "x", "lr": 1e-4, "rank": 16, "alpha": 32, "epoch": 1,
+             "val_corr_wer_norm": 25.0, "val_reg_wer": float("nan"),
+             "val_corr_cer": 9.0, "eval_loss": 0.3, "wall_s": 100}]
+    lb = build_leaderboard(rows, baseline)
+    assert lb[0]["reg_delta"] is None
+    assert pick_best(lb, max_reg_delta=1.0)["config_id"] == "x"
+
+
 def test_render_markdown_contains_table_and_best_line():
     lb = _sample_lb()
     md = render_markdown(lb, pick_best(lb, max_reg_delta=1.0))
