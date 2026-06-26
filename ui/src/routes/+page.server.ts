@@ -2,6 +2,13 @@ import { redirect } from '@sveltejs/kit';
 import { getRepo } from '$lib/server/repo';
 import { getStatsCache } from '$lib/server/state/stats-cache';
 import { parseSeedParam, randomSeed, reviewHref } from '$lib/shared/urls';
+import {
+	parseReviewFilter,
+	serializeReviewFilter,
+	isFilterActive,
+	matchesReviewFilter
+} from '$lib/shared/review-filters';
+import { firstFilteredId } from '$lib/server/state/review-filter-queue';
 import type { IncludeStatus } from '$lib/domain/types';
 import type { PageServerLoad } from './$types';
 
@@ -43,40 +50,42 @@ export const load: PageServerLoad = async ({ url }) => {
 	if (seedParam !== null) {
 		const repo = await getRepo();
 		const skipClassified = url.searchParams.get('skip') === '1';
+		// Start-time review filters (punct/src). When active, every landing path
+		// below scopes to matching groups so the queue we drop the reviewer into
+		// already excludes filtered-out corrections. `filterQuery` is the
+		// canonical query preserved on the redirect so the review page re-applies it.
+		const filterSpec = parseReviewFilter(url.searchParams);
+		const filterQuery = serializeReviewFilter(filterSpec);
+		const active = isFilterActive(filterSpec);
+
 		// Resume at a specific item if the client passed one and it still
-		// belongs to the eligible (navigable) universe for this dataset.
-		// Falls through to the skip walk when it's stale/ineligible.
+		// belongs to the eligible (navigable) universe AND passes the active
+		// filter. Falls through to the walk when it's stale/ineligible/filtered.
 		const resume = url.searchParams.get('resume');
-		if (resume && repo.getGroup(resume) && repo.eligibleOrderedIds().includes(resume)) {
-			throw redirect(302, reviewHref({ utterance_id: resume, seed: seedParam }));
+		if (resume && repo.eligibleOrderedIds().includes(resume)) {
+			const g = repo.getGroup(resume);
+			if (g && (!active || matchesReviewFilter(g, filterSpec))) {
+				throw redirect(302, reviewHref({ utterance_id: resume, seed: seedParam, filter: filterQuery }));
+			}
 		}
 		if (skipClassified) {
-			// Walk the seeded order and pick the first unreviewed group.
-			// Caps the scan at 5000 to stay cheap; falls back to the first.
-			const labels = repo.allLabels();
-			let landed: string | null = null;
-			let cursor = 0;
-			while (cursor < 5000) {
-				const page = repo.queue(seedParam, cursor, 100);
-				if (!page.groups.length) break;
-				for (const g of page.groups) {
-					const lbl = labels.get(g.utterance_id);
-					if (!lbl || lbl.include_status === 'unreviewed') { landed = g.utterance_id; break; }
-				}
-				if (landed) break;
-				if (page.next_cursor === null) break;
-				cursor = page.next_cursor;
-			}
-			if (!landed) {
-				const { groups } = repo.queue(seedParam, 0, 1);
-				if (!groups.length) throw redirect(302, '/stats');
-				landed = groups[0].utterance_id;
-			}
-			throw redirect(302, reviewHref({ utterance_id: landed, seed: seedParam }));
+			// First unreviewed group that also passes the filter. firstFilteredId
+			// pages the seeded order in capped passes (no full materialisation).
+			let landed = firstFilteredId(repo, seedParam, filterSpec, {
+				accept: (g) => g.label.include_status === 'unreviewed',
+				// Bound the unreviewed search so the all-reviewed end-state stays cheap;
+				// falls back to the first matching item below.
+				maxScan: 20_000
+			});
+			// Everything reviewed (or none unreviewed left) → land on the first
+			// filter-matching item rather than bouncing to stats.
+			if (!landed) landed = firstFilteredId(repo, seedParam, filterSpec);
+			if (!landed) throw redirect(302, '/stats');
+			throw redirect(302, reviewHref({ utterance_id: landed, seed: seedParam, filter: filterQuery }));
 		}
-		const { groups } = repo.queue(seedParam, 0, 1);
-		if (!groups.length) throw redirect(302, '/stats');
-		throw redirect(302, reviewHref({ utterance_id: groups[0].utterance_id, seed: seedParam }));
+		const landed = firstFilteredId(repo, seedParam, filterSpec);
+		if (!landed) throw redirect(302, '/stats');
+		throw redirect(302, reviewHref({ utterance_id: landed, seed: seedParam, filter: filterQuery }));
 	}
 
 	// No seed → show the landing page. Pre-generate a random seed so the user

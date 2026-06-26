@@ -1,6 +1,12 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { parseSeedParam, randomSeed, hashSeedString, UINT32_MAX } from '$lib/shared/urls';
+	import { parseSeedParam, randomSeed, hashSeedString, resumeStorageKey } from '$lib/shared/urls';
+	import {
+		applyReviewFilterParams,
+		serializeReviewFilter,
+		ALL_SOURCE_PROFILES,
+		type SourceProfile
+	} from '$lib/shared/review-filters';
 	import { t } from '$lib/i18n.svelte';
 	import StatusDistribution from '$lib/components/StatusDistribution.svelte';
 	import type { PageData } from './$types';
@@ -10,6 +16,16 @@
 	let seedInput = $state<string>('');
 	let skipClassified = $state(true);
 	let error = $state<string | null>(null);
+
+	// Start-time queue filters. Defaults reflect the reviewer's stated preference:
+	// drop punctuation/capitalization-only corrections, and hide task-only ones
+	// (keep task+user and user-only). All are explicit URL params on submit, so
+	// direct deep-links without them stay unfiltered.
+	let dropPunctOnly = $state(true);
+	let srcTask = $state(false);
+	let srcBoth = $state(true);
+	let srcUser = $state(true);
+	const anySource = $derived(srcTask || srcBoth || srcUser);
 
 	const INT_RE = /^\d+$/;
 	const seedPreview = $derived.by(() => {
@@ -32,13 +48,32 @@
 			}
 			seed = parsed;
 		}
+		// Source-empty is surfaced inline + via the disabled submit button, so it
+		// never borrows the seed input's `error` (which drives seed aria-invalid).
+		if (!anySource) return;
+
 		const params = new URLSearchParams({ seed: String(seed) });
+
+		// Build a canonical filter spec from the toggles. picked.length===3
+		// collapses to null (no source constraint) inside the serializer.
+		const checked: Record<SourceProfile, boolean> = {
+			task: srcTask,
+			both: srcBoth,
+			user: srcUser
+		};
+		const picked = ALL_SOURCE_PROFILES.filter((p) => checked[p]);
+		const spec = {
+			dropPunctOnly,
+			sources: picked.length === ALL_SOURCE_PROFILES.length ? null : picked
+		};
+		applyReviewFilterParams(params, spec);
+
 		if (skipClassified) {
 			params.set('skip', '1');
-			// Resume at the last item viewed under this seed, if we have one.
-			// The server validates it still belongs to the eligible universe.
+			// Resume the last item viewed under this seed+filter, if we have one.
+			// The server re-validates it (eligible AND still passes the filter).
 			try {
-				const resume = localStorage.getItem(`oc:resume:${seed}`);
+				const resume = localStorage.getItem(resumeStorageKey(seed, serializeReviewFilter(spec)));
 				if (resume) params.set('resume', resume);
 			} catch {
 				/* localStorage blocked — fall back to first-unreviewed walk */
@@ -91,7 +126,26 @@
 			<input type="checkbox" bind:checked={skipClassified} />
 			<span>{t('skipClassifiedLabel')}</span>
 		</label>
-		<button type="submit" class="primary">{t('startReview')}</button>
+
+		<fieldset class="filters">
+			<legend>{t('filtersLabel')}</legend>
+			<label class="check">
+				<input type="checkbox" bind:checked={dropPunctOnly} />
+				<span>{t('dropPunctLabel')}</span>
+			</label>
+			<small class="hint">{t('dropPunctHint')}</small>
+
+			<span class="src-label">{t('sourceLabel')}</span>
+			<div class="src-row">
+				<label class="check"><input type="checkbox" bind:checked={srcBoth} /><span>{t('sourceBoth')}</span></label>
+				<label class="check"><input type="checkbox" bind:checked={srcUser} /><span>{t('sourceUser')}</span></label>
+				<label class="check"><input type="checkbox" bind:checked={srcTask} /><span>{t('sourceTask')}</span></label>
+			</div>
+			<small class="hint">{t('sourceHint')}</small>
+			{#if !anySource}<span class="error">{t('sourceEmptyWarn')}</span>{/if}
+		</fieldset>
+
+		<button type="submit" class="primary" disabled={!anySource}>{t('startReview')}</button>
 	</form>
 
 	<nav class="links">
@@ -108,12 +162,14 @@
 	.seed-form { display: flex; flex-direction: column; gap: 1rem; }
 	label { display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.85rem; color: var(--text-2, #475569); }
 	.row { display: flex; gap: 0.5rem; }
-	input {
+	/* Scoped to the seed text field only — a bare `input` rule here leaks
+	   `flex:1` onto the filter checkboxes and stretches them. */
+	input[type='text'] {
 		flex: 1; padding: 0.55rem 0.75rem; font-size: 1rem;
 		border: 1px solid var(--border, #e2e8f0); border-radius: 8px;
 		font-family: monospace;
 	}
-	input[aria-invalid='true'] { border-color: #dc2626; }
+	input[type='text'][aria-invalid='true'] { border-color: #dc2626; }
 	.hint { font-size: 0.72rem; color: var(--text-3, #94a3b8); }
 	.preview { font-size: 0.72rem; color: var(--accent, #2563eb); font-family: monospace; }
 	.skip-toggle {
@@ -130,6 +186,35 @@
 	}
 	.skip-toggle span { flex: 0 1 auto; }
 	.error { font-size: 0.78rem; color: #dc2626; }
+	.filters {
+		border: 1px solid var(--border, #e2e8f0); border-radius: 8px;
+		padding: 0.75rem 0.9rem; margin: 0; display: flex; flex-direction: column; gap: 0.45rem;
+	}
+	.filters legend {
+		font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em;
+		color: var(--text-3, #94a3b8); font-weight: 600; padding: 0 0.35rem;
+	}
+	.check {
+		display: flex; flex-direction: row; align-items: center; gap: 0.5rem;
+		align-self: flex-start;
+		font-size: 0.82rem; color: var(--text-2, #475569); cursor: pointer; user-select: none;
+	}
+	.check input {
+		accent-color: var(--accent, #2563eb);
+		width: 1rem; height: 1rem; margin: 0; flex: none;
+	}
+	.src-label { font-size: 0.78rem; font-weight: 600; color: var(--text-2, #475569); margin-top: 0.35rem; }
+	.src-row { display: flex; flex-wrap: wrap; gap: 0.4rem 0.5rem; }
+	/* Source options read as a grouped set of pill toggles. */
+	.src-row .check {
+		padding: 0.3rem 0.6rem; border: 1px solid var(--border, #e2e8f0); border-radius: 999px;
+		background: var(--surface-2, #f8fafc);
+	}
+	.src-row .check:has(input:checked) {
+		border-color: var(--accent, #2563eb); background: color-mix(in srgb, var(--accent, #2563eb) 10%, transparent);
+		color: var(--text-1, #0f172a);
+	}
+	.primary:disabled { opacity: 0.5; cursor: not-allowed; }
 	button {
 		padding: 0.5rem 0.95rem; font-size: 0.9rem;
 		border-radius: 8px; cursor: pointer; font-family: inherit;

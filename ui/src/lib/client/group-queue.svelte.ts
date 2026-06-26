@@ -25,6 +25,10 @@ const order = $state<string[]>([]);
 let cacheHash = $state<string | null>(null);
 let nextCursor = $state<number | null>(null);
 let currentSeed = $state<number>(1);
+// Canonical review-filter query for the seeded queue (e.g. "punct=drop&src=both,user").
+// Empty string = unfiltered (today's behaviour). Appended to every queue fetch
+// and folded into the fetch cache key so two filter states never mix.
+let currentFilterQuery = $state<string>('');
 let mode = $state<Mode>('seeded');
 // Canonical filter identity, e.g. "status:include" / "category:akronymio" /
 // "errorCategory:homophone". Null in seeded mode.
@@ -133,12 +137,18 @@ export async function nextUnreviewedId(id: string): Promise<string | undefined> 
 	let idx = order.indexOf(id);
 	if (idx < 0) return undefined;
 	// Guard against a pathological loop; the real bound is order.length.
-	for (let guard = 0; guard < 1_000_000; guard++) {
-		if (idx + 1 >= order.length) {
+	for (let guard = 0; guard < 5_000_000; guard++) {
+		// Page forward until the window grows past `idx`. With server-side
+		// filtering a fetch may advance the cursor WITHOUT adding items (scan cap
+		// hit no matches), so we can't treat "no growth" as the end — only a null
+		// cursor means exhausted. Bail only when a fetch makes no progress at all
+		// (e.g. a failed request leaves both order length and cursor unchanged).
+		while (idx + 1 >= order.length) {
 			if (nextCursor === null) return undefined;
-			const before = order.length;
+			const beforeLen = order.length;
+			const beforeCursor = nextCursor;
 			await fetchSlice(nextCursor, 50);
-			if (order.length === before) return undefined; // no growth → give up
+			if (order.length === beforeLen && nextCursor === beforeCursor) return undefined;
 		}
 		idx += 1;
 		if (!isClassified(cache.get(order[idx]))) return order[idx];
@@ -226,9 +236,20 @@ export function currentFilter(): string | null {
 	return filterKey;
 }
 
-export function setSeed(s: number) {
-	if (mode === 'seeded' && s === currentSeed) return;
+export function currentSeededFilter(): string {
+	return mode === 'seeded' ? currentFilterQuery : '';
+}
+
+/**
+ * Enter seeded mode for `s`, optionally narrowed by `filterQuery` (a canonical
+ * review-filter query string from `serializeReviewFilter`). Changing either the
+ * seed OR the filter resets the queue, so the warm window, order, cursor, and
+ * in-flight fetches can't carry stale (differently-filtered) groups.
+ */
+export function setSeed(s: number, filterQuery: string = '') {
+	if (mode === 'seeded' && s === currentSeed && currentFilterQuery === filterQuery) return;
 	currentSeed = s;
+	currentFilterQuery = filterQuery;
 	mode = 'seeded';
 	filterKey = null;
 	filterRevision = null;
@@ -284,12 +305,13 @@ export function patchLocalLabel(id: string, updates: GroupPatchBody): void {
 }
 
 async function fetchSlice(from: number, n: number): Promise<void> {
-	const key = `seed|${currentSeed}|${from}`;
+	const q = currentFilterQuery ? `&${currentFilterQuery}` : '';
+	const key = `seed|${currentSeed}|${currentFilterQuery}|${from}`;
 	const existing = inFlight.get(key);
 	if (existing) return existing;
 	const p = (async () => {
 		try {
-			const resp = await fetch(`/api/review/queue?seed=${currentSeed}&from=${from}&n=${n}`);
+			const resp = await fetch(`/api/review/queue?seed=${currentSeed}&from=${from}&n=${n}${q}`);
 			if (!resp.ok) return;
 			const data = (await resp.json()) as QueueResponse;
 			if (cacheHash && data.cache_hash !== cacheHash) {

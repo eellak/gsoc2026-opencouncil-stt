@@ -8,6 +8,8 @@
  *     review route expects utterance_id, not edit_id).
  */
 
+import { applyReviewFilterParams, parseReviewFilter } from './review-filters';
+
 export const UINT32_MAX = 4_294_967_295;
 const INT_RE = /^\d+$/;
 
@@ -26,12 +28,27 @@ export interface ReviewHrefArgs {
 	utterance_id: string;
 	seed: number;
 	highlight?: string | null;
+	/** Canonical review-filter query (e.g. "punct=drop&src=both,user"); preserved across nav. */
+	filter?: string | null;
 }
 
-export function reviewHref({ utterance_id, seed, highlight }: ReviewHrefArgs): string {
+export function reviewHref({ utterance_id, seed, highlight, filter }: ReviewHrefArgs): string {
 	const params = new URLSearchParams({ seed: String(seed) });
 	if (highlight) params.set('highlight', highlight);
+	// Whitelist: only the recognized review-filter keys are merged in, so a
+	// malformed `filter` can never clobber seed/highlight or smuggle params.
+	if (filter) applyReviewFilterParams(params, parseReviewFilter(new URLSearchParams(filter)));
 	return `/review/${encodeURIComponent(utterance_id)}?${params.toString()}`;
+}
+
+/**
+ * localStorage key for the "resume where I left off" pointer. Scoped by seed AND
+ * the canonical filter signature so a position saved under one filtered queue
+ * can't reopen inside a differently-filtered one. Empty sig → seed-only key
+ * (byte-identical to the pre-filter format, so old pointers still resolve).
+ */
+export function resumeStorageKey(seed: number, filterSig: string): string {
+	return filterSig ? `oc:resume:${seed}|${filterSig}` : `oc:resume:${seed}`;
 }
 
 export function editHref(edit_id: string, seed?: number): string {

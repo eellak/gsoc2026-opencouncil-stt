@@ -94,6 +94,14 @@ export interface QueueResponse {
 	total: number;
 	groups: Group[];
 	next_cursor: number | null;
+	/**
+	 * Present on the seeded queue endpoint. `true` ⟺ the seeded order is fully
+	 * consumed (and `next_cursor` is null). On a filtered queue a request may
+	 * advance `next_cursor` without matches (scan cap) — that is NOT exhaustion.
+	 * The client treats `next_cursor === null` as the end condition; this field
+	 * is the explicit, self-documenting form of the same fact.
+	 */
+	exhausted?: boolean;
 }
 
 export interface GroupPatchBody {

@@ -5,12 +5,19 @@
  * seeded permutation (not an utterance_id), so paging is a simple integer
  * cursor.
  *
- * Response: { cache_hash, total, groups, next_cursor }
+ * Optional start-time filters (`punct=drop`, `src=task,both,user`) narrow which
+ * groups the seeded queue surfaces. When present, the endpoint scan-filters the
+ * seeded order server-side and returns only matching groups, so filtered-out
+ * items are never sent and never prefetched. Absent → byte-identical to before.
+ *
+ * Response: { cache_hash, total, groups, next_cursor, exhausted? }
  */
 
 import { json, error } from '@sveltejs/kit';
 import { getRepo } from '$lib/server/repo';
 import { parseSeedParam } from '$lib/shared/urls';
+import { parseReviewFilter, isFilterActive } from '$lib/shared/review-filters';
+import { scanFilteredQueue } from '$lib/server/state/review-filter-queue';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ url }) => {
@@ -29,5 +36,14 @@ export const GET: RequestHandler = async ({ url }) => {
 	}
 
 	const repo = await getRepo();
-	return json(repo.queue(seed, from, n));
+
+	const filter = parseReviewFilter(url.searchParams);
+	if (isFilterActive(filter)) {
+		return json(scanFilteredQueue(repo, seed, from, n, filter));
+	}
+
+	// Unfiltered path: passthrough, with `exhausted` made explicit so the client
+	// end-condition is uniform across both paths.
+	const res = repo.queue(seed, from, n);
+	return json({ ...res, exhausted: res.next_cursor === null });
 };
