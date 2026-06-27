@@ -1,4 +1,5 @@
 from eval.sweep.sweep_utils import (
+    _disp,
     build_leaderboard,
     make_grid,
     pick_best,
@@ -97,3 +98,52 @@ def test_render_markdown_contains_table_and_best_line():
     assert "lr1e-04_r16" not in md   # ids in fixture are 'a'/'b'
     assert "**Best (regression-guarded):** a" in md
     assert "24.0" in md              # values rendered
+
+
+def test_disp_keeps_small_learning_rates_readable():
+    # Bug: round(2e-4, 3) collapses to 0.0 -> the lr column showed 0.0 for every config.
+    assert _disp(2e-4) == 0.0002
+    assert _disp(1e-4) == 0.0001
+    assert _disp(5e-5) == 5e-05
+    # Normal-magnitude values are still rounded to 3dp, and 0.0 stays 0.0.
+    assert _disp(20.4823) == 20.482
+    assert _disp(0.0) == 0.0
+    assert _disp(8) == 8             # ints pass through unchanged
+
+
+def test_render_markdown_renders_real_learning_rates_not_zero():
+    grid_rows = build_leaderboard(
+        [{"config_id": "lr0.0002_r32", "lr": 2e-4, "rank": 32, "alpha": 64,
+          "epoch": 3, "val_corr_wer_norm": 20.482, "val_reg_wer": 25.0,
+          "val_corr_cer": 14.8, "eval_loss": 0.9, "wall_s": 161}],
+        {"val_corr_wer_norm": 33.0, "val_reg_wer": 27.0},
+    )
+    md = render_markdown(grid_rows, pick_best(grid_rows, 1.0))
+    assert "| 0.0002 | 32 |" in md   # the lr cell renders the real lr, not 0.0
+
+
+def test_render_markdown_includes_baseline_row_and_eval_set_sizes():
+    lb = _sample_lb()
+    baseline = {"val_corr_wer_norm": 33.0, "val_reg_wer": 27.0}
+    counts = {"n_corr_clips": 70, "n_corr_words": 1234,
+              "n_reg_clips": 16, "n_reg_words": 512}
+    md = render_markdown(lb, pick_best(lb, 1.0), baseline=baseline, counts=counts)
+    assert "BASELINE" in md          # baseline anchor row present
+    assert "33.0" in md              # baseline corr WER shown
+    assert "70 clips" in md and "1234 words" in md   # corr eval-set size
+    assert "16 clips" in md and "512 words" in md     # reg eval-set size
+
+
+def test_disp_handles_nan_none_and_negative_small_floats():
+    import math
+    assert math.isnan(_disp(float("nan")))   # NaN survives (no formatting crash)
+    assert _disp(None) is None               # non-floats pass through
+    assert _disp(-2e-4) == -0.0002           # negative small lrs keep sig-figs
+
+
+def test_render_markdown_baseline_row_renders_zero_reg_delta():
+    lb = _sample_lb()
+    baseline = {"val_corr_wer_norm": 33.0, "val_reg_wer": 27.0}
+    md = render_markdown(lb, pick_best(lb, 1.0), baseline=baseline)
+    assert "| BASELINE |" in md      # baseline row rendered
+    assert "| 0.0 |" in md           # its reg_delta cell is 0.0 and renders fine

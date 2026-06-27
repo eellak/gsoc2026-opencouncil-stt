@@ -88,3 +88,6 @@ data/asr/*.out
 
 # matrix run intermediate caches (resumable)
 data/reports/error-division/cache/
+
+# local-only chart prompts (not for git)
+docs/reports/img/CHART-PROMPTS.md
