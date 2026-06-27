@@ -53,6 +53,10 @@ See [logs/_index.md](logs/_index.md) for cadence rules (weekly digest, skip empt
 
 Older daily-normalization entries (May 13–18) are archived under [`archive/logs/2026-W20-daily-normalizations/`](../archive/logs/2026-W20-daily-normalizations/).
 
+## Monthly Reports (narrative journal — trilogy)
+
+- [Month #1 — June 2026](reports/month-1-2026-06.md): engaging progress journal — how OpenCouncil transcribes, what fixTranscript does, why the review tool exists, the benchmark + the domain-gap paradox, and what's certain so far (5,016 reviewed / 2,179 included). Part 1 of 3; local only.
+
 ## Data Folders
 
 - [`../data/clean`](../data/clean): analysis-ready CSV outputs.

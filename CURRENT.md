@@ -32,6 +32,16 @@ Last updated: 2026-05-20
 > and [decisions/data.md](docs/decisions/data.md#open). Next calls: Thu 11:30 (team),
 > Fri 13:00 (check-in).
 
+> **2026-06-24 — first real GPU finetune lands, and it works.** whisper-large-v3
+> + LoRA (0.51% of weights) on the **2,179 curated includes** + no-edit backbone,
+> held-out cities orestiada+argos. **val_corr WER 33.4→26.7 (−20%), CER −34%;
+> val_reg WER 27.1→17.3 (−36%), normalized −50%.** Ordinary speech improved *more*
+> than the hard cases — the correction-bias trap did not materialise. Smoke-grade
+> (small val, two decoding bugs to fix, needs seeds+CIs) but the direction is
+> clear. Report: [largev3-first-gpu-run](data/reports/finetune-research/largev3-first-gpu-run.md).
+> To fix before re-test: `clean_up_tokenization_spaces=False`, distinct pad
+> token / attention_mask, cache the clip build (kernel rebuilt ~70min each restart).
+
 This is the human and LLM entry point. Read this first, then follow links only as needed.
 
 ## Goal Right Now

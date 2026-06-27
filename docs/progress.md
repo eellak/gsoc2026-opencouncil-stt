@@ -33,8 +33,8 @@ and GPU decisions: [decisions/data.md](decisions/data.md).
 | 2    | Dataset work continued: train/val/test split with two held-out municipalities + date-based test split         | not started |          |
 | 3    | Dataset finalisation; publish reproducible dataset on HuggingFace                                             | not started |          |
 | 4    | Baseline evaluation: Gladia WER/CER reconstructed from `UtteranceEdit.beforeText`                             | not started |          |
-| 5    | Baseline evaluation: zero-shot Whisper-large-v3, Charalampos/whisper-medium-el, Cohere transcribe. **M1**     | not started |          |
-| 6    | LoRA fine-tuning, hyperparameter sweep (rank, alpha, learning rate)                                           | not started |          |
+| 5    | Baseline evaluation: zero-shot Whisper-large-v3, Charalampos/whisper-medium-el, Cohere transcribe. **M1**     | in progress | zero-shot large-v3 baseline measured on held-out cities (val_corr WER 33.4, val_reg 27.1) in the 2026-06-24 smoke run |
+| 6    | LoRA fine-tuning, hyperparameter sweep (rank, alpha, learning rate)                                           | in progress | first large-v3 LoRA run done: val_corr WER −20%, val_reg WER −36% vs zero-shot. Smoke-grade; [report](../data/reports/finetune-research/largev3-first-gpu-run.md). Sweep + seeds/CIs pending |
 | 7    | LoRA fine-tuning continued; evaluate on held-out municipalities                                               | not started |          |
 | 8    | Target morphological errors and domain terminology                                                            | not started |          |
 | 9    | Ablation studies (concatenation, data subsets). **M2: ≥15% relative DS-WER over Gladia baseline**             | not started |          |

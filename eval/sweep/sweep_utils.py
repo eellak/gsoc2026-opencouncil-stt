@@ -81,20 +81,53 @@ _COLS = ["config_id", "lr", "rank", "alpha", "epoch",
 
 
 def _disp(v):
-    """Round floats to 3dp for display only; pass everything else through."""
-    return round(v, 3) if isinstance(v, float) else v
+    """Round floats to 3dp for display only; pass everything else through.
+
+    Small magnitudes (learning rates like 2e-4) would collapse to 0.0 under a
+    blind round(v, 3), so keep 3 significant figures for |v| < 1e-3 instead.
+    """
+    if isinstance(v, float):
+        if v != 0 and abs(v) < 1e-3:
+            return float(f"{v:.3g}")
+        return round(v, 3)
+    return v
 
 
-def render_markdown(sorted_rows, best):
-    """Render the leaderboard as a Markdown table plus a best-pick line."""
+def _row_md(r):
+    return "| " + " | ".join(str(_disp(r.get(c, ""))) for c in _COLS) + " |"
+
+
+def render_markdown(sorted_rows, best, baseline=None, counts=None):
+    """Render the leaderboard as a Markdown table plus a best-pick line.
+
+    baseline (optional): {"val_corr_wer_norm", "val_reg_wer"} — rendered as a
+    pinned "BASELINE" row (epoch 0) so the table shows where fine-tuning started.
+    counts (optional): {"n_corr_clips","n_corr_words","n_reg_clips","n_reg_words"}
+    — appended as an "eval sets" line so readers see how small the eval is and do
+    not over-read sub-word WER differences.
+    """
     header = "| " + " | ".join(_COLS) + " |"
     sep = "| " + " | ".join("---" for _ in _COLS) + " |"
     lines = [header, sep]
+    if baseline:
+        lines.append(_row_md({
+            "config_id": "BASELINE", "epoch": 0,
+            "val_corr_wer_norm": baseline.get("val_corr_wer_norm"),
+            "val_reg_wer": baseline.get("val_reg_wer"),
+            "reg_delta": 0.0,
+        }))
     for r in sorted_rows:
-        lines.append("| " + " | ".join(str(_disp(r.get(c, ""))) for c in _COLS) + " |")
+        lines.append(_row_md(r))
     best_line = (f"**Best (regression-guarded):** {best['config_id']} "
                  f"(epoch {best['epoch']}, val_corr_wer_norm {best['val_corr_wer_norm']}, "
                  f"reg_delta {_disp(best['reg_delta'])})"
                  if best else
                  "**Best (regression-guarded):** none — every config regressed val_reg")
-    return "\n".join(lines) + "\n\n" + best_line + "\n"
+    tail = ""
+    if counts:
+        tail = ("\n\n**eval sets:** "
+                f"corr = {counts.get('n_corr_clips', '?')} clips / "
+                f"{counts.get('n_corr_words', '?')} words, "
+                f"reg = {counts.get('n_reg_clips', '?')} clips / "
+                f"{counts.get('n_reg_words', '?')} words")
+    return "\n".join(lines) + "\n\n" + best_line + tail + "\n"
