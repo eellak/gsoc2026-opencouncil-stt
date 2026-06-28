@@ -1,0 +1,179 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": "# Whisper large-v3 LoRA fine-tune: Greek council ASR (dry run)\n\nThis is a dry run. The point is to check the whole pipeline holds together and to get an early read on the ~1.9k curated corrections (about 1.8 hours of audio). It is not evidence that the model got better; there is far too little data here, so expect it to overfit.\n\nTo run it on Kaggle: set the Accelerator to GPU T4 x2, turn Internet on, then use Save & Run All (Commit) for a headless run.\n\nOne thing on memory: each meeting's mp3 is decoded to PCM one at a time and freed before the next one loads. An earlier version kept every meeting in RAM at once and ran out of memory."
+  },
+  {
+   "cell_type": "code",
+   "metadata": {},
+   "source": "# 1. Install\n# NB: Kaggle ships torchao==0.10.0, which PEFT's LoRA dispatcher rejects with an\n# ImportError (\"only versions above 0.16.0 are supported\"). We don't use torchao\n# (plain fp16 LoRA), and is_torchao_available() returns False cleanly when it's\n# absent; so just remove it.\n!pip -q uninstall -y torchao 2>/dev/null\n!pip -q install -U transformers datasets peft accelerate evaluate jiwer faster-whisper librosa soundfile 2>/dev/null\nimport torch; print(\"torch\", torch.__version__, \"cuda\", torch.cuda.is_available(), torch.cuda.get_device_name(0) if torch.cuda.is_available() else \"\")",
+   "outputs": [],
+   "execution_count": null
+  },
+  {
+   "cell_type": "code",
+   "metadata": {},
+   "source": "# 2. Config\nEXPORT_URL = \"https://79-76-114-184.sslip.io/api/export\"\nMEETING_API = \"https://opencouncil.gr/api/cities/{city}/meetings/{meeting}\"\nMODEL_ID   = \"openai/whisper-large-v3\"\nLANGUAGE, TASK = \"greek\", \"transcribe\"\nVAL_CITIES = {\"orestiada\", \"argos\"}\nSMOKE      = True                 # True = fast smoke test; set False for the full run\nSAMPLE_N   = 60 if SMOKE else None\n# Smoke speed is dominated by the number of DISTINCT meetings whose full mp3 we\n# download+decode (each council meeting is hours of audio). Capping clips alone\n# (SAMPLE_N) doesn't help if those clips still span ~84 meetings; cap meetings.\nSMOKE_TRAIN_MEETINGS = 4 if SMOKE else None\nSMOKE_VAL_MEETINGS   = 2 if SMOKE else None\nVAL_REG_PER_MEETING = 8\nSR = 16000; PAD_S = 0.2; MIN_DUR, MAX_DUR = 0.3, 30.0; SEED = 13\nLORA_R, LORA_ALPHA, LORA_DROPOUT = 16, 32, 0.05\nLR, TRAIN_BS, GRAD_ACC, EVAL_BS = 1e-4, 2, 4, 4\nEPOCHS = 1 if SMOKE else 4\nOUT_DIR = \"/kaggle/working/whisper-lora-greek\"\nimport os, random, numpy as np\nos.makedirs(OUT_DIR, exist_ok=True); random.seed(SEED); np.random.seed(SEED)",
+   "outputs": [],
+   "execution_count": null
+  },
+  {
+   "cell_type": "code",
+   "metadata": {},
+   "source": "# 3. Fetch export + meeting JSON helper\nimport requests, json, collections\ndef fetch_jsonl(url):\n    r = requests.get(url, timeout=600); r.raise_for_status()\n    return [json.loads(l) for l in r.text.splitlines() if l.strip()]\nrows = fetch_jsonl(EXPORT_URL)\nprint(\"included rows:\", len(rows))\nprint(\"per city:\", dict(collections.Counter(r[\"city_id\"] for r in rows).most_common()))\ndef fetch_meeting(city, meeting):\n    r = requests.get(MEETING_API.format(city=city, meeting=meeting),\n                     headers={\"User-Agent\":\"oc-ft/1.0\",\"Accept\":\"application/json\"}, timeout=120)\n    r.raise_for_status(); return r.json()\n\n# Drop denylisted (unreviewed, <5% human-edit) meetings — defense in depth in\n# case the export wasn't rebuilt yet. Canonical list: data/exclusions/ in the repo.\ntry:\n    _exj = requests.get(\"https://raw.githubusercontent.com/eellak/gsoc2026-opencouncil-stt/main/data/exclusions/unreviewed_meetings.json\", timeout=60).json()\n    _excl = {(m[\"city_id\"], m[\"meeting_id\"]) for m in _exj.get(\"meetings\", [])}\n    _b = len(rows); rows = [r for r in rows if (r[\"city_id\"], r[\"meeting_id\"]) not in _excl]\n    print(f\"denylist: dropped {_b-len(rows)} rows from {len(_excl)} excluded meetings\")\nexcept Exception as e:\n    print(\"denylist filter skipped:\", e)",
+   "outputs": [],
+   "execution_count": null
+  },
+  {
+   "cell_type": "code",
+   "metadata": {},
+   "source": [
+    "# 4. Audio helpers (NO global PCM cache; decode per meeting, free after)\n",
+    "import librosa, hashlib, pathlib, gc\n",
+    "CACHE = pathlib.Path(\"/tmp/audio_cache\"); CACHE.mkdir(parents=True, exist_ok=True)\n",
+    "def dl(url):\n",
+    "    p = CACHE / (hashlib.md5(url.encode()).hexdigest() + \".mp3\")\n",
+    "    if not p.exists():\n",
+    "        with requests.get(url, stream=True, timeout=600) as r:\n",
+    "            r.raise_for_status()\n",
+    "            with open(p, \"wb\") as f:\n",
+    "                for c in r.iter_content(1 << 20): f.write(c)\n",
+    "    return str(p)\n",
+    "def load_pcm_path(path): return librosa.load(path, sr=SR, mono=True)[0]\n",
+    "def cut(y, start, end):\n",
+    "    a = max(0, int((start - PAD_S) * SR)); b = min(len(y), int((end + PAD_S) * SR)); return y[a:b]\n",
+    "def ok_span(s, e):\n",
+    "    d = (e or 0) - (s or 0); return MIN_DUR <= d <= MAX_DUR"
+   ],
+   "outputs": [],
+   "execution_count": null
+  },
+  {
+   "cell_type": "code",
+   "metadata": {},
+   "source": "# 5. Memory-safe build: slice clips and STREAM to disk (wav). RAM holds only a manifest.\nimport gc, soundfile as sf\nCLIPS = pathlib.Path(\"/tmp/clips\"); CLIPS.mkdir(parents=True, exist_ok=True)\ntrain_src = [r for r in rows if r[\"city_id\"] not in VAL_CITIES and r.get(\"final_after_text\") and ok_span(r[\"start\"], r[\"end\"])]\nval_src   = [r for r in rows if r[\"city_id\"] in VAL_CITIES and r.get(\"final_after_text\") and ok_span(r[\"start\"], r[\"end\"])]\n\ndef cap_meetings(src, n):\n    # Keep only rows from the first n randomly-chosen meetings -> fewer full-mp3 downloads.\n    if not n: return src\n    mids = list({(r[\"city_id\"], r[\"meeting_id\"]) for r in src})\n    random.shuffle(mids); keep = set(mids[:n])\n    return [r for r in src if (r[\"city_id\"], r[\"meeting_id\"]) in keep]\n\ntrain_src = cap_meetings(train_src, SMOKE_TRAIN_MEETINGS)\nval_src   = cap_meetings(val_src, SMOKE_VAL_MEETINGS)\nif SAMPLE_N: random.shuffle(train_src); train_src = train_src[:SAMPLE_N]\nprint(f\"sources: train_src={len(train_src)} ({len({(r['city_id'],r['meeting_id']) for r in train_src})} mtgs) \"\n      f\"val_src={len(val_src)} ({len({(r['city_id'],r['meeting_id']) for r in val_src})} mtgs)\")\n\nreg_src = []\nfor city, mtg in sorted({(r[\"city_id\"], r[\"meeting_id\"]) for r in val_src}):\n    try: mj = fetch_meeting(city, mtg)\n    except Exception as e: print(\"skip\", city, mtg, e); continue\n    au = (mj.get(\"meeting\") or {}).get(\"audioUrl\")\n    if not au: continue\n    ne = [u for seg in (mj.get(\"transcript\") or []) for u in (seg.get(\"utterances\") or [])\n          if u.get(\"lastModifiedBy\") is None and ok_span(u.get(\"startTimestamp\"), u.get(\"endTimestamp\")) and (u.get(\"text\") or \"\").strip()]\n    random.shuffle(ne)\n    for u in ne[:VAL_REG_PER_MEETING]:\n        reg_src.append({\"audio_url\": au, \"start\": u[\"startTimestamp\"], \"end\": u[\"endTimestamp\"], \"text\": u[\"text\"]})\n\ndef mk(r, dst, k): return {\"url\": r[\"audio_url\"], \"start\": r[\"start\"], \"end\": r[\"end\"], \"text\": r[k], \"dst\": dst}\ntasks = ([mk(r,\"train\",\"final_after_text\") for r in train_src]\n       + [mk(r,\"valc\",\"final_after_text\") for r in val_src]\n       + [mk(r,\"valr\",\"text\") for r in reg_src])\nbuckets = collections.defaultdict(list)\nfor t in tasks: buckets[t[\"url\"]].append(t)\n\nman = {\"train\": [], \"valc\": [], \"valr\": []}\nfail = 0; idx = 0\nfor i, (url, ts) in enumerate(buckets.items(), 1):\n    try:\n        path = dl(url); y = load_pcm_path(path)        # ONE meeting in RAM at a time\n    except Exception as e:\n        fail += len(ts); print(\"audio fail\", url, str(e)[:60]); continue\n    for t in ts:\n        wav = str(CLIPS / f\"{t['dst']}_{idx}.wav\"); idx += 1\n        sf.write(wav, cut(y, t[\"start\"], t[\"end\"]), SR)   # stream clip to disk\n        man[t[\"dst\"]].append({\"audio\": wav, \"text\": (t[\"text\"] or \"\").strip()})\n    del y; gc.collect()                                # free RAM + disk before next meeting\n    try: os.remove(path)\n    except Exception: pass\n    if i % 20 == 0: print(f\"{i}/{len(buckets)} meetings | train={len(man['train'])} valc={len(man['valc'])} valr={len(man['valr'])}\")\nprint(f\"DONE train={len(man['train'])} valc={len(man['valc'])} valr={len(man['valr'])} audio_fail={fail}\")",
+   "outputs": [],
+   "execution_count": null
+  },
+  {
+   "cell_type": "code",
+   "metadata": {},
+   "source": [
+    "# 6. HF datasets (LAZY audio from disk) + Whisper preprocessing -> Arrow on disk\n",
+    "from datasets import Dataset, Audio\n",
+    "from transformers import WhisperProcessor\n",
+    "processor = WhisperProcessor.from_pretrained(MODEL_ID, language=LANGUAGE, task=TASK)\n",
+    "def to_ds(recs):\n",
+    "    if not recs: return None\n",
+    "    d = Dataset.from_list(recs).cast_column(\"audio\", Audio(sampling_rate=SR))\n",
+    "    def prep(b):\n",
+    "        a = b[\"audio\"]\n",
+    "        b[\"input_features\"] = processor.feature_extractor(a[\"array\"], sampling_rate=a[\"sampling_rate\"]).input_features[0]\n",
+    "        b[\"labels\"] = processor.tokenizer(b[\"text\"]).input_ids\n",
+    "        return b\n",
+    "    return d.map(prep, remove_columns=[\"audio\",\"text\"])\n",
+    "ds_train = to_ds(man[\"train\"]); ds_valc = to_ds(man[\"valc\"]); ds_valr = to_ds(man[\"valr\"])\n",
+    "gc.collect()\n",
+    "print(\"datasets:\", ds_train.num_rows, ds_valc.num_rows, (ds_valr.num_rows if ds_valr else 0))"
+   ],
+   "outputs": [],
+   "execution_count": null
+  },
+  {
+   "cell_type": "code",
+   "metadata": {},
+   "source": "# 7. Collator + metrics (raw WER, Greek-normalized WER, CER)\nimport torch, evaluate, unicodedata, re\nfrom dataclasses import dataclass\n@dataclass\nclass Collator:\n    processor: object\n    def __call__(self, feats):\n        batch = self.processor.feature_extractor.pad([{\"input_features\": f[\"input_features\"]} for f in feats], return_tensors=\"pt\")\n        # Feature extractor emits float32, but the model is loaded in fp16; match dtypes\n        # at the batch boundary so encoder conv1 doesn't crash in generate() during eval\n        # (\"Input type (float) and bias type (c10::Half) should be the same\").\n        batch[\"input_features\"] = batch[\"input_features\"].to(torch.float16)\n        lab = self.processor.tokenizer.pad([{\"input_ids\": f[\"labels\"]} for f in feats], return_tensors=\"pt\")\n        labels = lab[\"input_ids\"].masked_fill(lab.attention_mask.ne(1), -100)\n        if (labels[:,0] == self.processor.tokenizer.bos_token_id).all().cpu().item(): labels = labels[:,1:]\n        batch[\"labels\"] = labels; return batch\ncollator = Collator(processor)\nwer_m, cer_m = evaluate.load(\"wer\"), evaluate.load(\"cer\")\n_PUNCT = re.compile(r\"[^\\w\\s]\", re.UNICODE)\ndef gnorm(s):\n    s = unicodedata.normalize(\"NFD\", s.lower()); s = \"\".join(c for c in s if unicodedata.category(c)!=\"Mn\")\n    s = unicodedata.normalize(\"NFC\", s).replace(\"ς\",\"σ\"); return re.sub(r\"\\s+\",\" \", _PUNCT.sub(\" \", s)).strip()\ndef metrics(pred):\n    lab = np.where(pred.label_ids != -100, pred.label_ids, processor.tokenizer.pad_token_id)\n    P = processor.tokenizer.batch_decode(pred.predictions, skip_special_tokens=True)\n    R = processor.tokenizer.batch_decode(lab, skip_special_tokens=True)\n    return {\"wer\": 100*wer_m.compute(predictions=P, references=R),\n            \"wer_norm\": 100*wer_m.compute(predictions=[gnorm(x) for x in P], references=[gnorm(x) for x in R]),\n            \"cer\": 100*cer_m.compute(predictions=P, references=R)}",
+   "outputs": [],
+   "execution_count": null
+  },
+  {
+   "cell_type": "code",
+   "metadata": {},
+   "source": [
+    "# 8. Model + LoRA (freeze encoder) + trainer\n",
+    "import torch\n",
+    "from transformers import WhisperForConditionalGeneration, Seq2SeqTrainingArguments, Seq2SeqTrainer\n",
+    "from peft import LoraConfig, get_peft_model\n",
+    "model = WhisperForConditionalGeneration.from_pretrained(MODEL_ID, torch_dtype=torch.float16)\n",
+    "model.config.forced_decoder_ids = processor.get_decoder_prompt_ids(language=LANGUAGE, task=TASK)\n",
+    "model.config.suppress_tokens = []\n",
+    "model.generation_config.language, model.generation_config.task = LANGUAGE, TASK\n",
+    "model.model.encoder.requires_grad_(False)\n",
+    "model.gradient_checkpointing_enable(); model.config.use_cache = False\n",
+    "model = get_peft_model(model, LoraConfig(r=LORA_R, lora_alpha=LORA_ALPHA, lora_dropout=LORA_DROPOUT,\n",
+    "                                         target_modules=[\"q_proj\",\"v_proj\"]))\n",
+    "model.print_trainable_parameters()\n",
+    "args = Seq2SeqTrainingArguments(output_dir=OUT_DIR, per_device_train_batch_size=TRAIN_BS,\n",
+    "    gradient_accumulation_steps=GRAD_ACC, learning_rate=LR, warmup_ratio=0.1, num_train_epochs=EPOCHS,\n",
+    "    fp16=True, predict_with_generate=True, generation_max_length=225, eval_strategy=\"epoch\",\n",
+    "    save_strategy=\"epoch\", logging_steps=20, report_to=[], remove_unused_columns=False,\n",
+    "    label_names=[\"labels\"], load_best_model_at_end=True, metric_for_best_model=\"wer\", greater_is_better=False,\n",
+    "    seed=SEED, per_device_eval_batch_size=EVAL_BS)\n",
+    "trainer = Seq2SeqTrainer(model=model, args=args, train_dataset=ds_train, eval_dataset=ds_valc,\n",
+    "                         data_collator=collator, compute_metrics=metrics, processing_class=processor)"
+   ],
+   "outputs": [],
+   "execution_count": null
+  },
+  {
+   "cell_type": "code",
+   "metadata": {},
+   "source": [
+    "# 9. Baseline -> train -> after (val_corr improved? val_reg regressed?)\n",
+    "print(\"BASELINE val_corr:\", trainer.evaluate(ds_valc))\n",
+    "if ds_valr: print(\"BASELINE val_reg:\", trainer.evaluate(ds_valr))\n",
+    "trainer.train()\n",
+    "print(\"AFTER val_corr:\", trainer.evaluate(ds_valc))\n",
+    "if ds_valr: print(\"AFTER val_reg (regression check):\", trainer.evaluate(ds_valr))"
+   ],
+   "outputs": [],
+   "execution_count": null
+  },
+  {
+   "cell_type": "code",
+   "metadata": {},
+   "source": [
+    "# 10. Save adapter (persisted as Kaggle output on Commit)\n",
+    "import json\n",
+    "model.save_pretrained(OUT_DIR); processor.save_pretrained(OUT_DIR)\n",
+    "json.dump({\"model\": MODEL_ID, \"lora_r\": LORA_R, \"lr\": LR, \"epochs\": EPOCHS, \"seed\": SEED,\n",
+    "           \"n_val_corr\": ds_valc.num_rows, \"n_val_reg\": (ds_valr.num_rows if ds_valr else 0),\n",
+    "           \"val_cities\": sorted(VAL_CITIES)}, open(OUT_DIR+\"/run_meta.json\",\"w\"), ensure_ascii=False, indent=2)\n",
+    "print(\"saved ->\", OUT_DIR)"
+   ],
+   "outputs": [],
+   "execution_count": null
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": "## N-best / confidence (optional)\n\nRun this after the main pipeline. faster-whisper reports an `avg_logprob` and `no_speech_prob` per segment, plus a `probability` per word. The idea is to emit condensed JSON only for the low-confidence spans, so a downstream LLM only has to fix the parts the model was unsure about. For real N-best you would need beam search with `num_return_sequences`."
+  },
+  {
+   "cell_type": "code",
+   "metadata": {},
+   "source": "# 11. Confidence-gated condensed output (optional)\n# This loads a SECOND large-v3 (faster-whisper / CTranslate2). First free the\n# fine-tune model so its VRAM is released, then load in int8_float16 (~1.5GB\n# instead of ~3GB) so it fits next to anything the trainer left on a 16GB T4.\n# Whole thing is guarded: an optional demo cell must never fail the run.\nimport gc, torch\nfor _v in (\"trainer\", \"model\"):\n    if _v in globals(): del globals()[_v]\ngc.collect(); torch.cuda.empty_cache()\nfrom faster_whisper import WhisperModel\nCONF_AVG_LOGPROB, CONF_WORD_P = -1.0, 0.7\ntry:\n    fw = WhisperModel(\"large-v3\", device=\"cuda\", compute_type=\"int8_float16\")\nexcept RuntimeError as e:\n    print(\"GPU load failed, falling back to CPU int8:\", str(e)[:80])\n    fw = WhisperModel(\"large-v3\", device=\"cpu\", compute_type=\"int8\")\ndef annotate(wav_path):\n    segs, _ = fw.transcribe(wav_path, language=\"el\", beam_size=5, word_timestamps=True)\n    out = []\n    for s in segs:\n        low = (s.avg_logprob < CONF_AVG_LOGPROB) or any((w.probability or 1) < CONF_WORD_P for w in (s.words or []))\n        out.append({\"text\": s.text.strip(), \"conf\": round(float(s.avg_logprob),2),\n                    \"low_words\": [w.word for w in (s.words or []) if (w.probability or 1) < CONF_WORD_P]} if low else s.text.strip())\n    return out\nprint(\"annotate() ready\")",
+   "outputs": [],
+   "execution_count": null
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": "## Next\n\n- Compare BASELINE vs AFTER on val_corr (did the corrections improve?) and on val_reg (did anything regress?). The regression check is the one that matters most.\n- Scale up: fold the no-edit backbone into training and run a sweep on the mini PC (Track 2).\n- Before trusting any number: at least 3 seeds, report the mean and range, and bootstrap confidence intervals by meeting."
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "name": "python3",
+   "display_name": "Python 3"
+  },
+  "language_info": {
+   "name": "python"
+  },
+  "accelerator": "GPU"
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
