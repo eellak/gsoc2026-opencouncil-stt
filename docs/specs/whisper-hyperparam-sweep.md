@@ -38,16 +38,16 @@ proposes the next batch) is an optional future addition — explicitly out of sc
 | Orchestration | Single self-contained Kaggle notebook → leaderboard CSV |
 | Search space | LR × LoRA-rank grid; epochs measured per-epoch (free axis) |
 | Data recipe | Fixed: corrections (training cities) + 1× no-edit backbone |
-| Budget | Standard test ~3–4h, 9 configs, single seed |
-| Base model | `openai/whisper-large-v3`, LoRA on `q_proj`/`v_proj`, encoder frozen |
+| Budget | 9 configs, single seed, ≤12h Kaggle session (per-epoch flush + wall-clock guard) |
+| Base model | Sweep on `openai/whisper-large-v3-turbo` (fast decoder); apply the chosen LR/rank to the `large-v3` final run. LoRA on `q_proj`/`v_proj`, encoder frozen |
 
 ### Search space (concrete)
 
 - LR ∈ {5e-5, 1e-4, 2e-4}
 - LoRA rank ∈ {8, 16, 32}, alpha = 2 × rank, dropout = 0.05
 - 3 × 3 = **9 configs**
-- epochs: train each config to max **4**, eval after every epoch (epochs is not a
-  separate run — it is read off the per-epoch curve)
+- epochs: train each config to max **3**, eval after every epoch (epochs is not a
+  separate run — it is read off the per-epoch curve; smoke showed epoch 4 overfitting)
 - seed: single fixed seed
 
 ## Architecture — three phases, one notebook
@@ -118,8 +118,17 @@ These are non-negotiable — they were each a bug that was fixed once:
 2. **Single seed + small sample**: prior CPU research showed seed-variance (≈0.062)
    exceeded config-ranking differences (≈0.064). The leaderboard is **indicative, not
    definitive**. Multiple seeds belong to the later, larger run.
-3. **Kaggle quota** ~30h GPU/week, 12h/session, ~2 concurrent GPU sessions. A Standard
-   ~3–4h run is comfortable.
+3. **Kaggle quota** ~30h GPU/week, 12h/session, ~2 concurrent GPU sessions.
+4. **12h hard-kill is real (learned the hard way)**: a `large-v3` run hit ~2.8h/config →
+   9 configs ≈ 25h, killed at 12h (exit 137) and — because the leaderboard was written
+   only at the end — produced **zero output**. Two fixes: (a) the sweep now runs on
+   `large-v3-turbo` (fast decoder) so the full grid fits; (b) the loop writes
+   `leaderboard.csv/.md` **after every epoch** and stops ~40min before the limit
+   (`MAX_RUNTIME_S`, anchored at `KERNEL_T0` before the data build), so a timeout always
+   leaves the finished configs on disk.
+5. **Turbo-vs-large-v3 transfer**: hyperparameters are tuned on `large-v3-turbo` as a
+   fast proxy. LR/rank usually transfer, but confirm the winner on `large-v3` in the
+   final run rather than assuming identical optima.
 
 ## Out of scope (this spec)
 
