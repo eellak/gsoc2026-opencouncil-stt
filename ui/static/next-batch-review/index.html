@@ -167,7 +167,11 @@ document.getElementById('export').onclick = ()=>{
 document.getElementById('cat').onchange = ()=>{ i=0; applyFilter(); };
 document.getElementById('onlymark').onchange = ()=>{ i=0; applyFilter(); };
 
-fetch('edits.json').then(r=>r.json()).then(d=>{
+// absolute path so it resolves the same with or without a trailing slash on the page URL
+fetch('/next-batch-review/edits.json').then(r=>{
+  if(!r.ok) throw new Error('HTTP '+r.status+' — το edits.json δεν σερβίρεται σε αυτό το deploy');
+  return r.json();
+}).then(d=>{
   all=d;
   const cats=['(όλες)',...[...new Set(d.map(e=>e.cat))].sort()];
   document.getElementById('cat').innerHTML = cats.map(c=>`<option>${c}</option>`).join('');
