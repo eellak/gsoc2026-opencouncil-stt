@@ -99,3 +99,7 @@ data/reports/error-division/cache/
 
 # local-only chart prompts (not for git)
 docs/reports/img/CHART-PROMPTS.md
+
+# next-batch selection: keep code+summaries+final list; ignore big binaries & calib audio
+data/next-batch/*.parquet
+data/next-batch/calib/

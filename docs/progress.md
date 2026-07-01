@@ -12,6 +12,15 @@ but the mid-July dataset target is the binding one). Finetuning background and
 plan: [reference/finetuning-101.md](reference/finetuning-101.md). Split, baseline,
 and GPU decisions: [decisions/data.md](decisions/data.md).
 
+**Batch-2 auto-selection (2026-07-01):** end-to-end automated selection landed —
+**7,364 fine-tune edits** chosen from the 93,584-candidate un-curated remainder via
+a validated Soniox faithfulness metric + Codex-designed interestingness ranking +
+Sonnet text triage. Outputs under `data/next-batch/`, code under
+`eval/next_batch_step*.py`. See
+[logs/2026-07-01-next-batch-selection.md](logs/2026-07-01-next-batch-selection.md).
+Pending human-gated steps: lock CER thresholds, Soniox gold-faithfulness pass,
+segmentation + no-edit backbone.
+
 ## Pre-coding (community bonding / preparation)
 
 | Focus                                                                                                  | Status        | Evidence                                                                                                                                |
