@@ -185,3 +185,39 @@ little generic Greek ASR data only if domain overfitting appears.
 When a step lands, update `docs/progress.md` and leave a short note in
 `docs/logs/` per the vault's history rules. Keep `data/next-batch/` outputs and
 this runbook the source of truth for what ran.
+
+---
+
+## RUN STATUS — 2026-07-01
+
+Ran on `harold-venusseries` (has the CSV + `.venv-eval` locally). Code:
+`eval/next_batch_step{1,2_sample,2_transcribe,3_4,5_rank,6_judge,7_select}.py`,
+`cer()`/`wer()` added to `eval/scoring.py`. Outputs in `data/next-batch/`.
+
+- **Step 1 [DONE]** `candidates.parquet` — **93,584** candidates. Drops (all logged
+  in `step1_summary.md`): LLM-only 130,742; broken-chain 92; normalisation-only
+  35,628; empty gold 5,284; unreviewed-meeting denylist 245; **held-out eval
+  meetings 22,030 (leakage — added beyond the brief after Codex review)**.
+- **Step 2 [DONE]** stratified 320-clip calibration, Soniox realtime.
+  **320/320 transcribed, 0 failures** (`calib/`).
+- **Step 3–4 [DONE]** metric validated (KEEP = confirmed fixes, DROP = bad labels).
+  Human-gate artifacts: `calib/calib_audit.csv`, `calib/cer_distributions.png`,
+  `step3_4_summary.md`. **Thresholds still using Codex STARTING gates — Angelos to
+  lock.**
+- **Step 5 [DONE]** interestingness formula (Codex-reviewed) + greedy-diverse →
+  `shortlist.parquet` (15,000; 14,370 distinct edits). `ranked.parquet` has all
+  61,730 prefilter survivors with scores.
+- **Step 6 [DONE]** Sonnet triage of all 15,000 → `judged.jsonl`: **7,364 keep**,
+  5,967 reject, 1,669 unsure.
+- **Step 7 [DONE]** `selected_edits.jsonl` — **7,364 edits**, 99.8% acoustic, 7,173
+  distinct corrections, 177 meetings / 11 cities, ~5.4 h raw span (→ ~30 h after
+  concatenation). `step7_summary.md`.
+
+**Not yet run (human-gated):** Step 5-bulk Soniox gold-faithfulness pass over the
+selected 7,364 / top shortlist (async key present in `~/projects/soniox-tools/.env`,
+real API spend — awaiting go); exact CER threshold lock; Step 6 segmentation +
+no-edit backbone; Step 7 DB/VPS write-back.
+
+**Note:** the pre-existing `data/asr/train_manifest.csv` (93,864 rows, 119 meetings)
+is an ad-hoc export with no committed builder; it leaked 17,237 rows from 30
+held-out test meetings and covered fewer meetings. Superseded by this pipeline.

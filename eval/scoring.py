@@ -45,6 +45,32 @@ def _norm_tokens(s: str) -> list[str]:
     return n.split() if n else []
 
 
+def cer(hyp: str, ref: str) -> float:
+    """Character error rate of `hyp` against reference `ref`, on the Greek-
+    normalised char form (accent/sigma/punct/case/whitespace-insensitive).
+
+    Denominator is len(normalised ref). Edge cases are explicit so callers never
+    divide by zero:
+      - ref and hyp both normalise to empty -> 0.0 (nothing to transcribe, got nothing)
+      - ref empty, hyp non-empty            -> 1.0 (any output is fully spurious)
+    For the faithfulness pipeline empty-ref rows are dropped upstream, so this
+    only guards degenerate inputs.
+    """
+    nh, nr = greek_normalize(hyp), greek_normalize(ref)
+    if not nr:
+        return 0.0 if not nh else 1.0
+    return Levenshtein.distance(nh, nr) / len(nr)
+
+
+def wer(hyp: str, ref: str) -> float:
+    """Word error rate of `hyp` vs `ref` on Greek-normalised tokens (token-level
+    Levenshtein / len(ref tokens)). Same zero-ref guard as `cer`."""
+    th, tr = _norm_tokens(hyp), _norm_tokens(ref)
+    if not tr:
+        return 0.0 if not th else 1.0
+    return Levenshtein.distance(th, tr) / len(tr)
+
+
 def score_pair(input_raw: str, model_output: str, gold: str) -> dict:
     """Score one corrected line against the gold reference.
 

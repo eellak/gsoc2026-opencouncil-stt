@@ -6,7 +6,7 @@ on normalised-equivalent changes.
 """
 import pytest
 
-from eval.scoring import greek_normalize, score_pair
+from eval.scoring import cer, greek_normalize, score_pair, wer
 
 
 @pytest.mark.parametrize(
@@ -88,3 +88,28 @@ def test_wer_one_substitution():
 def test_wer_full_on_empty_output():
     s = score_pair(input_raw="ναι", model_output="", gold="ναι")
     assert s["wer"] == pytest.approx(1.0)
+
+
+# ---- cer() / wer() faithfulness helpers (next-batch pipeline) ----------------
+
+
+def test_cer_zero_on_normalised_equivalent():
+    # differs only by accent/punctuation/casing -> identical normalised form
+    assert cer("Καλησπέρα,", "καλησπερα") == pytest.approx(0.0)
+
+
+def test_cer_counts_real_char_errors():
+    # one substitution over a 5-char normalised reference ("γινει")
+    assert cer("γινι", "γινει") == pytest.approx(1 / 5)
+
+
+def test_cer_empty_ref_guards_no_zero_division():
+    assert cer("", "") == pytest.approx(0.0)      # nothing expected, nothing got
+    assert cer("κάτι", "") == pytest.approx(1.0)  # spurious output, empty ref
+
+
+def test_wer_helper_word_level():
+    # token-level: 1 substitution over 3 reference tokens
+    assert wer("ο δήμος ήταν", "ο δήμος είναι") == pytest.approx(1 / 3)
+    assert wer("", "ναι") == pytest.approx(1.0)
+    assert wer("", "") == pytest.approx(0.0)
