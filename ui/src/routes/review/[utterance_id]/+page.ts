@@ -36,6 +36,10 @@ function readFilter(url: URL): QueueFilter | null {
 	if (errorCategory) {
 		return { query: `errorCategory=${encodeURIComponent(errorCategory)}`, label: errorCategory };
 	}
+	const queueName = url.searchParams.get('queue');
+	if (queueName === 'nb2') {
+		return { query: 'queue=nb2', label: 'ήχος OK (batch-2)' };
+	}
 	return null;
 }
 

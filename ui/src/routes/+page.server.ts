@@ -9,6 +9,7 @@ import {
 	matchesReviewFilter
 } from '$lib/shared/review-filters';
 import { firstFilteredId } from '$lib/server/state/review-filter-queue';
+import { nb2IdSet } from '$lib/server/state/nb2-ids';
 import type { IncludeStatus } from '$lib/domain/types';
 import type { PageServerLoad } from './$types';
 
@@ -33,6 +34,19 @@ function parseStatus(raw: string | null): IncludeStatus | null {
  *     distribution row.
  */
 export const load: PageServerLoad = async ({ url }) => {
+	// Fixed batch-2 queue (audio-verified "faithful" edits). Same shape as the
+	// status queue: jump into the first eligible item, review page re-applies
+	// `?queue=nb2` for filtered j/k navigation.
+	if (url.searchParams.get('queue') === 'nb2') {
+		const repo = await getRepo();
+		const set = nb2IdSet();
+		const ids = repo.eligibleOrderedIds().filter((id) => set.has(id));
+		if (!ids.length) throw redirect(302, '/stats');
+		const target = new URL(`/review/${encodeURIComponent(ids[0])}`, url);
+		target.searchParams.set('queue', 'nb2');
+		throw redirect(302, target.pathname + target.search);
+	}
+
 	const statusParam = parseStatus(url.searchParams.get('status'));
 	if (statusParam && statusParam !== 'unreviewed') {
 		const repo = await getRepo();
