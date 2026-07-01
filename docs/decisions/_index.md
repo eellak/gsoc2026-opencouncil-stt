@@ -9,6 +9,7 @@ Accepted decisions and open questions, one file per theme. Keep entries short �
 - [ui.md](ui.md) — exploration-before-training stance, waveform/peaks-cache
 - [audio.md](audio.md) — CORS workaround, Vercel proxy, fixed-file URL map
 - [matching.md](matching.md) — meeting JSON usage, `utterance.text` semantics, open matching/taxonomy questions
+- [metric-hir.md](metric-hir.md) — Human Intervention Rate metric; **likely NOT adopted** (mentor pushback 2026-06-23), WER (+CER) stays standard
 
 ## Index
 
@@ -33,7 +34,7 @@ Accepted decisions and open questions, one file per theme. Keep entries short �
 - [Supabase Postgres for live review state](storage.md#2026-05-19---supabase-postgres-for-live-review-state) — 2026-05-19
 - [File-backed prototype on `codex/file-backed-review-ui` (experimental, local-only)](storage.md#2026-05-20---file-backed-prototype-on-codexfile-backed-review-ui-experimental-local-only) — 2026-05-20
 - [Keep the `/api/oc-meeting` CORS bridge instead of direct browser fetch](storage.md#2026-05-22--keep-the-apioc-meeting-cors-bridge-instead-of-direct-browser-fetch) — 2026-05-22
-- [Audio source order: original first, mirror as last-resort fallback](audio.md#2026-05-20---audio-source-order-original-first-mirror-as-last-resort-fallback-branch-codexfile-backed-review-ui) — 2026-05-20
+- [Audio source order: original first, proxy fallback, mirror last](audio.md#2026-05-20---audio-source-order-original-first-proxy-fallback-mirror-last-branch-codexfile-backed-review-ui) — 2026-05-20
 - [Waveform component removed pending a segment-render library](audio.md#2026-05-20---waveform-component-removed-pending-a-segment-render-library-branch-codexfile-backed-review-ui) — 2026-05-20
 - [Waveform bars + peaks-cache prefetch](ui.md#2026-05-15---waveform-bars--peaks-cache-prefetch) — 2026-05-15
 - [Categorise all CSV rows instead of dropping](data.md#2026-05-16---categorise-all-csv-rows-instead-of-dropping) — 2026-05-16
@@ -54,6 +55,7 @@ Accepted decisions and open questions, one file per theme. Keep entries short �
 - [Human-edit threshold for eligible meetings: 10 → 20](data.md#human-edit-threshold-for-eligible-meetings-10--20-resolved-2026-06-16) — **resolved 2026-06-16 (use 20)**
 - [Correction-bias mix ratio](data.md#correction-bias-mix-ratio) — finetuning data
 - [Who fixes what: fine-tune vs LLM, by error type](../specs/error-division.md) — finetuning data (experiment planned)
+- [Human Intervention Rate (HIR) as a metric](metric-hir.md) — **likely dropped 2026-06-23** (mentor pushback); WER (+CER) stays standard, HIR kept only as a diagnostic
 - [Diagram maintenance](#diagram-maintenance) (meta — see below)
 
 ## Meta

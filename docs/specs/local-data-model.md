@@ -37,7 +37,7 @@ Fields:
 - `cleaning_applied`
 - `latest_per_utterance`
 
-Current live DB keeps only the latest edit per `utterance_id`. Superseded chain edits remain in the CSV; see [latest-per-utterance report](../../data/reports/latest-per-utterance.md).
+Current live DB keeps only the latest edit per `utterance_id`. Superseded chain edits remain in the CSV; see [decisions/data.md](../decisions/data.md#2026-05-19---keep-only-the-latest-edit-per-utterance).
 
 ### `meetings`
 

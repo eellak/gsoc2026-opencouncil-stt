@@ -75,7 +75,7 @@ CREATE TABLE transcript_meeting (
   kept rows); null `start`/`end` stored as null. Never reject a whole meeting for
   one bad utterance. Covered by tests.
 
-## Build pipeline ([build-cache.ts](../../ui/src/scripts/build-cache.ts) / [build.ts](../../ui/src/lib/server/cache/build.ts))
+## Build pipeline ([build-cache.ts](../../ui/scripts/build-cache.ts) / [build.ts](../../ui/src/lib/server/cache/build.ts))
 
 1. After eligibility is known, collect distinct eligible `(city_id, meeting_id)`.
 2. **Separate, resumable-by-meeting phase** (the expensive part, ~313 fetches).

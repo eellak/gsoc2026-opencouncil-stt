@@ -207,7 +207,7 @@ Implementation note: `corrections.audio_cdn_url` was moved to `meetings.audio_cd
 
 Reason: for the training/evaluation dataset the only useful signal is the final corrected text. Intermediate edits in a chain are noise: they capture transient states (e.g. mid-typo, accidental space, partial paste) that the reviewer themselves discarded in the next edit. Loading the chain into the review UI also wastes reviewer time on rows that are already known to be superseded.
 
-Numbers from the CSV (see [data/reports/latest-per-utterance.md](../../data/reports/latest-per-utterance.md) for distribution and worked examples):
+Numbers from the CSV (chain-length distribution and worked examples were captured in a local-only report under `data/reports/`, which is gitignored):
 
 - 287 605 unique utterances total
 - 70.2 % had a single edit (no chain)
@@ -230,6 +230,12 @@ degrades long-form (segmentation/timestamps/hallucinations). The corrected utter
 stays the target; neighbours add context (only trusted if the meeting passes the
 trust cutoff). Open: exact length + short/long mix ratio + whether to keep timestamp
 tokens in the first run — sweep on the mini PC once val is larger.
+
+**Length mix resolved (2026-07-01, research + Codex review):** use a MIX, not a single
+length — ~60–70% @15–30s, 20–30% @5–15s, 5–10% near-30s; concatenate within a speaker
+turn only, silence boundaries, ≤30s, no overlap. **First run trains WITHOUT timestamp
+tokens** (`--without_timestamps`); timestamp quality is a later, separate experiment.
+See [next-batch-selection-onbox-brief](../runbooks/next-batch-selection-onbox-brief.md).
 
 ### Meeting-trust cutoff: `humanReview` flag is unreliable (measured 2026-06-23)
 
@@ -295,6 +301,12 @@ Final ratio of corrected vs non-corrected utterances in the training set
 (starting point ~30–50% corrections / ~50–70% non-corrected). To be tuned once
 the eval harness can measure the effect. See
 [finetuning-101 → correction-bias trap](../reference/finetuning-101.md#our-dataset).
+
+**For batch-2 specifically (2026-07-01, Codex review):** keep batch-2 mostly corrections
+but ensure the *training mix* is **not** corrections-only — add **20–30% trusted no-edit
+backbone** from fully-reviewed meetings only (never random untouched ASR), tracked separately.
+Corrections-only fine-tuning risks the over-editing trap. (The 2026-06-24 smoke run found the
+trap did not materialise, but that ran with a backbone included — keep one.)
 The *error-type* shape of that mix (which categories the fine-tune should own vs
 leave to the LLM) is being decided by the experiment in
 [specs/error-division.md](../specs/error-division.md).

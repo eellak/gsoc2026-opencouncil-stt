@@ -201,7 +201,7 @@ Alternative architecture: If inference speed with Whisper \+ CTranslate2 isn't e
 * **Few-Shot Prompting:** Brown, Tom B., et al. (2020) ["Language Models are Few-Shot Learners". Neural Information Processing Systems, vol. 33](https://arxiv.org/abs/2005.14165).   
 * **The Greek Podcast corpus**: Paraskevopoulous, et al. (2024), [Competitive speech models for low-resourced languages with weakly supervised data](https://arxiv.org/abs/2406.15284)
 
-## Appendix A: Corrections’ sample analysis and error taxonomy {#appendix-a:-corrections’-sample-analysis-and-error-taxonomy}
+## Appendix A: Corrections’ sample analysis and error taxonomy
 
 ### A.1 Dataset overview
 
