@@ -1,0 +1,111 @@
+{
+  "seed": 1234,
+  "val_cities": [
+    "argos",
+    "orestiada"
+  ],
+  "duration_gate_s": [
+    1.0,
+    30.0
+  ],
+  "val_target_fraction": 0.2,
+  "achieved_val_fraction": 0.2004,
+  "total_minutes": 5808.8,
+  "val_minutes": 1164.0,
+  "train_minutes": 4644.8,
+  "straddling_meetings": 101,
+  "straddling_val_minutes": 536.9,
+  "holdout": {
+    "target_minutes": 1161.8,
+    "unseen_city_minutes": 627.0,
+    "unseen_speaker_minutes": 537.1,
+    "eligible_speakers": 106,
+    "held_out_speakers": 23,
+    "min_speaker_minutes": 10.0,
+    "eligible_speakers_exhausted": false,
+    "uncached_meetings_fetched": 0
+  },
+  "by_split": {
+    "train": {
+      "n_utts": 99905,
+      "minutes": 4644.8
+    },
+    "val": {
+      "n_utts": 26223,
+      "minutes": 1164.0
+    }
+  },
+  "by_stratum": {
+    "train": {
+      "n_utts": 99905,
+      "minutes": 4644.8
+    },
+    "unseen_city": {
+      "n_utts": 13833,
+      "minutes": 627.0
+    },
+    "unseen_speaker": {
+      "n_utts": 12390,
+      "minutes": 537.1
+    }
+  },
+  "by_tier": {
+    "human_verified": {
+      "n_utts": 1591,
+      "minutes": 106.4
+    },
+    "no_edit": {
+      "n_utts": 124537,
+      "minutes": 5702.4
+    }
+  },
+  "by_city": {
+    "argos": {
+      "n_utts": 4329,
+      "minutes": 222.2
+    },
+    "athens": {
+      "n_utts": 34752,
+      "minutes": 1498.8
+    },
+    "chalandri": {
+      "n_utts": 9341,
+      "minutes": 436.0
+    },
+    "chania": {
+      "n_utts": 22994,
+      "minutes": 1172.6
+    },
+    "orestiada": {
+      "n_utts": 9504,
+      "minutes": 404.8
+    },
+    "samothraki": {
+      "n_utts": 7971,
+      "minutes": 321.3
+    },
+    "sparta": {
+      "n_utts": 14470,
+      "minutes": 697.0
+    },
+    "vrilissia": {
+      "n_utts": 9684,
+      "minutes": 450.2
+    },
+    "xylokastro": {
+      "n_utts": 2930,
+      "minutes": 136.0
+    },
+    "zografou": {
+      "n_utts": 10153,
+      "minutes": 469.9
+    }
+  },
+  "noedit_correction_ratio": 78.276,
+  "n_no_edit": 124537,
+  "n_correction": 1591,
+  "null_person_id": {
+    "train": 12701,
+    "val": 907
+  }
+}
