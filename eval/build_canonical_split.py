@@ -16,13 +16,17 @@ Locked decisions (do not re-litigate here):
     (tier human_verified); no-edit backbone = lastModifiedBy-null utts from
     humanReview=true meetings only (tier no_edit), minus any correction uid
   - duration gate: keep only 1.0s <= end-start <= 30.0s
-  - determinism: SEED=1234, md5(person_id) only (no RNG). Same inputs -> same out.
+  - no-edit cap: keep ALL corrections, then deterministically down-sample the
+    no-edit backbone (by md5 of utterance_id) so the dataset is ~--target-total
+    utterances. Use --target-total 0 for the uncapped "everything" build.
+  - determinism: SEED=1234, md5 only (no RNG). Same inputs -> same output.
 
 Reuses fetch_meeting_json / noedit_utts from eval/autoresearch/prepare_asr.py.
-Run: .venv-eval/bin/python eval/build_canonical_split.py
+Run: .venv-eval/bin/python eval/build_canonical_split.py [--target-total N]
 """
 from __future__ import annotations
 
+import argparse
 import collections
 import csv
 import hashlib
@@ -64,6 +68,7 @@ MAX_DUR = 30.0
 VAL_TARGET_FRAC = 0.20
 VAL_BAND = (0.18, 0.22)
 MIN_SPEAKER_MIN = 10.0
+DEFAULT_TARGET_TOTAL = 25000  # target dataset size; 0 = uncapped ("everything")
 
 
 def log(msg: str) -> None:
@@ -207,10 +212,18 @@ def choose_holdout_speakers(
     pool: list[dict],
     total_min: float,
 ) -> tuple[set[str], dict]:
-    """md5-ordered whole-speaker hold-out from mixed cities until val>=20%."""
+    """md5-ordered whole-speaker hold-out from the mixed cities until val>=20%.
+
+    Speakers are scanned in md5(person_id) order (deterministic, no RNG). A
+    band-guard skips any single speaker whose whole minutes would push val past
+    the upper band (VAL_BAND[1]); scanning continues for a speaker that fits.
+    This keeps whole-speaker exclusivity while avoiding one large speaker blowing
+    the split past ~22% on a small (--target-total) dataset.
+    """
     unseen_city_min = sum(
         r["dur"] for r in pool if r["city_id"] in VAL_CITIES) / 60.0
     target_min = VAL_TARGET_FRAC * total_min
+    upper_min = VAL_BAND[1] * total_min
 
     mixed_speaker_min: dict[str, float] = collections.defaultdict(float)
     for r in pool:
@@ -227,22 +240,25 @@ def choose_holdout_speakers(
 
     holdout: set[str] = set()
     val_min = unseen_city_min
-    ran_out = True
+    skipped_for_band = 0
     for pid in eligible:
         if val_min >= target_min:
-            ran_out = False
             break
+        if val_min + mixed_speaker_min[pid] > upper_min:
+            skipped_for_band += 1  # would overshoot the band; try the next
+            continue
         holdout.add(pid)
         val_min += mixed_speaker_min[pid]
-    else:
-        ran_out = val_min < target_min
+    ran_out = val_min < target_min
 
     diag = {
         "target_minutes": round(target_min, 1),
+        "upper_band_minutes": round(upper_min, 1),
         "unseen_city_minutes": round(unseen_city_min, 1),
         "unseen_speaker_minutes": round(val_min - unseen_city_min, 1),
         "eligible_speakers": len(eligible),
         "held_out_speakers": len(holdout),
+        "speakers_skipped_for_band": skipped_for_band,
         "min_speaker_minutes": MIN_SPEAKER_MIN,
         "eligible_speakers_exhausted": ran_out,
     }
@@ -306,6 +322,21 @@ def validate(pool: list[dict], diag: dict) -> dict:
         "straddling_meetings": len(straddling),
         "straddling_val_minutes": round(straddle_val_min, 1),
     }
+
+
+def cap_noedit(noedit: list[dict], cap: int | None) -> tuple[list[dict], int]:
+    """Down-sample no-edit to `cap` utts, deterministically by md5(uid).
+
+    Returns (kept, n_before). cap=None means no cap. Sampling is a stable
+    md5-ordered take, so it stays representative across cities/speakers and is
+    reproducible with no RNG.
+    """
+    n_before = len(noedit)
+    if cap is None or n_before <= cap:
+        return noedit, n_before
+    ranked = sorted(noedit, key=lambda r: (md5_hex(r["utterance_id"]),
+                                           r["utterance_id"]))
+    return ranked[:cap], n_before
 
 
 def summarize(pool: list[dict]) -> dict:
@@ -388,6 +419,13 @@ def write_outputs(pool: list[dict]) -> None:
 
 
 def main() -> None:
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument(
+        "--target-total", type=int, default=DEFAULT_TARGET_TOTAL,
+        help="target dataset size in utterances (keep all corrections, "
+             "down-sample no-edit to fill the rest); 0 = uncapped")
+    args = ap.parse_args()
+
     excluded = load_excluded_keys()
     log(f"denylist: {len(excluded)} meetings")
 
@@ -401,6 +439,15 @@ def main() -> None:
     corrections = load_corrections(excluded)
     correction_uids = {r["utterance_id"] for r in corrections}
     noedit, fetched = load_noedit(hr_meetings, correction_uids)
+
+    # keep ALL corrections; cap the no-edit backbone to hit --target-total
+    noedit_cap = None
+    if args.target_total > 0:
+        noedit_cap = max(0, args.target_total - len(corrections))
+    noedit, noedit_before = cap_noedit(noedit, noedit_cap)
+    if noedit_cap is not None:
+        log(f"no-edit cap: {noedit_before} -> {len(noedit)} "
+            f"(target_total={args.target_total}, corrections={len(corrections)})")
 
     pool = corrections + noedit
     person_map = load_person_map()
@@ -430,6 +477,9 @@ def main() -> None:
         "val_cities": sorted(VAL_CITIES),
         "duration_gate_s": [MIN_DUR, MAX_DUR],
         "val_target_fraction": VAL_TARGET_FRAC,
+        "target_total": args.target_total,
+        "noedit_available": noedit_before,
+        "noedit_cap": noedit_cap,
         **val_stats,
         "holdout": diag,
         **summarize(pool),

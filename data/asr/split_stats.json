@@ -9,103 +9,108 @@
     30.0
   ],
   "val_target_fraction": 0.2,
-  "achieved_val_fraction": 0.2004,
-  "total_minutes": 5808.8,
-  "val_minutes": 1164.0,
-  "train_minutes": 4644.8,
-  "straddling_meetings": 101,
-  "straddling_val_minutes": 536.9,
+  "target_total": 25000,
+  "noedit_available": 124537,
+  "noedit_cap": 21735,
+  "achieved_val_fraction": 0.2118,
+  "total_minutes": 1215.7,
+  "val_minutes": 257.5,
+  "train_minutes": 958.2,
+  "straddling_meetings": 86,
+  "straddling_val_minutes": 128.9,
   "holdout": {
-    "target_minutes": 1161.8,
-    "unseen_city_minutes": 627.0,
-    "unseen_speaker_minutes": 537.1,
-    "eligible_speakers": 106,
-    "held_out_speakers": 23,
+    "target_minutes": 243.1,
+    "upper_band_minutes": 267.5,
+    "unseen_city_minutes": 128.5,
+    "unseen_speaker_minutes": 129.0,
+    "eligible_speakers": 22,
+    "held_out_speakers": 7,
+    "speakers_skipped_for_band": 2,
     "min_speaker_minutes": 10.0,
     "eligible_speakers_exhausted": false,
     "uncached_meetings_fetched": 0
   },
   "by_split": {
     "train": {
-      "n_utts": 99905,
-      "minutes": 4644.8
+      "n_utts": 19616,
+      "minutes": 958.2
     },
     "val": {
-      "n_utts": 26223,
-      "minutes": 1164.0
+      "n_utts": 5384,
+      "minutes": 257.5
     }
   },
   "by_stratum": {
     "train": {
-      "n_utts": 99905,
-      "minutes": 4644.8
+      "n_utts": 19616,
+      "minutes": 958.2
     },
     "unseen_city": {
-      "n_utts": 13833,
-      "minutes": 627.0
+      "n_utts": 2681,
+      "minutes": 128.5
     },
     "unseen_speaker": {
-      "n_utts": 12390,
-      "minutes": 537.1
+      "n_utts": 2703,
+      "minutes": 129.0
     }
   },
   "by_tier": {
     "human_verified": {
-      "n_utts": 1591,
-      "minutes": 106.4
+      "n_utts": 3265,
+      "minutes": 216.4
     },
     "no_edit": {
-      "n_utts": 124537,
-      "minutes": 5702.4
+      "n_utts": 21735,
+      "minutes": 999.3
     }
   },
   "by_city": {
     "argos": {
-      "n_utts": 4329,
-      "minutes": 222.2
+      "n_utts": 895,
+      "minutes": 48.6
     },
     "athens": {
-      "n_utts": 34752,
-      "minutes": 1498.8
+      "n_utts": 6966,
+      "minutes": 315.3
     },
     "chalandri": {
-      "n_utts": 9341,
-      "minutes": 436.0
+      "n_utts": 1800,
+      "minutes": 87.8
     },
     "chania": {
-      "n_utts": 22994,
-      "minutes": 1172.6
+      "n_utts": 4793,
+      "minutes": 262.4
     },
     "orestiada": {
-      "n_utts": 9504,
-      "minutes": 404.8
+      "n_utts": 1786,
+      "minutes": 79.9
     },
     "samothraki": {
-      "n_utts": 7971,
-      "minutes": 321.3
+      "n_utts": 1599,
+      "minutes": 69.3
     },
     "sparta": {
-      "n_utts": 14470,
-      "minutes": 697.0
+      "n_utts": 2746,
+      "minutes": 137.0
     },
     "vrilissia": {
-      "n_utts": 9684,
-      "minutes": 450.2
+      "n_utts": 1823,
+      "minutes": 87.4
     },
     "xylokastro": {
-      "n_utts": 2930,
-      "minutes": 136.0
+      "n_utts": 684,
+      "minutes": 35.1
     },
     "zografou": {
-      "n_utts": 10153,
-      "minutes": 469.9
+      "n_utts": 1908,
+      "minutes": 92.8
     }
   },
-  "noedit_correction_ratio": 78.276,
-  "n_no_edit": 124537,
-  "n_correction": 1591,
+  "noedit_correction_ratio": 6.657,
+  "n_no_edit": 21735,
+  "n_correction": 3265,
   "null_person_id": {
-    "train": 12701,
-    "val": 907
+    "train": 2568,
+    "val": 191
   }
 }
