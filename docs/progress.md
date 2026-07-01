@@ -23,7 +23,7 @@ and GPU decisions: [decisions/data.md](decisions/data.md).
 | Cached meeting JSON + correction-to-utterance matching                                                 | not started   | [decisions/matching.md](decisions/matching.md#correction-to-utterance-matching-strategy)                                                |
 | Audio CORS / decoding workaround (proxy + URL map)                                                     | in progress   | [decisions/audio.md](decisions/audio.md#2026-05-16---audio-workaround-via-vercel-proxy-and-fixed-file-map-pending-proper-fix); 2026-06-20: fixed slow-link audio — prefetch pool was over-warming (~24 `<audio preload=auto>` each pulling a whole meeting mp3, starving the link); now bounded to current+neighbours with only current+next at `preload=auto` (commit `e1be71d`) |
 | Stable-ID corrections export from mentors                                                              | done          | [decisions/data.md](decisions/data.md#2026-05-19---stable-ids-export-arrived) — landed 2026-05-19, ingested via `ingest-csv-v2.ts`      |
-| Latest-per-utterance reduction (live DB stores one row per utterance)                                  | done          | [decisions/data.md](decisions/data.md#2026-05-19---keep-only-the-latest-edit-per-utterance), [report](../data/reports/latest-per-utterance.md) |
+| Latest-per-utterance reduction (live DB stores one row per utterance)                                  | done          | [decisions/data.md](decisions/data.md#2026-05-19---keep-only-the-latest-edit-per-utterance) |
 
 ## GSoC weeks 1–12 (planned)
 
@@ -34,7 +34,7 @@ and GPU decisions: [decisions/data.md](decisions/data.md).
 | 3    | Dataset finalisation; publish reproducible dataset on HuggingFace                                             | not started |          |
 | 4    | Baseline evaluation: Gladia WER/CER reconstructed from `UtteranceEdit.beforeText`                             | not started |          |
 | 5    | Baseline evaluation: zero-shot Whisper-large-v3, Charalampos/whisper-medium-el, Cohere transcribe. **M1**     | in progress | zero-shot large-v3 baseline measured on held-out cities (val_corr WER 33.4, val_reg 27.1) in the 2026-06-24 smoke run |
-| 6    | LoRA fine-tuning, hyperparameter sweep (rank, alpha, learning rate)                                           | in progress | first large-v3 LoRA run done: val_corr WER −20%, val_reg WER −36% vs zero-shot. Smoke-grade; [report](../data/reports/finetune-research/largev3-first-gpu-run.md). Sweep + seeds/CIs pending |
+| 6    | LoRA fine-tuning, hyperparameter sweep (rank, alpha, learning rate)                                           | in progress | turbo sweep ran 6.3/9 configs before the 12h guard stopped it (per-epoch flush kept all 19 rows). Every config beat baseline on BOTH sets — val_corr 24.0→~21, val_reg 23.0→~14 (no regression to manage). LR/rank within eval noise (~654 words); pick `lr1e-4 r32, 2 epochs`. Confirm on large-v3 (sweep was turbo proxy). Sweep + seeds/CIs still pending |
 | 7    | LoRA fine-tuning continued; evaluate on held-out municipalities                                               | not started |          |
 | 8    | Target morphological errors and domain terminology                                                            | not started |          |
 | 9    | Ablation studies (concatenation, data subsets). **M2: ≥15% relative DS-WER over Gladia baseline**             | not started |          |

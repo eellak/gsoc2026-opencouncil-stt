@@ -1,6 +1,14 @@
 docs/issues/
 *.csv
 
+# macOS Finder metadata and notebook backups
+.DS_Store
+**/.DS_Store
+*.ipynb.bak
+
+# Obsidian per-machine vault state (not shared)
+**/.obsidian/
+
 # Archived / superseded material — kept locally, never pushed to remote.
 # Moving a tracked file into archive/ shows as a delete in git status;
 # stage and commit it to remove the file from the remote.

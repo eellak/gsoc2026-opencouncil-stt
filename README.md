@@ -40,7 +40,8 @@ Start here:
 - Historical sample (archived): [`archive/old-data/corrections-sample.csv`](archive/old-data/corrections-sample.csv)
 - Clean CSV: [`data/clean/corrections_clean.csv`](data/clean/corrections_clean.csv)
 - Rejected rows: [`data/reports/corrections_rejected.csv`](data/reports/corrections_rejected.csv)
-- Summary JSON: [`data/reports/corrections_summary.json`](data/reports/corrections_summary.json)
+
+(`data/` is gitignored — these are regenerated locally by the preprocessing script below.)
 
 Regenerate the cleaned data:
 

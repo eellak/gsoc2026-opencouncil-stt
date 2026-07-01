@@ -2,7 +2,8 @@
 chain. Aggregate metrics + curated narrative only — NO personal data (rosters,
 raw transcripts) and no secrets. Reads eval/timeline.json for the timeline.
 
-Output: report/index.html  (served via the gh-pages branch).
+Output: docs/reports/fix-task-experiment-report.html  (curated committed snapshot;
+copy it to the gh-pages branch as index.html to publish).
 """
 from __future__ import annotations
 
@@ -12,7 +13,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 TIMELINE = ROOT / "eval" / "timeline.json"
-OUT = ROOT / "report" / "index.html"
+OUT = ROOT / "docs" / "reports" / "fix-task-experiment-report.html"
 
 GENERATED = "2026-06-21"
 

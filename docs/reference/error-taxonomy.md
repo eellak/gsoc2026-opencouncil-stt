@@ -4,7 +4,7 @@ This note refines the proposal appendix into an operational taxonomy: each corre
 
 Primary reference: [GSoC proposal Appendix A](gsoc-proposal.md#appendix-a-corrections-sample-analysis-and-error-taxonomy).
 
-Data reference: [Correction data quality](../../data/reports/data_quality.md).
+Data reference: correction-data decisions and cleaning rules in [decisions/data.md](../decisions/data.md). (Detailed data-quality reports are generated locally under `data/reports/`, which is gitignored.)
 
 ## Routing Buckets
 
