@@ -37,8 +37,12 @@ function readFilter(url: URL): QueueFilter | null {
 		return { query: `errorCategory=${encodeURIComponent(errorCategory)}`, label: errorCategory };
 	}
 	const queueName = url.searchParams.get('queue');
-	if (queueName === 'nb2') {
-		return { query: 'queue=nb2', label: 'batch-2 (auto-selected)' };
+	const QUEUE_LABELS: Record<string, string> = {
+		nb2: 'batch-2 (auto-selected)',
+		nb2audio: 'audio-verified (balanced)'
+	};
+	if (queueName && queueName in QUEUE_LABELS) {
+		return { query: `queue=${queueName}`, label: QUEUE_LABELS[queueName] };
 	}
 	return null;
 }

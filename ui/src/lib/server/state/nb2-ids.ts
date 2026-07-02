@@ -1,21 +1,30 @@
 /**
- * Fixed id set for the auto-selected "audio matches transcript" batch-2 edits.
+ * Fixed review-queue id sets (the `?queue=<name>` filters).
  *
- * These 7,364 utterance_ids are the output of the next-batch faithfulness +
- * interestingness pipeline (data/next-batch/selected_edits.jsonl). Shipped as a
- * bundled JSON import so it deploys with the server — no DB write, no runtime
- * fs path assumptions. Consumed by the `?queue=nb2` review filter.
+ * Each is a bundled JSON import so it deploys with the server — no DB write, no
+ * runtime fs path assumptions. Add a queue by importing its id list and adding it
+ * to REGISTRY.
+ *
+ *   nb2      — auto-selected batch-2 (interestingness + LLM triage), ~13k
+ *   nb2audio — city-balanced, per-item AUDIO-VERIFIED (Soniox), randomized order
  */
-import ids from './nb2-ids.json';
+import nb2 from './nb2-ids.json';
+import nb2audio from './nb2audio-ids.json';
 
-let _set: Set<string> | null = null;
+const REGISTRY: Record<string, string[]> = {
+	nb2: nb2 as string[],
+	nb2audio: nb2audio as string[]
+};
 
-/** Memoised set of the selected utterance_ids. */
-export function nb2IdSet(): Set<string> {
-	if (!_set) _set = new Set(ids as string[]);
-	return _set;
+const _sets: Record<string, Set<string>> = {};
+
+/** Memoised id set for a named queue, or null if the name is unknown. */
+export function queueIdSet(name: string): Set<string> | null {
+	if (!(name in REGISTRY)) return null;
+	if (!_sets[name]) _sets[name] = new Set(REGISTRY[name]);
+	return _sets[name];
 }
 
-export function nb2Count(): number {
-	return (ids as string[]).length;
+export function isKnownQueue(name: string): boolean {
+	return name in REGISTRY;
 }

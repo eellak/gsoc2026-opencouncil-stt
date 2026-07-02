@@ -19,7 +19,7 @@
 import { json, error } from '@sveltejs/kit';
 import { getRepo } from '$lib/server/repo';
 import { getCategoryCache } from '$lib/server/state/category-cache';
-import { nb2IdSet } from '$lib/server/state/nb2-ids';
+import { queueIdSet } from '$lib/server/state/nb2-ids';
 import { normalizeTaxonomyId } from '$lib/shared/taxonomy';
 import type { IncludeStatus } from '$lib/domain/types';
 import type { RequestHandler } from './$types';
@@ -68,14 +68,12 @@ export const GET: RequestHandler = async ({ url }) => {
 		filter = `errorCategory:${norm}`;
 		computeIds = () => repo.idsByErrorCategory(norm);
 	} else if (queueName) {
-		if (queueName !== 'nb2') throw error(400, 'unknown queue (only nb2 is defined)');
+		const set = queueIdSet(queueName);
+		if (!set) throw error(400, `unknown queue: ${queueName}`);
 		filter = `queue:${queueName}`;
-		// Fixed id set (audio-verified batch-2), intersected with the eligible
-		// universe so the queue can't navigate into a filtered-out meeting.
-		computeIds = () => {
-			const set = nb2IdSet();
-			return repo.eligibleOrderedIds().filter((id) => set.has(id));
-		};
+		// Fixed id set, intersected with the eligible universe so the queue can't
+		// navigate into a filtered-out meeting.
+		computeIds = () => repo.eligibleOrderedIds().filter((id) => set.has(id));
 	} else {
 		throw error(400, 'one of status, category, errorCategory, queue is required');
 	}
