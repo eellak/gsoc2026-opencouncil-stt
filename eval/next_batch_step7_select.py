@@ -43,10 +43,18 @@ def main() -> None:
     df = short.merge(judged[["utterance_id", "verdict", "acoustic", "why"]],
                      on="utterance_id", how="inner")
 
+    # drop audio-confirmed bad labels found by the faithfulness verification
+    bad_path = OUT_DIR / "verified_bad_ids.json"
+    n_bad = 0
+    if bad_path.exists():
+        bad = set(json.loads(bad_path.read_text()))
+        n_bad = int(df["utterance_id"].isin(bad).sum())
+        df = df[~df["utterance_id"].isin(bad)].copy()
+
     log = ["# Step 7 — final fine-tune edit list\n"]
     log.append(f"- shortlist: {len(short):,}")
     log.append(f"- judged so far: {len(judged):,}")
-    log.append(f"- shortlist ∩ judged: {len(df):,}")
+    log.append(f"- shortlist ∩ judged: {len(df):,} (dropped {n_bad} audio-confirmed bad)")
     vc = df["verdict"].value_counts().to_dict()
     log.append(f"- verdicts: {vc}")
 
