@@ -133,6 +133,14 @@ def join_speakers(rows: list[dict],
     return rows, n_missing
 
 
+def _as_list(v) -> list:
+    """error_categories may arrive as a list (JSON) or numpy array (parquet);
+    normalise to a list so `or []`-style truthiness never trips on arrays."""
+    if v is None:
+        return []
+    return list(v)
+
+
 def build_stats(rows: list[dict]) -> dict:
     """Aggregate hours/percentages/counters for stats.json (pure, tested)."""
     total_h = sum(r["duration_s"] for r in rows) / 3600
@@ -140,7 +148,7 @@ def build_stats(rows: list[dict]) -> dict:
     for split in sorted({r["split"] for r in rows}):
         sub = [r for r in rows if r["split"] == split]
         h = sum(r["duration_s"] for r in sub) / 3600
-        cats = collections.Counter(c for r in sub for c in (r["error_categories"] or []))
+        cats = collections.Counter(c for r in sub for c in _as_list(r["error_categories"]))
         by_split[split] = {
             "rows": len(sub),
             "hours": round(h, 2),

@@ -79,9 +79,12 @@ def test_join_speakers_matches_and_counts_missing():
 
 
 def test_build_stats_hours_and_percentages():
+    import numpy as np
     rows = [
         {"split": "train", "duration_s": 3600.0, "city_id": "athens",
-         "error_categories": ["homophone"], "has_overlap": False,
+         # numpy array like parquet roundtrip gives, plus a 2nd category so a
+         # naive `arr or []` would raise (regression: ambiguous truthiness)
+         "error_categories": np.array(["homophone", "punct"]), "has_overlap": False,
          "boundary_status": "ok", "speaker_id": "s1"},
         {"split": "validation", "duration_s": 1800.0, "city_id": "argos",
          "error_categories": [], "has_overlap": True,
