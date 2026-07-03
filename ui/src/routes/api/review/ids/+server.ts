@@ -71,9 +71,14 @@ export const GET: RequestHandler = async ({ url }) => {
 		const set = queueIdSet(queueName);
 		if (!set) throw error(400, `unknown queue: ${queueName}`);
 		filter = `queue:${queueName}`;
-		// Fixed id set, intersected with the eligible universe so the queue can't
-		// navigate into a filtered-out meeting.
-		computeIds = () => repo.eligibleOrderedIds().filter((id) => set.has(id));
+		// Preserve the id-list's OWN order (nb2 = final_rank, nb2audio = seeded
+		// shuffle) so the queue browses as intended, not re-sorted into canonical
+		// meeting/city order (which clusters same-city edits together). Intersect
+		// with the eligible universe so it can't navigate into a filtered-out meeting.
+		computeIds = () => {
+			const eligible = new Set(repo.eligibleOrderedIds());
+			return [...set].filter((id) => eligible.has(id));
+		};
 	} else {
 		throw error(400, 'one of status, category, errorCategory, queue is required');
 	}

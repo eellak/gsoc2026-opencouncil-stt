@@ -42,7 +42,9 @@ export const load: PageServerLoad = async ({ url }) => {
 		const set = queueIdSet(queueName);
 		if (set) {
 			const repo = await getRepo();
-			const ids = repo.eligibleOrderedIds().filter((id) => set.has(id));
+			// enter at the first item of the queue's own order (see api/review/ids)
+			const eligible = new Set(repo.eligibleOrderedIds());
+			const ids = [...set].filter((id) => eligible.has(id));
 			if (!ids.length) throw redirect(302, '/stats');
 			const target = new URL(`/review/${encodeURIComponent(ids[0])}`, url);
 			target.searchParams.set('queue', queueName);
