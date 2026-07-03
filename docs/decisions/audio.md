@@ -54,3 +54,27 @@ For this iteration we removed the visual waveform entirely:
 The reviewer loses the visual waveform until we ship a follow-up: a `/api/audio/segment?u=&start=&end=` endpoint (ffmpeg with `-ss/-t`, streaming ~50–200 KB extracted MP3 per utterance) plus a JS waveform library that renders from that small blob.
 
 Cache key for the future segment endpoint will be `sha1(originalUrl + '|' + canonical_start + '|' + canonical_end)` — reviewer timestamp edits will not be cached, to keep the on-disk segment cache bounded.
+
+### 2026-07-03 - KNOWN ISSUE: training-clip boundary sync (must fix before training)
+
+The next-batch audio-verification (`?queue=nb2audio`, 4,329 edits) uses a
+faithfulness gate of `cer_local <= 0.20` under **local alignment**
+(`fuzz.partial_ratio(gold, soniox)`). Local alignment is deliberately tolerant of
+a missing/extra syllable or neighbouring context at the clip edges — that is why
+it works despite loose CSV utterance spans. So the **selection** is not broken by
+boundary sloppiness.
+
+**But the raw CSV `utterance_start/end` are loose/tight** (a clip can start or end
+mid-syllable, or bracket neighbouring speech). Evidence: rejected clips skew short
+(median 1.6s vs 2.1s kept); several 0.20-0.30 "rejects" are actually fine labels
+whose CER was inflated by an edge syllable / number formatting / a bled-in extra
+word (e.g. gold "…ή 400 ή 440 εκεί οι κλίνες" vs soniox "…400-440 οι κλίνες").
+~28 kept-pool clips returned empty Soniox (transcription failures, not bad labels).
+
+**TODO before building the actual training clips:** do NOT cut on raw CSV
+boundaries. Snap to **silence / VAD** and add padding (~±0.2s) so no syllable is
+clipped — the training audio must fully contain the label, or the model learns
+from misaligned (audio ≠ text) examples. With a real `SONIOX_API_KEY`, the async
+API returns per-token `start_ms/end_ms`, which gives exact word-level boundaries;
+the realtime path does not, so use VAD there. Owner flagged this explicitly
+(2026-07-03): "leave the threshold, just note the audio must be checked/fixed".
