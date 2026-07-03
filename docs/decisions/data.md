@@ -4,6 +4,29 @@ CSV ingest, content categorisation, stable IDs, task version, dataset split.
 
 ## Accepted
 
+### 2026-07-03 - Published HF dataset: split recipe + overlap flag convention
+
+Implements [hf-dataset-export](../specs/hf-dataset-export.md) (`eval/hf_export/`),
+the first reproducible HuggingFace export of the curated corrections.
+
+- **Split (seed `20260703`, reproducible):** validation = two whole held-out
+  cities (`orestiada`, `argos`) + whole seeded speakers (≥180s speech
+  in-dataset) from the remaining cities, added in seeded order until validation
+  reaches ~20% of total hours; speaker-disjoint from train by construction.
+  Null-speaker rows can never go to validation (stay train). A speaker that
+  would overshoot 22% is skipped and recorded. The temporal test (meetings
+  `>= 2026-06-01`) is withheld and never published. If the val share lands
+  outside 18–22% of hours the build **stops for a human decision** rather than
+  silently accepting. First live run: 5,095 rows, val **20.2%** of hours.
+- **`has_overlap` convention:** the reviewer marks overlapping speech with a
+  standalone Latin «C» in `reviewer_notes` (regex `(?i)(?<![a-z])c(?![a-z])`),
+  emitted as a boolean only. `reviewer_notes` itself is **never published**
+  (free text, PII risk); an eyeball report (`overlap-notes-report.md`) lets a
+  human sanity-check the rule before publishing.
+- First release is **metadata-only** (text pairs + audio URLs + offsets +
+  boundary-checked spans); only `data/hf-dataset/public/` is ever uploadable.
+  See also the boundary pass under [audio decisions](audio.md#2026-07-03---known-issue-training-clip-boundary-sync-must-fix-before-training).
+
 ### 2026-06-23 - Exclude 13 unreviewed meetings (<5% human-edit fraction) from our set
 
 13 meetings whose **human-edit fraction** (`user`-edited utterances / total) is

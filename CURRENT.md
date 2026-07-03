@@ -70,6 +70,12 @@ Update this diagram when the main project flow changes.
 - [ ] Enlarge the held-out val set (currently too small to rank configs).
 - [ ] Add seeds + meeting-clustered CIs to the eval.
 - [ ] Keep review throughput moving toward the ~6k dataset target.
+- [~] Publish the reproducible HF dataset (`eval/hf_export/`, spec
+  [hf-dataset-export](docs/specs/hf-dataset-export.md)). Pipeline built and run:
+  `data/hf-dataset/public/` (train/val parquet+jsonl, card, split map). Pending
+  before push: finish the boundary pass, eyeball `overlap-notes-report.md` +
+  `boundary-audit.csv`, confirm license with OpenCouncil, then the **manual**
+  `huggingface-cli upload` of `data/hf-dataset/public/` only.
 
 See:
 

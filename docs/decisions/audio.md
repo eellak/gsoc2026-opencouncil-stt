@@ -78,3 +78,15 @@ from misaligned (audio ≠ text) examples. With a real `SONIOX_API_KEY`, the asy
 API returns per-token `start_ms/end_ms`, which gives exact word-level boundaries;
 the realtime path does not, so use VAD there. Owner flagged this explicitly
 (2026-07-03): "leave the threshold, just note the audio must be checked/fixed".
+
+**Addressed for the published dataset (2026-07-03)** by `eval/hf_export` (spec
+[hf-dataset-export](../specs/hf-dataset-export.md)): a boundary pass force-aligns
+the label onto each clip (CTC forced aligner) + VAD and emits a `boundary_status`
+(`ok`/`adjusted`/`suspect_cut_start`/`suspect_cut_end`/`suspect_bleed_in`/
+`align_failed`) plus VAD-snapped `start_adj`/`end_adj` with ±0.2s padding.
+Suspects/failures go to `data/hf-dataset/boundary-audit.csv` for sampled human
+review and get `null` adjusted spans in the published files. Training-clip
+builds should consume `start_adj`/`end_adj` for the `ok`/`adjusted` rows. Note:
+the aligner is the PyPI `ctc-forced-aligner` (deskpai, ONNX MMS CTC, uroman
+romanization for Greek) — chosen over MahmoudAshraf's git package because the
+spec leaves the library open and it needs no untrusted external install.
