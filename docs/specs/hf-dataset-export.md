@@ -58,8 +58,9 @@ Transcribing *what* the other speaker says is out of scope.
 
 ## Split (seeded, reproducible)
 
-1. Drop denylisted meetings; drop temporal-TEST meetings (reviewed ≥ 2026-06-01
-   per the agreed policy) — logged, not published.
+1. Drop denylisted meetings; drop temporal-TEST meetings (`meeting_date >=
+   2026-06-01`, the operational form of "TEST = Jun 2026+") — logged, not
+   published.
 2. `validation` = all rows from held-out cities `orestiada`, `argos` (whole
    cities → speaker-disjoint by construction; 0 cross-city speakers measured).
 3. Then add **whole seeded speakers** from the train cities: eligibility floor
@@ -69,8 +70,13 @@ Transcribing *what* the other speaker says is out of scope.
 4. Rows with `speaker_id == null` (~9.5% of corpus utterances) can never go to
    validation — speaker disjointness can't be guaranteed for them; they stay in
    train.
-5. Guards: `assert_no_leakage` on both `speaker_id` and `(city_id, meeting_id)`;
-   uniqueness on `(city_id, meeting_id, utterance_id)`; if validation lands
+5. Guards: `assert_no_leakage` on `speaker_id` (excluding nulls), plus no
+   held-out-city row in train. Note: meetings in the *train* cities are NOT
+   meeting-disjoint across splits — a meeting can contribute train rows (its
+   train speakers) and validation rows (its val speakers). That is inherent to
+   the agreed hybrid split (whole speakers, not whole meetings, from the mixed
+   cities); the held-out cities remain fully meeting-disjoint.
+   Uniqueness on `(city_id, meeting_id, utterance_id)`; if validation lands
    outside 18–22% of hours the script **reports and stops** for a human
    decision instead of silently accepting.
 6. The seed, snapshot date, and full speaker→split map are written to
