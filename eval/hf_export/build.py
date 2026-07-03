@@ -284,11 +284,19 @@ def stage_rows(args) -> None:
 # ---------- boundary stage ----------
 
 def stage_boundary(args) -> None:
+    import math
+
     import numpy as np
     import pandas as pd
     import torch
-    from ctc_forced_aligner import (generate_emissions, get_alignments,
-                                     get_spans, load_alignment_model,
+    # NOTE: the PyPI `ctc-forced-aligner` (deskpai, ONNX) is used, NOT
+    # MahmoudAshraf's torch package the plan first named — same MMS CTC pipeline
+    # (preprocess_text/generate_emissions/get_alignments/get_spans/
+    # postprocess_results, uroman romanization for Greek), reached here because
+    # the git-installed package is not available and the spec leaves the aligner
+    # open. AlignmentSingleton auto-downloads the ONNX model on first use.
+    from ctc_forced_aligner import (AlignmentSingleton, generate_emissions,
+                                     get_alignments, get_spans,
                                      postprocess_results, preprocess_text)
     from silero_vad import get_speech_timestamps, load_silero_vad
 
@@ -310,7 +318,8 @@ def stage_boundary(args) -> None:
                 stale += 1
         log(f"resume: {len(done)} already classified, {stale} stale lines ignored")
 
-    align_model, tokenizer = load_alignment_model("cpu", dtype=torch.float32)
+    aligner = AlignmentSingleton()          # ONNX MMS CTC aligner (auto-download)
+    align_model, tokenizer = aligner.model, aligner.tokenizer
     vad_model = load_silero_vad()
 
     by_mtg = collections.defaultdict(list)
@@ -355,19 +364,29 @@ def stage_boundary(args) -> None:
             clip_dur = len(clip) / SR
             left_margin = s - a / SR  # actual margin (clamped near file start)
             try:
-                wav = torch.from_numpy(np.ascontiguousarray(clip))
+                wav = np.ascontiguousarray(clip, dtype=np.float32)  # ONNX: 1D numpy
                 emissions, stride = generate_emissions(align_model, wav, batch_size=4)
                 tok_star, txt_star = preprocess_text(
                     r["final_after_text"], romanize=True, language="ell",
                     split_size="word", star_frequency="edges")
                 segs, scores, blank = get_alignments(emissions, tok_star, tokenizer)
                 spans = get_spans(tok_star, segs, blank)
-                words = [w for w in postprocess_results(txt_star, spans, stride, scores)
-                         if w.get("text") != "<star>"]
+                words = []
+                for w in postprocess_results(txt_star, spans, stride, scores):
+                    if w.get("text") == "<star>":
+                        continue
+                    # deskpai returns each word's score as a SUM of per-frame
+                    # log-probs (negative). Normalise to a per-frame geometric
+                    # mean probability in (0,1] so boundary.MIN_MEAN_SCORE (a
+                    # probability floor) means what it says.
+                    n_frames = max(1.0, (w["end"] - w["start"]) * 1000.0 / stride)
+                    w["score"] = math.exp(w["score"] / n_frames)
+                    words.append(w)
             except Exception as ex:  # noqa: BLE001 — any aligner failure = align_failed
                 words = []
                 log(f"  align FAIL {r['utterance_id']}: {type(ex).__name__} {str(ex)[:60]}")
-            vad = get_speech_timestamps(clip, vad_model, sampling_rate=SR,
+            vad = get_speech_timestamps(torch.from_numpy(np.array(clip, dtype=np.float32)),
+                                        vad_model, sampling_rate=SR,
                                         return_seconds=True)
             res = classify_boundary(words, vad, raw_dur=e - s,
                                     clip_dur=clip_dur, margin_s=left_margin)
