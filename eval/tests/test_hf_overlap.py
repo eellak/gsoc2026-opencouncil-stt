@@ -31,6 +31,16 @@ def test_none_and_empty_do_not_match():
     assert has_overlap_marker("καθαρό") is False
 
 
+def test_nan_note_is_treated_as_empty():
+    # a NaN float (e.g. from a parquet roundtrip of a null note) must not crash
+    assert has_overlap_marker(float("nan")) is False
+    rows = [{"utterance_id": "u1", "reviewer_notes": float("nan")},
+            {"utterance_id": "u2", "reviewer_notes": "C"}]
+    matched, unmatched = notes_report_rows(rows)
+    assert [r["utterance_id"] for r in matched] == ["u2"]
+    assert unmatched == []
+
+
 def test_notes_report_partitions_matched_unmatched():
     rows = [
         {"utterance_id": "u1", "reviewer_notes": "C"},

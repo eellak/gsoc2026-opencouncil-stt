@@ -12,8 +12,9 @@ import re
 _STANDALONE_C = re.compile(r"(?<![A-Za-z])[cC](?![A-Za-z])")
 
 
-def has_overlap_marker(note: str | None) -> bool:
-    if not note:
+def has_overlap_marker(note) -> bool:
+    # non-str (None, or a NaN float from a parquet roundtrip) == no note
+    if not isinstance(note, str) or not note:
         return False
     return bool(_STANDALONE_C.search(note))
 
@@ -27,7 +28,11 @@ def notes_report_rows(rows: list[dict]) -> tuple[list[dict], list[dict]]:
     matched, unmatched = [], []
     for r in rows:
         note = r.get("reviewer_notes")
-        if not note or not str(note).strip():
+        # None / NaN (float) / blank all mean "no note"
+        if note is None or (isinstance(note, float) and note != note):
+            continue
+        note = str(note).strip()
+        if not note:
             continue
         (matched if has_overlap_marker(note) else unmatched).append(r)
     return matched, unmatched
