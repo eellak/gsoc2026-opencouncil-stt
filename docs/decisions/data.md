@@ -27,6 +27,23 @@ the first reproducible HuggingFace export of the curated corrections.
   boundary-checked spans); only `data/hf-dataset/public/` is ever uploadable.
   See also the boundary pass under [audio decisions](audio.md#2026-07-03---known-issue-training-clip-boundary-sync-must-fix-before-training).
 
+**Extended to the combined sample (2026-07-05).** The published set is no longer
+corrections-only. It combines three sources under **one frozen speaker-disjoint
+80/20 split computed over the whole sample** (so the ratio holds across sources
+and future batches inherit it by speaker): (1) 5,095 review-UI includes; (2) NB2
+audio-verified leftover corrections (`nb2audio_ids.json`, ~4.8k after dedupe);
+(3) ~20k **trusted no-edit backbone** — ASR from review-exposed meetings
+(`frac_user ≥ 0.15` / `humanReview`, minus denylist) that a reviewer left
+unchanged, per-city-capped (held-out cities capped harder so val stays ~20%).
+Backbone is gated by forced alignment ("alignment-passed no-edit ASR", a
+minimum-viability gate, **not** verified-correct — the open «trust non-corrected
+as ground truth?» question stands). Combined rows-stage run: **29,893 rows
+(9,893 correction + 20,000 no_edit), val 20.1% of hours, speaker- and
+span-disjoint.** Decisions (Codex-reviewed): forced-align gate instead of Soniox
+CER (no Soniox for 20k); single source-tagged table (not HF configs); backbone
+in val gives the `val_reg` slice natively. Rationale for the mix: training must
+not be corrections-only (over-editing trap, see the 20–30% backbone rule above).
+
 ### 2026-06-23 - Exclude 13 unreviewed meetings (<5% human-edit fraction) from our set
 
 13 meetings whose **human-edit fraction** (`user`-edited utterances / total) is

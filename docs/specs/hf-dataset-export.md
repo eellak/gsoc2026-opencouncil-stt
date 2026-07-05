@@ -41,8 +41,25 @@ license/PII question is confirmed with OpenCouncil. The temporal TEST
 | `text` | `final_after_text` — the training target |
 | `error_categories` | export labels |
 | `has_overlap` | standalone «C» in `reviewer_notes` (see below) |
-| `source` | `"correction"` (backbone rows would be `"no_edit"`, later) |
+| `source` | `"correction"` (review includes + NB2 leftover) or `"no_edit"` (backbone) |
 | `split` | `train` / `validation` |
+
+### Sources (combined dataset — 2026-07-05)
+
+The published set now combines three sources, all mapped to this schema, split
+by ONE frozen speaker-disjoint map (see Split):
+
+1. **review-UI includes** (`/api/export`, `include_status=="include"`) — `correction`.
+2. **NB2 audio-verified leftover** (`data/next-batch/final_audio/nb2audio_ids.json`
+   → text/span from `selected_edits.jsonl`), excluding rows already in (1) —
+   `correction`.
+3. **no-edit backbone** — trusted ASR from *review-exposed* meetings
+   (`frac_user ≥ 0.15` or `humanReview`, minus denylist), no-edit utterances
+   (`lastModifiedBy is null`) 1–15 s, text from meeting JSON, `before==text`,
+   per-city capped to ~20k. `source="no_edit"`. Gate: an utterance whose text
+   fails to force-align to its audio (`align_failed`) is dropped — this is
+   *alignment-passed no-edit ASR*, a minimum-viability gate, **not** verified
+   correct. Provided so training is not corrections-only.
 
 ### `has_overlap` derivation
 
@@ -61,6 +78,9 @@ Transcribing *what* the other speaker says is out of scope.
 1. Drop denylisted meetings; drop temporal-TEST meetings (`meeting_date >=
    2026-06-01`, the operational form of "TEST = Jun 2026+") — logged, not
    published.
+1b. The split runs **once over the whole combined sample** (corrections +
+   backbone), so 80/20-by-hours holds across sources and future batches inherit
+   it by speaker. Held-out-city backbone is per-city-capped so val stays ~20%.
 2. `validation` = all rows from held-out cities `orestiada`, `argos` (whole
    cities → speaker-disjoint by construction; 0 cross-city speakers measured).
 3. Then add **whole seeded speakers** from the train cities: eligibility floor
@@ -135,7 +155,5 @@ but never run automatically.
 ## Out of scope (this iteration)
 
 - Embedded audio clips (release 2, license-gated).
-- No-edit backbone rows in the published set (tracked separately; can be a
-  later config in the same HF repo).
 - Transcribing overlapping speech; neighbour-text stitching.
 - Any DB/VPS write-back.
