@@ -30,6 +30,7 @@ sys.path.insert(0, str(ROOT))
 from eval.exclusions import load_excluded_keys            # noqa: E402
 from eval.hf_export import boundary as _bnd               # noqa: E402
 from eval.hf_export.overlap import has_overlap_marker, notes_report_rows  # noqa: E402
+from eval.hf_export.sources import dedupe_by_span, slug_date  # noqa: E402
 from eval.hf_export.split import (DEFAULT_SEED, VAL_CITIES, SplitError,    # noqa: E402
                                   assign_splits)
 
@@ -40,6 +41,18 @@ ROWS_PARQUET = OUT / "rows.parquet"
 SPLIT_JSON = OUT / "split_assignments.json"
 BOUNDARY_JSONL = OUT / "boundary.jsonl"
 TEMPORAL_TEST_FROM = "2026-06-01"
+
+# --- extra sources (combined dataset) ---
+LEFTOVER_IDS = ROOT / "data" / "next-batch" / "final_audio" / "nb2audio_ids.json"
+SELECTED_EDITS = ROOT / "data" / "next-batch" / "selected_edits.jsonl"
+TRUST_TSV = ROOT / "data" / "reports" / "meeting-edit-fraction" / "distribution.tsv"
+TRUST_FRAC = 0.15               # frac_user gate: "review-exposed" meeting
+BACKBONE_TARGET = 20000         # ~20k trusted no-edit utterances
+BACKBONE_CAP_TRAIN = 2200       # per train-city cap
+BACKBONE_CAP_HELDOUT = 1200     # smaller cap on held-out cities (all -> val)
+BACKBONE_DUR = (1.0, 15.0)      # utterance duration window (seconds)
+# _rank for span-dedupe: include < leftover < backbone (lower wins)
+_RANK = {"include": 0, "leftover": 1, "backbone": 2}
 
 # Bump when the boundary algorithm or its thresholds change: it is folded into
 # row_sig so stale cached boundary results are ignored (Codex review #1).
@@ -155,16 +168,175 @@ def build_stats(rows: list[dict]) -> dict:
             "pct_hours": round(100 * h / total_h, 1) if total_h else 0.0,
             "cities": dict(collections.Counter(r["city_id"] for r in sub)),
             "speakers": len({r["speaker_id"] for r in sub if r.get("speaker_id")}),
+            "sources": dict(collections.Counter(
+                r.get("source") or "correction" for r in sub)),
             "error_categories": dict(cats.most_common()),
+        }
+    by_source: dict[str, dict] = {}
+    for source in sorted({r.get("source") or "correction" for r in rows}):
+        sub = [r for r in rows if (r.get("source") or "correction") == source]
+        by_source[source] = {
+            "rows": len(sub),
+            "hours": round(sum(r["duration_s"] for r in sub) / 3600, 2),
+            "by_split": dict(collections.Counter(r["split"] for r in sub)),
         }
     return {
         "total_rows": len(rows),
         "total_hours": round(total_h, 2),
         "by_split": by_split,
+        "by_source": by_source,
         "overlap_rows": sum(1 for r in rows if r.get("has_overlap")),
         "boundary_status": dict(collections.Counter(
             r.get("boundary_status") or "pending" for r in rows)),
     }
+
+
+# ---------- extra-source loaders ----------
+
+def _iso_to_date(dt: str | None) -> str | None:
+    """'2025-12-09T14:00:00.000Z' -> '2025-12-09 14:00:00'."""
+    if not dt or len(dt) < 19:
+        return None
+    return dt[:10] + " " + dt[11:19]
+
+
+def build_date_map(export_rows: list[dict]) -> dict:
+    return {(r["city_id"], r["meeting_id"]): r.get("meeting_date")
+            for r in export_rows}
+
+
+def _date_for(city: str, meeting: str, date_map: dict) -> str | None:
+    d = date_map.get((city, meeting))
+    if d and str(d)[:4].isdigit():
+        return str(d)
+    return slug_date(meeting)
+
+
+def _filter_extra(rows: list[dict],
+                  excluded_keys: set) -> tuple[list[dict], dict]:
+    """Denylist + temporal + bad date/span guards for non-export sources
+    (the live export already went through filter_rows). No silent drops."""
+    drops = collections.Counter()
+    out = []
+    for r in rows:
+        if (r["city_id"], r["meeting_id"]) in excluded_keys:
+            drops["denylist"] += 1
+            continue
+        date = str(r.get("meeting_date") or "")
+        if len(date) < 10 or not date[:4].isdigit():
+            drops["bad_date"] += 1
+            continue
+        if date >= TEMPORAL_TEST_FROM:
+            drops["temporal_test"] += 1
+            continue
+        try:
+            s, e = float(r["start"]), float(r["end"])
+        except (TypeError, ValueError):
+            drops["bad_span"] += 1
+            continue
+        if not (e > s >= 0):
+            drops["bad_span"] += 1
+            continue
+        out.append(r)
+    return out, dict(drops)
+
+
+def load_leftover_corrections(exclude_uids: set, date_map: dict) -> list[dict]:
+    """NB2 audio-verified balanced leftover edits -> export-schema rows."""
+    if not (LEFTOVER_IDS.exists() and SELECTED_EDITS.exists()):
+        log("leftover source missing -> 0 leftover rows")
+        return []
+    ids = set(json.loads(LEFTOVER_IDS.read_text()))
+    rows, seen = [], set()
+    for l in SELECTED_EDITS.open():
+        d = json.loads(l)
+        uid = d["utterance_id"]
+        if uid not in ids or uid in exclude_uids or uid in seen:
+            continue
+        seen.add(uid)
+        rows.append({
+            "utterance_id": uid, "city_id": d["city_id"],
+            "meeting_id": d["meeting_id"],
+            "meeting_date": _date_for(d["city_id"], d["meeting_id"], date_map),
+            "audio_url": d["audio_url"],
+            "start": float(d["utterance_start"]), "end": float(d["utterance_end"]),
+            "initial_before_text": d.get("input_raw") or "",
+            "final_after_text": d.get("gold_final") or "",
+            "error_categories": [str(d["category"])] if d.get("category") else [],
+            "reviewer_notes": None, "source": "correction",
+            "_rank": _RANK["leftover"],
+        })
+    return rows
+
+
+def load_review_exposed_meetings(excluded_keys: set) -> set:
+    """(city, meeting) with frac_user >= TRUST_FRAC or humanReview, not denylisted.
+
+    NB: this is a *review-exposed* gate (the meeting saw human editing), not a
+    proof every no-edit utterance was individually verified — documented in the
+    dataset card as the backbone's known limitation."""
+    import csv
+    trusted = set()
+    with TRUST_TSV.open() as f:
+        for r in csv.DictReader(f, delimiter="\t"):
+            key = (r["city"], r["meeting"])
+            if key in excluded_keys:
+                continue
+            try:
+                frac = float(r["frac_user"])
+            except (TypeError, ValueError):
+                frac = 0.0
+            if frac >= TRUST_FRAC or r["humanReview"].strip().lower() == "true":
+                trusted.add(key)
+    return trusted
+
+
+def load_backbone(trusted_meetings: set, spk_by_utt: dict, date_map: dict, *,
+                  seed: int) -> list[dict]:
+    """Trusted no-edit ASR utterances, per-city capped to ~BACKBONE_TARGET.
+
+    Text is the uncorrected ASR from the meeting JSON (before_text == text).
+    Rows without a speaker_id are skipped (can't guarantee split disjointness)."""
+    import numpy as np
+
+    from eval.autoresearch.prepare_asr import fetch_meeting_json, noedit_utts
+    lo, hi = BACKBONE_DUR
+    by_city: dict[str, list] = collections.defaultdict(list)
+    n_meet = 0
+    for (city, meeting) in sorted(trusted_meetings):
+        d = fetch_meeting_json(city, meeting)
+        if d is None:
+            continue
+        mt = d.get("meeting") or {}
+        audio_url = mt.get("audioUrl")
+        if not audio_url:
+            continue
+        n_meet += 1
+        mdate = _iso_to_date(mt.get("dateTime")) or _date_for(city, meeting, date_map)
+        for uid, s, e, txt in noedit_utts(d):
+            if not (lo <= (e - s) <= hi):
+                continue
+            if not spk_by_utt.get(uid):
+                continue
+            by_city[city].append({
+                "utterance_id": uid, "city_id": city, "meeting_id": meeting,
+                "meeting_date": mdate, "audio_url": audio_url,
+                "start": float(s), "end": float(e),
+                "initial_before_text": txt, "final_after_text": txt,
+                "error_categories": [], "reviewer_notes": None,
+                "source": "no_edit", "_rank": _RANK["backbone"],
+            })
+    log(f"backbone: {n_meet} review-exposed meetings, "
+        f"{sum(len(v) for v in by_city.values())} candidate no-edit utts")
+    rng = np.random.default_rng(seed)
+    out = []
+    for city in sorted(by_city):
+        cand = by_city[city]
+        cap = BACKBONE_CAP_HELDOUT if city in VAL_CITIES else BACKBONE_CAP_TRAIN
+        idx = np.arange(len(cand))
+        rng.shuffle(idx)
+        out.extend(cand[i] for i in idx[:cap])
+    return out
 
 
 # ---------- rows stage ----------
@@ -197,42 +369,93 @@ def load_speaker_map() -> dict[str, str]:
     return dict(zip(df["utterance_id"], df["person_id"]))
 
 
+def _normalize_meeting_urls(rows: list[dict]) -> int:
+    """One audio_url per (city, meeting) — prefer a correction row's URL so the
+    boundary stage downloads a single mp3 per meeting. Returns #rows rewritten."""
+    best_rank: dict[tuple, int] = {}
+    pref: dict[tuple, str] = {}
+    for r in rows:
+        key = (r["city_id"], r["meeting_id"])
+        if key not in best_rank or r["_rank"] < best_rank[key]:
+            best_rank[key] = r["_rank"]      # include < leftover < backbone
+            pref[key] = r["audio_url"]
+    changed = 0
+    for r in rows:
+        u = pref[(r["city_id"], r["meeting_id"])]
+        if r["audio_url"] != u:
+            r["audio_url"] = u
+            changed += 1
+    return changed
+
+
 def stage_rows(args) -> None:
+    import numpy as np
     import pandas as pd
     OUT.mkdir(parents=True, exist_ok=True)
     date = time.strftime("%Y-%m-%d")
     snapshot = OUT / f"raw-export-{date}.jsonl"
     export_rows = fetch_export(snapshot)
     log(f"export rows: {len(export_rows)}")
+    excluded = load_excluded_keys()
+    date_map = build_date_map(export_rows)
+    spk_map = load_speaker_map()
 
-    kept, drops = filter_rows(export_rows, load_excluded_keys())
+    # 1) includes (corrections) from the live export
+    kept, drops = filter_rows(export_rows, excluded)
     for k, v in sorted(drops.items()):
-        log(f"  dropped {v}: {k}")
-    log(f"kept include rows: {len(kept)}")
+        log(f"  export dropped {v}: {k}")
+    for r in kept:
+        r["source"] = "correction"
+        r["_rank"] = _RANK["include"]
+    include_uids = {r["utterance_id"] for r in kept}
+    log(f"includes kept: {len(kept)}")
 
-    kept, n_missing = join_speakers(kept, load_speaker_map())
-    log(f"speaker join: {len(kept) - n_missing} matched, {n_missing} without "
+    # 2) leftover corrections (NB2 audio-verified, not already included)
+    leftover, ld = _filter_extra(
+        load_leftover_corrections(include_uids, date_map), excluded)
+    log(f"leftover corrections: {len(leftover)} (drops {ld})")
+
+    # 3) no-edit backbone (trusted review-exposed meetings)
+    trusted = load_review_exposed_meetings(excluded)
+    backbone, bd = _filter_extra(
+        load_backbone(trusted, spk_map, date_map, seed=args.seed), excluded)
+    log(f"backbone no-edit: {len(backbone)} (drops {bd})")
+
+    # combine + span-dedupe (correction beats no_edit; include beats leftover)
+    combined = kept + leftover + backbone
+    n_url = _normalize_meeting_urls(combined)
+    combined, n_dup = dedupe_by_span(combined)
+    log(f"combined {len(kept)}+{len(leftover)}+{len(backbone)} -> {len(combined)} "
+        f"after span-dedupe ({n_dup} dropped; {n_url} audio_urls normalized)")
+
+    # global utterance_id uniqueness across all sources (join/boundary key)
+    uids = collections.Counter(r["utterance_id"] for r in combined)
+    dup_uids = [u for u, n in uids.items() if n > 1]
+    if dup_uids:
+        raise ValueError(f"utterance_id not globally unique: {dup_uids[:5]}")
+
+    combined, n_missing = join_speakers(combined, spk_map)
+    log(f"speaker join: {len(combined) - n_missing} matched, {n_missing} without "
         f"speaker_id (train-only, never validation)")
 
-    for r in kept:
+    for r in combined:
         r["duration_s"] = round(float(r["end"]) - float(r["start"]), 3)
         r["has_overlap"] = has_overlap_marker(r.get("reviewer_notes"))
-        r["source"] = "correction"
 
     try:
-        res = assign_splits(kept, seed=args.seed)
+        res = assign_splits(combined, seed=args.seed)
     except SplitError as ex:
         log(f"SPLIT GATE: {ex}")
         raise SystemExit(
             "validation share landed outside 18-22% of hours — this is the "
             "designed human gate, not a bug. Review the numbers above and "
-            "decide (adjust window / seed / held-out cities) before proceeding."
+            "decide (adjust caps / window / seed / held-out cities) first."
         ) from ex
-    for r, s in zip(kept, res.splits):
+    for r, s in zip(combined, res.splits):
         r["split"] = s
 
-    # overlap eyeball report
-    matched, unmatched = notes_report_rows(kept)
+    # overlap eyeball report (only correction rows carry reviewer_notes)
+    matched, unmatched = notes_report_rows(combined)
     rep = ["# Overlap notes report", "",
            f"Rule: standalone Latin C in reviewer_notes. Matched {len(matched)}, "
            f"unmatched non-empty notes {len(unmatched)}.", "", "## Matched", ""]
@@ -242,22 +465,39 @@ def stage_rows(args) -> None:
     (OUT / "overlap-notes-report.md").write_text("\n".join(rep) + "\n")
 
     hours = collections.defaultdict(float)
-    for r in kept:
+    src = collections.Counter()
+    for r in combined:
         hours[r["split"]] += r["duration_s"] / 3600
-    # held-out-city vs seeded-speaker validation hours, reported separately so
-    # the composition of the val set is auditable (Codex review #5)
-    val_heldout_h = sum(r["duration_s"] for r in kept
+        src[(r["source"], r["split"])] += 1
+    val_heldout_h = sum(r["duration_s"] for r in combined
                         if r["city_id"] in VAL_CITIES) / 3600
     val_seeded_h = hours["validation"] - val_heldout_h
     log(f"split: train {hours['train']:.2f}h / validation {hours['validation']:.2f}h "
         f"({res.val_share:.1%}) — held-out {val_heldout_h:.2f}h + seeded "
-        f"{val_seeded_h:.2f}h; {len(res.val_speakers)} mixed-city val speakers, "
-        f"{len(res.skipped_speakers)} skipped as overshoot")
+        f"{val_seeded_h:.2f}h; {len(res.val_speakers)} seeded val speakers, "
+        f"{len(res.skipped_speakers)} skipped")
+    log(f"source x split: {dict(src)}")
 
-    import numpy as np
+    def _h(p):
+        return _sha256(p) if p.exists() else None
     SPLIT_JSON.write_text(json.dumps({
         "seed": args.seed, "snapshot": snapshot.name,
-        "snapshot_sha256": _sha256(snapshot),         # reproducibility (Codex #3)
+        "snapshot_sha256": _sha256(snapshot),
+        "sources": {
+            "includes": len(kept), "leftover": len(leftover),
+            "backbone": len(backbone), "combined_after_dedupe": len(combined),
+            "span_dupes_dropped": n_dup,
+        },
+        "input_hashes": {
+            "nb2audio_ids": _h(LEFTOVER_IDS),
+            "selected_edits": _h(SELECTED_EDITS),
+            "trust_tsv": _h(TRUST_TSV),
+        },
+        "backbone_config": {
+            "trust_frac": TRUST_FRAC, "dur_window": list(BACKBONE_DUR),
+            "cap_train": BACKBONE_CAP_TRAIN, "cap_heldout": BACKBONE_CAP_HELDOUT,
+            "review_exposed_meetings": len(trusted),
+        },
         "val_cities": sorted(VAL_CITIES),
         "val_speakers": sorted(res.val_speakers),
         "skipped_speakers": res.skipped_speakers,
@@ -268,7 +508,8 @@ def stage_rows(args) -> None:
         "val_heldout_hours": round(val_heldout_h, 3),
         "val_seeded_hours": round(val_seeded_h, 3),
         "temporal_test_from": TEMPORAL_TEST_FROM,
-        "drop_counts": drops, "n_missing_speaker": n_missing,
+        "drop_counts": {"export": drops, "leftover": ld, "backbone": bd},
+        "n_missing_speaker": n_missing,
         "versions": {"python": platform.python_version(),
                      "numpy": np.__version__},
     }, ensure_ascii=False, indent=2))
@@ -277,8 +518,8 @@ def stage_rows(args) -> None:
             "audio_url", "start", "end", "duration_s", "initial_before_text",
             "final_after_text", "error_categories", "has_overlap", "source",
             "split", "reviewer_notes"]
-    pd.DataFrame([{c: r.get(c) for c in cols} for r in kept]).to_parquet(ROWS_PARQUET)
-    log(f"-> {ROWS_PARQUET} ({len(kept)} rows), {SPLIT_JSON}, overlap-notes-report.md")
+    pd.DataFrame([{c: r.get(c) for c in cols} for r in combined]).to_parquet(ROWS_PARQUET)
+    log(f"-> {ROWS_PARQUET} ({len(combined)} rows), {SPLIT_JSON}, overlap-notes-report.md")
 
 
 # ---------- boundary stage ----------
@@ -451,6 +692,30 @@ def stage_finalize(args) -> None:
     df["start_adj"] = [bnd.get(u, {}).get("start_adj") for u in df["utterance_id"]]
     df["end_adj"] = [bnd.get(u, {}).get("end_adj") for u in df["utterance_id"]]
 
+    # backbone alignment gate (Codex review): a no-edit row whose ASR text does
+    # not align to its audio is not a trustworthy positive ("alignment-passed
+    # no-edit ASR", a minimum-viability gate — NOT verified-correct). Drop it
+    # from the published set; the frozen sample is the gated set.
+    gate = (df["source"] == "no_edit") & (df["boundary_status"] == "align_failed")
+    n_gated = int(gate.sum())
+    if n_gated:
+        df[gate][["utterance_id", "city_id", "meeting_id", "audio_url", "start",
+                  "end", "final_after_text"]].to_csv(
+            OUT / "backbone-dropped.csv", index=False)
+    df = df[~gate].reset_index(drop=True)
+    log(f"backbone align-gate: dropped {n_gated} no_edit align_failed rows "
+        f"-> {len(df)} rows")
+    # re-check val share over the gated set (must stay in the agreed window)
+    if not df.empty and (df["boundary_status"] != "pending").any():
+        vh = df[df.split == "validation"].duration_s.sum() / 3600
+        th = df.duration_s.sum() / 3600
+        share = vh / th if th else 0.0
+        if not (0.18 <= share <= 0.22):
+            raise SystemExit(
+                f"val share {share:.1%} left the 18-22% window after the "
+                f"backbone gate — human decision (adjust caps/seed).")
+        log(f"val share after gate: {share:.1%}")
+
     # audit CSV: everything not ok/adjusted, for sampled human review
     audit = df[~df["boundary_status"].isin(["ok", "adjusted"])]
     audit_cols = ["utterance_id", "city_id", "meeting_id", "audio_url", "start",
@@ -504,11 +769,17 @@ def stage_finalize(args) -> None:
     (OUT / "stats.json").write_text(json.dumps(stats, ensure_ascii=False, indent=2))
 
     md = ["# HF dataset export — stats", "",
-          f"Total: {stats['total_rows']} rows, {stats['total_hours']} h", ""]
+          f"Total: {stats['total_rows']} rows, {stats['total_hours']} h", "",
+          "## By source", ""]
+    for source, s in stats.get("by_source", {}).items():
+        md += [f"- **{source}**: {s['rows']} rows, {s['hours']} h "
+               f"(split {s['by_split']})"]
+    md += [""]
     for split, s in stats["by_split"].items():
         md += [f"## {split}", "",
                f"- rows {s['rows']}, hours {s['hours']} ({s['pct_hours']}%), "
                f"speakers {s['speakers']}",
+               f"- sources: {s.get('sources', {})}",
                f"- cities: {s['cities']}",
                f"- categories: {s['error_categories']}", ""]
     md += [f"overlap rows: {stats['overlap_rows']}",
@@ -525,6 +796,9 @@ def write_dataset_card(stats: dict) -> None:
     split_lines = "\n".join(
         f"| {k} | {v['rows']} | {v['hours']} h | {v['pct_hours']}% | {v['speakers']} |"
         for k, v in stats["by_split"].items())
+    source_lines = "\n".join(
+        f"| {k} | {v['rows']} | {v['hours']} h | {v['by_split']} |"
+        for k, v in stats.get("by_source", {}).items())
     seed = (json.loads(SPLIT_JSON.read_text())["seed"]
             if SPLIT_JSON.exists() else "N/A")
     (OUT / "public" / "README.md").write_text(f"""---
@@ -552,8 +826,24 @@ embedded. A clip-embedded release may follow once licensing is confirmed.
 |---|---|---|---|---|
 {split_lines}
 
+## Sources (`source` column)
+
+| source | rows | hours | by split |
+|---|---|---|---|
+{source_lines}
+
+- **correction** — human-curated `(before → after)` edit pairs (review-UI
+  includes + audio-verified NB2 leftover).
+- **no_edit** — trusted backbone: ASR utterances from review-exposed meetings
+  that a reviewer left unchanged (`before_text == text`). This is
+  *alignment-passed no-edit ASR* — each clip's text force-aligns to its audio —
+  **not** independently verified-correct transcription; treat it as a
+  high-precision-but-not-perfect positive. Provided so training is not
+  corrections-only (avoids the over-editing bias).
+
 ## Fields
 
+- `source` — `correction` (edit pair) or `no_edit` (trusted backbone).
 - `before_text` — raw ASR output; `text` — the human-corrected target.
 - `start`/`end` — raw utterance span in the meeting audio; `start_adj`/`end_adj`
   — spans snapped via forced alignment + VAD with ±0.2 s padding.
@@ -569,11 +859,15 @@ embedded. A clip-embedded release may follow once licensing is confirmed.
 
 ## Split methodology
 
-Validation = two whole held-out cities (orestiada, argos) plus whole seeded
-speakers (>= 3 min speech in-dataset) from the remaining cities up to ~20% of
-total hours; speaker-disjoint from train. A temporal test set (meetings from
-June 2026 on) is withheld entirely. Split map: `split_assignments.json`
-(seed {seed}).
+The 80/20 (by hours) split is computed **once over the whole combined sample**
+(corrections + no-edit backbone), so it holds across sources and future batches
+inherit it by speaker. Validation = two whole held-out cities (orestiada, argos)
+plus whole seeded speakers (>= 3 min speech in-dataset) from the remaining
+cities up to ~20% of total hours; **speaker-disjoint** from train. Held-out-city
+backbone is per-city-capped so val stays ~20%. A temporal test set (meetings
+from June 2026 on) is withheld entirely. Note the val set mixes held-out-city
+and seeded-speaker holdout (not a pure random-speaker holdout) — see
+`split_assignments.json` (seed {seed}) for the exact map and per-source counts.
 
 ## Caveats
 
