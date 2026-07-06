@@ -66,6 +66,42 @@ def log(msg: str) -> None:
     print(f"[{time.strftime('%H:%M:%S')}] {msg}", flush=True)
 
 
+def _boundary_files() -> list[Path]:
+    """Legacy single-writer file + any sharded part files (Codex: merge set)."""
+    return ([BOUNDARY_JSONL] if BOUNDARY_JSONL.exists() else []) + \
+        sorted(OUT.glob("boundary.part-*.jsonl"))
+
+
+def _iter_boundary_lines(path: Path):
+    """Yield parsed JSON records, tolerating a truncated trailing line."""
+    for l in path.open():
+        l = l.strip()
+        if not l:
+            continue
+        try:
+            yield json.loads(l)
+        except json.JSONDecodeError:
+            log(f"  skip malformed line in {path.name}")
+
+
+def _load_aligner(threads: int):
+    """(model, tokenizer). threads>0 -> capped ONNX session for parallel shards."""
+    if threads <= 0:
+        from ctc_forced_aligner import AlignmentSingleton
+        a = AlignmentSingleton()
+        return a.model, a.tokenizer
+    import os
+
+    import onnxruntime
+    from ctc_forced_aligner import MODEL_URL, Tokenizer, ensure_onnx_model
+    mp = os.path.join(os.path.expanduser("~"), "ctc_forced_aligner", "model.onnx")
+    ensure_onnx_model(mp, MODEL_URL)
+    so = onnxruntime.SessionOptions()
+    so.intra_op_num_threads = threads
+    so.inter_op_num_threads = 1
+    return onnxruntime.InferenceSession(mp, sess_options=so), Tokenizer()
+
+
 def _sha256(p: Path) -> str:
     h = hashlib.sha256()
     with p.open("rb") as f:
@@ -536,9 +572,9 @@ def stage_boundary(args) -> None:
     # postprocess_results, uroman romanization for Greek), reached here because
     # the git-installed package is not available and the spec leaves the aligner
     # open. AlignmentSingleton auto-downloads the ONNX model on first use.
-    from ctc_forced_aligner import (AlignmentSingleton, generate_emissions,
-                                     get_alignments, get_spans,
-                                     postprocess_results, preprocess_text)
+    from ctc_forced_aligner import (generate_emissions, get_alignments,
+                                     get_spans, postprocess_results,
+                                     preprocess_text)
     from silero_vad import get_speech_timestamps, load_silero_vad
 
     from eval.autoresearch.prepare_asr import SR, decode_pcm, download_mp3
@@ -546,21 +582,23 @@ def stage_boundary(args) -> None:
 
     df = pd.read_parquet(ROWS_PARQUET)
     # staleness guard (Codex #19/#1): a boundary line only counts as done if it
-    # was computed for the SAME span+text+algo as the current rows.parquet
+    # was computed for the SAME span+text+algo as the current rows.parquet.
+    # Done-set spans the legacy file AND every shard part file (Codex: workers
+    # must skip clips finished by any worker).
     expected = {r["utterance_id"]: _row_sig(r) for r in df.to_dict("records")}
     done = set()
     stale = 0
-    if BOUNDARY_JSONL.exists():
-        for l in BOUNDARY_JSONL.open():
-            d = json.loads(l)
+    for path in _boundary_files():
+        for d in _iter_boundary_lines(path):
             if expected.get(d["utterance_id"]) == d.get("row_sig"):
                 done.add(d["utterance_id"])
             else:
                 stale += 1
-        log(f"resume: {len(done)} already classified, {stale} stale lines ignored")
+    log(f"resume: {len(done)} already classified, {stale} stale lines ignored")
 
-    aligner = AlignmentSingleton()          # ONNX MMS CTC aligner (auto-download)
-    align_model, tokenizer = aligner.model, aligner.tokenizer
+    if args.threads > 0:
+        torch.set_num_threads(args.threads)
+    align_model, tokenizer = _load_aligner(args.threads)
     vad_model = load_silero_vad()
 
     by_mtg = collections.defaultdict(list)
@@ -568,6 +606,11 @@ def stage_boundary(args) -> None:
         if r["utterance_id"] not in done:
             by_mtg[(r["city_id"], r["meeting_id"])].append(r)
     meetings = sorted(by_mtg)
+    if args.shard:
+        k, n = (int(x) for x in args.shard.split("/"))
+        meetings = meetings[k::n]      # deterministic meeting partition
+        log(f"--shard {args.shard}: {len(meetings)} meetings, "
+            f"{sum(len(by_mtg[m]) for m in meetings)} utterances")
     if args.limit_meetings:
         meetings = meetings[: args.limit_meetings]
         log(f"--limit-meetings {args.limit_meetings}: processing "
@@ -580,7 +623,8 @@ def stage_boundary(args) -> None:
                            "start_adj": r["start"], "end_adj": r["end"],
                            "mean_score": 0.0, "note": note}) + "\n"
 
-    out = BOUNDARY_JSONL.open("a")
+    out_path = OUT / args.out if args.out else BOUNDARY_JSONL
+    out = out_path.open("a")
     for mi, (city, meeting) in enumerate(meetings, 1):
         rows = by_mtg[(city, meeting)]
         mp3 = download_mp3(rows[0]["audio_url"], city, meeting)
@@ -644,7 +688,7 @@ def stage_boundary(args) -> None:
         del pcm
         log(f"[{mi}/{len(meetings)}] {city}/{meeting}: {n_ok} clips classified")
     out.close()
-    log(f"-> {BOUNDARY_JSONL}")
+    log(f"-> {out_path}")
 
 
 # ---------- finalize stage ----------
@@ -654,22 +698,20 @@ def _load_boundary(expected: dict[str, str]) -> tuple[dict[str, dict], int]:
     conflicting duplicates (Codex review #2)."""
     bnd: dict[str, dict] = {}
     stale = 0
-    if not BOUNDARY_JSONL.exists():
-        return bnd, stale
-    for l in BOUNDARY_JSONL.open():
-        d = json.loads(l)
-        uid = d["utterance_id"]
-        if expected.get(uid) != d.get("row_sig"):
-            stale += 1
-            continue
-        prev = bnd.get(uid)
-        if prev is not None:
-            same = all(prev.get(k) == d.get(k) for k in
-                       ("boundary_status", "start_adj", "end_adj"))
-            if not same:
-                raise ValueError(
-                    f"conflicting boundary results for {uid}: {prev} vs {d}")
-        bnd[uid] = d
+    for path in _boundary_files():
+        for d in _iter_boundary_lines(path):
+            uid = d["utterance_id"]
+            if expected.get(uid) != d.get("row_sig"):
+                stale += 1
+                continue
+            prev = bnd.get(uid)
+            if prev is not None:
+                same = all(prev.get(k) == d.get(k) for k in
+                           ("boundary_status", "start_adj", "end_adj"))
+                if not same:
+                    raise ValueError(
+                        f"conflicting boundary results for {uid}: {prev} vs {d}")
+            bnd[uid] = d
     return bnd, stale
 
 
@@ -888,6 +930,13 @@ def main() -> None:
     p_rows.add_argument("--seed", type=int, default=DEFAULT_SEED)
     p_bnd = sub.add_parser("boundary")
     p_bnd.add_argument("--limit-meetings", type=int, default=0)
+    p_bnd.add_argument("--shard", type=str, default="",
+                       help="K/N deterministic meeting shard for parallel workers")
+    p_bnd.add_argument("--out", type=str, default="",
+                       help="output file name under data/hf-dataset/ "
+                            "(e.g. boundary.part-0.jsonl); default boundary.jsonl")
+    p_bnd.add_argument("--threads", type=int, default=0,
+                       help="cap ONNX/torch threads per process (for sharding)")
     p_fin = sub.add_parser("finalize")
     p_fin.add_argument("--allow-pending-boundary", action="store_true")
     args = ap.parse_args()
