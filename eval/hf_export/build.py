@@ -845,6 +845,7 @@ def write_dataset_card(stats: dict) -> None:
             if SPLIT_JSON.exists() else "N/A")
     (OUT / "public" / "README.md").write_text(f"""---
 language: [el]
+license: cc-by-sa-4.0
 task_categories: [automatic-speech-recognition]
 pretty_name: OpenCouncil Greek municipal-council ASR corrections
 configs:
@@ -918,8 +919,12 @@ and seeded-speaker holdout (not a pure random-speaker holdout) — see
 - `meeting_id` slugs collide across cities — always key by
   `(city_id, meeting_id)`.
 - Rows with `speaker_id = null` (~no diarization identity) are train-only.
-- License: pending confirmation with OpenCouncil; audio remains at
-  data.opencouncil.gr and is not redistributed here.
+- License: **CC-BY-SA-4.0** (attribution + share-alike), mirroring OpenCouncil's
+  AGPL-3.0 copyleft. Source: OpenCouncil / Schema Labs (opencouncil.gr), derived
+  from public Greek municipal-council proceedings. This release is
+  **metadata-only** — audio is **not** redistributed (stays at
+  data.opencouncil.gr). Attribution: "Transcripts © OpenCouncil / Schema Labs,
+  CC-BY-SA-4.0". Confirm the attribution wording with Schema Labs before pushing.
 """)
 
 
