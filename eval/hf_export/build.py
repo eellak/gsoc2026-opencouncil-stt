@@ -980,6 +980,32 @@ embedded. A clip-embedded release may follow once licensing is confirmed.
   in this span. Boolean only; the overlapping speech is not transcribed.
 - `error_categories` — reviewer labels for the correction type.
 
+## Getting the audio (no full-meeting download)
+
+This release is metadata-only; audio stays at `data.opencouncil.gr`, which
+serves **HTTP range requests**. So you fetch only each utterance's segment
+(~90 kB) — never the whole meeting recording — by seeking with ffmpeg on the
+**corrected** span `start_adj`/`end_adj` (fall back to `start`/`end` when those
+are null). No syllable is clipped.
+
+```python
+import subprocess, math
+
+def fetch_clip(row, out="clip.wav", sr=16000, pad=0.15):
+    sa, ea = row.get("start_adj"), row.get("end_adj")
+    ok = lambda x: x is not None and not (isinstance(x, float) and math.isnan(x))
+    start, end = (float(sa), float(ea)) if ok(sa) and ok(ea) else (float(row["start"]), float(row["end"]))
+    s, dur = max(0.0, start - pad), (end - start) + 2 * pad
+    subprocess.run(["ffmpeg", "-nostdin", "-loglevel", "error", "-ss", f"{s:.3f}",
+                    "-i", row["audio_url"], "-t", f"{dur:.3f}", "-ar", str(sr),
+                    "-ac", "1", "-y", out], check=True)
+    return out
+
+# from datasets import load_dataset
+# ds = load_dataset("<namespace>/oc-greek-asr", split="train")
+# fetch_clip(ds[0])   # -> clip.wav, only that segment downloaded
+```
+
 ## Split methodology
 
 The 80/20 (by hours) split is computed **once over the whole combined sample**
