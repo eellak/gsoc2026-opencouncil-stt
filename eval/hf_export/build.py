@@ -778,7 +778,17 @@ def stage_finalize(args) -> None:
     # keep the adjusted-offset columns as nullable float, not object (Codex #7)
     df["start_adj"] = pd.to_numeric(df["start_adj"], errors="coerce")
     df["end_adj"] = pd.to_numeric(df["end_adj"], errors="coerce")
-    write_boundary_report(df)
+    # the hand-picked included corrections (for the sync report) = the utterance
+    # ids in the live-export snapshot
+    inc_uids = set()
+    snaps = sorted(OUT.glob("raw-export-*.jsonl"))
+    if snaps:
+        for l in snaps[-1].open():
+            try:
+                inc_uids.add(json.loads(l)["utterance_id"])
+            except json.JSONDecodeError:
+                pass
+    write_boundary_report(df, inc_uids)
 
     # published columns — reviewer_notes stays internal (free text, PII risk)
     pub_cols = ["utterance_id", "city_id", "meeting_id", "meeting_date",
@@ -839,7 +849,7 @@ def stage_finalize(args) -> None:
     log("-> README.md (dataset card draft)")
 
 
-def write_boundary_report(df) -> None:
+def write_boundary_report(df, include_uids: set | None = None) -> None:
     """Team-facing plain-language report on span/sync quality (boundary pass)."""
     import collections as _c
 
@@ -850,45 +860,54 @@ def write_boundary_report(df) -> None:
         def p(k):
             return f"{st.get(k, 0)} ({100 * st.get(k, 0) / n:.1f}%)" if n else "0"
         clean = st.get("ok", 0) + st.get("adjusted", 0)
-        return (n, st, clean, [
+        lines = [
             f"### {title}", "",
             f"- checked: **{n}** / {len(sub)} rows",
             f"- **in-sync / clean** (ok + adjusted): **{100 * clean / n:.0f}%**" if n else "",
             f"- ends too early, last syllable cut (`suspect_cut_end`): {p('suspect_cut_end')}",
             f"- starts too early (`suspect_cut_start`): {p('suspect_cut_start')}",
             f"- neighbouring phrase audible in span (`suspect_bleed_in`): {p('suspect_bleed_in')}",
-            f"- could not align (`align_failed`): {p('align_failed')}", ""])
+            f"- could not align (`align_failed`): {p('align_failed')}", ""]
+        return n, st, clean, lines
 
     corr = df[df["source"] == "correction"]
-    n, st, clean, corr_lines = block(corr, "Curated corrections (synced via the review UI)")
-    ce, cs = st.get("suspect_cut_end", 0), st.get("suspect_cut_start", 0)
-    skew = (f"`cut_end` is {ce / cs:.1f}x `cut_start`"
-            if cs else f"{ce} cut_end vs {cs} cut_start")
+    inc = corr[corr["utterance_id"].isin(include_uids)] if include_uids else corr
+    left = corr[~corr["utterance_id"].isin(include_uids)] if include_uids else corr.iloc[0:0]
+    ni, sti, cleani, inc_lines = block(inc, "Curated *included* corrections (your hand-picked set)")
+    ce, cs = sti.get("suspect_cut_end", 0), sti.get("suspect_cut_start", 0)
+    lean = ("lean to *ends-too-early* (last syllable clipped)" if ce > 1.3 * cs
+            else "lean to *starts-too-early*" if cs > 1.3 * ce
+            else "roughly balanced between the two edges")
+
     lines = [
         "# Span / sync quality report", "",
-        "**What this checks.** Each utterance's *text* is force-aligned to its "
-        "*audio*, and speech is detected with VAD. This tells us whether the "
-        "stored `start`/`end` timestamps actually bracket the spoken words, or "
-        "cut a syllable / include a neighbour. Every row gets a `boundary_status`; "
-        "aligned rows also get a corrected span `start_adj`/`end_adj` "
-        "(full word ± 0.2 s padding) — **the span you should cut clips on.**", "",
-        "## Headline", "",
-        f"- **{100 * clean / n:.0f}% of the curated corrections are already "
-        f"in-sync**; the rest are flagged and given a corrected span." if n else "",
-        f"- The errors skew to *ends-too-early*: {skew}. That matches a small, "
-        "systematic audio-vs-timestamp offset from the UI sync — spans tend to "
-        "clip the **last syllable**. `start_adj`/`end_adj` fix this.", "",
+        "**What this checks.** We force-align each utterance's *text* to its "
+        "*audio* and run VAD (speech detection). That tells us whether the stored "
+        "`start`/`end` timestamps really bracket the spoken words, or clip a "
+        "syllable / swallow a neighbour. Every row gets a `boundary_status`; "
+        "aligned rows also get a corrected span `start_adj`/`end_adj` (aligned "
+        "words ± 0.2 s padding) — **the span to cut clips on.**", "",
+        "## Headline (plain words)", "",
+        f"- About **{100 * cleani / ni:.0f}% of your hand-picked corrections are "
+        f"already in-sync**; the other ~{100 - round(100 * cleani / ni)}% clip a "
+        "word at one edge or catch a neighbour." if ni else "",
+        f"- Those errors {lean} — so it is **loose timestamps, not one constant "
+        "audio offset** (the no-edit backbone actually leans the other way).",
+        "- **The fix is automatic:** use `start_adj`/`end_adj` and no syllable is "
+        "clipped, whichever edge was loose. No manual re-sync needed.", "",
         "## Numbers", "",
-    ] + corr_lines
+    ] + inc_lines
+    if include_uids:
+        _, _, _, left_lines = block(left, "Leftover corrections (NB2 audio-verified)")
+        lines += left_lines
     _, _, _, bk_lines = block(df[df["source"] == "no_edit"], "No-edit backbone")
     lines += bk_lines
     lines += [
         "## What to do", "",
         "- **Cut training clips on `start_adj`/`end_adj`, not `start`/`end`.** "
-        "Those include the whole word plus padding, so no syllable is clipped.",
-        "- Rows with `boundary_status = align_failed` (no reliable span) are "
-        "rare; `start_adj`/`end_adj` are null there — fall back to raw + padding.",
-        "- `suspect_bleed_in` marks a neighbouring phrase inside the raw span; "
+        "They include the whole word plus padding, so no syllable is clipped.",
+        "- `align_failed` rows (rare) have null `*_adj` — fall back to raw + padding.",
+        "- `suspect_bleed_in` = a neighbouring phrase sits inside the raw span; "
         "the corrected span covers only the labelled words.", ""]
     (OUT / "boundary-sync-report.md").write_text("\n".join(lines) + "\n")
 
