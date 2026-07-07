@@ -36,10 +36,11 @@ def main() -> int:
         assert (df_.boundary_status != "pending").all(), "pending boundary in published set"
         # no_edit rows are never align_failed (gated out)
         assert df_[(df_.source == "no_edit") & (df_.boundary_status == "align_failed")].empty
-        # adjusted spans present iff ok/adjusted
-        trusted = df_.boundary_status.isin(["ok", "adjusted"])
-        assert df_.loc[~trusted, "start_adj"].isna().all()
-        assert df_.loc[trusted, "start_adj"].notna().all()
+        # corrected spans present for every aligned row, null only for
+        # align_failed / pending
+        no_span = df_.boundary_status.isin(["align_failed", "pending"])
+        assert df_.loc[no_span, "start_adj"].isna().all()
+        assert df_.loc[~no_span, "start_adj"].notna().all()
 
     stats = json.load(open(ROOT / "data" / "hf-dataset" / "stats.json"))
     share = stats["by_split"]["validation"]["pct_hours"]

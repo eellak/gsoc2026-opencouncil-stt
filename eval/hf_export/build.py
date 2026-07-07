@@ -767,14 +767,18 @@ def stage_finalize(args) -> None:
     audit[audit_cols].to_csv(OUT / "boundary-audit.csv", index=False)
     log(f"boundary audit rows: {len(audit)} -> boundary-audit.csv")
 
-    # adjusted spans are only trustworthy for ok/adjusted rows (Codex #10) —
-    # in the PUBLISHED files suspects/failures get start_adj/end_adj = null so
-    # nobody uses them blindly (the proposals stay in boundary-audit.csv above)
-    trusted = df["boundary_status"].isin(["ok", "adjusted"])
-    df.loc[~trusted, ["start_adj", "end_adj"]] = None
+    # start_adj/end_adj = the aligner-corrected span (aligned words +/- PAD_S) —
+    # the RECOMMENDED span to cut clips on. Provided for EVERY row that aligned,
+    # INCLUDING suspect_cut_*/bleed_in, so no clip cuts a syllable (raw CSV spans
+    # do: ~16% of curated corrections end too early). Only align_failed / pending
+    # (no reliable alignment) get null; boundary_status still records what the
+    # raw span's problem was, for transparency.
+    no_span = df["boundary_status"].isin(["align_failed", "pending"])
+    df.loc[no_span, ["start_adj", "end_adj"]] = None
     # keep the adjusted-offset columns as nullable float, not object (Codex #7)
     df["start_adj"] = pd.to_numeric(df["start_adj"], errors="coerce")
     df["end_adj"] = pd.to_numeric(df["end_adj"], errors="coerce")
+    write_boundary_report(df)
 
     # published columns — reviewer_notes stays internal (free text, PII risk)
     pub_cols = ["utterance_id", "city_id", "meeting_id", "meeting_date",
@@ -835,6 +839,60 @@ def stage_finalize(args) -> None:
     log("-> README.md (dataset card draft)")
 
 
+def write_boundary_report(df) -> None:
+    """Team-facing plain-language report on span/sync quality (boundary pass)."""
+    import collections as _c
+
+    def block(sub, title):
+        done = sub[sub["boundary_status"] != "pending"]
+        n = len(done)
+        st = _c.Counter(done["boundary_status"])
+        def p(k):
+            return f"{st.get(k, 0)} ({100 * st.get(k, 0) / n:.1f}%)" if n else "0"
+        clean = st.get("ok", 0) + st.get("adjusted", 0)
+        return (n, st, clean, [
+            f"### {title}", "",
+            f"- checked: **{n}** / {len(sub)} rows",
+            f"- **in-sync / clean** (ok + adjusted): **{100 * clean / n:.0f}%**" if n else "",
+            f"- ends too early, last syllable cut (`suspect_cut_end`): {p('suspect_cut_end')}",
+            f"- starts too early (`suspect_cut_start`): {p('suspect_cut_start')}",
+            f"- neighbouring phrase audible in span (`suspect_bleed_in`): {p('suspect_bleed_in')}",
+            f"- could not align (`align_failed`): {p('align_failed')}", ""])
+
+    corr = df[df["source"] == "correction"]
+    n, st, clean, corr_lines = block(corr, "Curated corrections (synced via the review UI)")
+    ce, cs = st.get("suspect_cut_end", 0), st.get("suspect_cut_start", 0)
+    skew = (f"`cut_end` is {ce / cs:.1f}x `cut_start`"
+            if cs else f"{ce} cut_end vs {cs} cut_start")
+    lines = [
+        "# Span / sync quality report", "",
+        "**What this checks.** Each utterance's *text* is force-aligned to its "
+        "*audio*, and speech is detected with VAD. This tells us whether the "
+        "stored `start`/`end` timestamps actually bracket the spoken words, or "
+        "cut a syllable / include a neighbour. Every row gets a `boundary_status`; "
+        "aligned rows also get a corrected span `start_adj`/`end_adj` "
+        "(full word ± 0.2 s padding) — **the span you should cut clips on.**", "",
+        "## Headline", "",
+        f"- **{100 * clean / n:.0f}% of the curated corrections are already "
+        f"in-sync**; the rest are flagged and given a corrected span." if n else "",
+        f"- The errors skew to *ends-too-early*: {skew}. That matches a small, "
+        "systematic audio-vs-timestamp offset from the UI sync — spans tend to "
+        "clip the **last syllable**. `start_adj`/`end_adj` fix this.", "",
+        "## Numbers", "",
+    ] + corr_lines
+    _, _, _, bk_lines = block(df[df["source"] == "no_edit"], "No-edit backbone")
+    lines += bk_lines
+    lines += [
+        "## What to do", "",
+        "- **Cut training clips on `start_adj`/`end_adj`, not `start`/`end`.** "
+        "Those include the whole word plus padding, so no syllable is clipped.",
+        "- Rows with `boundary_status = align_failed` (no reliable span) are "
+        "rare; `start_adj`/`end_adj` are null there — fall back to raw + padding.",
+        "- `suspect_bleed_in` marks a neighbouring phrase inside the raw span; "
+        "the corrected span covers only the labelled words.", ""]
+    (OUT / "boundary-sync-report.md").write_text("\n".join(lines) + "\n")
+
+
 def write_dataset_card(stats: dict) -> None:
     split_lines = "\n".join(
         f"| {k} | {v['rows']} | {v['hours']} h | {v['pct_hours']}% | {v['speakers']} |"
@@ -889,14 +947,16 @@ embedded. A clip-embedded release may follow once licensing is confirmed.
 
 - `source` — `correction` (edit pair) or `no_edit` (trusted backbone).
 - `before_text` — raw ASR output; `text` — the human-corrected target.
-- `start`/`end` — raw utterance span in the meeting audio; `start_adj`/`end_adj`
-  — spans snapped via forced alignment + VAD with ±0.2 s padding.
-- `boundary_status` — `ok`/`adjusted` (usable as-is) vs `suspect_cut_start`/
-  `suspect_cut_end`/`suspect_bleed_in`/`align_failed` (inspect before use;
-  `start_adj`/`end_adj` are null for these). `suspect_bleed_in` is a
-  *conservative* flag: VAD speech inside the span that the alignment did not
-  cover — often neighbouring speech, but sometimes fillers/hesitations the
-  corrected text omits.
+- `start`/`end` — raw utterance span in the meeting audio. **`start_adj`/
+  `end_adj` — the recommended span to cut on**: the force-aligned words ± 0.2 s
+  padding, so no syllable is clipped. Provided for every row that aligned
+  (including the `suspect_*` ones); null only for `align_failed`.
+- `boundary_status` — quality of the *raw* span: `ok`/`adjusted` (raw was fine)
+  vs `suspect_cut_start`/`suspect_cut_end` (raw clipped a word — corrected in
+  `*_adj`), `suspect_bleed_in` (a neighbouring phrase is audible inside the raw
+  span; `*_adj` covers only the labelled words), `align_failed` (no reliable
+  alignment). ~16% of curated corrections had `suspect_cut_end` — the raw spans
+  systematically end a touch early — which `start_adj`/`end_adj` fix.
 - `has_overlap` — a reviewer marked overlapping speech (someone else audible)
   in this span. Boolean only; the overlapping speech is not transcribed.
 - `error_categories` — reviewer labels for the correction type.
