@@ -650,7 +650,8 @@ def stage_boundary(args) -> None:
             left_margin = s - a / SR  # actual margin (clamped near file start)
             try:
                 wav = np.ascontiguousarray(clip, dtype=np.float32)  # ONNX: 1D numpy
-                emissions, stride = generate_emissions(align_model, wav, batch_size=4)
+                emissions, stride = generate_emissions(
+                    align_model, wav, window_length=args.window, batch_size=4)
                 tok_star, txt_star = preprocess_text(
                     r["final_after_text"], romanize=True, language="ell",
                     split_size="word", star_frequency="edges")
@@ -942,6 +943,9 @@ def main() -> None:
                             "(e.g. boundary.part-0.jsonl); default boundary.jsonl")
     p_bnd.add_argument("--threads", type=int, default=0,
                        help="cap ONNX/torch threads per process (for sharding)")
+    p_bnd.add_argument("--window", type=int, default=30,
+                       help="forced-align window seconds; 20 is ~29%% faster and "
+                            "lossless for clips <=18s (backbone), default 30")
     p_fin = sub.add_parser("finalize")
     p_fin.add_argument("--allow-pending-boundary", action="store_true")
     args = ap.parse_args()
