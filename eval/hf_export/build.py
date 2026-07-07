@@ -277,17 +277,23 @@ def _filter_extra(rows: list[dict],
     return out, dict(drops)
 
 
-def load_leftover_corrections(exclude_uids: set, date_map: dict) -> list[dict]:
-    """NB2 audio-verified balanced leftover edits -> export-schema rows."""
-    if not (LEFTOVER_IDS.exists() and SELECTED_EDITS.exists()):
+def load_leftover_corrections(exclude_uids: set, date_map: dict, *,
+                              all_leftover: bool = False) -> list[dict]:
+    """NB2 leftover edits -> export-schema rows. Default: the audio-verified
+    balanced set (nb2audio_ids). all_leftover=True: every judged-keep leftover
+    edit (more signal, lower confidence — the alignment gate audio-grounds them)."""
+    if not SELECTED_EDITS.exists():
         log("leftover source missing -> 0 leftover rows")
         return []
-    ids = set(json.loads(LEFTOVER_IDS.read_text()))
+    ids = None if all_leftover else (
+        set(json.loads(LEFTOVER_IDS.read_text())) if LEFTOVER_IDS.exists() else set())
     rows, seen = [], set()
     for l in SELECTED_EDITS.open():
         d = json.loads(l)
         uid = d["utterance_id"]
-        if uid not in ids or uid in exclude_uids or uid in seen:
+        if uid in exclude_uids or uid in seen:
+            continue
+        if ids is not None and uid not in ids:
             continue
         seen.add(uid)
         rows.append({
@@ -448,7 +454,8 @@ def stage_rows(args) -> None:
 
     # 2) leftover corrections (NB2 audio-verified, not already included)
     leftover, ld = _filter_extra(
-        load_leftover_corrections(include_uids, date_map), excluded)
+        load_leftover_corrections(include_uids, date_map,
+                                  all_leftover=args.all_leftover), excluded)
     log(f"leftover corrections: {len(leftover)} (drops {ld})")
 
     # 3) no-edit backbone (trusted review-exposed meetings)
@@ -735,19 +742,19 @@ def stage_finalize(args) -> None:
     df["start_adj"] = [bnd.get(u, {}).get("start_adj") for u in df["utterance_id"]]
     df["end_adj"] = [bnd.get(u, {}).get("end_adj") for u in df["utterance_id"]]
 
-    # backbone alignment gate (Codex review): a no-edit row whose ASR text does
-    # not align to its audio is not a trustworthy positive ("alignment-passed
-    # no-edit ASR", a minimum-viability gate — NOT verified-correct). Drop it
-    # from the published set; the frozen sample is the gated set.
-    gate = (df["source"] == "no_edit") & (df["boundary_status"] == "align_failed")
+    # alignment gate: a row whose text does not force-align to its audio is an
+    # audio!=text pair — bad for training. Drop it (all sources: backbone AND
+    # corrections). The published sample is the gated set.
+    gate = df["boundary_status"] == "align_failed"
     n_gated = int(gate.sum())
     if n_gated:
-        df[gate][["utterance_id", "city_id", "meeting_id", "audio_url", "start",
-                  "end", "final_after_text"]].to_csv(
-            OUT / "backbone-dropped.csv", index=False)
+        df[gate][["utterance_id", "source", "city_id", "meeting_id", "audio_url",
+                  "start", "end", "final_after_text"]].to_csv(
+            OUT / "align-failed-dropped.csv", index=False)
+    n_bk = int((gate & (df["source"] == "no_edit")).sum())
     df = df[~gate].reset_index(drop=True)
-    log(f"backbone align-gate: dropped {n_gated} no_edit align_failed rows "
-        f"-> {len(df)} rows")
+    log(f"align-gate: dropped {n_gated} align_failed rows "
+        f"({n_bk} no_edit + {n_gated - n_bk} correction) -> {len(df)} rows")
     # re-check val share over the gated set (must stay in the agreed window)
     if not df.empty and (df["boundary_status"] != "pending").any():
         vh = df[df.split == "validation"].duration_s.sum() / 3600
@@ -968,14 +975,13 @@ embedded. A clip-embedded release may follow once licensing is confirmed.
 - `before_text` — raw ASR output; `text` — the human-corrected target.
 - `start`/`end` — raw utterance span in the meeting audio. **`start_adj`/
   `end_adj` — the recommended span to cut on**: the force-aligned words ± 0.2 s
-  padding, so no syllable is clipped. Provided for every row that aligned
-  (including the `suspect_*` ones); null only for `align_failed`.
+  padding, so no syllable is clipped. Present for **every** row (rows whose text
+  would not align to the audio are dropped from the release).
 - `boundary_status` — quality of the *raw* span: `ok`/`adjusted` (raw was fine)
   vs `suspect_cut_start`/`suspect_cut_end` (raw clipped a word — corrected in
-  `*_adj`), `suspect_bleed_in` (a neighbouring phrase is audible inside the raw
-  span; `*_adj` covers only the labelled words), `align_failed` (no reliable
-  alignment). ~16% of curated corrections had `suspect_cut_end` — the raw spans
-  systematically end a touch early — which `start_adj`/`end_adj` fix.
+  `*_adj`) and `suspect_bleed_in` (a neighbouring phrase is audible inside the
+  raw span; `*_adj` covers only the labelled words). Every row still aligned;
+  the `*_adj` span is safe to cut on regardless of status.
 - `has_overlap` — a reviewer marked overlapping speech (someone else audible)
   in this span. Boolean only; the overlapping speech is not transcribed.
 - `error_categories` — reviewer labels for the correction type.
@@ -1039,6 +1045,9 @@ def main() -> None:
     sub = ap.add_subparsers(dest="stage", required=True)
     p_rows = sub.add_parser("rows")
     p_rows.add_argument("--seed", type=int, default=DEFAULT_SEED)
+    p_rows.add_argument("--all-leftover", action="store_true",
+                        help="use every judged-keep leftover edit, not just the "
+                             "audio-verified nb2audio set (more correction signal)")
     p_bnd = sub.add_parser("boundary")
     p_bnd.add_argument("--limit-meetings", type=int, default=0)
     p_bnd.add_argument("--shard", type=str, default="",

@@ -34,13 +34,11 @@ def main() -> int:
     for df_ in (t, v):
         assert "reviewer_notes" not in df_.columns
         assert (df_.boundary_status != "pending").all(), "pending boundary in published set"
-        # no_edit rows are never align_failed (gated out)
-        assert df_[(df_.source == "no_edit") & (df_.boundary_status == "align_failed")].empty
-        # corrected spans present for every aligned row, null only for
-        # align_failed / pending
-        no_span = df_.boundary_status.isin(["align_failed", "pending"])
-        assert df_.loc[no_span, "start_adj"].isna().all()
-        assert df_.loc[~no_span, "start_adj"].notna().all()
+        # no row is align_failed (all sources gated out of the release)
+        assert df_[df_.boundary_status == "align_failed"].empty
+        assert (df_.boundary_status != "pending").all()
+        # corrected spans present for every published row
+        assert df_["start_adj"].notna().all()
 
     stats = json.load(open(ROOT / "data" / "hf-dataset" / "stats.json"))
     share = stats["by_split"]["validation"]["pct_hours"]
