@@ -996,8 +996,8 @@ def fetch_clip(row, out="clip.wav", sr=16000, pad=0.15):
     ok = lambda x: x is not None and not (isinstance(x, float) and math.isnan(x))
     start, end = (float(sa), float(ea)) if ok(sa) and ok(ea) else (float(row["start"]), float(row["end"]))
     s, dur = max(0.0, start - pad), (end - start) + 2 * pad
-    subprocess.run(["ffmpeg", "-nostdin", "-loglevel", "error", "-ss", f"{s:.3f}",
-                    "-i", row["audio_url"], "-t", f"{dur:.3f}", "-ar", str(sr),
+    subprocess.run(["ffmpeg", "-nostdin", "-loglevel", "error", "-ss", f"{{s:.3f}}",
+                    "-i", row["audio_url"], "-t", f"{{dur:.3f}}", "-ar", str(sr),
                     "-ac", "1", "-y", out], check=True)
     return out
 
