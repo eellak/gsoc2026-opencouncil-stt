@@ -53,7 +53,7 @@ by ONE frozen speaker-disjoint map (see Split):
 2. **NB2 audio-verified leftover** (`data/next-batch/final_audio/nb2audio_ids.json`
    → text/span from `selected_edits.jsonl`), excluding rows already in (1) —
    `correction`.
-3. **no-edit backbone** — trusted ASR from *review-exposed* meetings
+3. **no-edit backbone** — alignment-passed no-edit ASR from *review-exposed* meetings
    (`frac_user ≥ 0.15` or `humanReview`, minus denylist), no-edit utterances
    (`lastModifiedBy is null`) 1–15 s, text from meeting JSON, `before==text`,
    per-city capped to ~20k. `source="no_edit"`. Gate: an utterance whose text

@@ -55,13 +55,20 @@ def fetch_clip(audio_url: str, start: float, end: float,
     cmd = ["ffmpeg", "-nostdin", "-loglevel", "error",
            "-ss", f"{s:.3f}", "-i", audio_url, "-t", f"{dur:.3f}",
            "-ar", str(sr), "-ac", "1", "-y", target]
-    subprocess.run(cmd, check=True)
-    if out_path is not None:
-        return out_path
-    import soundfile as sf
-    data, got_sr = sf.read(target)
-    os.unlink(target)
-    return data, got_sr
+    try:
+        # finite timeout so a stalled remote fetch can't hang forever
+        subprocess.run(cmd, check=True, timeout=60)
+        if out_path is not None:
+            return out_path
+        import soundfile as sf
+        data, got_sr = sf.read(target)
+        return data, got_sr
+    finally:
+        if tmp_fd is not None and out_path is None:
+            try:
+                os.unlink(target)
+            except OSError:
+                pass
 
 
 def _main() -> None:
