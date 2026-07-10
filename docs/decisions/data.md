@@ -347,6 +347,9 @@ but ensure the *training mix* is **not** corrections-only — add **20–30% tru
 backbone** from fully-reviewed meetings only (never random untouched ASR), tracked separately.
 Corrections-only fine-tuning risks the over-editing trap. (The 2026-06-24 smoke run found the
 trap did not materialise, but that ran with a backbone included — keep one.)
+
+**Published composition + provenance (per-piece vetting, how NB2 was built, hand-picked
+vs pipeline-vetted):** [dataset-composition](../reference/dataset-composition.md).
 The *error-type* shape of that mix (which categories the fine-tune should own vs
 leave to the LLM) is being decided by the experiment in
 [specs/error-division.md](../specs/error-division.md).
