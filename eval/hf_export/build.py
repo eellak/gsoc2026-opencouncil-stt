@@ -755,16 +755,28 @@ def stage_finalize(args) -> None:
     df = df[~gate].reset_index(drop=True)
     log(f"align-gate: dropped {n_gated} align_failed rows "
         f"({n_bk} no_edit + {n_gated - n_bk} correction) -> {len(df)} rows")
-    # re-check val share over the gated set (must stay in the agreed window)
+    # re-split on the GATED set so the published val share is exact: the rows
+    # stage split over the pre-gate candidates, and dropping align_failed shifts
+    # the hours. Deterministic (same seed + gated set) -> still reproducible.
     if not df.empty and (df["boundary_status"] != "pending").any():
-        vh = df[df.split == "validation"].duration_s.sum() / 3600
-        th = df.duration_s.sum() / 3600
-        share = vh / th if th else 0.0
-        if not (0.18 <= share <= 0.22):
-            raise SystemExit(
-                f"val share {share:.1%} left the 18-22% window after the "
-                f"backbone gate — human decision (adjust caps/seed).")
-        log(f"val share after gate: {share:.1%}")
+        sa = json.loads(SPLIT_JSON.read_text()) if SPLIT_JSON.exists() else {}
+        seed = int(sa.get("seed", DEFAULT_SEED))
+        recs = df.to_dict("records")
+        for r in recs:                       # parquet null speaker_id -> NaN float
+            if pd.isna(r.get("speaker_id")):
+                r["speaker_id"] = None
+        try:
+            res = assign_splits(recs, seed=seed)
+        except SplitError as ex:
+            raise SystemExit(f"post-gate split outside 18-22% window: {ex}")
+        df["split"] = res.splits
+        if sa:
+            sa["val_speakers"] = sorted(res.val_speakers)
+            sa["val_share_hours"] = round(res.val_share, 4)
+            sa["post_gate_rows"] = int(len(df))
+            SPLIT_JSON.write_text(json.dumps(sa, ensure_ascii=False, indent=2))
+        log(f"re-split on gated set: val {res.val_share:.1%}, "
+            f"{len(res.val_speakers)} val speakers")
 
     # audit CSV: everything not ok/adjusted, for sampled human review
     audit = df[~df["boundary_status"].isin(["ok", "adjusted"])]
