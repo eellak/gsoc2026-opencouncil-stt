@@ -40,21 +40,21 @@ be pushed. The command below targets `public/` explicitly, so they stay local.
 **3. Upload to the org** (start **private**, flip to public later):
 
 ```bash
-.venv-eval/bin/hf upload <ORG>/oc-greek-asr data/hf-dataset/public . \
+.venv-eval/bin/hf upload <ORG>/opencouncil-greek-asr data/hf-dataset/public . \
   --repo-type=dataset --private
 ```
 
 - `<ORG>` = the org's HF namespace. Find it at huggingface.co → your avatar →
   *Organizations* (it's the name in the URL, e.g. `huggingface.co/<ORG>`).
 - Argument order is `REPO_ID  LOCAL_FOLDER  PATH_IN_REPO`:
-  - `<ORG>/oc-greek-asr`: the repo id (namespace/name **only**),
+  - `<ORG>/opencouncil-greek-asr`: the repo id (namespace/name **only**),
   - `data/hf-dataset/public`: the folder to upload,
   - `.`: put it at the repo root.
 - The repo is created automatically on first upload.
 - `--private` = visible only to org members. Drop it (or use `--no-private`) to
   make it public.
 
-**4. Check it** → `https://huggingface.co/datasets/<ORG>/oc-greek-asr`
+**4. Check it** → `https://huggingface.co/datasets/<ORG>/opencouncil-greek-asr`
 The card + dataset viewer should render.
 
 ## Updating it later (same command)
@@ -69,7 +69,7 @@ revision.
 When license (confirm with Schema Labs) + the human-gate reports are cleared:
 
 ```bash
-.venv-eval/bin/hf repo settings <ORG>/oc-greek-asr --repo-type=dataset --no-private
+.venv-eval/bin/hf repo settings <ORG>/opencouncil-greek-asr --repo-type=dataset --no-private
 # or flip it in the repo's Settings page on huggingface.co
 ```
 
