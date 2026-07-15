@@ -3,6 +3,13 @@
 How to upload `data/hf-dataset/public/` to the team's Hugging Face **organization**
 (or a personal account). Anyone with **write** access to the org can run this.
 
+> **Staging (2026-07-15):** the current build is already uploaded **private** at
+> <https://huggingface.co/datasets/haroldpoi/opencouncil-greek-asr> (round-trip
+> verified: 28,967 train / 7,879 validation rows). The local `haroldpoi` token
+> has no org membership, so the org publish below still needs org write access.
+> Once granted, run step 3 against the org repo id, then delete or keep the
+> staging copy.
+
 ## What gets uploaded
 
 **Only** `data/hf-dataset/public/`:

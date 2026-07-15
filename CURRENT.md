@@ -71,13 +71,15 @@ Update this diagram when the main project flow changes.
 - [ ] Add seeds + meeting-clustered CIs to the eval.
 - [ ] Keep review throughput moving toward the ~6k dataset target.
 - [~] Publish the reproducible HF dataset (`eval/hf_export/`, spec
-  [hf-dataset-export](docs/specs/hf-dataset-export.md)). Now the **combined
-  sample**: 5,095 review includes + ~4.8k NB2 audio-verified leftover +
-  ~20k trusted no-edit backbone = **29,893 rows**, one frozen speaker-disjoint
-  80/20 split (**val 20.1% of hours**), source-tagged. Pending before push:
-  finish the combined boundary pass (running), eyeball the human-gate reports,
-  confirm license with OpenCouncil, then the **manual** `huggingface-cli upload`
-  of `data/hf-dataset/public/` only.
+  [hf-dataset-export](docs/specs/hf-dataset-export.md)). Combined sample after
+  the full-leftover re-split: **36,846 rows / 28.6 h** (review includes + NB2
+  judged-keep leftover + no-edit backbone, all align-gated), one frozen
+  speaker-disjoint split (**val 21.3% of hours**), source-tagged. **Staged
+  private on HF as `haroldpoi/opencouncil-greek-asr`** (2026-07-15, round-trip
+  verified; publish-gate checks green). Pending before the org publish: eyeball
+  the human-gate reports, confirm license with OpenCouncil, get org write
+  access, then re-run the upload per
+  [runbooks/hf-upload.md](docs/runbooks/hf-upload.md).
 
 See:
 
