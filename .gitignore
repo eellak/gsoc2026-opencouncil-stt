@@ -103,3 +103,4 @@ docs/reports/img/CHART-PROMPTS.md
 # next-batch selection: keep code+summaries+final list; ignore big binaries & calib audio
 data/next-batch/*.parquet
 data/next-batch/calib/
+.venv-smoke/

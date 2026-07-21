@@ -1020,7 +1020,7 @@ def fetch_clip(row, out="clip.wav", sr=16000, pad=0.15):
     return out
 
 # from datasets import load_dataset
-# ds = load_dataset("<namespace>/opencouncil-greek-asr", split="train")
+# ds = load_dataset("opencouncil/transcription-corrections", split="train")
 # fetch_clip(ds[0])   # -> clip.wav, only that segment downloaded
 ```
 

@@ -3,12 +3,12 @@
 How to upload `data/hf-dataset/public/` to the team's Hugging Face **organization**
 (or a personal account). Anyone with **write** access to the org can run this.
 
-> **Staging (2026-07-15):** the current build is already uploaded **private** at
-> <https://huggingface.co/datasets/haroldpoi/opencouncil-greek-asr> (round-trip
-> verified: 28,967 train / 7,879 validation rows). The local `haroldpoi` token
-> has no org membership, so the org publish below still needs org write access.
-> Once granted, run step 3 against the org repo id, then delete or keep the
-> staging copy.
+> **Status (2026-07-16):** published **private** to the org at
+> <https://huggingface.co/datasets/opencouncil/transcription-corrections>
+> (28,967 train / 7,879 validation rows). Uploaded with the `angelospk` account
+> (write member of the `opencouncil` org). The earlier `haroldpoi` staging copy
+> has been deleted. Re-run step 3 to push dataset updates; keep it private until
+> the human-gate reports are cleared.
 
 ## What gets uploaded
 
@@ -47,21 +47,21 @@ be pushed. The command below targets `public/` explicitly, so they stay local.
 **3. Upload to the org** (start **private**, flip to public later):
 
 ```bash
-.venv-eval/bin/hf upload <ORG>/opencouncil-greek-asr data/hf-dataset/public . \
+.venv-eval/bin/hf upload opencouncil/transcription-corrections data/hf-dataset/public . \
   --repo-type=dataset --private
 ```
 
-- `<ORG>` = the org's HF namespace. Find it at huggingface.co → your avatar →
-  *Organizations* (it's the name in the URL, e.g. `huggingface.co/<ORG>`).
+- `opencouncil` is the org's HF namespace; `transcription-corrections` is the
+  dataset name. (For a personal test, swap in your own namespace.)
 - Argument order is `REPO_ID  LOCAL_FOLDER  PATH_IN_REPO`:
-  - `<ORG>/opencouncil-greek-asr`: the repo id (namespace/name **only**),
+  - `opencouncil/transcription-corrections`: the repo id (namespace/name **only**),
   - `data/hf-dataset/public`: the folder to upload,
   - `.`: put it at the repo root.
 - The repo is created automatically on first upload.
 - `--private` = visible only to org members. Drop it (or use `--no-private`) to
   make it public.
 
-**4. Check it** → `https://huggingface.co/datasets/<ORG>/opencouncil-greek-asr`
+**4. Check it** → `https://huggingface.co/datasets/opencouncil/transcription-corrections`
 The card + dataset viewer should render.
 
 ## Updating it later (same command)
@@ -73,10 +73,12 @@ revision.
 
 ## Making it public
 
-When license (confirm with Schema Labs) + the human-gate reports are cleared:
+The release is metadata-only (audio is never redistributed; users fetch each
+clip from data.opencouncil.gr), so it needs no separate audio license or
+sign-off. When the human-gate reports are cleared:
 
 ```bash
-.venv-eval/bin/hf repo settings <ORG>/opencouncil-greek-asr --repo-type=dataset --no-private
+.venv-eval/bin/hf repo settings opencouncil/transcription-corrections --repo-type=dataset --no-private
 # or flip it in the repo's Settings page on huggingface.co
 ```
 
