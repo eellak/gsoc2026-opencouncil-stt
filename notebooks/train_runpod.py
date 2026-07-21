@@ -240,16 +240,24 @@ def main():
         generation_max_length=225, eval_strategy="epoch", save_strategy="epoch",
         logging_steps=20, report_to=[], remove_unused_columns=False,
         label_names=["labels"], load_best_model_at_end=True, metric_for_best_model="wer",
-        greater_is_better=False, seed=SEED, per_device_eval_batch_size=EVAL_BS)
+        greater_is_better=False, seed=SEED, per_device_eval_batch_size=EVAL_BS,
+        save_total_limit=2)
     trainer = Seq2SeqTrainer(model=model, args=args, train_dataset=ds_train,
                              eval_dataset=ds_valc, data_collator=collator,
                              compute_metrics=metrics, processing_class=processor)
 
-    # --- baseline -> train -> after ---
-    log(f"BASELINE val_corr: {trainer.evaluate(ds_valc)}")
-    if ds_valr:
-        log(f"BASELINE val_reg: {trainer.evaluate(ds_valr)}")
-    trainer.train()
+    # --- baseline -> train (resume if a checkpoint exists) -> after ---
+    import glob
+    ckpts = sorted(glob.glob(os.path.join(OUT_DIR, "checkpoint-*")),
+                   key=lambda p: int(p.rsplit("-", 1)[-1]) if p.rsplit("-", 1)[-1].isdigit() else 0)
+    resume = bool(ckpts)
+    if resume:
+        log(f"RESUMING from {ckpts[-1]}")
+    else:
+        log(f"BASELINE val_corr: {trainer.evaluate(ds_valc)}")
+        if ds_valr:
+            log(f"BASELINE val_reg: {trainer.evaluate(ds_valr)}")
+    trainer.train(resume_from_checkpoint=resume)
     log(f"AFTER val_corr: {trainer.evaluate(ds_valc)}")
     if ds_valr:
         log(f"AFTER val_reg (regression check): {trainer.evaluate(ds_valr)}")
