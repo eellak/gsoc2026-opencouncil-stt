@@ -128,19 +128,24 @@ def main():
                              _sig_str, librosa, sf, log)
 
     # --- HF datasets + Whisper preprocessing ---
-    from datasets import Dataset, Audio
+    # NB: decode the wav clips OURSELVES with soundfile rather than datasets'
+    # Audio() feature — recent `datasets` routes Audio decoding through torchcodec
+    # ("please install 'torchcodec'"), a fragile extra dep. Our clips are already
+    # cut to 16 kHz mono wav on disk, so a plain soundfile.read is enough.
+    import soundfile as sf
+    from datasets import Dataset
     from transformers import WhisperProcessor
     processor = WhisperProcessor.from_pretrained(MODEL_ID, language=LANGUAGE, task=TASK)
 
     def to_ds(recs):
         if not recs:
             return None
-        d = Dataset.from_list(recs).cast_column("audio", Audio(sampling_rate=SR))
+        d = Dataset.from_list(recs)
 
         def prep(b):
-            a = b["audio"]
+            arr, sr = sf.read(b["audio"], dtype="float32")
             b["input_features"] = processor.feature_extractor(
-                a["array"], sampling_rate=a["sampling_rate"]).input_features[0]
+                arr, sampling_rate=sr).input_features[0]
             b["labels"] = processor.tokenizer(b["text"]).input_ids
             return b
         return d.map(prep, remove_columns=["audio", "text"])
