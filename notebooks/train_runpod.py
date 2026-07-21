@@ -242,15 +242,21 @@ def main():
                                              lora_dropout=LORA_DROPOUT,
                                              target_modules=["q_proj", "v_proj"]))
     model.print_trainable_parameters()
+    # Checkpoint by STEPS (not just per epoch) so an interrupted run resumes with
+    # fine granularity — epochs here are ~10h, so per-epoch save would risk losing
+    # ~10h on a reclaim. eval stays per-epoch (generate eval is expensive).
+    # load_best_model_at_end needs save==eval strategy, so it's off (2 epochs; the
+    # final model is fine, and per-epoch WER is still logged).
+    SAVE_STEPS = int(os.environ.get("SAVE_STEPS", "400"))
     args = Seq2SeqTrainingArguments(
         output_dir=OUT_DIR, per_device_train_batch_size=TRAIN_BS,
         gradient_accumulation_steps=GRAD_ACC, learning_rate=LR, warmup_ratio=0.1,
         num_train_epochs=EPOCHS, fp16=True, predict_with_generate=True,
-        generation_max_length=225, eval_strategy="epoch", save_strategy="epoch",
+        generation_max_length=225, eval_strategy="epoch",
+        save_strategy="steps", save_steps=SAVE_STEPS, save_total_limit=3,
         logging_steps=20, report_to=[], remove_unused_columns=False,
-        label_names=["labels"], load_best_model_at_end=True, metric_for_best_model="wer",
-        greater_is_better=False, seed=SEED, per_device_eval_batch_size=EVAL_BS,
-        save_total_limit=2)
+        label_names=["labels"], load_best_model_at_end=False,
+        seed=SEED, per_device_eval_batch_size=EVAL_BS)
     trainer = Seq2SeqTrainer(model=model, args=args, train_dataset=ds_train,
                              eval_dataset=ds_valc, data_collator=collator,
                              compute_metrics=metrics, processing_class=processor)
