@@ -4,6 +4,90 @@ CSV ingest, content categorisation, stable IDs, task version, dataset split.
 
 ## Accepted
 
+### 2026-07-17 - HF publication on legal hold (DPO); PII removal is harm-reduction, not a green light
+
+**Status: do NOT publish the dataset publicly.** OpenCouncil's DPO (Δικηγορική
+εταιρεία, E. Papanikolaou) reviewed the planned HF release and advised against it
+at this stage. The private staged repo (`opencouncil/transcription-corrections`)
+stays private.
+
+**The DPO's reasoning (paraphrased):** releasing council content to train
+algorithms is a *new processing act* with a different purpose from the original
+recording/transcription. For it to be lawful, OpenCouncil (as its own controller)
+needs a valid legal basis + the ΓΚΠΔ obligations (inform data subjects, possible
+DPIA, handle special categories). The only alternative that takes it out of ΓΚΠΔ
+scope is **genuine anonymisation** where re-identification is not reasonably
+possible — which is *difficult to impossible here* because of the **audio** and
+the likely **public availability of the meeting videos**. Anonymisation would
+need all of: (a) no identifying feature in the audio (names, roles, forms of
+address), (b) voice alteration, (c) references removed from the text — and even
+then only if no other source can re-identify. Separately, the **current municipal
+contracts don't cover this use**.
+
+**Key engineering fact for us:** text-level PII removal does **not** anonymise
+this dataset, because every row points to `audio_url` (+`start`/`end`) at
+data.opencouncil.gr — the audio still says the name/voice. Scrubbing text while
+linking the audio is not anonymisation. So the mentor's "at least strip
+non-elected names" is a **harm-reduction floor**, not the thing that unblocks
+publication. The blocker is legal (legal basis + updated contracts), not a script.
+
+**Options discussed for the audio side (none reach "anonymised"):**
+- (a) *mute the flagged utterance's audio* — converges with dropping it if we ship
+  clips; muting a sub-span inside a kept clip is unreliable and desyncs the ASR
+  target. Low value.
+- (b) *ship cut clips instead of `{url, start, end}`* — the only option that breaks
+  the pointer to the full public video and lets us control what audio ships, **but**
+  it turns OpenCouncil into a direct re-publisher of voice (heavier processing +
+  licensing, the opposite of the metadata-only stance) and the voice still enables
+  re-identification unless `city_id/meeting_id/speaker_id/meeting_date` are also
+  stripped (which kills speaker-disjoint splits / per-city eval).
+- (c) *ignore audio, metadata-only as-is* — cheapest, but leaves the strongest
+  re-identification vector untouched; only acceptable for an **internal** dataset.
+
+**Open items requiring the DPO, not us:**
+- Are elected officials' names OK to keep? Under ΓΚΠΔ their names are still personal
+  data; keeping them is a *legal-basis* bet (public officials / public proceedings),
+  not anonymisation — needs DPO sign-off, and the contract gap applies.
+- **Third parties have already scraped our public `/api/export` and posted data on
+  HF, possibly incl. personal data — is there OpenCouncil liability?** Genuine legal
+  question for the DPO. Shape: we are the controller for what our public API
+  exposes; a re-poster becomes a separate controller but that doesn't extinguish
+  our responsibility for the original exposure. This is arguably *bigger and more
+  urgent* than the HF release — it suggests reviewing what the public API returns.
+
+**Tooling built (harm-reduction, for internal use / any future negotiated release):**
+`eval/pii_scan.py` — local NER (GLiNER) + per-(city, meeting) roster/speaker
+allowlist (fuzzy, Greek-inflection tolerant) + context-gated structured-PII regex.
+Flags utterances mentioning a person **not** in the meeting roster (candidate
+private third party) or leaking structured PII, and can drop them (text+audio
+together). Recall ~85–95% on uncased Greek ASR → the flagged report is for **human
+review**, not blind trust; special-category PII (health/criminal) is not covered by
+this pass (needs an LLM stage). Outputs under `data/pii/` (report.md, flagged.csv,
+optional `public-pii-gated/`). Does not touch the published artifacts.
+
+**Two-stage pipeline + results (2026-07-21).** The scan is a high-recall candidate
+generator; an LLM adjudication (`eval/pii_adjudicate.py`, Sonnet) turns it into a
+precise drop-list and covers the special-category gap. Both Codex-reviewed; the
+adjudicator's keep/drop is derived **deterministically in code** (keep only if
+proven safe — drop on any private name, special category, structured PII,
+unclassified name, or malformed/uncertain LLM response), so an injected or garbled
+verdict cannot keep a private exposure. Full per-meeting rosters were fetched for
+311/367 meetings (`eval/pii_fetch_rosters.py`) to cut false positives.
+
+- **Scan (v3):** 4,703 / 36,846 utterances flagged as candidates (12.8%).
+- **Adjudication:** 4,703 → **681 drop** (14.5% of candidates) / 4,022 keep, i.e.
+  **681 = 1.85% of the dataset** confirmed as private-third-party / special-category
+  exposures. Breakdown: 644 private individuals, 20 special-category (health 12,
+  criminal 3, political 3, ethnic 1, religious 1), 3 real structured PII
+  (mobile/id/iban), 23 unclassified/conservative.
+- The raw scan rate overstated ~7×: most candidates were public officials, national
+  figures, place/saint names, or NER false positives (incl. a license-plate regex
+  that matched "του 2025"/dates — removed). This is why the LLM stage is necessary.
+- Artifacts: `data/pii/adjudicated-drop.csv` (for human review),
+  `data/hf-dataset/public-pii-adjudicated/` (gated 36,846 → 36,165). Still
+  harm-reduction on text only — does **not** anonymise the audio; publication stays
+  on the legal hold above.
+
 ### 2026-07-03 - Published HF dataset: split recipe + overlap flag convention
 
 Implements [hf-dataset-export](../specs/hf-dataset-export.md) (`eval/hf_export/`),

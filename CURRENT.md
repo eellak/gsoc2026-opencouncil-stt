@@ -70,16 +70,26 @@ Update this diagram when the main project flow changes.
 - [ ] Enlarge the held-out val set (currently too small to rank configs).
 - [ ] Add seeds + meeting-clustered CIs to the eval.
 - [ ] Keep review throughput moving toward the ~6k dataset target.
-- [~] Publish the reproducible HF dataset (`eval/hf_export/`, spec
-  [hf-dataset-export](docs/specs/hf-dataset-export.md)). Combined sample after
-  the full-leftover re-split: **36,846 rows / 28.6 h** (review includes + NB2
-  judged-keep leftover + no-edit backbone, all align-gated), one frozen
-  speaker-disjoint split (**val 21.3% of hours**), source-tagged. **Staged
-  private on HF as `haroldpoi/opencouncil-greek-asr`** (2026-07-15, round-trip
-  verified; publish-gate checks green). Pending before the org publish: eyeball
-  the human-gate reports, confirm license with OpenCouncil, get org write
-  access, then re-run the upload per
-  [runbooks/hf-upload.md](docs/runbooks/hf-upload.md).
+- [?] **HF publication is on legal hold (DPO advised against it, 2026-07-17).**
+  See [decisions/data.md](docs/decisions/data.md#2026-07-17---hf-publication-on-legal-hold-dpo-pii-removal-is-harm-reduction-not-a-green-light).
+  The dataset stays **private** (`opencouncil/transcription-corrections`). The
+  blocker is legal (legal basis + updated municipal contracts), not technical:
+  text-level PII removal does not anonymise the set because each row links the
+  audio, which still carries the name/voice. A harm-reduction PII pipeline was
+  built (`eval/pii_scan.py` NER candidate scan → `eval/pii_adjudicate.py` LLM
+  adjudication, Codex-reviewed, deterministic keep/drop gate): **681 utterances
+  (1.85%) flagged as private-third-party / special-category exposures** (644
+  private individuals + 20 special-category), gated set at
+  `data/hf-dataset/public-pii-adjudicated/` (36,846 → 36,165). But this does
+  **not** unblock publication — the audio is still linked. Open for the DPO:
+  whether elected names may stay, and OpenCouncil's liability for third parties
+  who already scraped the public API onto HF.
+- [~] Reproducible HF export pipeline (`eval/hf_export/`, spec
+  [hf-dataset-export](docs/specs/hf-dataset-export.md)) is built and run: combined
+  sample **36,846 rows / 28.6 h** (review includes + NB2 judged-keep leftover +
+  no-edit backbone, all align-gated), one frozen speaker-disjoint split (**val
+  21.3% of hours**), source-tagged; round-trip + publish-gate green. Kept for a
+  future *negotiated* release only — held behind the legal hold above.
 
 See:
 
