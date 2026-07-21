@@ -103,14 +103,21 @@ def main():
     def ok_span(s, e):
         d = (e or 0) - (s or 0); return MIN_DUR <= d <= MAX_DUR
 
-    # --- build clips + manifest with cache guard (kernel restart doesn't re-decode) ---
+    # --- build clips + manifest with cache guard (restart doesn't re-decode) ---
     CLIPS = WORK / "clips"; CLIPS.mkdir(parents=True, exist_ok=True)
     MAN_PATH = WORK / "manifest.json"
-    _sig = {"ver": 2, "sr": SR, "val_cities": sorted(VAL_CITIES),
-            "smoke_train": SMOKE_TRAIN_MEETINGS, "smoke_val": SMOKE_VAL_MEETINGS,
-            "sample_n": SAMPLE_N, "val_reg_per_mtg": VAL_REG_PER_MEETING,
-            "n_included": len(rows)}
-    _sig_str = json.dumps(_sig, sort_keys=True, ensure_ascii=False)
+    # DATA_DIR set -> train on the pre-built COMBINED parquet manifest (28.6h:
+    # corrections + no-edit backbone), the curated set. Else self-fetch corrections.
+    DATA_DIR = os.environ.get("DATA_DIR")
+    if DATA_DIR:
+        _sig_str = json.dumps({"ver": 3, "sr": SR, "data_dir": DATA_DIR, "smoke": SMOKE},
+                              sort_keys=True)
+    else:
+        _sig_str = json.dumps({"ver": 2, "sr": SR, "val_cities": sorted(VAL_CITIES),
+                               "smoke_train": SMOKE_TRAIN_MEETINGS,
+                               "smoke_val": SMOKE_VAL_MEETINGS, "sample_n": SAMPLE_N,
+                               "val_reg_per_mtg": VAL_REG_PER_MEETING,
+                               "n_included": len(rows)}, sort_keys=True, ensure_ascii=False)
 
     man = None
     if MAN_PATH.exists():
@@ -124,8 +131,12 @@ def main():
             log("cache mismatch -> rebuilding")
 
     if man is None:
-        man = build_manifest(rows, fetch_meeting, dl, cut, ok_span, CLIPS, MAN_PATH,
-                             _sig_str, librosa, sf, log)
+        if DATA_DIR:
+            man = build_from_parquet(pathlib.Path(DATA_DIR), dl, ok_span, CLIPS,
+                                     MAN_PATH, _sig_str, librosa, sf, log)
+        else:
+            man = build_manifest(rows, fetch_meeting, dl, cut, ok_span, CLIPS, MAN_PATH,
+                                 _sig_str, librosa, sf, log)
 
     # --- HF datasets + Whisper preprocessing ---
     # NB: decode the wav clips OURSELVES with soundfile rather than datasets'
@@ -328,6 +339,71 @@ def build_manifest(rows, fetch_meeting, dl, cut, ok_span, CLIPS, MAN_PATH,
     man = {"train": build(train_src, "train"),
            "valc": build(val_src, "valc"),
            "valr": build(reg_src, "valr")}
+    save = dict(man); save["_sig"] = sig_str
+    json.dump(save, open(MAN_PATH, "w"), ensure_ascii=False)
+    return man
+
+
+def build_from_parquet(data_dir, dl, ok_span, CLIPS, MAN_PATH, sig_str, librosa, sf, log):
+    """Build clips from the pre-built COMBINED manifest (data/hf-dataset/public).
+
+    Cuts on the boundary-corrected span (start_adj/end_adj) when present, else
+    raw start/end. val split: correction rows -> valc, no_edit rows -> valr.
+    Downloads each meeting's mp3 once (cached), cuts all its clips, frees it."""
+    import numpy as np
+    import pandas as pd
+    tr = pd.read_parquet(data_dir / "train.parquet")
+    va = pd.read_parquet(data_dir / "validation.parquet")
+
+    def cap(df):
+        if not SMOKE:
+            return df
+        mids = sorted({(c, m) for c, m in zip(df.city_id, df.meeting_id)})
+        random.shuffle(mids); keep = set(mids[:4])
+        return df[[(c, m) in keep for c, m in zip(df.city_id, df.meeting_id)]]
+
+    def span(r):
+        sa, ea = r.get("start_adj"), r.get("end_adj")
+        good = lambda x: x is not None and not (isinstance(x, float) and np.isnan(x))
+        return (float(sa), float(ea)) if good(sa) and good(ea) else (float(r["start"]), float(r["end"]))
+
+    def build(df, tag):
+        recs = df.to_dict("records")
+        by_mtg = collections.defaultdict(list)
+        for r in recs:
+            by_mtg[(r["city_id"], r["meeting_id"], r["audio_url"])].append(r)
+        out, n_mtg = [], 0
+        for (city, mtg, au), items in sorted(by_mtg.items()):
+            n_mtg += 1
+            try:
+                y = librosa.load(dl(au), sr=SR, mono=True)[0]
+            except Exception as e:
+                log(f"audio fail {city}/{mtg}: {str(e)[:60]}"); continue
+            d = CLIPS / tag / city / mtg; d.mkdir(parents=True, exist_ok=True)
+            for r in items:
+                s, e = span(r)
+                if not ok_span(s, e):
+                    continue
+                a = max(0, int((s - PAD_S) * SR)); b = min(len(y), int((e + PAD_S) * SR))
+                clip = y[a:b]
+                if len(clip) < int(MIN_DUR * SR):
+                    continue
+                p = d / f"{r['utterance_id']}.wav"
+                sf.write(str(p), clip, SR)
+                out.append({"audio": str(p), "text": r["text"]})
+            del y; gc.collect()
+            if n_mtg % 20 == 0:
+                log(f"  {tag}: {n_mtg}/{len(by_mtg)} meetings, {len(out)} clips")
+        log(f"built {tag}: {len(out)} clips from {len(by_mtg)} meetings")
+        return out
+
+    tr, va = cap(tr), cap(va)
+    log(f"parquet manifest: train={len(tr)} val={len(va)} "
+        f"(valc={int((va['source'] == 'correction').sum())} "
+        f"valr={int((va['source'] == 'no_edit').sum())})")
+    man = {"train": build(tr, "train"),
+           "valc": build(va[va["source"] == "correction"], "valc"),
+           "valr": build(va[va["source"] == "no_edit"], "valr")}
     save = dict(man); save["_sig"] = sig_str
     json.dump(save, open(MAN_PATH, "w"), ensure_ascii=False)
     return man
