@@ -110,7 +110,11 @@ def main():
     # corrections + no-edit backbone), the curated set. Else self-fetch corrections.
     DATA_DIR = os.environ.get("DATA_DIR")
     if DATA_DIR:
-        _sig_str = json.dumps({"ver": 3, "sr": SR, "data_dir": DATA_DIR, "smoke": SMOKE},
+        _pq = {f: (pathlib.Path(DATA_DIR) / f).stat().st_size
+               for f in ("train.parquet", "validation.parquet")
+               if (pathlib.Path(DATA_DIR) / f).exists()}
+        _sig_str = json.dumps({"ver": 3, "sr": SR, "data_dir": DATA_DIR, "smoke": SMOKE,
+                               "pad": PAD_S, "dur": [MIN_DUR, MAX_DUR], "parquet": _pq},
                               sort_keys=True)
     else:
         _sig_str = json.dumps({"ver": 2, "sr": SR, "val_cities": sorted(VAL_CITIES),
@@ -163,6 +167,11 @@ def main():
 
     ds_train, ds_valc, ds_valr = to_ds(man["train"]), to_ds(man["valc"]), to_ds(man["valr"])
     gc.collect()
+    # fail-fast: never start a long run on an empty/None train or val set (Codex)
+    if ds_train is None or ds_train.num_rows == 0:
+        sys.exit("[train FATAL] no training clips built — check manifest/audio")
+    if ds_valc is None or ds_valc.num_rows == 0:
+        sys.exit("[train FATAL] no val_corr clips built — check manifest/audio")
     log(f"datasets: train={ds_train.num_rows} valc={ds_valc.num_rows} "
         f"valr={ds_valr.num_rows if ds_valr else 0}")
 
@@ -250,9 +259,9 @@ def main():
     import glob
     ckpts = sorted(glob.glob(os.path.join(OUT_DIR, "checkpoint-*")),
                    key=lambda p: int(p.rsplit("-", 1)[-1]) if p.rsplit("-", 1)[-1].isdigit() else 0)
-    resume = bool(ckpts)
+    resume = ckpts[-1] if ckpts else None   # explicit path, not bool (Codex)
     if resume:
-        log(f"RESUMING from {ckpts[-1]}")
+        log(f"RESUMING from {resume}")
     else:
         log(f"BASELINE val_corr: {trainer.evaluate(ds_valc)}")
         if ds_valr:
@@ -383,8 +392,11 @@ def build_from_parquet(data_dir, dl, ok_span, CLIPS, MAN_PATH, sig_str, librosa,
         out, n_mtg = [], 0
         for (city, mtg, au), items in sorted(by_mtg.items()):
             n_mtg += 1
+            if not au or (isinstance(au, float) and np.isnan(au)):
+                log(f"skip {city}/{mtg}: null audio_url"); continue
             try:
-                y = librosa.load(dl(au), sr=SR, mono=True)[0]
+                mp3 = dl(au)
+                y = librosa.load(mp3, sr=SR, mono=True)[0]
             except Exception as e:
                 log(f"audio fail {city}/{mtg}: {str(e)[:60]}"); continue
             d = CLIPS / tag / city / mtg; d.mkdir(parents=True, exist_ok=True)
@@ -400,6 +412,12 @@ def build_from_parquet(data_dir, dl, ok_span, CLIPS, MAN_PATH, sig_str, librosa,
                 sf.write(str(p), clip, SR)
                 out.append({"audio": str(p), "text": r["text"]})
             del y; gc.collect()
+            # free the meeting mp3 (each meeting processed once; keeps disk bounded
+            # on an 80GB pod vs caching all ~367 full-meeting mp3s ~37GB) (Codex)
+            try:
+                os.remove(mp3)
+            except OSError:
+                pass
             if n_mtg % 20 == 0:
                 log(f"  {tag}: {n_mtg}/{len(by_mtg)} meetings, {len(out)} clips")
         log(f"built {tag}: {len(out)} clips from {len(by_mtg)} meetings")
