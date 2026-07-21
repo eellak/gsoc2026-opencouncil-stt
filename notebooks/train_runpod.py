@@ -2,7 +2,7 @@
 """Whisper-large-v3 LoRA fine-tune for RunPod (GPU), headless.
 
 Ported from notebooks/whisper_finetune_kaggle.ipynb. Same recipe (large-v3 fp16,
-LoRA r16 on q/v, frozen encoder, val_corr + val_reg), self-contained (fetches the
+LoRA r32/alpha64 on q/v, frozen encoder, val_corr + val_reg), self-contained (fetches the
 export + downloads meeting audio itself — no local dataset needed).
 
 IMPORTANT: this trains on ALL curated included utterances. The PII removal work is
@@ -13,7 +13,7 @@ Config via env:
   SMOKE=1  (default)  GPU ACCEPTANCE run: 4 train + 2 val meetings, 1 epoch — just
                       proves the real GPU path (model load, fp16 LoRA, train, eval,
                       save) works and fits VRAM. ~15-30 min.
-  SMOKE=0             FULL run: all included meetings, 4 epochs (~30-40h).
+  SMOKE=0             FULL run: all included meetings, 2 epochs (sweep pick).
   WORK_DIR   (default /workspace/whisper-run)  outputs + clip/manifest cache
   MODEL_ID   (default openai/whisper-large-v3)
 
@@ -34,9 +34,9 @@ SMOKE_TRAIN_MEETINGS = 4 if SMOKE else None
 SMOKE_VAL_MEETINGS = 2 if SMOKE else None
 VAL_REG_PER_MEETING = 8
 SR = 16000; PAD_S = 0.2; MIN_DUR, MAX_DUR = 0.3, 30.0; SEED = 13
-LORA_R, LORA_ALPHA, LORA_DROPOUT = 16, 32, 0.05
+LORA_R, LORA_ALPHA, LORA_DROPOUT = 32, 64, 0.05  # sweep pick
 LR, TRAIN_BS, GRAD_ACC, EVAL_BS = 1e-4, 2, 4, 4
-EPOCHS = 1 if SMOKE else 4
+EPOCHS = 1 if SMOKE else 2  # sweep: epoch 4 overfit
 WORK = pathlib.Path(os.environ.get("WORK_DIR", "/workspace/whisper-run"))
 OUT_DIR = str(WORK / "adapter")
 os.makedirs(OUT_DIR, exist_ok=True)
