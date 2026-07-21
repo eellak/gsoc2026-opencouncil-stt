@@ -70,6 +70,12 @@ Update this diagram when the main project flow changes.
 - [ ] Enlarge the held-out val set (currently too small to rank configs).
 - [ ] Add seeds + meeting-clustered CIs to the eval.
 - [ ] Keep review throughput moving toward the ~6k dataset target.
+- [x] **Repo cleaned for GDPR (2026-07-21 DLE meeting):** PII-bearing data
+  (ASR manifests / train / val / exports with utterance text) removed from the
+  public GitHub repo **and its history** (filter-repo purge + force-push), branches
+  consolidated to a single `main` (+ `gh-pages` publish site). Blog post published
+  without the dataset. Only scripts + aggregate reports remain public. See
+  [meeting 2026-07-21](docs/meetings/2026-07-21.md).
 - [?] **HF publication is on legal hold (DPO advised against it, 2026-07-17).**
   See [decisions/data.md](docs/decisions/data.md#2026-07-17---hf-publication-on-legal-hold-dpo-pii-removal-is-harm-reduction-not-a-green-light).
   The dataset stays **private** (`opencouncil/transcription-corrections`). The
