@@ -152,7 +152,17 @@ def main():
     from transformers import WhisperProcessor
     processor = WhisperProcessor.from_pretrained(MODEL_ID, language=LANGUAGE, task=TASK)
 
-    def to_ds(recs):
+    # Feature cache MUST land on the pod's disk, not RAM: large-v3 features are
+    # 128x3000 float32 (~1.5 MB each). Building all ~29k train features in memory
+    # blows past the container's cgroup RAM cap (~54 GB, NOT the 220 GB `free`
+    # reports) and the kernel OOM-kills the process silently around 79% of the map
+    # (no traceback) — that was the repeated "freeze". Force keep_in_memory=False
+    # with an explicit on-disk cache_file_name and a small writer buffer so the
+    # arrow is streamed to disk (75 GB free) instead of accumulating in RAM.
+    feat_cache = WORK / "featcache"
+    feat_cache.mkdir(parents=True, exist_ok=True)
+
+    def to_ds(recs, name):
         if not recs:
             return None
         d = Dataset.from_list(recs)
@@ -163,9 +173,13 @@ def main():
                 arr, sampling_rate=sr).input_features[0]
             b["labels"] = processor.tokenizer(b["text"]).input_ids
             return b
-        return d.map(prep, remove_columns=["audio", "text"])
+        return d.map(prep, remove_columns=["audio", "text"],
+                     keep_in_memory=False, writer_batch_size=200,
+                     cache_file_name=str(feat_cache / f"{name}.arrow"))
 
-    ds_train, ds_valc, ds_valr = to_ds(man["train"]), to_ds(man["valc"]), to_ds(man["valr"])
+    ds_train, ds_valc, ds_valr = (to_ds(man["train"], "train"),
+                                  to_ds(man["valc"], "valc"),
+                                  to_ds(man["valr"], "valr"))
     gc.collect()
     # fail-fast: never start a long run on an empty/None train or val set (Codex)
     if ds_train is None or ds_train.num_rows == 0:
