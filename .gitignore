@@ -104,3 +104,4 @@ docs/reports/img/CHART-PROMPTS.md
 data/next-batch/*.parquet
 data/next-batch/calib/
 .venv-smoke/
+.agents/
