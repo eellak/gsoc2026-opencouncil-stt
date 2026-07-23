@@ -1,0 +1,9 @@
+# cloudflared config for the containerized tunnel: routes to the `asr` service
+# on the compose network (not localhost). The creds json is mounted from
+# ~/.cloudflared into /etc/cloudflared.
+tunnel: oc-asr
+credentials-file: /etc/cloudflared/c9525c0c-b302-4b9f-8d22-e13962b9355c.json
+ingress:
+  - hostname: asr.haroldpoi.dev
+    service: http://asr:8000
+  - service: http_status:404

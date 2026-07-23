@@ -1,0 +1,5 @@
+faster-whisper>=1.2,<2
+ctranslate2>=4.8,<5
+fastapi>=0.139,<1
+uvicorn[standard]>=0.30
+python-multipart>=0.0.9

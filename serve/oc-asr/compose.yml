@@ -1,0 +1,32 @@
+# Container stack: the ASR server + the Cloudflare tunnel, both auto-restarting.
+# `restart: unless-stopped` + the Docker daemon starting on boot = the endpoint
+# comes back up on its own after a reboot or crash.
+#
+#   docker compose up -d --build
+#
+# Prereqs on the host: ./ct2 model built (build_model.sh), asr.env with
+# OC_ASR_API_KEY, and ~/.cloudflared/ holding the tunnel creds json.
+services:
+  asr:
+    build: .
+    env_file: ./asr.env
+    volumes:
+      - ./ct2:/models/ct2:ro
+    expose:
+      - "8000"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --config /etc/cloudflared/config.yml run oc-asr
+    volumes:
+      - ${HOME}/.cloudflared:/etc/cloudflared:ro
+      - ./config.docker.yml:/etc/cloudflared/config.yml:ro
+    depends_on:
+      - asr
+    restart: unless-stopped
