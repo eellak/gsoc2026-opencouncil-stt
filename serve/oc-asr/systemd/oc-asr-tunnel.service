@@ -1,0 +1,14 @@
+[Unit]
+Description=Cloudflare tunnel for OpenCouncil ASR
+After=network-online.target oc-asr.service
+Wants=network-online.target
+Requires=oc-asr.service
+
+[Service]
+Type=simple
+ExecStart=/home/harold/.local/bin/cloudflared tunnel --config /home/harold/.cloudflared/config.yml run oc-asr
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target

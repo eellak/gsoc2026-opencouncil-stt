@@ -1,0 +1,7 @@
+# never commit secrets or model weights
+api_key.txt
+asr.env
+ct2/
+merged/
+__pycache__/
+*.pyc

@@ -1,0 +1,15 @@
+[Unit]
+Description=OpenCouncil self-hosted ASR (faster-whisper)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/harold/oc-asr-serve
+EnvironmentFile=/home/harold/oc-asr-serve/asr.env
+ExecStart=/home/harold/opencouncil-fine-tuning/.venv-eval/bin/python -m uvicorn oc_asr_server:app --app-dir /home/harold/oc-asr-serve --host 127.0.0.1 --port 8000
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target
