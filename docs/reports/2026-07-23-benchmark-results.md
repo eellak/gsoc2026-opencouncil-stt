@@ -87,15 +87,46 @@ clips, where even the faster CPU path runs past Cloudflare's 100s window before 
 finishes. That is a limitation of serving on CPU behind a tunnel, not a model
 problem, and it is the reason for the next step.
 
+## Corrected re-run on the larger 260-clip sample (GPU, all clips finished)
+
+The 65-clip numbers above come from a small sample (only 10 held-out clips) and a
+short provider list. We re-ran the bigger 260-clip June benchmark
+(`2026-06-10-oc-benchmark`, 10 cities, more providers) on a RunPod GPU so our model
+could actually finish every clip. It did: **260/260, 0 errors**, where the mini-PC
+had been stuck at 58/260 behind Cloudflare. This is the more reliable measurement.
+
+Held-out subset (argos + orestiada, n=40 clips, word-weighted wer-nofillers):
+
+| Provider | wer-nofillers | CER |
+|---|---|---|
+| Soniox | 0.142 | 0.094 |
+| Scribe v2 (clean read) | 0.143 | 0.101 |
+| **OC fine-tune (ours)** | **0.173** | 0.118 |
+| base whisper-large-v3 | 0.178 | 0.115 |
+| Gladia | 0.185 | 0.123 |
+| gpt-4o-transcribe | 0.196 | 0.136 |
+| greek-whisper-v3-turbo | 0.530 | 0.491 |
+
+On unseen cities our fine-tune beats the base `whisper-large-v3` it was trained from
+(0.173 vs 0.178), Gladia (0.185), and gpt-4o (0.196), but loses clearly to Soniox
+(0.142) and the clean-read Scribe v2 (0.143). This is a more sober picture than the
+65-clip read suggested. Two honest takeaways:
+
+- The generalizable gain over base whisper is small (~3% relative on full-window
+  WER). Training measured a ~32% relative drop on the corrected-utterance set, but
+  corrections are a minority of words in a 2.5-minute window, so they wash out in an
+  aggregate score. The fine-tune helps where it was trained to help, not everywhere.
+- It does not clear the ~25%-over-Gladia migration bar, and the strongest providers
+  here (Soniox, Scribe v2) are ahead of it.
+
 ## Next step
 
-The mini-PC endpoint proved the model works and is competitive, but CPU-behind-a-
-tunnel is not a good fit for the benchmark's longer clips or for a fair re-run. The
-plan is to serve the same model on a GPU (RunPod) with the same request shape, so
-long clips finish well inside any timeout, then re-run the reference benchmark
-cleanly.
+Two directions, both tracked:
 
-Separately, the sample itself needs fixing: a benchmark that is 78% training
-meetings cannot measure progress. The right sample is recent-only, meetings from
-after the training cutoff (2026-05-19), drawn from all cities. That is a request to
-the OpenCouncil side and is tracked for later.
+- The sample still needs fixing: even the 260-clip set is mostly meetings from cities
+  that were in training (only argos + orestiada are held out). A recent-only sample
+  (meetings after the 2026-05-19 cutoff, all cities) is the honest way to measure
+  progress. That is a request to the OpenCouncil side.
+- The headroom is council-specific errors (names, place names, acronyms), not general
+  transcription quality. Beating Soniox/Scribe means data and context work, not more
+  hyperparameter tuning.
