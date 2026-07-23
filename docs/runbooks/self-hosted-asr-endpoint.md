@@ -77,3 +77,48 @@ alternative are in [serve/oc-asr/README.md](../../serve/oc-asr/README.md).
 
 CPU only, so this is for async/batch transcription, not real-time: a ~9s clip
 takes about 6s. A GPU host would be much faster if throughput ever matters.
+
+## Serving on RunPod (GPU)
+
+The mini-PC is fine for one-off clips but too slow behind Cloudflare for long
+benchmark clips (multi-minute clips hit the ~100s edge timeout and return 502/524).
+Two GPU options on RunPod, both serving the same model.
+
+### Serverless endpoint (pay-per-use, scale-to-zero)
+
+A live RunPod Serverless endpoint runs the same model and bills only for the seconds
+a GPU spends transcribing, nothing while idle. Source and build (GitHub Actions ->
+`ghcr.io`) are in [github.com/angelospk/oc-asr-serverless](https://github.com/angelospk/oc-asr-serverless).
+
+- Endpoint ID: `o1jda6sxo85dnk`, 24GB Ampere pool, workers min 0 / max 1.
+- Auth is the RunPod account key (`~/.runpod/config.toml`), not the mini-PC key.
+- Compute type is `float16`; `int8_float16` throws `CUBLAS_STATUS_NOT_SUPPORTED` on
+  the serverless CUDA image.
+
+```bash
+RUNPOD_API_KEY=$(grep apikey ~/.runpod/config.toml | sed "s/.*'\(.*\)'.*/\1/")
+curl -X POST https://api.runpod.ai/v2/o1jda6sxo85dnk/runsync \
+  -H "Authorization: Bearer $RUNPOD_API_KEY" -H "Content-Type: application/json" \
+  -d '{"input":{"audioUrl":"https://data.opencouncil.gr/audio/<segment>.mp3","language":"el"}}'
+```
+
+The response `output` is the same `Transcript` object. Cold start adds ~20-40s to
+wake a worker from zero; warm workers respond immediately.
+
+**This serverless endpoint cannot be a benchmark provider as-is.** The benchmark
+(`bench.opencouncil.gr`) only reaches a model through an `openai-compatible`,
+`hf-endpoint`, or `huggingface` provider. RunPod Serverless speaks its own
+`POST /v2/<id>/run(sync)` API with the input wrapped in `{"input": {...}}` and the
+RunPod account key, and replies with a `{"status", "output", ...}` envelope instead
+of the OpenAI transcription shape. So the benchmark cannot call it directly. Use the
+temporary pod below for benchmark runs, or put a small `openai-compatible` shim in
+front of the serverless endpoint.
+
+### Temporary GPU pod (for benchmark re-runs)
+
+For a benchmark run, spin up a RunPod GPU pod (not serverless) running this same
+`oc_asr_server.py` with `OC_ASR_DEVICE=cuda`. It exposes the `openai-compatible`
+`/v1/audio/transcriptions` route the benchmark expects, so it registers as a normal
+provider. A full 260-clip run is roughly 1.5h of pod time (~$0.35 on a community
+RTX 3090). The pod bills continuously while it exists, so terminate it right after
+the run (`runpodctl remove pod <id>`).
