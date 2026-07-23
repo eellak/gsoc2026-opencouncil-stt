@@ -36,6 +36,10 @@ API_KEY = os.environ.get("OC_ASR_API_KEY", "")
 COMPUTE = os.environ.get("OC_ASR_COMPUTE", "int8")
 LANGUAGE = os.environ.get("OC_ASR_LANGUAGE", "el")
 MAX_BYTES = int(os.environ.get("OC_ASR_MAX_BYTES", str(500 * 1024 * 1024)))
+# Use all CPU cores by default: CTranslate2's default doesn't saturate them, and
+# a slow transcription can blow past Cloudflare's ~100s edge timeout (HTTP 524).
+CPU_THREADS = int(os.environ.get("OC_ASR_CPU_THREADS", str(os.cpu_count() or 8)))
+BEAM = int(os.environ.get("OC_ASR_BEAM", "5"))
 CHUNK = 1 << 20
 
 _ALLOWED_SCHEMES = {"http", "https"}
@@ -55,7 +59,8 @@ def _get_model():
         with _model_lock:
             if _model is None:
                 from faster_whisper import WhisperModel
-                _model = WhisperModel(MODEL_DIR, device="cpu", compute_type=COMPUTE)
+                _model = WhisperModel(MODEL_DIR, device="cpu", compute_type=COMPUTE,
+                                      cpu_threads=CPU_THREADS)
     return _model
 
 
@@ -131,7 +136,7 @@ def _download(url: str) -> Path:
     return Path(tmp)
 
 
-def _transcribe_file(path: str, language: str) -> dict:
+def _transcribe_file(path: str, language: str, word_timestamps: bool = True) -> dict:
     model = _get_model()
     t0 = time.time()
     utterances = []
@@ -140,7 +145,7 @@ def _transcribe_file(path: str, language: str) -> dict:
     # demand, so the model is in use until iteration finishes.
     with _infer_lock:
         segments, info = model.transcribe(path, language=language,
-                                          word_timestamps=True, beam_size=5)
+                                          word_timestamps=word_timestamps, beam_size=BEAM)
         for seg in segments:
             words = []
             for w in (seg.words or []):
@@ -222,10 +227,10 @@ def health():
             "model_loaded": _model is not None}
 
 
-async def _run(src: str, language: str | None) -> dict:
+async def _run(src: str, language: str | None, word_timestamps: bool = True) -> dict:
     # Whisper transcription is CPU-bound and synchronous; run it off the event
     # loop so /health and other requests stay responsive.
-    return await run_in_threadpool(_transcribe_file, src, language or LANGUAGE)
+    return await run_in_threadpool(_transcribe_file, src, language or LANGUAGE, word_timestamps)
 
 
 @app.post("/transcribe")
@@ -285,7 +290,10 @@ async def openai_transcriptions(file: UploadFile = File(...),
     `openai-compatible` provider (POST {baseURL}/audio/transcriptions)."""
     tmp = await _spool_upload(file)
     try:
-        result = await _run(str(tmp), language)
+        # This route only returns text, so skip word timestamps: the alignment
+        # pass roughly doubles CPU time and would push long clips past
+        # Cloudflare's ~100s edge timeout.
+        result = await _run(str(tmp), language, word_timestamps=False)
         return {"text": result["transcription"]["full_transcript"]}
     finally:
         tmp.unlink(missing_ok=True)
