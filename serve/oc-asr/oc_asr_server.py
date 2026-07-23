@@ -40,6 +40,9 @@ MAX_BYTES = int(os.environ.get("OC_ASR_MAX_BYTES", str(500 * 1024 * 1024)))
 # a slow transcription can blow past Cloudflare's ~100s edge timeout (HTTP 524).
 CPU_THREADS = int(os.environ.get("OC_ASR_CPU_THREADS", str(os.cpu_count() or 8)))
 BEAM = int(os.environ.get("OC_ASR_BEAM", "5"))
+# Hard wall-clock cap per transcription: if decoding ever runs away (e.g. a
+# repetition loop), stop consuming segments instead of pegging the CPU forever.
+MAX_INFER_SEC = float(os.environ.get("OC_ASR_MAX_INFER_SEC", "150"))
 CHUNK = 1 << 20
 
 _ALLOWED_SCHEMES = {"http", "https"}
@@ -144,9 +147,17 @@ def _transcribe_file(path: str, language: str, word_timestamps: bool = True) -> 
     # Hold the lock across the whole lazy generator: segments are produced on
     # demand, so the model is in use until iteration finishes.
     with _infer_lock:
+        # condition_on_previous_text=False is the key guard against runaway
+        # repetition loops (greedy/low-beam decoding can otherwise loop forever
+        # on some audio, pegging the CPU and blocking every other request).
         segments, info = model.transcribe(path, language=language,
-                                          word_timestamps=word_timestamps, beam_size=BEAM)
+                                          word_timestamps=word_timestamps, beam_size=BEAM,
+                                          condition_on_previous_text=False)
         for seg in segments:
+            if time.time() - t0 > MAX_INFER_SEC:
+                # Runaway guard: return what we have rather than hang the server.
+                full.append("[truncated: transcription exceeded time limit]")
+                break
             words = []
             for w in (seg.words or []):
                 words.append({
