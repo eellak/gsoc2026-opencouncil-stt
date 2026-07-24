@@ -107,26 +107,53 @@ Held-out subset (argos + orestiada, n=40 clips, word-weighted wer-nofillers):
 | gpt-4o-transcribe | 0.196 | 0.136 |
 | greek-whisper-v3-turbo | 0.530 | 0.491 |
 
-On unseen cities our fine-tune beats the base `whisper-large-v3` it was trained from
-(0.173 vs 0.178), Gladia (0.185), and gpt-4o (0.196), but loses clearly to Soniox
-(0.142) and the clean-read Scribe v2 (0.143). This is a more sober picture than the
-65-clip read suggested. Two honest takeaways:
+On unseen cities our fine-tune appears to beat the base `whisper-large-v3` here
+(0.173 vs 0.178), Gladia (0.185), and gpt-4o (0.196), but loses to Soniox (0.142)
+and Scribe v2 (0.143). **This apparent win over base whisper turned out to be an
+artifact.** The benchmark's base-whisper provider runs through the HF serverless
+pipeline, which decodes badly (hallucinations, garbled names). The controlled test
+below removes that confound, and the win disappears.
 
-- The generalizable gain over base whisper is small (~3% relative on full-window
-  WER). Training measured a ~32% relative drop on the corrected-utterance set, but
-  corrections are a minority of words in a 2.5-minute window, so they wash out in an
-  aggregate score. The fine-tune helps where it was trained to help, not everywhere.
-- It does not clear the ~25%-over-Gladia migration bar, and the strongest providers
-  here (Soniox, Scribe v2) are ahead of it.
+## Controlled same-stack A/B (the decisive test)
 
-## Next step
+The comparisons above all had a confound: our model ran on our own faster-whisper
+stack, while base whisper ran on a different, worse-served stack. To isolate the
+adapter, we ran base whisper and our fine-tune through the **identical**
+faster-whisper stack (same decoding, same normalization) on held-out
+argos/orestiada audio, locally.
 
-Two directions, both tracked:
+On general entity-containing utterances (n=34) the two are a tie: base 0.163 WER /
+86.4% entity recall, ours 0.164 / 87.2%. `int8` and full-precision `float32` of our
+model score the same, so quantization is not the issue.
 
-- The sample still needs fixing: even the 260-clip set is mostly meetings from cities
-  that were in training (only argos + orestiada are held out). A recent-only sample
-  (meetings after the 2026-05-19 cutoff, all cities) is the honest way to measure
-  progress. That is a request to the OpenCouncil side.
-- The headroom is council-specific errors (names, place names, acronyms), not general
-  transcription quality. Beating Soniox/Scribe means data and context work, not more
-  hyperparameter tuning.
+The decisive run is on the **actually-corrected** held-out utterances (n=50), the
+exact cases the fine-tune was trained to fix, scored against the human reference:
+
+| model (same stack) | WER vs human reference |
+|---|---|
+| base whisper-large-v3 | 0.158 |
+| **our fine-tune** | **0.176** (worse) |
+
+Per-utterance, our model is better on 6, worse on 20, tied on 24. On the utterances
+it was built to improve, served fairly, **the fine-tune is slightly worse than the
+base model, not better.** Looking at cases, it drops leading words and drifts on
+spelling and names (reference `Λιόλιος` becomes `Λιόλειος`).
+
+This does not reproduce the ~32% training-time gain. That number was measured against
+a baseline that was not the same fairly-served model, so it overstated the effect.
+The honest conclusion: **this adapter does not beat base whisper under a controlled
+comparison, and regresses on its target utterances. Do not migrate to it.**
+
+## Next steps
+
+- **Fix evaluation first.** Every future model comparison must be a controlled
+  same-stack, same-normalization A/B. The gains we chased were measurement artifacts.
+- **Rethink the approach.** The current recipe (LoRA r32 on q/v only, 2 epochs, frozen
+  encoder, trained on isolated cut utterances) introduces onset and name-spelling
+  regressions that cancel any gain. Options worth testing before another fine-tune:
+  training on context windows (not isolated utterances) to kill the onset drop; higher
+  LoRA rank or unfreezing the encoder; or dropping fine-tuning in favour of
+  inference-time contextual biasing with the per-meeting roster and glossary, which
+  targets names directly without touching general transcription.
+- The recent-only benchmark sample (meetings after the 2026-05-19 cutoff, all cities)
+  is still worth requesting, but it is secondary to fixing the eval and the approach.
