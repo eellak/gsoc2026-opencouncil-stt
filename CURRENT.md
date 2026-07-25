@@ -1,6 +1,6 @@
 # Current State
 
-Last updated: 2026-07-01
+Last updated: 2026-07-25
 
 This is the human and LLM entry point. Read this first, then follow links only as needed.
 
@@ -11,22 +11,25 @@ UI is built and in use — it is now a *tool* that produces the curated dataset,
 the end goal. The current work is training whisper-large-v3 with LoRA on that
 dataset and measuring it on held-out cities.
 
-The first real GPU fine-tune (2026-06-24) beat the zero-shot baseline on both
-corrected and ordinary speech, so the direction is validated. The immediate job is
-to make that result trustworthy (fix decoding bugs, enlarge the val set, add seeds
-and confidence intervals) and to confirm the sweep's hyperparameter pick on
-large-v3.
+**Correction (2026-07-25):** the earlier "the fine-tune beats baseline" conclusion
+did not survive a controlled test. Under a same-stack, same-normalization A/B, the
+LoRA fine-tune does **not** beat base whisper, and slightly **regresses** on the
+utterances it was trained to fix. The earlier gains were evaluation artifacts
+(baselines served worse than our model). `int8` was ruled out as a cause. Full
+postmortem and next directions:
+[docs/handoff/2026-07-25-finetune-eval-postmortem.md](docs/handoff/2026-07-25-finetune-eval-postmortem.md).
 
 ## Goal Right Now
 
-Produce a defensible fine-tuning result on held-out cities:
+The fine-tune is not the deliverable it looked like. Two things, in order:
 
-- fix the two decoding bugs from the first run (`clean_up_tokenization_spaces=False`,
-  distinct pad token / attention_mask);
-- enlarge the held-out val set so gains can be ranked with confidence;
-- confirm the sweep's pick (`lr 1e-4, rank 32, 2 epochs`) on large-v3, not just the
-  turbo proxy;
-- report WER (+ CER) with seeds and meeting-clustered CIs.
+- **Build a trustworthy controlled eval harness** (same stack, same normalization,
+  held-out general + actually-corrected subsets, WER/CER/entity-recall, per-utterance
+  head-to-head). Starter scripts: `eval/controlled_eval/`. Every future claim goes
+  through this.
+- **Try inference-time contextual biasing** (per-meeting roster + glossary via
+  faster-whisper `initial_prompt`/`hotwords`) as an alternative to retraining. It
+  targets names directly without the onset/spelling regressions the fine-tune added.
 
 Metric decision: **WER (+CER) is the standard**; HIR is likely dropped after mentor
 pushback — see [decisions/metric-hir.md](docs/decisions/metric-hir.md).
