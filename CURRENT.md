@@ -57,6 +57,11 @@ Update this diagram when the main project flow changes.
 
 ## Current Status (key numbers)
 
+> **Superseded (2026-07-25):** the fine-tune "beat baseline" numbers below were
+> measured against unfairly-served baselines. A controlled same-stack A/B shows no
+> gain (regression on corrected utterances). Treat the deltas below as historical.
+> See [handoff postmortem](docs/handoff/2026-07-25-finetune-eval-postmortem.md).
+
 - **Review throughput:** ~5,016 reviewed / ~2,179 included. Target ~6k by mid-July.
 - **Baseline (zero-shot whisper-large-v3):** provider benchmark WER 15.0%; on
   held-out cities val_corr WER 33.4, val_reg WER 27.1.
