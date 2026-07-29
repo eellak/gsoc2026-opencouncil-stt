@@ -3,6 +3,15 @@
 Audience: the next agent (or person) picking up the Greek council ASR work. This is a
 self-contained brief. Read it before touching the model or the benchmark.
 
+> **⚠ PARTIALLY CORRECTED (2026-07-29).** The claim below that the *training-time* "-32%"
+> was measured against an unfairly-served baseline is **wrong**. The code shows the training
+> baseline used the same trainer, clips, decode path and normalization
+> (`notebooks/train_runpod.py:286-292`) — it was fair within its own harness. The
+> unfair-baseline story holds only for the **benchmark** comparison. The real candidate
+> causes (checkpoint selected on the val set; `val_reg` scored against another ASR's output;
+> greedy-HF vs beam faster-whisper decoding) are analysed in
+> [2026-07-29-where-we-are-stuck.md](2026-07-29-where-we-are-stuck.md). Read that first.
+
 ## TL;DR
 
 The fine-tuned `whisper-large-v3` council LoRA **does not beat base whisper** under a
