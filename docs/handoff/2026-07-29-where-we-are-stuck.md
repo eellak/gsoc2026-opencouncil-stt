@@ -230,7 +230,7 @@ the only test that can justify migration.
 
 Two more sober facts:
 
-- **Scribe (the current production ASR) is still the best overall** on long utterances
+- ~~**Scribe is still the best overall**~~ **RETRACTED 2026-07-29**: the reference was made by editing Scribe, so its WER is the size of the human edit, not ASR quality. Not a fair competitor. See the report.
   (15.59 vs ours 16.43) and only slightly behind on short. Whisper+LoRA is not clearly
   better than what OpenCouncil already runs.
 - **The gain only appears under faster-whisper**, not under HF greedy (28.18 vs 28.25 —
