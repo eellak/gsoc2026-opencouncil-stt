@@ -183,3 +183,64 @@ the highest-value move. Questions worth reasoning about:
   GPU pods bill continuously ($0.22/hr); terminate immediately after use.
 - `rtk` is referenced in CLAUDE.md but is **not installed** on this machine; use git directly.
 - Small-n results (n=34/50/59) are datapoints, not verdicts. Report CIs.
+
+---
+
+## RESULT (2026-07-29, same day): the contradiction is explained
+
+The experiment ran on **n=300** held-out corrected utterances. Normalized WER (`gnorm`),
+reference = human `final_after_text`:
+
+| config | all (n=300) | long only, 4-30s & >=6 words (n=84) | short/short-text (n=216) |
+|---|---|---|---|
+| scribe_before (production ASR) | 22.39 | **15.59** | 30.40 |
+| base, faster-whisper beam=2 | 27.08 | 16.99 | 38.96 |
+| **ours, faster-whisper beam=2** | **22.66** | 16.43 | **29.98** |
+| base, HF greedy | 28.25 | 17.20 | 41.27 |
+| ours, HF greedy | 28.18 | 18.18 | 39.95 |
+
+Bootstrap (2000 resamples) on the ours−base delta, faster-whisper beam=2:
+
+| subset | delta | 95% CI |
+|---|---|---|
+| all (n=300) | **−4.35 pp** | [−6.86, −2.28] |
+| long only (n=84) | −0.41 pp | [−3.44, +1.73] |
+| short (n=216) | **−8.98 pp** | [−12.80, −5.46] |
+
+### What this means
+
+1. **The n=50 "regression" was a sampling artifact.** That run filtered to `4-30s AND
+   >=6 words`. On exactly that filter here, ours ≈ base (−0.41 pp, CI straddles zero) —
+   the old +0.018 was noise. The filter **systematically excluded the utterances where the
+   fine-tune helps.**
+2. **The fine-tune's gain is concentrated in SHORT utterances** (−8.98 pp, CI far from
+   zero). Base whisper degrades badly on short isolated clips (38.96); the fine-tune, trained
+   on exactly such clips, does not (29.98).
+3. **Therefore "do not migrate" was based on a subset that hid the effect.** That conclusion,
+   and the postmortem built on it, must be revisited.
+
+### But do NOT declare victory — the load-bearing caveat
+
+The gain appears on **isolated short clips**, which is exactly the condition the model was
+trained on and exactly how this eval cuts audio. Production transcribes **continuous meeting
+audio**, where "short utterance" is not a thing the decoder sees in isolation. **This gain may
+be an artifact of the eval setup mirroring the training setup** (candidate cause (d) above).
+Nothing here measures full-meeting performance. That is the next thing to test, and it is
+the only test that can justify migration.
+
+Two more sober facts:
+
+- **Scribe (the current production ASR) is still the best overall** on long utterances
+  (15.59 vs ours 16.43) and only slightly behind on short. Whisper+LoRA is not clearly
+  better than what OpenCouncil already runs.
+- **The gain only appears under faster-whisper**, not under HF greedy (28.18 vs 28.25 —
+  a tie). Unexplained, and worth understanding before trusting the number.
+
+### Ruled out
+
+- `clean_up_tokenization_spaces` — True and False produced **identical** WER. Not a factor.
+- Hypothesis (c) as originally stated is **wrong**: the fine-tune did not learn to compensate
+  for weak greedy decoding. The opposite — its advantage shows up under beam search and
+  disappears under greedy.
+
+Raw data: `eval/diagnose/results.json`, script `eval/diagnose/decompose_training_gap.py`.
