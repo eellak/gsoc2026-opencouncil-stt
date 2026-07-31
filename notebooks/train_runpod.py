@@ -22,6 +22,7 @@ Deps (install on the pod first):
   apt-get install -y ffmpeg
 """
 import os, sys, json, time, random, hashlib, pathlib, gc, collections
+from dataclasses import dataclass
 
 EXPORT_URL = os.environ.get("EXPORT_URL", "https://79-76-114-184.sslip.io/api/export")
 MEETING_API = "https://opencouncil.gr/api/cities/{city}/meetings/{meeting}"
@@ -39,14 +40,81 @@ LR, TRAIN_BS, GRAD_ACC, EVAL_BS = 1e-4, 2, 4, 4
 EPOCHS = 1 if SMOKE else 2  # sweep: epoch 4 overfit
 WORK = pathlib.Path(os.environ.get("WORK_DIR", "/workspace/whisper-run"))
 OUT_DIR = str(WORK / "adapter")
-os.makedirs(OUT_DIR, exist_ok=True)
-random.seed(SEED)
+
+# Label semantics fingerprint. Checkpoints written before the decoder-start-token
+# fix (see Collator) trained on a DIFFERENT target sequence, so resuming from one
+# would silently reintroduce the bug. Bumped whenever label construction changes.
+LABEL_SEMANTICS = "decoder_start_v2"
+# Written INTO each checkpoint, not just into OUT_DIR: a directory-level marker
+# authenticates the directory, not the checkpoint, so a pre-fix run (or a SMOKE
+# run) writing into the same WORK_DIR could leave a checkpoint that inherits a
+# valid-looking marker. A checkpoint with no fingerprint is non-resumable by
+# design — a crash between saving and stamping must fail closed. (Codex review.)
+FINGERPRINT_FILE = "run_fingerprint.json"
+RUN_FINGERPRINT = json.dumps({"label_semantics": LABEL_SEMANTICS, "smoke": SMOKE,
+                              "model": MODEL_ID, "epochs": EPOCHS,
+                              "lora": [LORA_R, LORA_ALPHA, LORA_DROPOUT]},
+                             sort_keys=True)
 
 
 def log(m): print(f"[train {time.strftime('%H:%M:%S')}] {m}", flush=True)
 
 
+@dataclass
+class Collator:
+    """Pad a batch of features and build Whisper decoder labels.
+
+    THE PREFIX STRIP. `tokenizer(text).input_ids` starts with
+    `<|startoftranscript|>` (50258) = `model.config.decoder_start_token_id`.
+    Whisper's `shift_tokens_right` prepends that same id to build
+    `decoder_input_ids`, so the label sequence must NOT keep its own copy.
+
+    Until 2026-07-31 this compared against `tokenizer.bos_token_id`, which for
+    Whisper is `<|endoftext|>` (50257), NOT 50258. The condition was therefore
+    always False, the strip never ran, and every run trained on
+
+        decoder_input_ids: <|sot|> <|sot|> <|el|> <|transcribe|> <|notimestamps|> t1 ...
+
+    i.e. the model learned to emit `<|startoftranscript|>` as its first token and
+    every content token was trained one learned-position later than at inference.
+    Compare against `decoder_start_token_id` explicitly, like HF's official
+    Whisper collator does. Do not "simplify" this back to bos_token_id.
+    """
+    processor: object
+    decoder_start_token_id: int
+
+    def __call__(self, feats):
+        import torch
+        # Check the RAW sequences, before padding. Checking labels[:, 0] after
+        # padding would crash on a legitimately left-padded batch, where short
+        # rows start with a pad token even though every raw sequence is fine.
+        bad = [i for i, f in enumerate(feats)
+               if not len(f["labels"]) or f["labels"][0] != self.decoder_start_token_id]
+        if bad:
+            raise ValueError(
+                f"label prefix invariant broken: {len(bad)}/{len(feats)} sequences do not "
+                f"start with decoder_start_token_id={self.decoder_start_token_id}; "
+                f"first ids={[f['labels'][:1] for f in feats][:8]}")
+        # ...and the strip itself only makes sense on right-padded tensors.
+        side = getattr(self.processor.tokenizer, "padding_side", "right")
+        if side != "right":
+            raise ValueError(f"collator assumes right padding, tokenizer uses {side!r}: "
+                             "labels[:, 1:] would drop a pad token, not the prefix")
+        batch = self.processor.feature_extractor.pad(
+            [{"input_features": f["input_features"]} for f in feats], return_tensors="pt")
+        batch["input_features"] = batch["input_features"].to(torch.float16)
+        lab = self.processor.tokenizer.pad(
+            [{"input_ids": f["labels"]} for f in feats], return_tensors="pt")
+        labels = lab["input_ids"].masked_fill(lab.attention_mask.ne(1), -100)
+        batch["labels"] = labels[:, 1:]
+        return batch
+
+
 def main():
+    # Side effects live in main() so importing this file (eval/tests/) neither
+    # creates directories nor reseeds the caller's global RNG.
+    os.makedirs(OUT_DIR, exist_ok=True)
+    random.seed(SEED)
     import numpy as np
     np.random.seed(SEED)
     import torch
@@ -191,25 +259,8 @@ def main():
 
     # --- collator + metrics ---
     import unicodedata, re
-    from dataclasses import dataclass
-
-    @dataclass
-    class Collator:
-        processor: object
-
-        def __call__(self, feats):
-            batch = self.processor.feature_extractor.pad(
-                [{"input_features": f["input_features"]} for f in feats], return_tensors="pt")
-            batch["input_features"] = batch["input_features"].to(torch.float16)
-            lab = self.processor.tokenizer.pad(
-                [{"input_ids": f["labels"]} for f in feats], return_tensors="pt")
-            labels = lab["input_ids"].masked_fill(lab.attention_mask.ne(1), -100)
-            if (labels[:, 0] == self.processor.tokenizer.bos_token_id).all().cpu().item():
-                labels = labels[:, 1:]
-            batch["labels"] = labels
-            return batch
-
-    collator = Collator(processor)
+    # Collator lives at module level so eval/tests/ can import and test the real
+    # thing rather than a reimplementation of it.
     import evaluate
     wer_m, cer_m = evaluate.load("wer"), evaluate.load("cer")
     _PUNCT = re.compile(r"[^\w\s]", re.UNICODE)
@@ -242,20 +293,41 @@ def main():
                 "cer": 100 * cer_m.compute(predictions=[x.strip() for x in P],
                                            references=[x.strip() for x in R])}
 
-    # --- model + LoRA (freeze encoder) ---
-    from transformers import (WhisperForConditionalGeneration,
+    # --- model + LoRA ---
+    from transformers import (WhisperForConditionalGeneration, TrainerCallback,
                               Seq2SeqTrainingArguments, Seq2SeqTrainer)
     from peft import LoraConfig, get_peft_model
     model = WhisperForConditionalGeneration.from_pretrained(MODEL_ID, torch_dtype=torch.float16)
-    model.config.forced_decoder_ids = processor.get_decoder_prompt_ids(language=LANGUAGE, task=TASK)
-    model.config.suppress_tokens = []
+    # Decoding is configured on generation_config ONLY. Current transformers reads
+    # generation from model.generation_config and ignores legacy model.config
+    # generation fields, so the old `model.config.suppress_tokens = []` never
+    # actually disabled the base suppression list — it just looked like it did.
+    # Keep the base list; if we ever want it off, that is a decoding ablation with
+    # its own measurement, not a silent default. (Codex review 2026-07-31.)
     model.generation_config.language, model.generation_config.task = LANGUAGE, TASK
+    model.generation_config.forced_decoder_ids = None   # ignored when language/task set
+    log(f"decode cfg: language={model.generation_config.language} "
+        f"task={model.generation_config.task} "
+        f"suppress_tokens={len(model.generation_config.suppress_tokens or [])} ids "
+        f"decoder_start={model.config.decoder_start_token_id}")
+    collator = Collator(processor, model.config.decoder_start_token_id)
     model.model.encoder.requires_grad_(False)
     model.gradient_checkpointing_enable(); model.config.use_cache = False
     model = get_peft_model(model, LoraConfig(r=LORA_R, lora_alpha=LORA_ALPHA,
                                              lora_dropout=LORA_DROPOUT,
                                              target_modules=["q_proj", "v_proj"]))
     model.print_trainable_parameters()
+    # NB: freezing the encoder above does NOT keep LoRA out of it — PEFT injects
+    # fresh trainable adapters into every module matching q_proj/v_proj, encoder
+    # included. The published 2026-07-22 adapter has 128 encoder LoRA tensors
+    # (15.73M trainable), not the "frozen encoder / 7.86M" the docs claimed. Log
+    # where the trainable params actually live so the claim is checked, not assumed.
+    _tp = [(n, p) for n, p in model.named_parameters() if p.requires_grad]
+    _enc = sum(p.numel() for n, p in _tp if ".encoder." in n)
+    _dec = sum(p.numel() for n, p in _tp if ".decoder." in n)
+    log(f"trainable: {sum(p.numel() for _, p in _tp)/1e6:.2f}M total | "
+        f"encoder {_enc/1e6:.2f}M | decoder {_dec/1e6:.2f}M | "
+        f"dtypes={sorted({str(p.dtype) for _, p in _tp})}")
     # Checkpoint by STEPS (not just per epoch) so an interrupted run resumes with
     # fine granularity — epochs here are ~10h, so per-epoch save would risk losing
     # ~10h on a reclaim. eval stays per-epoch (generate eval is expensive).
@@ -271,15 +343,38 @@ def main():
         logging_steps=20, report_to=[], remove_unused_columns=False,
         label_names=["labels"], load_best_model_at_end=False,
         seed=SEED, per_device_eval_batch_size=EVAL_BS)
+    class StampCheckpoint(TrainerCallback):
+        """Stamp each checkpoint with the run fingerprint, so resume can verify
+        the checkpoint itself rather than the directory it happens to sit in."""
+
+        def on_save(self, args, state, control, **kw):
+            d = pathlib.Path(args.output_dir) / f"checkpoint-{state.global_step}"
+            if d.is_dir():
+                (d / FINGERPRINT_FILE).write_text(RUN_FINGERPRINT)
+
     trainer = Seq2SeqTrainer(model=model, args=args, train_dataset=ds_train,
                              eval_dataset=ds_valc, data_collator=collator,
-                             compute_metrics=metrics, processing_class=processor)
+                             compute_metrics=metrics, processing_class=processor,
+                             callbacks=[StampCheckpoint()])
 
     # --- baseline -> train (resume if a checkpoint exists) -> after ---
     import glob
     ckpts = sorted(glob.glob(os.path.join(OUT_DIR, "checkpoint-*")),
                    key=lambda p: int(p.rsplit("-", 1)[-1]) if p.rsplit("-", 1)[-1].isdigit() else 0)
     resume = ckpts[-1] if ckpts else None   # explicit path, not bool (Codex)
+    # A checkpoint written before the decoder-start fix trained on a different
+    # target sequence; resuming from one silently reintroduces the bug for the
+    # rest of the run. Same for a SMOKE checkpoint picked up by a full run: the
+    # trainer state, scheduler and global-step meaning do not carry over. Refuse
+    # rather than waste another 8h, and refuse an unstamped checkpoint too.
+    if resume:
+        fp = pathlib.Path(resume) / FINGERPRINT_FILE
+        seen = fp.read_text().strip() if fp.exists() else None
+        if seen != RUN_FINGERPRINT:
+            sys.exit(f"[train FATAL] refusing to resume {resume}\n"
+                     f"  checkpoint: {seen or 'UNSTAMPED (pre-fix or crashed mid-save)'}\n"
+                     f"  this run  : {RUN_FINGERPRINT}\n"
+                     f"  Point WORK_DIR at a fresh directory.")
     if resume:
         log(f"RESUMING from {resume}")
     else:
@@ -295,6 +390,7 @@ def main():
     processor.tokenizer.clean_up_tokenization_spaces = False
     model.save_pretrained(OUT_DIR); processor.save_pretrained(OUT_DIR)
     json.dump({"model": MODEL_ID, "lora_r": LORA_R, "lr": LR, "epochs": EPOCHS,
+               "label_semantics": LABEL_SEMANTICS,
                "seed": SEED, "smoke": SMOKE, "n_train": ds_train.num_rows,
                "n_val_corr": ds_valc.num_rows,
                "n_val_reg": (ds_valr.num_rows if ds_valr else 0),

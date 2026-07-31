@@ -124,7 +124,7 @@ def main():
     model.generation_config.task = TASK
     model.generation_config.forced_decoder_ids = None
     model.config.forced_decoder_ids = None
-    model.config.suppress_tokens = []
+    decoder_start = model.config.decoder_start_token_id   # <|startoftranscript|>, for the collator
     model.config.use_cache = True  # smoke: no gradient checkpointing, keep cache for fast generate
     lconf = LoraConfig(r=8, lora_alpha=16, lora_dropout=0.05, target_modules=["q_proj", "v_proj"])
     model = get_peft_model(model, lconf)
@@ -181,10 +181,10 @@ def main():
     ds_train = Dataset.from_list(recs["train"])
     ds_val = Dataset.from_list(recs["val"])
 
-    # ---- collator: keep float32, mask pad labels, strip leading bos ----
+    # ---- collator: keep float32, mask pad labels, strip the leading <|startoftranscript|> ----
     import torch as _t
     class Collator:
-        def __init__(self, proc): self.proc = proc
+        def __init__(self, proc, decoder_start): self.proc = proc; self.decoder_start = decoder_start
         def __call__(self, feats):
             batch = self.proc.feature_extractor.pad(
                 [{"input_features": f["input_features"]} for f in feats], return_tensors="pt")
@@ -192,11 +192,16 @@ def main():
             lab = self.proc.tokenizer.pad(
                 [{"input_ids": f["labels"]} for f in feats], return_tensors="pt")
             labels = lab["input_ids"].masked_fill(lab.attention_mask.ne(1), -100)
-            if (labels[:, 0] == self.proc.tokenizer.bos_token_id).all().cpu().item():
-                labels = labels[:, 1:]
-            batch["labels"] = labels
+            # Compare against decoder_start_token_id (50258 <|startoftranscript|>),
+            # NOT tokenizer.bos_token_id (50257 <|endoftext|>) — they differ for
+            # Whisper, so the old bos check never fired and left a duplicate SOT
+            # in every training target. See eval/tests/test_whisper_label_prefix.py.
+            if not (labels[:, 0] == self.decoder_start).all().cpu().item():
+                raise ValueError("label prefix invariant broken: batch does not start "
+                                 f"with decoder_start_token_id={self.decoder_start}")
+            batch["labels"] = labels[:, 1:]
             return batch
-    collator = Collator(processor)
+    collator = Collator(processor, decoder_start)
 
     def compute_metrics(pred):
         import numpy as _np
