@@ -89,7 +89,11 @@ Those gaps are the HF-pipeline handicap, not the adapter.
 1. **Evaluation methodology (the big one).** No comparison was a controlled same-stack,
    same-normalization A/B until 2026-07-24. Fix this first, permanently.
 2. **The fine-tune recipe is weak or slightly harmful.** LoRA r32 on q_proj/v_proj only,
-   2 epochs, encoder frozen, trained on **isolated cut utterances**. The isolated-utterance
+   2 epochs, base encoder weights frozen (LoRA still trainable inside the encoder),
+   trained on **isolated cut utterances**.
+   **Update 2026-07-31:** a third cause was found that this list missed entirely — the
+   [label-prefix bug](../reports/2026-07-31-label-prefix-bug.md). Every run trained on
+   targets shifted one position. Weigh the recipe critique below against that. The isolated-utterance
    training is the likely source of the onset-drop (the model learned to start each
    segment "clean" and drops bridge words inside a continuous window). Name-spelling drift
    suggests the correction signal taught changes that do not generalize to unseen cities.

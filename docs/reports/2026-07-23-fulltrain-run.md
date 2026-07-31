@@ -11,7 +11,10 @@ the model.
 
 ## Configuration
 
-- Base: `openai/whisper-large-v3`, encoder frozen.
+- Base: `openai/whisper-large-v3`. Base encoder weights frozen — but PEFT then injects
+  trainable LoRA into encoder `q_proj`/`v_proj` too, so this run was **not** "frozen
+  encoder / 7.86M params" as originally written here: 15.73M trainable, 128 encoder
+  LoRA tensors. See [label-prefix bug report](2026-07-31-label-prefix-bug.md).
 - Adapter: LoRA `r=32`, `alpha=64`, `dropout=0.05`, targets `q_proj`, `v_proj`.
 - 2 epochs, lr 1e-4, fp16, seed 13, gradient checkpointing.
 - Data: `train=28,967` clips, `val_corr=3,157`, `val_reg=4,722`. Held-out

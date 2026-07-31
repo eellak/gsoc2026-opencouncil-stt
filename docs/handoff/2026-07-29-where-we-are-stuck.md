@@ -132,7 +132,10 @@ Data (all local; **private, GDPR legal hold — never publish text or audio**):
 
 Models:
 - Adapter (public): `opencouncil/whisper-large-v3-el-council-lora`. LoRA r32/alpha64,
-  q_proj+v_proj, encoder frozen, 2 epochs, lr 1e-4, `VAL_CITIES={argos, orestiada}`.
+  q_proj+v_proj, base encoder weights frozen (encoder LoRA still trainable — 15.73M
+  trainable params, not the 7.86M/0.51% claimed elsewhere), 2 epochs, lr 1e-4,
+  `VAL_CITIES={argos, orestiada}`. **Trained with the
+  [label-prefix bug](../reports/2026-07-31-label-prefix-bug.md)** — needs replacing.
 - Local merged: `/home/harold/oc-asr-serve/merged`; shipped ct2 int8: `/home/harold/oc-asr-serve/ct2`.
 - Eval env: `.venv-eval` (faster_whisper, ctranslate2, transformers, ffmpeg). CPU only →
   use `float32`; `float16` is GPU-only in CTranslate2.

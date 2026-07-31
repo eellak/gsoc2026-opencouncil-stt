@@ -1,6 +1,11 @@
 # Spec: Whisper-large-v3 hyperparameter sweep (self-contained Kaggle notebook)
 
 Status: approved design — 2026-06-26
+> **Its results are void (2026-07-31).** The sweep notebook carried the label-prefix
+> bug: every config trained on targets shifted by one position. `lr 1e-4 / r32 /
+> 2 epochs` was therefore *selected under the legacy label schema and never
+> revalidated* — not "confirmed hyperparameters". Re-run this sweep only if the
+> [A/B](../reports/2026-07-31-label-prefix-bug.md) shows the bug mattered.
 Owner: Άγγελος
 Artifact: `notebooks/whisper_sweep_kaggle.ipynb` (new; does not modify `whisper_finetune_kaggle.ipynb`)
 
@@ -39,7 +44,7 @@ proposes the next batch) is an optional future addition — explicitly out of sc
 | Search space | LR × LoRA-rank grid; epochs measured per-epoch (free axis) |
 | Data recipe | Fixed: corrections (training cities) + 1× no-edit backbone |
 | Budget | 9 configs, single seed, ≤12h Kaggle session (per-epoch flush + wall-clock guard) |
-| Base model | Sweep on `openai/whisper-large-v3-turbo` (fast decoder); apply the chosen LR/rank to the `large-v3` final run. LoRA on `q_proj`/`v_proj`, encoder frozen |
+| Base model | Sweep on `openai/whisper-large-v3-turbo` (fast decoder); apply the chosen LR/rank to the `large-v3` final run. LoRA on `q_proj`/`v_proj` (base encoder weights frozen, but LoRA is injected into the encoder too) |
 
 ### Search space (concrete)
 

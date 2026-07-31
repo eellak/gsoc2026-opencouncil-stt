@@ -148,8 +148,12 @@ comparison, and regresses on its target utterances. Do not migrate to it.**
 
 - **Fix evaluation first.** Every future model comparison must be a controlled
   same-stack, same-normalization A/B. The gains we chased were measurement artifacts.
-- **Rethink the approach.** The current recipe (LoRA r32 on q/v only, 2 epochs, frozen
-  encoder, trained on isolated cut utterances) introduces onset and name-spelling
+- **Fix the training objective first (added 2026-07-31).** The runs behind these
+  numbers carried the [label-prefix bug](2026-07-31-label-prefix-bug.md): targets were
+  shifted one position on every sample. Re-read the recipe critique below with that in
+  mind — some of it may be explained by the bug rather than by the recipe.
+- **Rethink the approach.** The current recipe (LoRA r32 on q/v only, 2 epochs, base
+  encoder weights frozen, trained on isolated cut utterances) introduces onset and name-spelling
   regressions that cancel any gain. Options worth testing before another fine-tune:
   training on context windows (not isolated utterances) to kill the onset drop; higher
   LoRA rank or unfreezing the encoder; or dropping fine-tuning in favour of
