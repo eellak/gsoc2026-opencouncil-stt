@@ -1,5 +1,13 @@
 # Full fine-tune run: whisper-large-v3 Greek council LoRA (2026-07-23)
 
+> **This result is superseded — do not migrate or cite the numbers below.** Two
+> separate problems: the reported gains were measured against unfairly-served
+> baselines ([postmortem](../handoff/2026-07-25-finetune-eval-postmortem.md)), and the
+> run itself trained through the
+> [label-prefix bug](2026-07-31-label-prefix-bug.md) — every target shifted one
+> position. The adapter this run published needs replacing, not deploying. The report
+> is kept for the engineering record (the OOM diagnosis below is still valid).
+
 ## Goal
 
 Run the full LoRA fine-tune of `whisper-large-v3` on the combined ~28.6h Greek

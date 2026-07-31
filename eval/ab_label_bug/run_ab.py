@@ -252,13 +252,21 @@ def main():
     CACHE = pathlib.Path("/tmp/audio_cache"); CACHE.mkdir(parents=True, exist_ok=True)
 
     def dl(url):
+        # Download to a temp name and rename only on success: a connection dropped
+        # mid-meeting would otherwise leave a truncated mp3 that looks like a cache
+        # hit forever, and the clips cut from it would be quietly wrong. (CodeRabbit)
         p = CACHE / (hashlib.md5(url.encode()).hexdigest() + ".mp3")
         if not p.exists():
-            with requests.get(url, stream=True, timeout=600) as resp:
-                resp.raise_for_status()
-                with open(p, "wb") as f:
-                    for c in resp.iter_content(1 << 20):
-                        f.write(c)
+            tmp = p.with_suffix(".part")
+            try:
+                with requests.get(url, stream=True, timeout=600) as resp:
+                    resp.raise_for_status()
+                    with open(tmp, "wb") as f:
+                        for c in resp.iter_content(1 << 20):
+                            f.write(c)
+                tmp.replace(p)
+            finally:
+                tmp.unlink(missing_ok=True)
         return str(p)
 
     def fetch_meeting(city, meeting):
@@ -283,9 +291,11 @@ def main():
     man = None
     if MAN_PATH.exists():
         _c = json.load(open(MAN_PATH))
+        # Check every clip, not a sample of five: a half-written cache would
+        # otherwise pass and silently shrink the training set. (CodeRabbit)
         if _c.get("_sig") == sig and all(
                 pathlib.Path(c["audio"]).exists()
-                for s in ("train", "valc", "valr") for c in _c.get(s, [])[:5]):
+                for s in ("train", "valc", "valr") for c in _c.get(s, [])):
             man = {k: _c[k] for k in ("train", "valc", "valr")}
             log("manifest CACHE HIT")
     if man is None:
