@@ -62,16 +62,37 @@ Break-even is therefore at **20% to 24%**: unless at least a fifth of utterances
 real meeting actually contain an ASR error worth fixing, running the post-editor over
 everything makes the transcript worse, not better.
 
-We do not currently know that fraction. The review data cannot answer it — reviewers
-chose utterances that looked wrong, so its ~43% include rate is an overestimate of an
-unknown size. **This is now the gating measurement for the whole idea**, and it is
-cheap: take a few hundred consecutive utterances from meetings nobody has reviewed,
-judge each one as needs-fixing or not, and read the fraction off directly.
+That fraction turned out to be already measured, in a file built for something else.
+`data/reports/meeting-edit-fraction/distribution.tsv` records, for every cached meeting
+JSON, how many utterances a human edited out of the total — it exists because the same
+quantity was used to set the unreviewed-meetings trust cutoff. Across the 314 meetings
+that survive the denylist, that is **530,036 utterances, of which 143,039 (27.0%) were
+touched by a human**. Discounting the 8.8% of corrections that experiment A found to be
+pure formatting (invisible after WER normalization) leaves **24.6%** as the WER-relevant
+share. Reproduce with `eval/controlled_eval/breakeven.py`.
 
-If the fraction turns out to be comfortably above a quarter, the next step is a
-selective post-editor: run it only where an error is likely (low ASR confidence, a
-roster name nearby, an out-of-vocabulary token) rather than everywhere. That converts
-the over-editing tax from a fixed cost into a targeted one.
+| cost estimate | break-even | margin | meetings below break-even |
+|---|---|---|---|
+| 0.0097 (training-city sample) | 20.1% | +4.5% | 75 / 314 (24%) |
+| 0.0124 (held-out sample) | 24.4% | **+0.2%** | 138 / 314 (44%) |
+
+**A blanket post-editor is a coin flip.** On the pessimistic cost estimate the margin is
+two tenths of a percentage point, and 44% of individual meetings sit on the wrong side
+of the line. Averaged over the corpus it might come out slightly ahead; on any given
+meeting it is as likely to hurt as help. That is not something to deploy.
+
+What this does say is that the **selective** post-editor is the only version worth
+building: run it only where an error is likely (low ASR confidence, a roster name in the
+window, an out-of-vocabulary token) instead of everywhere. Selection does not need to be
+clever to pay — the arithmetic above is dominated by the 75% of utterances that need no
+help and can only lose. Halving how often the editor touches a correct utterance moves
+break-even from 24% down to roughly 14%, which the real 24.6% clears comfortably.
+
+Caveat on the 27.0%: "a human edited it" is a proxy for "it needed correction" that errs
+in both directions. Reviewers miss errors, which pushes the true fraction up; they also
+edit for reasons an ASR could never have got right, which pushes it down beyond the
+formatting adjustment. It is the best available estimate, not a measurement of the thing
+itself.
 
 ## Caveats
 
