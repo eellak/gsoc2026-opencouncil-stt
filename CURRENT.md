@@ -19,6 +19,26 @@ utterances it was trained to fix. The earlier gains were evaluation artifacts
 postmortem and next directions:
 [docs/handoff/2026-07-25-finetune-eval-postmortem.md](docs/handoff/2026-07-25-finetune-eval-postmortem.md).
 
+**Root cause found (2026-07-31):** every GPU fine-tune trained on the wrong targets.
+The collator stripped Whisper's leading `<|startoftranscript|>` only when it matched
+`tokenizer.bos_token_id`, which is `<|endoftext|>` (50257), not `<|startoftranscript|>`
+(50258) — so it never stripped. The model was trained to emit `<|startoftranscript|>`
+and every content token sat one decoder position later than at inference, on every
+sample of every run, including the sweep that picked the "confirmed" hyperparameters.
+Fixed in `00d9235` with 13 tests.
+
+**Measured 2026-08-01** (6 paired LoRA runs, `eval/ab_label_bug/`): the mechanism is
+confirmed outright — the legacy model ranks `<|startoftranscript|>` **first** at
+decoder position 0 in 50–95% of clips, against ~2000th for base — but the WER cost is
+at the noise floor (+0.005, +0.001, −0.001 across seeds; sign not consistent). What is
+consistent is likelihood: NLL worse in 3/3 seeds and far less stable. **Retrain
+because the objective was wrong, not because the bug cost accuracy; skip the sweep
+re-run.** Unexpectedly, the corrected adapter beats base whisper by ~5 WER points on
+this held-out sample with 0/16 meetings worse — which does not overturn the postmortem
+(different sample, same-stack eval, old-system references on val_reg) but does re-open
+the question. Report:
+[reports/2026-07-31-label-prefix-bug.md](docs/reports/2026-07-31-label-prefix-bug.md).
+
 ## Goal Right Now
 
 The fine-tune is not the deliverable it looked like. Two things, in order:
@@ -73,10 +93,50 @@ Update this diagram when the main project flow changes.
 
 ## Next Concrete Steps
 
-- [ ] Re-run the large-v3 fine-tune with the decoding-bug fixes applied.
-- [ ] Cache the clip build (the kernel rebuilt ~70 min on each restart).
-- [ ] Enlarge the held-out val set (currently too small to rank configs).
-- [ ] Add seeds + meeting-clustered CIs to the eval.
+Ordered by the postmortem's ranking. Retraining is **not** next — a trustworthy eval
+and a no-retrain alternative come first.
+
+- [x] **Fix the label-prefix bug** (`00d9235`, 13 tests). Every GPU entry point trained
+  on targets shifted by one token; the CPU sweep was unaffected.
+- [x] **Measure what the bug cost** (`eval/ab_label_bug/`, 6 paired runs, A40, ~$1.50).
+  Mechanism confirmed; WER cost at the noise floor; likelihood cost consistent.
+- [x] **Sweep re-run: decided against.** The bug's WER effect is smaller than the seed
+  noise the sweep already could not resolve. Keep `r32 / lr 1e-4 / 2 epochs`, described
+  as *selected under the legacy label schema, never revalidated*.
+- [ ] **Full corrected run (~8h GPU) + replace the public HF adapter and model card.**
+  Justified by a correct, stable objective — not by a promised accuracy gain. Gate
+  publication on the controlled harness, not on the training script's own eval.
+- [ ] **Re-open "does the fine-tune beat base?"** The corrected adapter beat base by
+  ~5 WER points on the A/B's held-out sample (0/16 meetings worse), which contradicts
+  the postmortem. Same-sample, same-stack comparison through the harness before any
+  claim.
+- [~] **Controlled eval harness.** Generalize `eval/controlled_eval/` into one tool:
+  same stack, same normalization, two held-out subsets (general + actually-corrected),
+  WER + CER + entity recall, per-utterance head-to-head. Every future claim goes
+  through it. Today: three ad-hoc scripts (`ab_general_utterances.py`,
+  `ab_corrected_utterances.py`, `ab_hotwords.py`) that share a sample and a scorer by
+  copy-paste; needs paths de-hardcoded and the scorer factored out.
+- [~] **Inference-time contextual biasing (roster hotwords) — first real gain.**
+  Two runs on 2026-07-25 (`ab_hotwords.py`, `ab_hotwords_names.py`).
+  On the **name-focused** held-out subset (n=59, 114 gold names): base+hotwords lifts
+  name recall **27.2% → 36.0% (McNemar p=0.021)** at no WER cost, and fine-tune+hotwords
+  is the best config (WER 0.3072 vs base 0.3412, bootstrap CI excludes zero).
+  On the **corrected** subset (n=50) biasing is a wash on base and only narrows the
+  fine-tune's regression — the two subsets disagree, so nothing migrates until the
+  harness reports them side by side.
+  Report: [reports/2026-07-25-hotwords-biasing.md](docs/reports/2026-07-25-hotwords-biasing.md).
+- [ ] Diagnose the training-vs-controlled discrepancy (why training reported −32% on
+  val_corr while the controlled test regresses). ~1h, prevents repeating the mistake.
+- [~] **Text post-editing over Scribe output — first controlled run (2026-07-29): best
+  system yet.** claude-sonnet + per-meeting roster takes the corrected subset from
+  0.155 → **0.119 WER** (CI excludes zero) and also improves base whisper (0.158 →
+  0.137). Same run showed whisper-hotword biasing is *saturated* (oracle names buy no
+  recall over the full roster) and ~half its gain is a generic prompt effect. See
+  [reports/2026-07-29-lexical-thesis-experiments.md](docs/reports/2026-07-29-lexical-thesis-experiments.md).
+  Next: output-validity gate, over-editing check on clean utterances, then the harness.
+- [ ] Only then: retrain the LoRA on **context windows** (not isolated cut utterances)
+  to kill the onset drop — gated through the harness above.
+- [ ] Enlarge the held-out val set; add seeds + meeting-clustered CIs.
 - [ ] Keep review throughput moving toward the ~6k dataset target.
 - [x] **Repo cleaned for GDPR (2026-07-21 DLE meeting):** PII-bearing data
   (ASR manifests / train / val / exports with utterance text) removed from the
@@ -107,6 +167,9 @@ Update this diagram when the main project flow changes.
 
 See:
 
+- [If we built the acoustic model again](docs/specs/asr-v2-design.md) — what the evidence
+  says we would change and why
+- [Modeling decisions](docs/decisions/modeling.md) — biasing adopted, adapter not deployed
 - [Roadmap](docs/roadmap.md)
 - [Progress vs GSoC plan](docs/progress.md)
 - [Decisions index](docs/decisions/_index.md) · [data decisions](docs/decisions/data.md)
