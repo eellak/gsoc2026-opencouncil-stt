@@ -133,7 +133,13 @@ and a no-retrain alternative come first.
   0.137). Same run showed whisper-hotword biasing is *saturated* (oracle names buy no
   recall over the full roster) and ~half its gain is a generic prompt effect. See
   [reports/2026-07-29-lexical-thesis-experiments.md](docs/reports/2026-07-29-lexical-thesis-experiments.md).
-  Next: output-validity gate, over-editing check on clean utterances, then the harness.
+  **Followed up 2026-08-01** ([report](docs/reports/2026-08-01-postedit-gate.md)): the
+  output-validity gate turns out to be the result, not a safety net — ungated the gain
+  is *not* significant (CI [−0.045, +0.014]), gated it is (0.1529 → 0.1144, CI
+  [−0.049, −0.028]) on 98 held-out utterances. But the editor damages ~1 in 6
+  already-correct utterances, so **break-even is at 20–24% of utterances actually
+  needing correction** — and nobody has measured that fraction on unreviewed speech.
+  Next: measure it (no GPU), then a selective post-editor rather than a blanket one.
 - [ ] Only then: retrain the LoRA on **context windows** (not isolated cut utterances)
   to kill the onset drop — gated through the harness above.
 - [ ] Enlarge the held-out val set; add seeds + meeting-clustered CIs.
