@@ -1,0 +1,153 @@
+{
+  "model": "sonnet",
+  "gate": {
+    "min_ratio": 0.6,
+    "max_ratio": 1.6,
+    "max_rel_edit": 0.35
+  },
+  "started": "2026-08-01T13:05:35",
+  "A_scribe": {
+    "n": 98,
+    "wer_source": 0.1528899937849596,
+    "wer_raw": 0.13238036047234308,
+    "wer_gated": 0.11435674331883157,
+    "wer_repaired": 0.13175885643256682,
+    "gate": {
+      "rejected": 4,
+      "reject_rate": 0.04081632653061224,
+      "reasons": {
+        "length_ratio": 2,
+        "multi_paragraph": 1,
+        "rewrote_too_much": 1
+      },
+      "rejections_that_saved_errors": 3,
+      "rejections_that_lost_a_good_edit": 1,
+      "errors_avoided": 29
+    },
+    "head2head_raw_vs_source": {
+      "a_better": 50,
+      "tie": 37,
+      "b_better": 11
+    },
+    "head2head_gated_vs_source": {
+      "a_better": 49,
+      "tie": 41,
+      "b_better": 8
+    },
+    "utterances_made_worse_by_raw": 11,
+    "utterances_made_worse_by_gated": 8,
+    "ci_gated_minus_source": {
+      "delta": -0.03853325046612803,
+      "ci95": [
+        -0.048747654211042345,
+        -0.02786618041450573
+      ],
+      "excludes_zero": true,
+      "n_clusters": 29
+    },
+    "ci_raw_minus_source": {
+      "delta": -0.020509633312616515,
+      "ci95": [
+        -0.04464323568602116,
+        0.013502902826686959
+      ],
+      "excludes_zero": false,
+      "n_clusters": 29
+    }
+  },
+  "B_clean_held": {
+    "n": 98,
+    "wer_source": 0.0,
+    "wer_raw": 0.0254816656308266,
+    "wer_gated": 0.012430080795525171,
+    "wer_repaired": 0.0254816656308266,
+    "gate": {
+      "rejected": 3,
+      "reject_rate": 0.030612244897959183,
+      "reasons": {
+        "rewrote_too_much": 2,
+        "length_ratio": 1
+      },
+      "rejections_that_saved_errors": 3,
+      "rejections_that_lost_a_good_edit": 0,
+      "errors_avoided": 21
+    },
+    "head2head_raw_vs_source": {
+      "a_better": 0,
+      "tie": 80,
+      "b_better": 18
+    },
+    "head2head_gated_vs_source": {
+      "a_better": 0,
+      "tie": 83,
+      "b_better": 15
+    },
+    "utterances_made_worse_by_raw": 18,
+    "utterances_made_worse_by_gated": 15,
+    "ci_gated_minus_source": {
+      "delta": 0.012430080795525171,
+      "ci95": [
+        0.006404842544112016,
+        0.020846239854342526
+      ],
+      "excludes_zero": true,
+      "n_clusters": 29
+    },
+    "ci_raw_minus_source": {
+      "delta": 0.0254816656308266,
+      "ci95": [
+        0.011651702269121945,
+        0.04271913828663412
+      ],
+      "excludes_zero": true,
+      "n_clusters": 29
+    }
+  },
+  "B_clean_train": {
+    "n": 150,
+    "wer_source": 0.0,
+    "wer_raw": 0.009708737864077669,
+    "wer_gated": 0.009708737864077669,
+    "wer_repaired": 0.009708737864077669,
+    "gate": {
+      "rejected": 1,
+      "reject_rate": 0.006666666666666667,
+      "reasons": {
+        "meta_marker": 1
+      },
+      "rejections_that_saved_errors": 0,
+      "rejections_that_lost_a_good_edit": 0,
+      "errors_avoided": 0
+    },
+    "head2head_raw_vs_source": {
+      "a_better": 0,
+      "tie": 126,
+      "b_better": 24
+    },
+    "head2head_gated_vs_source": {
+      "a_better": 0,
+      "tie": 126,
+      "b_better": 24
+    },
+    "utterances_made_worse_by_raw": 24,
+    "utterances_made_worse_by_gated": 24,
+    "ci_gated_minus_source": {
+      "delta": 0.009708737864077669,
+      "ci95": [
+        0.00601768913058672,
+        0.013801047840642892
+      ],
+      "excludes_zero": true,
+      "n_clusters": 92
+    },
+    "ci_raw_minus_source": {
+      "delta": 0.009708737864077669,
+      "ci95": [
+        0.00601768913058672,
+        0.013801047840642892
+      ],
+      "excludes_zero": true,
+      "n_clusters": 92
+    }
+  }
+}
