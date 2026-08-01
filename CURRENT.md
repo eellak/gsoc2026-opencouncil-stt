@@ -103,9 +103,18 @@ and a no-retrain alternative come first.
 - [x] **Sweep re-run: decided against.** The bug's WER effect is smaller than the seed
   noise the sweep already could not resolve. Keep `r32 / lr 1e-4 / 2 epochs`, described
   as *selected under the legacy label schema, never revalidated*.
-- [ ] **Full corrected run (~8h GPU) + replace the public HF adapter and model card.**
-  Justified by a correct, stable objective — not by a promised accuracy gain. Gate
-  publication on the controlled harness, not on the training script's own eval.
+- [x] **Full corrected run** (2026-08-02, A40, ~12.8h, ~$5.6):
+  [report](docs/reports/2026-08-02-fulltrain-corrected.md). Both baselines reproduce the
+  old run to the decimal, so the comparison is clean. val_corr **37.37 / 29.01 / 17.27**
+  vs the buggy run's 37.74 / 29.35 / 17.46; val_reg **10.39 / 4.82 / 3.36** vs
+  10.46 / 4.87 / 3.43. Better on all six, by very little — exactly the magnitude the
+  A/B predicted. One run vs one run, so not a significance claim. Adapter at
+  `~/oc-asr-serve/adapter-fixed-2026-08-01`, **not published yet**.
+- [ ] **Gate publication on the controlled harness.** Same sample, same stack, base vs
+  the corrected adapter, corrected + general subsets. The training script's own eval
+  cannot settle this: it scores in the stack the model trained in, and val_reg's
+  references are the old system's output. Until then this is "the same model, trained
+  correctly", not "a better model".
 - [ ] **Re-open "does the fine-tune beat base?"** The corrected adapter beat base by
   ~5 WER points on the A/B's held-out sample (0/16 meetings worse), which contradicts
   the postmortem. Same-sample, same-stack comparison through the harness before any
