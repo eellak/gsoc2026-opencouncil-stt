@@ -1,0 +1,195 @@
+{
+  "model": "sonnet",
+  "trio": [
+    "scribe-v2-clean",
+    "soniox",
+    "oc-minipc-finetune"
+  ],
+  "primary_provider": "scribe-v2-clean",
+  "n_items": 250,
+  "n_meetings": 147,
+  "arms": [
+    "C_edit_one",
+    "D_fusion"
+  ],
+  "started": "2026-08-02T16:55:51",
+  "trio_selected_on_this_benchmark": true,
+  "consensus_picks": {
+    "soniox": 122,
+    "scribe-v2-clean": 111,
+    "oc-minipc-finetune": 17
+  },
+  "A_scribe": {
+    "wer": 0.1318904384045554
+  },
+  "B_consensus": {
+    "wer": 0.12109508870903962,
+    "wer_baseline": 0.1318904384045554,
+    "vs": "A_scribe",
+    "ci_minus_baseline": {
+      "delta": -0.010795349695515766,
+      "ci95": [
+        -0.014164980680629742,
+        -0.0073858133410419835
+      ],
+      "excludes_zero": true,
+      "n_clusters": 147
+    },
+    "head2head": {
+      "a_better": 105,
+      "tie": 116,
+      "b_better": 29
+    }
+  },
+  "ungated": {
+    "C_edit_one": {
+      "wer": 0.1354361637624232,
+      "empty_or_failed": 6
+    },
+    "D_fusion": {
+      "wer": 0.1174175519995782,
+      "empty_or_failed": 7
+    }
+  },
+  "PRIMARY_D_vs_C": {
+    "wer": 0.1174175519995782,
+    "wer_baseline": 0.1354361637624232,
+    "vs": "C_edit_one",
+    "ci_minus_baseline": {
+      "delta": -0.018018611762845,
+      "ci95": [
+        -0.02283876259500972,
+        -0.013150865917919485
+      ],
+      "excludes_zero": true,
+      "n_clusters": 147
+    },
+    "head2head": {
+      "a_better": 183,
+      "tie": 20,
+      "b_better": 47
+    },
+    "robustness": {
+      "per_city_delta": {
+        "argos": {
+          "n": 18,
+          "delta": -0.019219569015725108
+        },
+        "athens": {
+          "n": 40,
+          "delta": -0.024134645919339462
+        },
+        "chalandri": {
+          "n": 17,
+          "delta": -0.025650991061018272
+        },
+        "chania": {
+          "n": 40,
+          "delta": -0.0021039712457263104
+        },
+        "orestiada": {
+          "n": 19,
+          "delta": -0.024259198957994138
+        },
+        "samothraki": {
+          "n": 19,
+          "delta": -0.010632734878856548
+        },
+        "sparta": {
+          "n": 39,
+          "delta": -0.02200742211098644
+        },
+        "vrilissia": {
+          "n": 19,
+          "delta": -0.021608832807570977
+        },
+        "xylokastro": {
+          "n": 20,
+          "delta": -0.010334137099552193
+        },
+        "zografou": {
+          "n": 19,
+          "delta": -0.024521330198186087
+        }
+      },
+      "leave_one_city_out_delta": {
+        "argos": -0.017931132008767586,
+        "athens": -0.01680101153785364,
+        "chalandri": -0.017463235294117654,
+        "chania": -0.020834949347647333,
+        "orestiada": -0.01746887728759107,
+        "samothraki": -0.018622823653552723,
+        "sparta": -0.017299584623282876,
+        "vrilissia": -0.017691223427207095,
+        "xylokastro": -0.01865543819583214,
+        "zografou": -0.017464812907655336
+      },
+      "worst_loco": -0.01680101153785364
+    }
+  },
+  "operational_gated": {
+    "C_edit_one": {
+      "wer": 0.13378852186750323,
+      "wer_baseline": 0.1318904384045554,
+      "vs": "A_scribe",
+      "ci_minus_baseline": {
+        "delta": 0.0018980834629478416,
+        "ci95": [
+          0.00039746555343127005,
+          0.0037751462751701953
+        ],
+        "excludes_zero": true,
+        "n_clusters": 147
+      },
+      "head2head": {
+        "a_better": 30,
+        "tie": 182,
+        "b_better": 38
+      },
+      "gate": {
+        "rejected": 28,
+        "reject_rate": 0.112,
+        "reasons": {
+          "multi_paragraph": 21,
+          "empty": 6,
+          "meta_marker": 1
+        },
+        "rejections_that_saved_errors": 15,
+        "rejections_that_lost_a_good_edit": 4
+      },
+      "note": "Different arms fall back to different text on purpose here. This is the deployable pipeline, NOT the identifying contrast."
+    },
+    "D_fusion": {
+      "wer": 0.11566446102338333,
+      "wer_baseline": 0.12109508870903962,
+      "vs": "B_consensus",
+      "ci_minus_baseline": {
+        "delta": -0.005430627685656289,
+        "ci95": [
+          -0.009049977830640201,
+          -0.0016738996316450515
+        ],
+        "excludes_zero": true,
+        "n_clusters": 147
+      },
+      "head2head": {
+        "a_better": 143,
+        "tie": 34,
+        "b_better": 73
+      },
+      "gate": {
+        "rejected": 21,
+        "reject_rate": 0.084,
+        "reasons": {
+          "multi_paragraph": 12,
+          "empty": 7,
+          "rewrote_too_much": 1,
+          "meta_marker": 1
+        },
+        "rejections_that_saved_errors": 14,
+        "rejections_that_lost_a_good_edit": 5
+      },
+      "note": "Different arms fall back to different text on purpose here. This is the deployable pipeline, NOT the identifying contrast."
+    }
+  }
+}

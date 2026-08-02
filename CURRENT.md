@@ -124,6 +124,23 @@ and a no-retrain alternative come first.
   imitation, including its errors). The old val_corr / val_reg pair measured exactly those
   two populations, which is why it reported gains. Same shape as the post-editor's
   over-editing tax. **More training on this data cannot fix it.**
+- [x] **Combining ASR systems beats all of them, and the LLM is not what does it**
+  ([report](docs/reports/2026-08-02-asr-fusion.md)). The benchmark's public `report.json`
+  carries every provider's verbatim transcript per window next to the human reference, so
+  this cost 500 sonnet calls and no GPU. The systems fail on **different** windows (oracle
+  window selection 0.1016 vs Scribe's 0.1319), and a **reference-free consensus vote over
+  three of them reaches 0.1211**, −0.0108 CI [−0.0142, −0.0074] over 147 meetings, with no
+  model, no training and no prompt. Our own fine-tune, second-worst alone, is the most
+  useful third voter, and the gain is *larger* on meetings outside its training data.
+  The LLM arms answer the attribution question: given three hypotheses it scores 0.1174,
+  **−0.0180 CI [−0.0228, −0.0132] against the same LLM with the same prompt given one**,
+  negative in all ten cities. So the combination does the work. But the LLM given a single
+  transcript is **worse than doing nothing** (0.1354 vs 0.1319, CI excludes zero), the same
+  over-editing tax as the fine-tune and the post-editor, and it beats the free vote by only
+  −0.0037 CI [−0.0080, +0.0008]. **The cheap half of the idea is most of the idea.**
+- [ ] **Decide on the vote.** It is deployable today; the cost is three ASR bills instead of
+  one. That trade, not the WER, is the question for OpenCouncil. Cheaper shape to explore:
+  call the second and third systems only where the first is uncertain.
 - [ ] **Fix the data, not the recipe.** Verify the 15,038 no-edit labels (review hours, not
   GPU hours) and make application selective rather than blanket. Also re-run the benchmark
   for our model through the RunPod serverless endpoint: 10 items returned HTTP 524 from the
