@@ -138,6 +138,28 @@ and a no-retrain alternative come first.
   transcript is **worse than doing nothing** (0.1354 vs 0.1319, CI excludes zero), the same
   over-editing tax as the fine-tune and the post-editor, and it beats the free vote by only
   −0.0037 CI [−0.0080, +0.0008]. **The cheap half of the idea is most of the idea.**
+- [x] **Overlap screen: rare, expensive, and the vote does not fix it**
+  ([report](docs/reports/2026-08-03-overlap-screen.md)). pyannote community-1 over 232
+  benchmark windows, CPU, 4h, no labels. Overlap is **2.2% of speech time on average**
+  (median 0.3%, 43% of windows at zero), but it is a marker for **all seven** systems:
+  in the top-overlap quartile error rates roughly double (Scribe +0.0994 CI [+0.061,
+  +0.143]), and that quartile carries 19.9% of reference words but 26-34% of errors.
+  If those windows behaved like zero-overlap ones Scribe would drop ~2.0 WER points,
+  which bounds the category without predicting it. **The consensus vote's gain shrinks
+  as overlap rises** (−0.0158 at zero to −0.0018 at high, interaction +0.0141 CI [+0.0041,
+  +0.0249]): the systems fail together there, so fusion and overlap are separate problems.
+  Reference-policy check is inconclusive (insertions rise faster than substitutions for
+  3 of 7 systems; Soniox quintuples). **Descriptive only** - overlap is confounded with
+  general difficulty and pyannote is unvalidated on Greek, so this neither justifies nor
+  kills the DiCoW line.
+- [ ] **Blinded listening audit, 50-100 overlap events.** Two Greek speakers, no ASR
+  output visible, main and secondary speaker transcribed separately, then mark which
+  audible words are in the benchmark reference. Answers whether WER can score an overlap
+  fix at all, and validates pyannote's detection. Needs human time, no GPU.
+- [ ] **Paired synthetic-overlap intervention.** Clean single-speaker audio, real
+  interjector mixed in at set levels, both versions through the same systems, identical
+  main-speaker reference. Causal for the manipulation, no new labels. The only cheap
+  thing that estimates a burden rather than an association.
 - [ ] **Decide on the vote.** It is deployable today; the cost is three ASR bills instead of
   one. That trade, not the WER, is the question for OpenCouncil. Cheaper shape to explore:
   call the second and third systems only where the first is uncertain.

@@ -1,0 +1,404 @@
+{
+  "model": "pyannote/speaker-diarization-community-1",
+  "feature_version": 2,
+  "n_windows": 232,
+  "n_dropped_no_audio": 18,
+  "n_boot": 10000,
+  "generated": "2026-08-03T02:23:20",
+  "claim_limits": "Descriptive association between pyannote-ESTIMATED overlap and the error rates of existing systems. Not causal, not an estimate of what an overlap-targeted system would recover. Overlap is confounded with general acoustic difficulty and the diarizer is unvalidated on Greek.",
+  "dropped_vs_kept": {
+    "gladia-prod": {
+      "wer_kept": 0.1394643975183562,
+      "wer_dropped": 0.18014311270125224
+    },
+    "gpt-4o-transcribe": {
+      "wer_kept": 0.16759633445272923,
+      "wer_dropped": 0.16923076923076924
+    },
+    "hf-openai-whisper-large-v3": {
+      "wer_kept": 0.14229608970345495,
+      "wer_dropped": 0.18658318425760287
+    },
+    "greek-whisper-v3-turbo": {
+      "wer_kept": 0.47008936194433376,
+      "wer_dropped": 0.6615384615384615
+    },
+    "scribe-v2-clean": {
+      "wer_kept": 0.13048551425806817,
+      "wer_dropped": 0.14955277280858675
+    },
+    "soniox": {
+      "wer_kept": 0.13816950310205475,
+      "wer_dropped": 0.16815742397137745
+    },
+    "oc-minipc-finetune": {
+      "wer_kept": 0.14699186066366896,
+      "wer_dropped": 0.18389982110912342
+    }
+  },
+  "overlap": {
+    "buckets": [
+      {
+        "lo": 0.0,
+        "hi": 1e-09,
+        "name": "none"
+      },
+      {
+        "lo": 1e-09,
+        "hi": 0.0069735006973498555,
+        "name": "low"
+      },
+      {
+        "lo": 0.0069735006973498555,
+        "hi": 0.028844222587293345,
+        "name": "mid"
+      },
+      {
+        "lo": 0.028844222587293345,
+        "hi": 1.01,
+        "name": "high"
+      }
+    ],
+    "frac_of_speech": {
+      "mean": 0.021544385546146568,
+      "median": 0.002646267734101973,
+      "max": 0.21005339236879847
+    },
+    "sec_per_window": {
+      "mean": 2.7333135775862076,
+      "median": 0.3206250000000015
+    },
+    "windows_with_zero_detected_overlap": 100,
+    "mean_detected_speakers": 2.4224137931034484,
+    "n_per_bucket": {
+      "low": 44,
+      "none": 100,
+      "mid": 44,
+      "high": 44
+    }
+  },
+  "Q2_error_rate_vs_overlap": {
+    "gladia-prod": {
+      "wer_by_bucket": {
+        "none": 0.11546985082525717,
+        "low": 0.13411468575473925,
+        "mid": 0.13167580560354541,
+        "high": 0.20346721837768425
+      },
+      "high_minus_none": 0.08799736755242708,
+      "ci95": [
+        0.046040458093953976,
+        0.13157874156303323
+      ],
+      "excludes_zero": true,
+      "share_of_errors_in_high": 0.29099071523313946,
+      "share_of_ref_words_in_high": 0.1994564289373328,
+      "concentration_ratio": 1.4589187061228586
+    },
+    "gpt-4o-transcribe": {
+      "wer_by_bucket": {
+        "none": 0.11464293983395628,
+        "low": 0.24101313615983638,
+        "mid": 0.15668895064974087,
+        "high": 0.2255832203752586
+      },
+      "high_minus_none": 0.11094028054130232,
+      "ci95": [
+        0.06514840940261798,
+        0.1610520669719216
+      ],
+      "excludes_zero": true,
+      "share_of_errors_in_high": 0.2684666327050433,
+      "share_of_ref_words_in_high": 0.1994564289373328,
+      "concentration_ratio": 1.345991373330928
+    },
+    "hf-openai-whisper-large-v3": {
+      "wer_by_bucket": {
+        "none": 0.11077299639466807,
+        "low": 0.14607095099504444,
+        "mid": 0.13633290768421844,
+        "high": 0.21252764500249696
+      },
+      "high_minus_none": 0.10175464860782889,
+      "ci95": [
+        0.060061221622126966,
+        0.14644741096153685
+      ],
+      "excludes_zero": true,
+      "share_of_errors_in_high": 0.2979,
+      "share_of_ref_words_in_high": 0.1994564289373328,
+      "concentration_ratio": 1.4935592780195477
+    },
+    "greek-whisper-v3-turbo": {
+      "wer_by_bucket": {
+        "none": 0.3702907419045414,
+        "low": 0.4382915126248722,
+        "mid": 0.5759783670096897,
+        "high": 0.6136120425197974
+      },
+      "high_minus_none": 0.24332130061525598,
+      "ci95": [
+        0.17266265491952057,
+        0.31627749490785767
+      ],
+      "excludes_zero": true,
+      "share_of_errors_in_high": 0.260352342898656,
+      "share_of_ref_words_in_high": 0.1994564289373328,
+      "concentration_ratio": 1.305309356463291
+    },
+    "scribe-v2-clean": {
+      "wer_by_bucket": {
+        "none": 0.10233850428339894,
+        "low": 0.12585542358215998,
+        "mid": 0.12378877788627657,
+        "high": 0.2017550117714204
+      },
+      "high_minus_none": 0.09941650748802147,
+      "ci95": [
+        0.06110741795103642,
+        0.14279556375642108
+      ],
+      "excludes_zero": true,
+      "share_of_errors_in_high": 0.3083969465648855,
+      "share_of_ref_words_in_high": 0.1994564289373328,
+      "concentration_ratio": 1.5461870455014548
+    },
+    "soniox": {
+      "wer_by_bucket": {
+        "none": 0.09334171269804518,
+        "low": 0.13741839062377095,
+        "mid": 0.1349808457898295,
+        "high": 0.2385674538060926
+      },
+      "high_minus_none": 0.14522574110804742,
+      "ci95": [
+        0.09811956712206345,
+        0.19730458993666328
+      ],
+      "excludes_zero": true,
+      "share_of_errors_in_high": 0.3443872296601442,
+      "share_of_ref_words_in_high": 0.1994564289373328,
+      "concentration_ratio": 1.7266288757648778
+    },
+    "oc-minipc-finetune": {
+      "wer_by_bucket": {
+        "none": 0.11431217543743591,
+        "low": 0.13899158341854795,
+        "mid": 0.13963794787050252,
+        "high": 0.23171862738103732
+      },
+      "high_minus_none": 0.11740645194360141,
+      "ci95": [
+        0.0781148391144045,
+        0.15800799030491317
+      ],
+      "excludes_zero": true,
+      "share_of_errors_in_high": 0.3144240077444337,
+      "share_of_ref_words_in_high": 0.1994564289373328,
+      "concentration_ratio": 1.576404478008691
+    }
+  },
+  "Q1_error_mix": {
+    "per_provider": {
+      "gladia-prod": {
+        "ins_rate": {
+          "none": 0.012843854480452846,
+          "low": 0.02313685370268356,
+          "mid": 0.020892830302119345,
+          "high": 0.05472992283509574
+        },
+        "sub_rate": {
+          "none": 0.06915157734449999,
+          "low": 0.09026520815298654,
+          "mid": 0.08199308582594318,
+          "high": 0.11410402972277793
+        },
+        "del_rate": {
+          "none": 0.03558542156311033,
+          "low": 0.023530337609191786,
+          "mid": 0.03179016984818879,
+          "high": 0.039511288939697055
+        },
+        "ins_minus_sub_diff_in_diff": -0.0030663840236350437,
+        "ci95": [
+          -0.017352749164425297,
+          0.012458079354101073
+        ],
+        "excludes_zero": false
+      },
+      "gpt-4o-transcribe": {
+        "ins_rate": {
+          "none": 0.011718362077526565,
+          "low": 0.1052962933816007,
+          "mid": 0.01923944085375019,
+          "high": 0.04844241211774793
+        },
+        "sub_rate": {
+          "none": 0.07514316925419577,
+          "low": 0.08475643346187141,
+          "mid": 0.07816022846836014,
+          "high": 0.11567590740211489
+        },
+        "del_rate": {
+          "none": 0.030553808467675195,
+          "low": 0.054222082316833245,
+          "mid": 0.06200210431384338,
+          "high": 0.06587596456130324
+        },
+        "ins_minus_sub_diff_in_diff": -0.003808688107697758,
+        "ci95": [
+          -0.025149248507663483,
+          0.020615279096961356
+        ],
+        "excludes_zero": false
+      },
+      "hf-openai-whisper-large-v3": {
+        "ins_rate": {
+          "none": 0.012678340891787215,
+          "low": 0.032029589989769416,
+          "mid": 0.024049301067187733,
+          "high": 0.06609031151757645
+        },
+        "sub_rate": {
+          "none": 0.07183289748088319,
+          "low": 0.08971433068387503,
+          "mid": 0.08635202164437096,
+          "high": 0.10481566161760503
+        },
+        "del_rate": {
+          "none": 0.028700056274620148,
+          "low": 0.028016054143385535,
+          "mid": 0.029610701938974898,
+          "high": 0.0460845955987425
+        },
+        "ins_minus_sub_diff_in_diff": 0.020429206489067396,
+        "ci95": [
+          0.001437300229261859,
+          0.04148676193635664
+        ],
+        "excludes_zero": true
+      },
+      "greek-whisper-v3-turbo": {
+        "ins_rate": {
+          "none": 0.011950081101658447,
+          "low": 0.008971433068387503,
+          "mid": 0.006688711859311589,
+          "high": 0.01679051157473564
+        },
+        "sub_rate": {
+          "none": 0.0816975073653547,
+          "low": 0.08082159439678917,
+          "mid": 0.05516308432286186,
+          "high": 0.06737639325521577
+        },
+        "del_rate": {
+          "none": 0.2777980072163925,
+          "low": 0.35067285748012905,
+          "mid": 0.5159326619570119,
+          "high": 0.5310803086596171
+        },
+        "ins_minus_sub_diff_in_diff": 0.019161544583216113,
+        "ci95": [
+          -0.006748562881880129,
+          0.04988713422738526
+        ],
+        "excludes_zero": false
+      },
+      "scribe-v2-clean": {
+        "ins_rate": {
+          "none": 0.017445132245357344,
+          "low": 0.040214055245140476,
+          "mid": 0.029009469412295204,
+          "high": 0.0810231494712775
+        },
+        "sub_rate": {
+          "none": 0.050845774438081366,
+          "low": 0.058629102069725346,
+          "mid": 0.051931459491958515,
+          "high": 0.08223778222349243
+        },
+        "del_rate": {
+          "none": 0.03575093515177596,
+          "low": 0.030691744707641456,
+          "mid": 0.04343905005260785,
+          "high": 0.04265504429837096
+        },
+        "ins_minus_sub_diff_in_diff": 0.032186009440509096,
+        "ci95": [
+          0.010878071733180965,
+          0.057823895940743726
+        ],
+        "excludes_zero": true
+      },
+      "soniox": {
+        "ins_rate": {
+          "none": 0.03091793836273958,
+          "low": 0.0712205870779885,
+          "mid": 0.06583496167142643,
+          "high": 0.15747356387539296
+        },
+        "sub_rate": {
+          "none": 0.04568175047171373,
+          "low": 0.05886519241363028,
+          "mid": 0.04952652938523974,
+          "high": 0.0727350671620463
+        },
+        "del_rate": {
+          "none": 0.016882386043894203,
+          "low": 0.00842055559927599,
+          "mid": 0.017210281076206223,
+          "high": 0.010002857959416977
+        },
+        "ins_minus_sub_diff_in_diff": 0.0995023088223208,
+        "ci95": [
+          0.06447019068182572,
+          0.14151842500875347
+        ],
+        "excludes_zero": true
+      },
+      "oc-minipc-finetune": {
+        "ins_rate": {
+          "none": 0.014830017544440398,
+          "low": 0.022113795545762177,
+          "mid": 0.022771681947993387,
+          "high": 0.05187196341811946
+        },
+        "sub_rate": {
+          "none": 0.0650799430633255,
+          "low": 0.08152986542850398,
+          "mid": 0.07056966781902901,
+          "high": 0.10731637610745927
+        },
+        "del_rate": {
+          "none": 0.03671091396603661,
+          "low": 0.03848272605650429,
+          "mid": 0.04900045092439501,
+          "high": 0.07673621034581309
+        },
+        "ins_minus_sub_diff_in_diff": -0.0051944871704547035,
+        "ci95": [
+          -0.024920108379487788,
+          0.01772936614068654
+        ],
+        "excludes_zero": false
+      }
+    },
+    "interpretation": "A positive DiD means insertions rise faster than substitutions between the low and high overlap buckets. That is CONSISTENT with references omitting the interjector, and equally consistent with hallucination in noisy audio or with transcribers dropping disfluencies. It decides nothing. Its only use is to decide whether a blinded listening audit of overlap events is worth booking."
+  },
+  "Q3_consensus_gain_by_overlap": {
+    "baseline": "scribe-v2-clean",
+    "gain_by_bucket": {
+      "none": -0.015843614593325173,
+      "low": -0.009596476048139693,
+      "mid": -0.00878840231352812,
+      "high": -0.0017835485481914881
+    },
+    "interaction_high_minus_low": 0.014060066045133685,
+    "ci95": [
+      0.004113797123355881,
+      0.0249015753286156
+    ],
+    "excludes_zero": true,
+    "note": "Exploratory subgroup contrast on the exact paired window set."
+  }
+}
