@@ -115,6 +115,19 @@ and a no-retrain alternative come first.
   cannot settle this: it scores in the stack the model trained in, and val_reg's
   references are the old system's output. Until then this is "the same model, trained
   correctly", not "a better model".
+- [x] **Why the fine-tune loses to base — answered from the benchmark**
+  ([report](docs/reports/2026-08-02-benchmark-diagnosis.md)). The per-city breakdown shows
+  the adapter is worse in **4 of 4 cities where base whisper is already under 13% WER**
+  (mean +1.7) and neutral-to-better on hard audio. Cause: **48.1% of training clips are
+  corrections** (teaching a standing edit bias that costs on clean speech) and **51.9% are
+  no-edit rows whose targets are the old pipeline's unverified output** (teaching
+  imitation, including its errors). The old val_corr / val_reg pair measured exactly those
+  two populations, which is why it reported gains. Same shape as the post-editor's
+  over-editing tax. **More training on this data cannot fix it.**
+- [ ] **Fix the data, not the recipe.** Verify the 15,038 no-edit labels (review hours, not
+  GPU hours) and make application selective rather than blanket. Also re-run the benchmark
+  for our model through the RunPod serverless endpoint: 10 items returned HTTP 524 from the
+  mini-PC, so 15.33 vs 15.02 is not strictly like for like.
 - [ ] **Re-open "does the fine-tune beat base?"** The corrected adapter beat base by
   ~5 WER points on the A/B's held-out sample (0/16 meetings worse), which contradicts
   the postmortem. Same-sample, same-stack comparison through the harness before any
