@@ -1,0 +1,616 @@
+{
+  "run_id": "2026-06-10-oc-benchmark",
+  "providers": [
+    "gladia-prod",
+    "gpt-4o-transcribe",
+    "hf-openai-whisper-large-v3",
+    "greek-whisper-v3-turbo",
+    "scribe-v2-clean",
+    "soniox",
+    "oc-minipc-finetune"
+  ],
+  "n_items": 250,
+  "scorer": "eval/controlled_eval/scoring.py (not the benchmark app's)",
+  "generated": "2026-08-02T11:57:52",
+  "all": {
+    "single": {
+      "gladia-prod": 0.14246170880236206,
+      "gpt-4o-transcribe": 0.16771676376769568,
+      "hf-openai-whisper-large-v3": 0.14555927556481163,
+      "greek-whisper-v3-turbo": 0.48419581894392744,
+      "scribe-v2-clean": 0.1318904384045554,
+      "soniox": 0.1403790894471832,
+      "oc-minipc-finetune": 0.14971133314001
+    },
+    "best_provider": "scribe-v2-clean",
+    "best_single": 0.1318904384045554,
+    "oracle_all": 0.10162655207866501,
+    "headroom_all": 0.030263886325890374,
+    "subsets": {
+      "gladia-prod+gpt-4o-transcribe": {
+        "oracle": 0.1302427965096354,
+        "best_single": 0.14246170880236206,
+        "headroom": 0.012218912292726647
+      },
+      "gladia-prod+hf-openai-whisper-large-v3": {
+        "oracle": 0.131363192998181,
+        "best_single": 0.14246170880236206,
+        "headroom": 0.011098515804181058
+      },
+      "gladia-prod+greek-whisper-v3-turbo": {
+        "oracle": 0.1421585426936968,
+        "best_single": 0.14246170880236206,
+        "headroom": 0.00030316610866526483
+      },
+      "gladia-prod+scribe-v2-clean": {
+        "oracle": 0.11213191680067487,
+        "best_single": 0.1318904384045554,
+        "headroom": 0.019758521603880516
+      },
+      "gladia-prod+soniox": {
+        "oracle": 0.11467587588643134,
+        "best_single": 0.1403790894471832,
+        "headroom": 0.02570321356075185
+      },
+      "gladia-prod+oc-minipc-finetune": {
+        "oracle": 0.12904331321013365,
+        "best_single": 0.14246170880236206,
+        "headroom": 0.013418395592228405
+      },
+      "gpt-4o-transcribe+hf-openai-whisper-large-v3": {
+        "oracle": 0.1336962539213877,
+        "best_single": 0.14555927556481163,
+        "headroom": 0.011863021643423927
+      },
+      "gpt-4o-transcribe+greek-whisper-v3-turbo": {
+        "oracle": 0.15207075633353545,
+        "best_single": 0.16771676376769568,
+        "headroom": 0.015646007434160225
+      },
+      "gpt-4o-transcribe+scribe-v2-clean": {
+        "oracle": 0.11892020140774523,
+        "best_single": 0.1318904384045554,
+        "headroom": 0.012970236996810158
+      },
+      "gpt-4o-transcribe+soniox": {
+        "oracle": 0.12096327735744603,
+        "best_single": 0.1403790894471832,
+        "headroom": 0.019415812089737167
+      },
+      "gpt-4o-transcribe+oc-minipc-finetune": {
+        "oracle": 0.13370943505654706,
+        "best_single": 0.14971133314001,
+        "headroom": 0.016001898083462945
+      },
+      "hf-openai-whisper-large-v3+greek-whisper-v3-turbo": {
+        "oracle": 0.14519020378034955,
+        "best_single": 0.14555927556481163,
+        "headroom": 0.0003690717844620772
+      },
+      "hf-openai-whisper-large-v3+scribe-v2-clean": {
+        "oracle": 0.11566446102338333,
+        "best_single": 0.1318904384045554,
+        "headroom": 0.016225977381172055
+      },
+      "hf-openai-whisper-large-v3+soniox": {
+        "oracle": 0.11665304616033532,
+        "best_single": 0.1403790894471832,
+        "headroom": 0.023726043286847867
+      },
+      "hf-openai-whisper-large-v3+oc-minipc-finetune": {
+        "oracle": 0.1322199667835394,
+        "best_single": 0.14555927556481163,
+        "headroom": 0.013339308781272236
+      },
+      "greek-whisper-v3-turbo+scribe-v2-clean": {
+        "oracle": 0.1308359475918066,
+        "best_single": 0.1318904384045554,
+        "headroom": 0.0010544908127487762
+      },
+      "greek-whisper-v3-turbo+soniox": {
+        "oracle": 0.13829647009200433,
+        "best_single": 0.1403790894471832,
+        "headroom": 0.0020826193551788663
+      },
+      "greek-whisper-v3-turbo+oc-minipc-finetune": {
+        "oracle": 0.14931589908522921,
+        "best_single": 0.14971133314001,
+        "headroom": 0.0003954340547807911
+      },
+      "scribe-v2-clean+soniox": {
+        "oracle": 0.11793161627079324,
+        "best_single": 0.1318904384045554,
+        "headroom": 0.01395882213376215
+      },
+      "scribe-v2-clean+oc-minipc-finetune": {
+        "oracle": 0.11909155616481691,
+        "best_single": 0.1318904384045554,
+        "headroom": 0.012798882239738477
+      },
+      "soniox+oc-minipc-finetune": {
+        "oracle": 0.1200142356259721,
+        "best_single": 0.1403790894471832,
+        "headroom": 0.020364853821211087
+      },
+      "gladia-prod+gpt-4o-transcribe+hf-openai-whisper-large-v3": {
+        "oracle": 0.12581393509609048,
+        "best_single": 0.14246170880236206,
+        "headroom": 0.016647773706271574
+      },
+      "gladia-prod+gpt-4o-transcribe+greek-whisper-v3-turbo": {
+        "oracle": 0.1300846228877231,
+        "best_single": 0.14246170880236206,
+        "headroom": 0.012377085914638958
+      },
+      "gladia-prod+gpt-4o-transcribe+scribe-v2-clean": {
+        "oracle": 0.11027337674320513,
+        "best_single": 0.1318904384045554,
+        "headroom": 0.02161706166135026
+      },
+      "gladia-prod+gpt-4o-transcribe+soniox": {
+        "oracle": 0.11124878074499776,
+        "best_single": 0.1403790894471832,
+        "headroom": 0.02913030870218543
+      },
+      "gladia-prod+gpt-4o-transcribe+oc-minipc-finetune": {
+        "oracle": 0.12440355363403896,
+        "best_single": 0.14246170880236206,
+        "headroom": 0.018058155168323098
+      },
+      "gladia-prod+hf-openai-whisper-large-v3+greek-whisper-v3-turbo": {
+        "oracle": 0.1312050193762687,
+        "best_single": 0.14246170880236206,
+        "headroom": 0.01125668942609337
+      },
+      "gladia-prod+hf-openai-whisper-large-v3+scribe-v2-clean": {
+        "oracle": 0.1094561463633248,
+        "best_single": 0.1318904384045554,
+        "headroom": 0.022434292041230583
+      },
+      "gladia-prod+hf-openai-whisper-large-v3+soniox": {
+        "oracle": 0.11052381831123297,
+        "best_single": 0.1403790894471832,
+        "headroom": 0.029855271135950226
+      },
+      "gladia-prod+hf-openai-whisper-large-v3+oc-minipc-finetune": {
+        "oracle": 0.12464081406690744,
+        "best_single": 0.14246170880236206,
+        "headroom": 0.017820894735454618
+      },
+      "gladia-prod+greek-whisper-v3-turbo+scribe-v2-clean": {
+        "oracle": 0.11211873566551551,
+        "best_single": 0.1318904384045554,
+        "headroom": 0.019771702739039873
+      },
+      "gladia-prod+greek-whisper-v3-turbo+soniox": {
+        "oracle": 0.1146231513457939,
+        "best_single": 0.1403790894471832,
+        "headroom": 0.025755938101389292
+      },
+      "gladia-prod+greek-whisper-v3-turbo+oc-minipc-finetune": {
+        "oracle": 0.12888513958822134,
+        "best_single": 0.14246170880236206,
+        "headroom": 0.013576569214140716
+      },
+      "gladia-prod+scribe-v2-clean+soniox": {
+        "oracle": 0.10513273403105475,
+        "best_single": 0.1318904384045554,
+        "headroom": 0.02675770437350064
+      },
+      "gladia-prod+scribe-v2-clean+oc-minipc-finetune": {
+        "oracle": 0.1095220520391216,
+        "best_single": 0.1318904384045554,
+        "headroom": 0.022368386365433784
+      },
+      "gladia-prod+soniox+oc-minipc-finetune": {
+        "oracle": 0.11094561463633248,
+        "best_single": 0.1403790894471832,
+        "headroom": 0.029433474810850707
+      },
+      "gpt-4o-transcribe+hf-openai-whisper-large-v3+greek-whisper-v3-turbo": {
+        "oracle": 0.13360398597527218,
+        "best_single": 0.14555927556481163,
+        "headroom": 0.011955289589539453
+      },
+      "gpt-4o-transcribe+hf-openai-whisper-large-v3+scribe-v2-clean": {
+        "oracle": 0.11354229826272638,
+        "best_single": 0.1318904384045554,
+        "headroom": 0.018348140141829006
+      },
+      "gpt-4o-transcribe+hf-openai-whisper-large-v3+soniox": {
+        "oracle": 0.1137004718846387,
+        "best_single": 0.1403790894471832,
+        "headroom": 0.026678617562544485
+      },
+      "gpt-4o-transcribe+hf-openai-whisper-large-v3+oc-minipc-finetune": {
+        "oracle": 0.12688160704399862,
+        "best_single": 0.14555927556481163,
+        "headroom": 0.018677668520813012
+      },
+      "gpt-4o-transcribe+greek-whisper-v3-turbo+scribe-v2-clean": {
+        "oracle": 0.11826114464977724,
+        "best_single": 0.1318904384045554,
+        "headroom": 0.013629293754778143
+      },
+      "gpt-4o-transcribe+greek-whisper-v3-turbo+soniox": {
+        "oracle": 0.1200801413017689,
+        "best_single": 0.1403790894471832,
+        "headroom": 0.02029894814541429
+      },
+      "gpt-4o-transcribe+greek-whisper-v3-turbo+oc-minipc-finetune": {
+        "oracle": 0.13360398597527218,
+        "best_single": 0.14971133314001,
+        "headroom": 0.01610734716473783
+      },
+      "gpt-4o-transcribe+scribe-v2-clean+soniox": {
+        "oracle": 0.1106424485276672,
+        "best_single": 0.1318904384045554,
+        "headroom": 0.021247989876888182
+      },
+      "gpt-4o-transcribe+scribe-v2-clean+oc-minipc-finetune": {
+        "oracle": 0.11381910210107295,
+        "best_single": 0.1318904384045554,
+        "headroom": 0.01807133630348244
+      },
+      "gpt-4o-transcribe+soniox+oc-minipc-finetune": {
+        "oracle": 0.11463633248095326,
+        "best_single": 0.1403790894471832,
+        "headroom": 0.025742756966229935
+      },
+      "hf-openai-whisper-large-v3+greek-whisper-v3-turbo+scribe-v2-clean": {
+        "oracle": 0.11563809875306462,
+        "best_single": 0.1318904384045554,
+        "headroom": 0.01625233965149077
+      },
+      "hf-openai-whisper-large-v3+greek-whisper-v3-turbo+soniox": {
+        "oracle": 0.11658714048453853,
+        "best_single": 0.1403790894471832,
+        "headroom": 0.023791948962644666
+      },
+      "hf-openai-whisper-large-v3+greek-whisper-v3-turbo+oc-minipc-finetune": {
+        "oracle": 0.13206179316162708,
+        "best_single": 0.14555927556481163,
+        "headroom": 0.013497482403184546
+      },
+      "hf-openai-whisper-large-v3+scribe-v2-clean+soniox": {
+        "oracle": 0.10786122900904226,
+        "best_single": 0.1318904384045554,
+        "headroom": 0.024029209395513132
+      },
+      "hf-openai-whisper-large-v3+scribe-v2-clean+oc-minipc-finetune": {
+        "oracle": 0.11275143015316479,
+        "best_single": 0.1318904384045554,
+        "headroom": 0.019139008251390602
+      },
+      "hf-openai-whisper-large-v3+soniox+oc-minipc-finetune": {
+        "oracle": 0.11306777739698944,
+        "best_single": 0.1403790894471832,
+        "headroom": 0.027311312050193756
+      },
+      "greek-whisper-v3-turbo+scribe-v2-clean+soniox": {
+        "oracle": 0.11698257453931933,
+        "best_single": 0.1318904384045554,
+        "headroom": 0.014907863865236057
+      },
+      "greek-whisper-v3-turbo+scribe-v2-clean+oc-minipc-finetune": {
+        "oracle": 0.11894656367806396,
+        "best_single": 0.1318904384045554,
+        "headroom": 0.01294387472649143
+      },
+      "greek-whisper-v3-turbo+soniox+oc-minipc-finetune": {
+        "oracle": 0.11989560540953786,
+        "best_single": 0.1403790894471832,
+        "headroom": 0.020483484037645328
+      },
+      "scribe-v2-clean+soniox+oc-minipc-finetune": {
+        "oracle": 0.11080062214957952,
+        "best_single": 0.1318904384045554,
+        "headroom": 0.02108981625497587
+      }
+    }
+  },
+  "consensus": {
+    "scribe+soniox+ours": {
+      "combo": [
+        "scribe-v2-clean",
+        "soniox",
+        "oc-minipc-finetune"
+      ],
+      "baseline": "scribe-v2-clean",
+      "wer_consensus": 0.12109508870903962,
+      "wer_baseline": 0.1318904384045554,
+      "wer_oracle": 0.11080062214957952,
+      "headroom_captured": 0.5118749999999996,
+      "ci_vs_baseline": {
+        "delta": -0.010795349695515766,
+        "ci95": [
+          -0.014164980680629742,
+          -0.0073858133410419835
+        ],
+        "excludes_zero": true,
+        "n_clusters": 147
+      },
+      "head2head": {
+        "a_better": 105,
+        "tie": 116,
+        "b_better": 29
+      },
+      "n_items": 250,
+      "n_clusters": 147
+    },
+    "scribe+soniox+gladia": {
+      "combo": [
+        "scribe-v2-clean",
+        "soniox",
+        "gladia-prod"
+      ],
+      "baseline": "scribe-v2-clean",
+      "wer_consensus": 0.12337542509160888,
+      "wer_baseline": 0.1318904384045554,
+      "wer_oracle": 0.10513273403105475,
+      "headroom_captured": 0.3182266009852215,
+      "ci_vs_baseline": {
+        "delta": -0.008515013312946504,
+        "ci95": [
+          -0.012537479733105431,
+          -0.00421676091245979
+        ],
+        "excludes_zero": true,
+        "n_clusters": 147
+      },
+      "head2head": {
+        "a_better": 103,
+        "tie": 107,
+        "b_better": 40
+      },
+      "n_items": 250,
+      "n_clusters": 147
+    },
+    "scribe+soniox+whisper": {
+      "combo": [
+        "scribe-v2-clean",
+        "soniox",
+        "hf-openai-whisper-large-v3"
+      ],
+      "baseline": "scribe-v2-clean",
+      "wer_consensus": 0.12288772309071257,
+      "wer_baseline": 0.1318904384045554,
+      "wer_oracle": 0.10786122900904226,
+      "headroom_captured": 0.3746571585298956,
+      "ci_vs_baseline": {
+        "delta": -0.009002715313842821,
+        "ci95": [
+          -0.012683077669266725,
+          -0.00514921235779017
+        ],
+        "excludes_zero": true,
+        "n_clusters": 147
+      },
+      "head2head": {
+        "a_better": 111,
+        "tie": 103,
+        "b_better": 36
+      },
+      "n_items": 250,
+      "n_clusters": 147
+    }
+  },
+  "by_contamination": {
+    "clean": {
+      "n_items": 103,
+      "single": {
+        "gladia-prod": 0.1417376160990712,
+        "gpt-4o-transcribe": 0.1865970072239422,
+        "hf-openai-whisper-large-v3": 0.14573658410732715,
+        "greek-whisper-v3-turbo": 0.49593653250773995,
+        "scribe-v2-clean": 0.13280443756449947,
+        "soniox": 0.14122162022703819,
+        "oc-minipc-finetune": 0.1465750773993808
+      },
+      "scribe+soniox+ours": {
+        "combo": [
+          "scribe-v2-clean",
+          "soniox",
+          "oc-minipc-finetune"
+        ],
+        "baseline": "scribe-v2-clean",
+        "wer_consensus": 0.11932404540763673,
+        "wer_baseline": 0.13280443756449947,
+        "wer_oracle": 0.10958462332301341,
+        "headroom_captured": 0.5805555555555555,
+        "ci_vs_baseline": {
+          "delta": -0.013480392156862739,
+          "ci95": [
+            -0.020135319690624997,
+            -0.007466540529921252
+          ],
+          "excludes_zero": true,
+          "n_clusters": 79
+        },
+        "head2head": {
+          "a_better": 46,
+          "tie": 47,
+          "b_better": 10
+        },
+        "n_items": 103,
+        "n_clusters": 79
+      },
+      "scribe+soniox+gladia": {
+        "combo": [
+          "scribe-v2-clean",
+          "soniox",
+          "gladia-prod"
+        ],
+        "baseline": "scribe-v2-clean",
+        "wer_consensus": 0.12064628482972137,
+        "wer_baseline": 0.13280443756449947,
+        "wer_oracle": 0.1026186790505676,
+        "headroom_captured": 0.4027777777777774,
+        "ci_vs_baseline": {
+          "delta": -0.012158152734778105,
+          "ci95": [
+            -0.01925789580109232,
+            -0.0051164533034964025
+          ],
+          "excludes_zero": true,
+          "n_clusters": 79
+        },
+        "head2head": {
+          "a_better": 44,
+          "tie": 49,
+          "b_better": 10
+        },
+        "n_items": 103,
+        "n_clusters": 79
+      },
+      "scribe+soniox+whisper": {
+        "combo": [
+          "scribe-v2-clean",
+          "soniox",
+          "hf-openai-whisper-large-v3"
+        ],
+        "baseline": "scribe-v2-clean",
+        "wer_consensus": 0.11961429308565531,
+        "wer_baseline": 0.13280443756449947,
+        "wer_oracle": 0.10684339525283798,
+        "headroom_captured": 0.5080745341614906,
+        "ci_vs_baseline": {
+          "delta": -0.01319014447884416,
+          "ci95": [
+            -0.019734868155609757,
+            -0.007392197643684379
+          ],
+          "excludes_zero": true,
+          "n_clusters": 79
+        },
+        "head2head": {
+          "a_better": 48,
+          "tie": 45,
+          "b_better": 10
+        },
+        "n_items": 103,
+        "n_clusters": 79
+      }
+    },
+    "in_training": {
+      "n_items": 147,
+      "single": {
+        "gladia-prod": 0.14296223639038744,
+        "gpt-4o-transcribe": 0.15466583441080745,
+        "hf-openai-whisper-large-v3": 0.1454367114004191,
+        "greek-whisper-v3-turbo": 0.47608007490302734,
+        "scribe-v2-clean": 0.13125863836996746,
+        "soniox": 0.13979669178295956,
+        "oc-minipc-finetune": 0.1518792634535646
+      },
+      "scribe+soniox+ours": {
+        "combo": [
+          "scribe-v2-clean",
+          "soniox",
+          "oc-minipc-finetune"
+        ],
+        "baseline": "scribe-v2-clean",
+        "wer_consensus": 0.12231931873913238,
+        "wer_baseline": 0.13125863836996746,
+        "wer_oracle": 0.11164117883097775,
+        "headroom_captured": 0.45568181818181813,
+        "ci_vs_baseline": {
+          "delta": -0.00893931963083508,
+          "ci95": [
+            -0.01292607853577051,
+            -0.004812475041929559
+          ],
+          "excludes_zero": true,
+          "n_clusters": 77
+        },
+        "head2head": {
+          "a_better": 59,
+          "tie": 69,
+          "b_better": 19
+        },
+        "n_items": 147,
+        "n_clusters": 77
+      },
+      "scribe+soniox+gladia": {
+        "combo": [
+          "scribe-v2-clean",
+          "soniox",
+          "gladia-prod"
+        ],
+        "baseline": "scribe-v2-clean",
+        "wer_consensus": 0.12526193766998084,
+        "wer_baseline": 0.13125863836996746,
+        "wer_oracle": 0.10687056935217798,
+        "headroom_captured": 0.2458866544789759,
+        "ci_vs_baseline": {
+          "delta": -0.005996700699986618,
+          "ci95": [
+            -0.010777118544329957,
+            -0.0007506894722620116
+          ],
+          "excludes_zero": true,
+          "n_clusters": 77
+        },
+        "head2head": {
+          "a_better": 59,
+          "tie": 58,
+          "b_better": 30
+        },
+        "n_items": 147,
+        "n_clusters": 77
+      },
+      "scribe+soniox+whisper": {
+        "combo": [
+          "scribe-v2-clean",
+          "soniox",
+          "hf-openai-whisper-large-v3"
+        ],
+        "baseline": "scribe-v2-clean",
+        "wer_consensus": 0.12515047483169112,
+        "wer_baseline": 0.13125863836996746,
+        "wer_oracle": 0.10856480449418164,
+        "headroom_captured": 0.269155206286837,
+        "ci_vs_baseline": {
+          "delta": -0.00610816353827634,
+          "ci95": [
+            -0.010837897822228292,
+            -0.001201796070398447
+          ],
+          "excludes_zero": true,
+          "n_clusters": 77
+        },
+        "head2head": {
+          "a_better": 63,
+          "tie": 58,
+          "b_better": 26
+        },
+        "n_items": 147,
+        "n_clusters": 77
+      }
+    }
+  },
+  "split_half": {
+    "A_picks_B": {
+      "chosen_on_fit_half": [
+        "scribe-v2-clean",
+        "soniox",
+        "oc-minipc-finetune"
+      ],
+      "wer_on_fit": 0.13169600733291995,
+      "wer_on_test": 0.11095349856859155,
+      "baseline_on_test": 0.1233074562195342,
+      "n_test_items": 126
+    },
+    "B_picks_A": {
+      "chosen_on_fit_half": [
+        "gpt-4o-transcribe",
+        "scribe-v2-clean",
+        "soniox"
+      ],
+      "wer_on_fit": 0.1099218528357362,
+      "wer_on_test": 0.13266654085676544,
+      "baseline_on_test": 0.1408621572803494,
+      "n_test_items": 124
+    }
+  }
+}
