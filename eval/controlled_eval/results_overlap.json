@@ -4,7 +4,7 @@
   "n_windows": 232,
   "n_dropped_no_audio": 18,
   "n_boot": 10000,
-  "generated": "2026-08-03T02:23:20",
+  "generated": "2026-08-03T12:30:36",
   "claim_limits": "Descriptive association between pyannote-ESTIMATED overlap and the error rates of existing systems. Not causal, not an estimate of what an overlap-targeted system would recover. Overlap is confounded with general acoustic difficulty and the diarizer is unvalidated on Greek.",
   "dropped_vs_kept": {
     "gladia-prod": {

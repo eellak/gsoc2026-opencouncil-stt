@@ -1,0 +1,45 @@
+{
+  "n_corrections": 3832,
+  "utterance_level": {
+    "pure_formatting_pct": 8.8,
+    "word-level-change": 3495,
+    "pure-formatting": 337
+  },
+  "word_level_ops": {
+    "spelling-tweak": {
+      "ops": 2088,
+      "ops_pct": 43.1,
+      "token_volume": 2631,
+      "tok_pct": 32.6
+    },
+    "other-lexical": {
+      "ops": 1948,
+      "ops_pct": 40.2,
+      "token_volume": 3681,
+      "tok_pct": 45.6
+    },
+    "glossary-term": {
+      "ops": 408,
+      "ops_pct": 8.4,
+      "token_volume": 824,
+      "tok_pct": 10.2
+    },
+    "number": {
+      "ops": 228,
+      "ops_pct": 4.7,
+      "token_volume": 557,
+      "tok_pct": 6.9
+    },
+    "roster-name": {
+      "ops": 176,
+      "ops_pct": 3.6,
+      "token_volume": 387,
+      "tok_pct": 4.8
+    }
+  },
+  "non_formatting_utterances": {
+    "all-ops-contextual/textual": 1858,
+    "all-ops-other-lexical": 1174,
+    "mixed": 463
+  }
+}

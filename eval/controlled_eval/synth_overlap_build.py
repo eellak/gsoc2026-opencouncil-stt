@@ -121,20 +121,31 @@ def active_rms(x: np.ndarray, hop: int = SR // 100) -> float:
     m = active_mask(x, hop)
     if not m.any():
         return float(np.sqrt((x ** 2).mean() + 1e-20))
-    idx = np.repeat(m, hop)[:len(x)]
+    # frame_rms drops the tail partial frame, so the mask is short of len(x); the
+    # remainder is under a hop and is left out rather than guessed at.
+    idx = np.zeros(len(x), dtype=bool)
+    r = np.repeat(m, hop)[:len(x)]
+    idx[:len(r)] = r
     return float(np.sqrt((x[idx] ** 2).mean() + 1e-20))
 
 
-def longest_active_run(x: np.ndarray, want: float, hop: int = SR // 100):
-    """Start sample of a `want`-second stretch that is speech-active throughout."""
+def best_active_window(x: np.ndarray, want: float, min_frac: float = 0.7,
+                       hop: int = SR // 100):
+    """Start sample of the `want`-second stretch with the most speech in it.
+
+    Not "active in every frame": stop consonants and inter-word gaps mean a genuinely
+    continuous utterance is only ~50-90% active at 10 ms resolution, and demanding 100%
+    rejected 24 of the first 25 windows. The criterion that matters is "the main speaker
+    is talking through here", which is a fraction, not a run.
+    """
     m = active_mask(x, hop)
     need = int(round(want * SR / hop))
-    if need > len(m):
+    if need > len(m) or need <= 0:
         return None
     cs = np.concatenate([[0], np.cumsum(m.astype(int))])
     run = cs[need:] - cs[:-need]
     best = int(np.argmax(run))
-    if run[best] < need:                      # no fully-active stretch
+    if run[best] < min_frac * need:
         return None
     return best * hop
 
@@ -143,7 +154,7 @@ def longest_active_run(x: np.ndarray, want: float, hop: int = SR // 100):
 def mine_donor(item, dur: float):
     """A single-speaker excerpt from a zero-overlap window, fully speech-active."""
     x = decode(item["_audio"], item["_start"], item["_dur"])
-    s = longest_active_run(x, dur)
+    s = best_active_window(x, dur, min_frac=0.8)
     if s is None:
         return None
     d = x[s:s + int(dur * SR)]
@@ -181,19 +192,28 @@ def build_item(item, donors, out_dir: Path) -> dict | None:
     n = len(target)
 
     dur = float(rng_for("dur", item["item_id"]).uniform(DONOR_MIN, DONOR_MAX))
-    pos = longest_active_run(target, dur + 0.2)
+    pos = best_active_window(target, dur + 0.2, min_frac=0.7)
     if pos is None:
-        return None                              # no fully-active stretch to talk over
+        return "no target speech stretch"
     pos += int(0.1 * SR)
 
     # donor from a different city, chosen by a stable hash of the item id
     pool = [d for d in donors if d["city_id"] != item["city_id"]]
     if not pool:
-        return None
-    donor = pool[h32("donor", item["item_id"]) % len(pool)]
-    d = mine_donor(donor, dur)
+        return "no donor from another city"
+    # Deterministic start point, then walk the pool: one fixed pick failed on 11 of 25
+    # items because that particular window had no clean stretch of the wanted length.
+    # Walking preserves reproducibility (same hash, same order) and fixes coverage.
+    off = h32("donor", item["item_id"]) % len(pool)
+    donor = d = None
+    for j in range(len(pool)):
+        cand = pool[(off + j) % len(pool)]
+        d = mine_donor(cand, dur)
+        if d is not None:
+            donor = cand
+            break
     if d is None:
-        return None
+        return "no donor in the pool has a clean speech stretch"
 
     local = target[pos:pos + len(d)]
     t_rms = active_rms(local)
@@ -222,7 +242,7 @@ def build_item(item, donors, out_dir: Path) -> dict | None:
 
     bad = [a for a, got in achieved.items() if abs(got - ARMS[a][1]) > SIR_TOL]
     if bad:
-        return None                              # QC gate: achieved SIR off spec
+        return f"QC: achieved SIR off spec {bad}"
 
     ref = (arms["A"] * gain)
     for arm, y in arms.items():
@@ -281,7 +301,8 @@ def main():
     for i, it in enumerate(targets, 1):
         try:
             m = build_item(it, donors, OUT)
-            err = "qc gate or no usable speech stretch"
+            err = m if isinstance(m, str) else ""
+            m = None if isinstance(m, str) else m
         except (AssertionError, subprocess.CalledProcessError) as e:
             m, err = None, f"{type(e).__name__}: {e}"
         if m is None:

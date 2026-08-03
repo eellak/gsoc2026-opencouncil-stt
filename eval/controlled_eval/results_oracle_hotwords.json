@@ -1,0 +1,50 @@
+{
+  "n": 59,
+  "results": {
+    "base": {
+      "wer": 0.34119278779472956,
+      "name_recall": 0.2719298245614035,
+      "matched": 31,
+      "gold": 114,
+      "false_name_insertions": null
+    },
+    "base+roster": {
+      "wer": 0.3460471567267684,
+      "name_recall": 0.35964912280701755,
+      "matched": 41,
+      "gold": 114,
+      "false_name_insertions": null
+    },
+    "base+oracle": {
+      "wer": 0.3356449375866852,
+      "name_recall": 0.35964912280701755,
+      "matched": 41,
+      "gold": 114,
+      "false_name_insertions": 0
+    },
+    "base+distractor": {
+      "wer": 0.3578363384188627,
+      "name_recall": 0.32456140350877194,
+      "matched": 37,
+      "gold": 114,
+      "false_name_insertions": 1
+    }
+  },
+  "head2head": {
+    "base+oracle_vs_base": {
+      "a_better": 17,
+      "a_worse": 12,
+      "tie": 30
+    },
+    "base+oracle_vs_base+roster": {
+      "a_better": 25,
+      "a_worse": 14,
+      "tie": 20
+    },
+    "base+distractor_vs_base": {
+      "a_better": 10,
+      "a_worse": 12,
+      "tie": 37
+    }
+  }
+}

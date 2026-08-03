@@ -1,0 +1,52 @@
+{
+  "n": 50,
+  "results": {
+    "scribe_before": {
+      "wer": 0.15517241379310345,
+      "roster_recall": 0.0,
+      "matched": 0,
+      "gold": 1
+    },
+    "base": {
+      "wer": 0.15763546798029557,
+      "roster_recall": 0.0,
+      "matched": 0,
+      "gold": 1
+    },
+    "ours": {
+      "wer": 0.17610837438423646,
+      "roster_recall": 0.0,
+      "matched": 0,
+      "gold": 1
+    },
+    "base+hotwords": {
+      "wer": 0.15517241379310345,
+      "roster_recall": 1.0,
+      "matched": 1,
+      "gold": 1
+    },
+    "ours+hotwords": {
+      "wer": 0.16379310344827586,
+      "roster_recall": 1.0,
+      "matched": 1,
+      "gold": 1
+    }
+  },
+  "head2head": {
+    "base+hotwords_vs_base": {
+      "a_better": 7,
+      "a_worse": 6,
+      "tie": 37
+    },
+    "ours+hotwords_vs_ours": {
+      "a_better": 18,
+      "a_worse": 8,
+      "tie": 24
+    },
+    "base+hotwords_vs_ours": {
+      "a_better": 20,
+      "a_worse": 7,
+      "tie": 23
+    }
+  }
+}

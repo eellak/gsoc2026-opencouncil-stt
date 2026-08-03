@@ -1,0 +1,47 @@
+{
+  "n": 59,
+  "n_gold": 114,
+  "results": {
+    "base": {
+      "wer": 0.34119278779472956,
+      "name_recall": 0.2719298245614035,
+      "matched": 31,
+      "gold": 114
+    },
+    "base+hotwords": {
+      "wer": 0.3460471567267684,
+      "name_recall": 0.35964912280701755,
+      "matched": 41,
+      "gold": 114
+    },
+    "ours": {
+      "wer": 0.33356449375866853,
+      "name_recall": 0.3333333333333333,
+      "matched": 38,
+      "gold": 114
+    },
+    "ours+hotwords": {
+      "wer": 0.30721220527045767,
+      "name_recall": 0.37719298245614036,
+      "matched": 43,
+      "gold": 114
+    }
+  },
+  "head2head": {
+    "base+hotwords_vs_base": {
+      "a_better": 15,
+      "a_worse": 18,
+      "tie": 26
+    },
+    "ours+hotwords_vs_ours": {
+      "a_better": 30,
+      "a_worse": 8,
+      "tie": 21
+    },
+    "base+hotwords_vs_ours": {
+      "a_better": 29,
+      "a_worse": 20,
+      "tie": 10
+    }
+  }
+}
