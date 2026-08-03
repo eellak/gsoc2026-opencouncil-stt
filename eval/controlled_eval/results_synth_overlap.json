@@ -1,0 +1,204 @@
+{
+ "preregistration": "docs/specs/synthetic-overlap-preregistration.md",
+ "n_items": 95,
+ "n_target_meetings": 72,
+ "n_donor_meetings": 30,
+ "n_boot": 10000,
+ "cluster_warning": null,
+ "claim_limits": "Causal for THIS additive-speech intervention on these windows, not for natural crosstalk. Two Whisper-family systems only.",
+ "systems": {
+  "whisper-large-v3": {
+   "wer_clean": 0.1314024177206345,
+   "vs_clean": {
+    "B": {
+     "delta": -0.0020613514080078388,
+     "ci95": [
+      -0.006313343715842949,
+      0.0003326824919144703
+     ],
+     "excludes_zero": false,
+     "n_clusters": 72,
+     "label": "B - A",
+     "wer_a": 0.12934106631262665,
+     "wer_b": 0.1314024177206345
+    },
+    "C": {
+     "delta": 0.0016071553350569256,
+     "ci95": [
+      -0.0048760120277805494,
+      0.007601275532264521
+     ],
+     "excludes_zero": false,
+     "n_clusters": 72,
+     "label": "C - A",
+     "wer_a": 0.13300957305569142,
+     "wer_b": 0.1314024177206345
+    },
+    "D": {
+     "delta": 0.00838515826986233,
+     "ci95": [
+      0.00030624877395329844,
+      0.01680504919694385
+     ],
+     "excludes_zero": true,
+     "n_clusters": 72,
+     "label": "D - A",
+     "wer_a": 0.13978757599049682,
+     "wer_b": 0.1314024177206345
+    },
+    "E": {
+     "delta": -0.0034938159457759965,
+     "ci95": [
+      -0.011033955320898558,
+      0.002384209242379123
+     ],
+     "excludes_zero": false,
+     "n_clusters": 72,
+     "label": "E - A",
+     "wer_a": 0.1279086017748585,
+     "wer_b": 0.1314024177206345
+    },
+    "F": {
+     "delta": 0.0008734539864439783,
+     "ci95": [
+      -0.003810942523059574,
+      0.004562316321433277
+     ],
+     "excludes_zero": false,
+     "n_clusters": 72,
+     "label": "F - A",
+     "wer_a": 0.13227587170707847,
+     "wer_b": 0.1314024177206345
+    },
+    "G": {
+     "delta": 0.001048144783732774,
+     "ci95": [
+      -0.0015378437126940835,
+      0.004942940881453214
+     ],
+     "excludes_zero": false,
+     "n_clusters": 72,
+     "label": "G - A",
+     "wer_a": 0.13245056250436726,
+     "wer_b": 0.1314024177206345
+    },
+    "H": {
+     "delta": -0.0009083921459017708,
+     "ci95": [
+      -0.007977352773882018,
+      0.0056464150343048195
+     ],
+     "excludes_zero": false,
+     "n_clusters": 72,
+     "label": "H - A",
+     "wer_a": 0.13049402557473272,
+     "wer_b": 0.1314024177206345
+    }
+   },
+   "speech_specific_C_minus_E": {
+    "delta": 0.005100971280832922,
+    "ci95": [
+     -0.0006803670812100126,
+     0.014913399271808922
+    ],
+    "excludes_zero": false,
+    "n_clusters": 72,
+    "label": "C - E",
+    "wer_a": 0.13300957305569142,
+    "wer_b": 0.1279086017748585
+   },
+   "voice_vs_reversed_C_minus_F": {
+    "delta": 0.0007337013486129473,
+    "ci95": [
+     -0.004733827556546204,
+     0.006888017663709472
+    ],
+    "excludes_zero": false,
+    "n_clusters": 72,
+    "label": "C - F",
+    "wer_a": 0.13300957305569142,
+    "wer_b": 0.13227587170707847
+   },
+   "donor_aware_bound": {
+    "C": {
+     "delta": 0.0011878974215638327,
+     "ci95": [
+      -0.005315552459358176,
+      0.007204136165276758
+     ],
+     "excludes_zero": false,
+     "n_clusters": 72,
+     "label": "C - A, donor words discounted",
+     "wer_a": 0.14055621549856753,
+     "wer_b": 0.1393683180770037
+    }
+   },
+   "sdi_per_arm": {
+    "A": {
+     "sub": 0.0651247292292642,
+     "del": 0.054538466913563,
+     "ins": 0.01173922157780728,
+     "note": "alignment decomposition, not source attribution"
+    },
+    "B": {
+     "sub": 0.0654741108238418,
+     "del": 0.05251205366501293,
+     "ins": 0.011354901823771925,
+     "note": "alignment decomposition, not source attribution"
+    },
+    "C": {
+     "sub": 0.06746558591293411,
+     "del": 0.05352526028928796,
+     "ins": 0.01201872685346936,
+     "note": "alignment decomposition, not source attribution"
+    },
+    "D": {
+     "sub": 0.07113409265599888,
+     "del": 0.05607574592970442,
+     "ins": 0.012577737404793515,
+     "note": "alignment decomposition, not source attribution"
+    },
+    "E": {
+     "sub": 0.0672908951156453,
+     "del": 0.04922786667598351,
+     "ins": 0.011389839983229684,
+     "note": "alignment decomposition, not source attribution"
+    },
+    "F": {
+     "sub": 0.06722101879672979,
+     "del": 0.05394451820278108,
+     "ins": 0.011110334707567605,
+     "note": "alignment decomposition, not source attribution"
+    },
+    "G": {
+     "sub": 0.06575361609950388,
+     "del": 0.054224023478443156,
+     "ins": 0.012472922926420237,
+     "note": "alignment decomposition, not source attribution"
+    },
+    "H": {
+     "sub": 0.06488016211305989,
+     "del": 0.05373488924603452,
+     "ins": 0.01187897421563832,
+     "note": "alignment decomposition, not source attribution"
+    }
+   },
+   "spillover_C": {
+    "changed_words_outside_event": 467,
+    "words_outside_event": 25898,
+    "frac": 0.018032280484979533
+   }
+  }
+ },
+ "gate": {
+  "system": "whisper-large-v3",
+  "arm": "C",
+  "burden_C_minus_A": 0.0016071553350569256,
+  "threshold": 0.02,
+  "speech_specific_C_minus_E": 0.005100971280832922,
+  "threshold_speech": 0.01,
+  "one_sided_lb90_C_minus_E": 0.0005146918130653334,
+  "pass": false,
+  "note": "A pass still requires a frozen pretrained separator to recover >=25% of the added errors before DiCoW is trained."
+ }
+}

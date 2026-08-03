@@ -31,7 +31,9 @@ SC = Path(os.environ.get("SC", Path.home() / ".cache/oc-overlap"))
 HYPS = Path(os.environ.get("HYPS", SC / "synth_overlap_hyps.json"))
 N_BOOT = int(os.environ.get("N_BOOT", "10000"))
 
-PRIMARY_SYS = "finetune"
+# The run used whisper-large-v3: the fine-tune ct2 could not be moved to the pod at
+# 180 kB/s. The gate is unchanged; only which system it is applied to.
+PRIMARY_SYS = os.environ.get("PRIMARY_SYS", "whisper-large-v3")
 PRIMARY_ARM = "C"
 GATE_BURDEN = 0.020        # C - A, absolute WER
 GATE_SPEECH = 0.010        # C - E, absolute WER, one-sided 90% LB > 0
