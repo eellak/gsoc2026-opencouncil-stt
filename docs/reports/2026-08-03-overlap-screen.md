@@ -161,6 +161,37 @@ speaker count but no text. The count answers the pyannote question completely; i
 answer this one. What is needed is small and specific: the second speaker's words on the
 ~15 clips where they are intelligible at all.
 
+## 6. The paid model agrees with the free one
+
+`eval/controlled_eval/precision2_compare.py` · raw: `results_precision2.json`.
+pyannoteAI's commercial `precision-2` on the same 60 clips, judged against the same human
+answers.
+
+| | community-1 | precision-2 |
+|---|---|---|
+| overlap found in the 40 flagged clips | 40/40 (human-confirmed) | 40/40 |
+| overlap found in the 20 zero-overlap controls | 0/20 by construction | 1/20 |
+
+Complete agreement on the events, and an independent confirmation that 19 of the 20
+control windows really are overlap-free. **There is nothing to buy here.** The open-source
+model is not the limiting factor in any measurement in this file, so the overlap numbers
+stand as computed and precision-2 does not change a single one of them.
+
+The speaker *counts* diverge in an informative way:
+
+| | precision-2 says 1 | says 2 | says 3 |
+|---|---|---|---|
+| human heard 1 | **13** | 0 | 0 |
+| human heard 2 | 5 | **17** | 0 |
+| human heard 3+ | 1 | **23** | 1 |
+
+Perfect agreement wherever the human heard one voice, and systematic under-counting
+wherever they heard more. Read together with the free-text notes — *"ακούγονται και άλλοι
+στο background χωρίς μικρόφωνα"* — the explanation is not model error. The diarizers count
+**miked** speakers; the human counted everyone audible in the room. That is the same
+finding as section 5 arriving from the other direction, and it is the most concrete thing
+we now know about what overlap in this corpus actually is: mostly off-mic room speech.
+
 ## What would settle it
 
 Two things, in this order, neither of which needs a GPU.

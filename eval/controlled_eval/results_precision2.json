@@ -1,0 +1,435 @@
+{
+ "model": "precision-2",
+ "n_clips": 60,
+ "rows": [
+  {
+   "clip": "clip_001.wav",
+   "kind": "overlap",
+   "human_n": "2",
+   "p2_speakers": 2,
+   "p2_overlap_sec": 1.72
+  },
+  {
+   "clip": "clip_002.wav",
+   "kind": "overlap",
+   "human_n": "3+",
+   "p2_speakers": 2,
+   "p2_overlap_sec": 6.1
+  },
+  {
+   "clip": "clip_003.wav",
+   "kind": "control",
+   "human_n": "1",
+   "p2_speakers": 1,
+   "p2_overlap_sec": 0.0
+  },
+  {
+   "clip": "clip_004.wav",
+   "kind": "overlap",
+   "human_n": "2",
+   "p2_speakers": 2,
+   "p2_overlap_sec": 4.42
+  },
+  {
+   "clip": "clip_005.wav",
+   "kind": "control",
+   "human_n": "2",
+   "p2_speakers": 1,
+   "p2_overlap_sec": 0.0
+  },
+  {
+   "clip": "clip_006.wav",
+   "kind": "control",
+   "human_n": "2",
+   "p2_speakers": 1,
+   "p2_overlap_sec": 0.0
+  },
+  {
+   "clip": "clip_007.wav",
+   "kind": "overlap",
+   "human_n": "3+",
+   "p2_speakers": 2,
+   "p2_overlap_sec": 3.08
+  },
+  {
+   "clip": "clip_008.wav",
+   "kind": "overlap",
+   "human_n": "3+",
+   "p2_speakers": 2,
+   "p2_overlap_sec": 6.04
+  },
+  {
+   "clip": "clip_009.wav",
+   "kind": "overlap",
+   "human_n": "2",
+   "p2_speakers": 2,
+   "p2_overlap_sec": 3.88
+  },
+  {
+   "clip": "clip_010.wav",
+   "kind": "overlap",
+   "human_n": "2",
+   "p2_speakers": 2,
+   "p2_overlap_sec": 1.94
+  },
+  {
+   "clip": "clip_011.wav",
+   "kind": "overlap",
+   "human_n": "3+",
+   "p2_speakers": 2,
+   "p2_overlap_sec": 2.02
+  },
+  {
+   "clip": "clip_012.wav",
+   "kind": "overlap",
+   "human_n": "3+",
+   "p2_speakers": 2,
+   "p2_overlap_sec": 5.92
+  },
+  {
+   "clip": "clip_013.wav",
+   "kind": "control",
+   "human_n": "2",
+   "p2_speakers": 1,
+   "p2_overlap_sec": 0.0
+  },
+  {
+   "clip": "clip_014.wav",
+   "kind": "control",
+   "human_n": "2",
+   "p2_speakers": 1,
+   "p2_overlap_sec": 0.0
+  },
+  {
+   "clip": "clip_015.wav",
+   "kind": "overlap",
+   "human_n": "2",
+   "p2_speakers": 2,
+   "p2_overlap_sec": 4.06
+  },
+  {
+   "clip": "clip_016.wav",
+   "kind": "control",
+   "human_n": "1",
+   "p2_speakers": 1,
+   "p2_overlap_sec": 0.0
+  },
+  {
+   "clip": "clip_017.wav",
+   "kind": "overlap",
+   "human_n": "3+",
+   "p2_speakers": 3,
+   "p2_overlap_sec": 0.3
+  },
+  {
+   "clip": "clip_018.wav",
+   "kind": "overlap",
+   "human_n": "2",
+   "p2_speakers": 2,
+   "p2_overlap_sec": 3.88
+  },
+  {
+   "clip": "clip_019.wav",
+   "kind": "control",
+   "human_n": "1",
+   "p2_speakers": 1,
+   "p2_overlap_sec": 0.0
+  },
+  {
+   "clip": "clip_020.wav",
+   "kind": "overlap",
+   "human_n": "3+",
+   "p2_speakers": 2,
+   "p2_overlap_sec": 3.36
+  },
+  {
+   "clip": "clip_021.wav",
+   "kind": "overlap",
+   "human_n": "2",
+   "p2_speakers": 2,
+   "p2_overlap_sec": 3.96
+  },
+  {
+   "clip": "clip_022.wav",
+   "kind": "overlap",
+   "human_n": "3+",
+   "p2_speakers": 2,
+   "p2_overlap_sec": 5.88
+  },
+  {
+   "clip": "clip_023.wav",
+   "kind": "overlap",
+   "human_n": "2",
+   "p2_speakers": 2,
+   "p2_overlap_sec": 6.5
+  },
+  {
+   "clip": "clip_024.wav",
+   "kind": "overlap",
+   "human_n": "3+",
+   "p2_speakers": 2,
+   "p2_overlap_sec": 6.82
+  },
+  {
+   "clip": "clip_025.wav",
+   "kind": "overlap",
+   "human_n": "2",
+   "p2_speakers": 2,
+   "p2_overlap_sec": 5.12
+  },
+  {
+   "clip": "clip_026.wav",
+   "kind": "overlap",
+   "human_n": "3+",
+   "p2_speakers": 2,
+   "p2_overlap_sec": 1.68
+  },
+  {
+   "clip": "clip_027.wav",
+   "kind": "overlap",
+   "human_n": "3+",
+   "p2_speakers": 2,
+   "p2_overlap_sec": 3.36
+  },
+  {
+   "clip": "clip_028.wav",
+   "kind": "overlap",
+   "human_n": "3+",
+   "p2_speakers": 2,
+   "p2_overlap_sec": 2.14
+  },
+  {
+   "clip": "clip_029.wav",
+   "kind": "control",
+   "human_n": "3+",
+   "p2_speakers": 2,
+   "p2_overlap_sec": 0.46
+  },
+  {
+   "clip": "clip_030.wav",
+   "kind": "control",
+   "human_n": "1",
+   "p2_speakers": 1,
+   "p2_overlap_sec": 0.0
+  },
+  {
+   "clip": "clip_031.wav",
+   "kind": "control",
+   "human_n": "3+",
+   "p2_speakers": 1,
+   "p2_overlap_sec": 0.0
+  },
+  {
+   "clip": "clip_032.wav",
+   "kind": "control",
+   "human_n": "1",
+   "p2_speakers": 1,
+   "p2_overlap_sec": 0.0
+  },
+  {
+   "clip": "clip_033.wav",
+   "kind": "overlap",
+   "human_n": "3+",
+   "p2_speakers": 2,
+   "p2_overlap_sec": 5.72
+  },
+  {
+   "clip": "clip_034.wav",
+   "kind": "control",
+   "human_n": "1",
+   "p2_speakers": 1,
+   "p2_overlap_sec": 0.0
+  },
+  {
+   "clip": "clip_035.wav",
+   "kind": "control",
+   "human_n": "1",
+   "p2_speakers": 1,
+   "p2_overlap_sec": 0.0
+  },
+  {
+   "clip": "clip_036.wav",
+   "kind": "overlap",
+   "human_n": "2",
+   "p2_speakers": 2,
+   "p2_overlap_sec": 1.66
+  },
+  {
+   "clip": "clip_037.wav",
+   "kind": "overlap",
+   "human_n": "2",
+   "p2_speakers": 2,
+   "p2_overlap_sec": 4.8
+  },
+  {
+   "clip": "clip_038.wav",
+   "kind": "overlap",
+   "human_n": "2",
+   "p2_speakers": 2,
+   "p2_overlap_sec": 2.08
+  },
+  {
+   "clip": "clip_039.wav",
+   "kind": "overlap",
+   "human_n": "3+",
+   "p2_speakers": 2,
+   "p2_overlap_sec": 7.82
+  },
+  {
+   "clip": "clip_040.wav",
+   "kind": "overlap",
+   "human_n": "2",
+   "p2_speakers": 2,
+   "p2_overlap_sec": 2.0
+  },
+  {
+   "clip": "clip_041.wav",
+   "kind": "control",
+   "human_n": "1",
+   "p2_speakers": 1,
+   "p2_overlap_sec": 0.0
+  },
+  {
+   "clip": "clip_042.wav",
+   "kind": "control",
+   "human_n": "1",
+   "p2_speakers": 1,
+   "p2_overlap_sec": 0.0
+  },
+  {
+   "clip": "clip_043.wav",
+   "kind": "overlap",
+   "human_n": "3+",
+   "p2_speakers": 2,
+   "p2_overlap_sec": 2.34
+  },
+  {
+   "clip": "clip_044.wav",
+   "kind": "control",
+   "human_n": "2",
+   "p2_speakers": 1,
+   "p2_overlap_sec": 0.0
+  },
+  {
+   "clip": "clip_045.wav",
+   "kind": "control",
+   "human_n": "1",
+   "p2_speakers": 1,
+   "p2_overlap_sec": 0.0
+  },
+  {
+   "clip": "clip_046.wav",
+   "kind": "overlap",
+   "human_n": "3+",
+   "p2_speakers": 2,
+   "p2_overlap_sec": 2.54
+  },
+  {
+   "clip": "clip_047.wav",
+   "kind": "overlap",
+   "human_n": "3+",
+   "p2_speakers": 2,
+   "p2_overlap_sec": 5.72
+  },
+  {
+   "clip": "clip_048.wav",
+   "kind": "overlap",
+   "human_n": "3+",
+   "p2_speakers": 2,
+   "p2_overlap_sec": 4.92
+  },
+  {
+   "clip": "clip_049.wav",
+   "kind": "overlap",
+   "human_n": "2",
+   "p2_speakers": 2,
+   "p2_overlap_sec": 2.38
+  },
+  {
+   "clip": "clip_050.wav",
+   "kind": "overlap",
+   "human_n": "3+",
+   "p2_speakers": 2,
+   "p2_overlap_sec": 4.54
+  },
+  {
+   "clip": "clip_051.wav",
+   "kind": "overlap",
+   "human_n": "3+",
+   "p2_speakers": 2,
+   "p2_overlap_sec": 5.34
+  },
+  {
+   "clip": "clip_052.wav",
+   "kind": "overlap",
+   "human_n": "2",
+   "p2_speakers": 2,
+   "p2_overlap_sec": 3.02
+  },
+  {
+   "clip": "clip_053.wav",
+   "kind": "overlap",
+   "human_n": "3+",
+   "p2_speakers": 2,
+   "p2_overlap_sec": 5.04
+  },
+  {
+   "clip": "clip_054.wav",
+   "kind": "control",
+   "human_n": "1",
+   "p2_speakers": 1,
+   "p2_overlap_sec": 0.0
+  },
+  {
+   "clip": "clip_055.wav",
+   "kind": "overlap",
+   "human_n": "2",
+   "p2_speakers": 2,
+   "p2_overlap_sec": 3.92
+  },
+  {
+   "clip": "clip_056.wav",
+   "kind": "overlap",
+   "human_n": "2",
+   "p2_speakers": 2,
+   "p2_overlap_sec": 7.1
+  },
+  {
+   "clip": "clip_057.wav",
+   "kind": "control",
+   "human_n": "1",
+   "p2_speakers": 1,
+   "p2_overlap_sec": 0.0
+  },
+  {
+   "clip": "clip_058.wav",
+   "kind": "overlap",
+   "human_n": "3+",
+   "p2_speakers": 2,
+   "p2_overlap_sec": 6.28
+  },
+  {
+   "clip": "clip_059.wav",
+   "kind": "control",
+   "human_n": "1",
+   "p2_speakers": 1,
+   "p2_overlap_sec": 0.0
+  },
+  {
+   "clip": "clip_060.wav",
+   "kind": "overlap",
+   "human_n": "3+",
+   "p2_speakers": 2,
+   "p2_overlap_sec": 4.54
+  }
+ ],
+ "overlap_clips_confirmed": [
+  40,
+  40
+ ],
+ "control_clips_with_overlap": [
+  1,
+  20
+ ],
+ "note": "Human labels are speaker COUNTS in a 12s clip, not overlap judgements: two speakers taking turns count as two. So the control column bounds how often a zero-overlap window holds a second voice, not how often community-1 missed overlap."
+}
