@@ -192,6 +192,67 @@ wherever they heard more. Read together with the free-text notes — *"ακού�
 finding as section 5 arriving from the other direction, and it is the most concrete thing
 we now know about what overlap in this corpus actually is: mostly off-mic room speech.
 
+## 7. The full precision-2 pass: the association survives, the *variable* does not
+
+232 windows, 9.3 hours of audio, 232/232 succeeded. Plan and decision bands frozen in
+[precision2-corpus-analysis.md](../specs/precision2-corpus-analysis.md) before the run.
+Raw: `results_precision2_corpus.json`.
+
+**M1, prevalence.** community-1 says 2.31% of speech time, precision-2 says 3.07%. Paired
+ratio on a fixed denominator **1.35, CI [1.25, 1.46]** — reliably more, but the frozen
+bands called this **inconclusive**: outside the [0.70, 1.30] concordance band and far
+below the 2.0 that would have counted as materially higher. The honest reading is that
+2.2% is a **floor, not a measurement**, and since both detectors share the off-mic blind
+spot the audit exposed, the true number is above both. Prevalence is not settled and this
+pass could not settle it.
+
+**M2, robustness of the bucket association.** The high-minus-zero contrast averaged over
+the seven systems is +0.1247 under community-1 and +0.1340 under precision-2; the paired
+difference is **+0.0093, CI [−0.009, +0.032]**, inside the 1.0-point noninferiority
+margin, with precision-2's own contrast clear of zero. Verdict: **supported**. Section 2
+does not depend on which diarizer produced the buckets.
+
+**M3, and this is the result that matters.** Overlap and turn density were compared as
+*predictors* of window error, leave-one-meeting-out, because bucketing one against the
+other cannot tell them apart.
+
+| model | out-of-sample loss |
+|---|---|
+| base | 0.0320 |
+| base + overlap | 0.0281 |
+| base + turn density | **0.0266** |
+| base + overlap + turn density | 0.0268 |
+
+> **U(turns \| overlap) = +0.00127, CI [+0.00014, +0.00248]** — turn density carries real
+> information the overlap measure does not.
+> **U(overlap \| turns) = −0.00018, CI [−0.00032, −0.00008]** — once turn density is
+> known, adding overlap makes predictions *worse*.
+
+Both intervals exclude zero. Overlap on its own beats knowing nothing, which is section 2
+restated, but it is the weaker of the two markers and it contributes nothing on top of the
+stronger one. The plausible reading is the one the confound section warned about from the
+start: overlap has been standing in for **contested, fast-turnover passages**, and
+crosstalk is a symptom of that rather than the mechanism.
+
+This does not overturn the causal question — only the synthetic experiment can speak to
+that, and it has not run. What it does is separate two things that were being treated as
+one. **A treatment can be effective and still be aimed at the wrong variable.** If DiCoW is
+ever deployed behind an overlap trigger, this says the trigger is not the best available
+one.
+
+**M4, event geometry, and it embarrasses the synthetic design.** 1,123 detected events,
+median duration **0.52 s**, p75 1.0 s, p95 2.2 s. The preregistered synthetic dose is
+uniform(1.5, 3.0) seconds — that is above the 90th percentile of what actually happens.
+The dose stays primary as frozen, but it is now known to be an upper extreme rather than a
+typical case, and a short-event sensitivity arm at the empirical median is added to the
+amendment. Real crosstalk in this corpus is half-second interjections, not sustained
+argument.
+
+**The disagreement map**, for the audit that would actually buy information: 119 windows
+where both detectors find overlap, 79 where neither does, and **34 where they disagree**
+(21 precision-2 only, 13 community-1 only). Those 34 are where a further listening pass is
+worth the human time.
+
 ## What would settle it
 
 Two things, in this order, neither of which needs a GPU.

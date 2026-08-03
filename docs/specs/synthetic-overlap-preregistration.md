@@ -169,3 +169,21 @@ target meetings is reported alongside every interval, and if it falls under ~20 
 bootstrap is reported as unstable with a meeting-level aggregate as the fallback. `[codex]`
 Donors carry their own room, microphone and codec, so "same recording conditions" is an
 approximation; donor city is balanced but channel quality is not measured.
+
+## Amendment 2026-08-03: short-event sensitivity arm
+
+Added **after** the precision-2 corpus pass and **before** any mixture was transcribed.
+It changes no primary endpoint and does not move the gate.
+
+precision-2's event geometry over 232 windows: 1,123 events, median duration 0.52 s, p75
+1.0 s, p95 2.2 s. The preregistered dose of uniform(1.5, 3.0) s therefore sits above the
+90th percentile of real events. It stays the primary condition — the frozen plan
+explicitly refuses to re-derive a causal dose from a detector that has a known blind spot
+— but it is now understood as an upper extreme, not a typical case.
+
+New arm **C_short**: identical to C (+5 dB SIR) with donor duration drawn from
+uniform(0.4, 0.7) s, the empirical interquartile region around the median. Secondary,
+descriptive, reported as dose-response alongside B/C/D. If the burden at the real median
+event length is negligible while C's is large, then the measured burden is a statement
+about rare long interjections, and the deployment-weighted number is much smaller than C
+alone would suggest.

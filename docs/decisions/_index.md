@@ -10,11 +10,14 @@ Accepted decisions and open questions, one file per theme. Keep entries short �
 - [audio.md](audio.md) — CORS workaround, Vercel proxy, fixed-file URL map
 - [matching.md](matching.md) — meeting JSON usage, `utterance.text` semantics, open matching/taxonomy questions
 - [metric-hir.md](metric-hir.md) — Human Intervention Rate metric; **likely NOT adopted** (mentor pushback 2026-06-23), WER (+CER) stays standard
+- [modeling.md](modeling.md) — what we actually run: contextual biasing adopted, LoRA adapter not deployed
 
 ## Index
 
 ### Accepted
 
+- [Contextual biasing (roster hotwords) is the primary name-accuracy lever](modeling.md#2026-07-25--contextual-biasing-roster-hotwords-is-the-primary-name-accuracy-lever) — 2026-07-25
+- [The LoRA adapter is not deployed to OpenCouncil](modeling.md#2026-07-25--the-lora-adapter-is-not-deployed-to-opencouncil) — 2026-07-25
 - [Split mechanics: temporal test set + seeded automated train/val](data.md#2026-06-16---split-mechanics-temporal-test-set--seeded-automated-trainval) — 2026-06-16
 - [Cost is not a deciding factor for the provider (Scribe best)](data.md#2026-06-16---cost-is-not-a-deciding-factor-for-the-provider) — 2026-06-16
 - [Split train/val/test by whole meeting, not by utterance](data.md#2026-06---split-trainvaltest-by-whole-meeting-not-by-utterance) — 2026-06

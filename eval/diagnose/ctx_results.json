@@ -1,0 +1,66 @@
+{
+  "window_s": 1500.0,
+  "meetings": [
+    "orestiada__mar23_2026",
+    "orestiada__jan21_2026",
+    "argos__dec9_2025"
+  ],
+  "table": [
+    {
+      "cond": "iso",
+      "model": "base",
+      "n_corrected": 21,
+      "wer_corrected": 23.626373626373628,
+      "n_all": null,
+      "wer_all": null
+    },
+    {
+      "cond": "iso",
+      "model": "ours",
+      "n_corrected": 21,
+      "wer_corrected": 19.78021978021978,
+      "n_all": null,
+      "wer_all": null
+    },
+    {
+      "cond": "ctx",
+      "model": "base",
+      "n_corrected": 21,
+      "wer_corrected": 32.967032967032964,
+      "n_all": 412,
+      "wer_all": 33.83500557413601
+    },
+    {
+      "cond": "ctx",
+      "model": "ours",
+      "n_corrected": 21,
+      "wer_corrected": 26.373626373626372,
+      "n_all": 412,
+      "wer_all": 30.15607580824972
+    }
+  ],
+  "window_level": [
+    {
+      "model": "base",
+      "wer_window": 174.1917502787068,
+      "n_windows": 3
+    },
+    {
+      "model": "ours",
+      "wer_window": 183.77926421404683,
+      "n_windows": 3
+    }
+  ],
+  "head2head": {
+    "iso": {
+      "ours_better": 8,
+      "worse": 2,
+      "tie": 11
+    },
+    "ctx": {
+      "ours_better": 7,
+      "worse": 2,
+      "tie": 12
+    }
+  }
+}

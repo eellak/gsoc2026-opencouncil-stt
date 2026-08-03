@@ -19,6 +19,9 @@ timeline
             : Included rows, balance checks, export candidates
     Phase 5 : Evaluation and training
             : WER, Domain WER, Human Intervention Rate
+    Phase 6 : Controlled eval and inference-time biasing
+            : Same-stack A/B harness
+            : Roster hotwords, LLM post-editing
 ```
 
 Keep this timeline synchronized with the phase sections below.
@@ -191,3 +194,35 @@ Acceptance criteria:
 - [ ] Evaluation set is separated from training candidates.
 - [ ] Metrics are computed on clearly defined references.
 - [ ] Training starts only after dataset selection and evaluation definitions are reviewed.
+
+## Phase 6 - Controlled Evaluation and Inference-Time Biasing
+
+Status: `[~]` in progress (opened 2026-07-25)
+
+Why this phase exists: the LoRA fine-tune's apparent wins were evaluation artifacts —
+under a same-stack A/B it ties base whisper on general utterances and regresses on the
+corrected ones. Full reasoning:
+[handoff postmortem](handoff/2026-07-25-finetune-eval-postmortem.md).
+
+Goal: make every model claim reproducible, then try the cheap non-training levers
+before spending another GPU run.
+
+Tasks:
+
+- [~] Controlled eval harness: one tool, same serving stack, same normalization, two
+  held-out subsets (general + actually-corrected), WER/CER/entity-recall, per-utterance
+  head-to-head. Starter scripts in `eval/controlled_eval/`.
+- [~] Contextual biasing with the per-meeting roster (faster-whisper `hotwords`),
+  measured against plain base and against the fine-tune (`ab_hotwords.py`).
+- [ ] Reproduce the training-time val_corr eval to locate the discrepancy.
+- [~] LLM post-editing over Scribe output, conditioned on the roster — first controlled
+  run is the best system on the corrected subset (0.155 → 0.119 WER); see
+  [reports/2026-07-29-lexical-thesis-experiments.md](reports/2026-07-29-lexical-thesis-experiments.md).
+  Remaining: output-validity gate, over-editing check on clean utterances, glossary arm.
+- [ ] Retrain on context windows (only if the above plateau), gated through the harness.
+
+Acceptance criteria:
+
+- [ ] A single command reproduces any reported number on this project's held-out data.
+- [ ] No model is recommended for production without a same-stack A/B against base.
+- [ ] The biasing experiment reports WER *and* name/entity recall, not just WER.

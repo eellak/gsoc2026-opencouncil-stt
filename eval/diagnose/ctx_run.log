@@ -3,3 +3,40 @@
 [21:33:12] argos__dec9_2025: window 29.5-54.5 min | 109 utts, 6 corrected
 [21:33:15] loading base (float32)
 [21:33:24] === CTX orestiada__mar23_2026__base (25 min continuous) ===
+[22:08:20]     done in 2097s, 3055 words
+[22:08:20] === ISO orestiada__mar23_2026__base (10 isolated clips) ===
+[22:09:31]     iso 10/10
+[22:09:32] === CTX orestiada__jan21_2026__base (25 min continuous) ===
+[22:32:20]     done in 1368s, 3504 words
+[22:32:20] === ISO orestiada__jan21_2026__base (5 isolated clips) ===
+[22:32:53] === CTX argos__dec9_2025__base (25 min continuous) ===
+[22:52:31]     done in 1178s, 2481 words
+[22:52:31] === ISO argos__dec9_2025__base (6 isolated clips) ===
+[22:53:18] loading ours (float32)
+[22:53:22] === CTX orestiada__mar23_2026__ours (25 min continuous) ===
+[23:13:30]     done in 1208s, 3152 words
+[23:13:30] === ISO orestiada__mar23_2026__ours (10 isolated clips) ===
+[23:14:38]     iso 10/10
+[23:14:39] === CTX orestiada__jan21_2026__ours (25 min continuous) ===
+[23:36:29]     done in 1310s, 3646 words
+[23:36:29] === ISO orestiada__jan21_2026__ours (5 isolated clips) ===
+[23:37:01] === CTX argos__dec9_2025__ours (25 min continuous) ===
+[23:56:58]     done in 1197s, 2778 words
+[23:56:58] === ISO argos__dec9_2025__ours (6 isolated clips) ===
+
+==== ISOLATED CLIPS vs CONTINUOUS CONTEXT (same utterances) ====
+cond  model   n_corr  WER corrected   n_all   WER all
+iso   base        21          23.63       -         -
+iso   ours        21          19.78       -         -
+ctx   base        21          32.97     412     33.84
+ctx   ours        21          26.37     412     30.16
+
+==== window-level (whole 25-min transcript, reference partly Scribe) ====
+  base   WER=174.19  (3 windows)
+  ours   WER=183.78  (3 windows)
+
+iso: ours vs base -> better 8 | worse 2 | tie 11
+
+ctx: ours vs base -> better 7 | worse 2 | tie 12
+[23:57:48] wrote /home/harold/opencouncil-fine-tuning/eval/diagnose/ctx_results.json
+[23:57:48] done
