@@ -250,8 +250,21 @@ argument.
 
 **The disagreement map**, for the audit that would actually buy information: 119 windows
 where both detectors find overlap, 79 where neither does, and **34 where they disagree**
-(21 precision-2 only, 13 community-1 only). Those 34 are where a further listening pass is
-worth the human time.
+(21 precision-2 only, 13 community-1 only).
+
+Building the listening package for those 34 answered the question before anyone listened.
+In the 21 windows only precision-2 flags, the longest single overlap event has a **median
+of 0.18 s**, and 14 of the 21 have no event reaching 0.3 s at all. The two detectors agree
+about every substantial overlap in this corpus; where they differ is on slivers too short
+to be an interruption, and too short for a human to adjudicate fairly.
+
+Corpus-wide the event-length distribution says the same thing from the other side: 1,264
+events, median 0.46 s, and while events under 0.3 s are 35% of all events they are only 6%
+of overlap time. The 35% prevalence gap is therefore not simply fragments — but the part
+the detectors *disagree* about is.
+
+Only 14 of the 34 windows carry an event long enough to ask a person about, and those are
+the ones in the package.
 
 ## What would settle it
 
