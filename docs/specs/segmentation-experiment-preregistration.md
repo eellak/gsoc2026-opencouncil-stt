@@ -101,3 +101,21 @@ That turn density is causal. That the same gain survives on unseen meetings. Tha
 speaker attribution improved — this experiment never assigns a word to a speaker and
 cannot say anything about who-said-what. That overlap-targeted training is justified;
 that remains the synthetic experiment's separate question.
+
+## Amendment 2026-08-03: primary system
+
+Made **before any decode**, for a logistics reason, not a scientific one.
+
+The fine-tune's CTranslate2 build exists only on the mini-PC, and the measured uplink to
+the pod is 180 kB/s — four hours of billing to move 1.5 GB. **whisper-large-v3 becomes the
+primary system**; it downloads on the pod in seconds and is the family a
+diarization-conditioned model would be built on anyway.
+
+This costs the experiment nothing that matters. The identifying contrast is arm 2 minus
+arm 3 *within one system*, so the choice of system changes what the number generalises to,
+not whether it is identified. The fine-tune is added as a check if its build can be moved
+or rebuilt from the public adapter; if rebuilt, it is not bit-identical to the
+`oc-minipc-finetune` the benchmark scored and will be labelled as such.
+
+5 of the 232 windows are dropped: their meetings have no public audio URL, so the pod
+could not fetch them. 227 remain.

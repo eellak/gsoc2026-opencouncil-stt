@@ -218,10 +218,25 @@ def run():
     models_dir = Path(os.environ.get("MODELS", "/workspace/models"))
     out_json = Path(os.environ.get("OUT_JSON", "/workspace/segmentation_hyps.json"))
     audio_dir = Path(os.environ.get("AUDIO_DIR", "/workspace/audio"))
-    systems = {"finetune": str(models_dir / "ct2"), "whisper-large-v3": "large-v3"}
+    # The fine-tune's CTranslate2 build lives on the mini-PC and the pod's uplink from
+    # there measured 180 kB/s, so it is added only when it is actually present.
+    systems = {"whisper-large-v3": "large-v3"}
+    if (models_dir / "ct2" / "model.bin").exists():
+        systems["finetune"] = str(models_dir / "ct2")
+    only = os.environ.get("SYSTEMS")
+    if only:
+        systems = {k: v for k, v in systems.items() if k in only.split(",")}
     arms = [a for a in os.environ.get("ARMS", "arm1,arm2,arm3").split(",") if a]
 
-    jobs = [(s, it["item_id"], a) for s in systems for it in plan_["items"] for a in arms]
+    # 5 windows have no public audio URL, so the pod could not fetch them; they are
+    # dropped here rather than crashing the run 40 decodes in.
+    have = {it["item_id"] for it in plan_["items"]
+            if (audio_dir / f"{it['item_id']}.wav").exists()}
+    missing = len(plan_["items"]) - len(have)
+    if missing:
+        log(f"{missing} windows have no local audio and are dropped")
+    jobs = [(s, it["item_id"], a) for s in systems for it in plan_["items"]
+            if it["item_id"] in have for a in arms]
     random.Random(20260803).shuffle(jobs)
     by_id = {it["item_id"]: it for it in plan_["items"]}
     done = json.loads(out_json.read_text()) if out_json.exists() else {}
