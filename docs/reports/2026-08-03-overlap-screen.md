@@ -266,6 +266,74 @@ the detectors *disagree* about is.
 Only 14 of the 34 windows carry an event long enough to ask a person about, and those are
 the ones in the package.
 
+## 8. The words the reference does not have
+
+The annotator wrote out the second speaker on 24 of the 60 clips. For 19 of them, some of
+those words are **absent from the human reference** for the containing window — 51 tokens
+in 19 clips in 19 meetings. The test: how many of those words appear in each system's
+hypothesis, with one-to-one multiset matching so a single hypothesis token cannot
+"recover" two copies. The null is a permutation that reassigns each word list, intact, to
+a shuffled window, 20,000 times.
+
+| system | micro | macro | chance | excess | p | clips with a hit |
+|---|---|---|---|---|---|---|
+| **soniox** | 43.1% | 27.1% | 20.1% | **+23.1** | 0.0004 | 7/19 |
+| **scribe-v2-clean** | 41.2% | 23.3% | 17.4% | **+23.8** | 0.0004 | 6/19 |
+| whisper-large-v3 | 19.6% | 7.6% | 15.7% | +3.9 | 0.22 | 3/19 |
+| gpt-4o-transcribe | 17.6% | 11.6% | 15.3% | +2.4 | 0.35 | 3/19 |
+| our fine-tune | 15.7% | 13.2% | 14.1% | +1.6 | 0.43 | 4/19 |
+| gladia | 7.8% | 5.8% | 15.3% | −7.5 | 0.99 | 4/19 |
+| greek-whisper-v3-turbo | 2.0% | 2.6% | 6.6% | −4.6 | 0.99 | 1/19 |
+
+Seven systems were tested, so the honest p is Bonferroni-corrected: 0.0025 and 0.0028.
+Both survive.
+
+**The claim this supports, and no more:** in 19 selected clips containing intelligible
+second-speaker words absent from the reference, the Soniox and Scribe hypotheses for the
+containing two-minute window contained 43% and 41% of those words, against 20% and 17%
+under a cross-window shuffle. That is **consistent with the reference omitting speech**.
+It does not establish that either system correctly recognised the second speaker at that
+moment, and it does not quantify how much of their insertion rate this accounts for.
+
+The gap between micro and macro matters: the effect lives in 7 of 19 clips, not spread
+evenly. And the strongest surviving alternative is *right word, wrong occurrence* — the
+word appears somewhere in those two minutes, possibly from the main speaker or inferred
+from the topic, without the second speaker having been recognised at all. Ruling that out
+needs token timing, which the stored hypotheses do not carry.
+
+Three further limits, all real. The annotator is the project owner: blinded to clip
+identity and to all ASR output, but not naïve to the hypothesis, so this is
+single-annotator hypothesis-aware ground truth, not independent validation. The 19 clips
+are the ones where words could be made out, which is not a random subset of overlap
+events. And whisper-large-v3 was flagged by the earlier insertion analysis but shows
+nothing here, so that flag remains unexplained.
+
+What it does mean practically: incomplete reference speech can penalise a system for being
+right, and the two systems it touches are the two best on the leaderboard. The size of
+that penalty is not estimated here.
+
+## 9. On the marginal cases, the paid detector is better
+
+All 14 auditable disagreement clips came back, blinded to which detector flagged them.
+
+| stratum | n | simultaneous | alternating | one speaker | unsure |
+|---|---|---|---|---|---|
+| precision-2 only | 7 | **5** | 2 | 0 | 0 |
+| community-1 only | 7 | 1 | 2 | 3 | 1 |
+
+The direct accounting is the detector-win tally: precision-2's label matched the annotator
+in **10 of 13** determinate cases against community-1's 3, one unresolved. Exact 95% CI
+[46%, 95%], two-sided sign test p ≈ 0.09. Suggestive, not decisive.
+
+And it must not be called superiority on marginal cases, because **20 of the 34
+disagreements were excluded for having no event long enough to judge, and 14 of those 20
+were precision-2's**. If its short calls are mostly artifacts, the advantage shrinks. The
+defensible bounds over all unique detections are wide: precision-2 between 24% and 90%
+confirmed, community-1 between 8% and 62%.
+
+Three of community-1's seven unique detections had **only one speaker audible at all** —
+a different failure from calling turn-taking an overlap, and the more serious one.
+
 ## What would settle it
 
 Two things, in this order, neither of which needs a GPU.
