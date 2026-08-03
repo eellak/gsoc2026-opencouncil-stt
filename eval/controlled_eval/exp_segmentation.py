@@ -201,15 +201,34 @@ def plan():
 
 
 # ------------------------------------------------------------------ phase 2: decoding
-def dedupe(prev: str, nxt: str, max_overlap: int = 12) -> str:
-    """Drop the repeated words the padding creates at a seam."""
+def dedupe(prev: str, nxt: str, max_overlap: int = 16) -> str:
+    """Drop the repeated words the padding creates at a seam.
+
+    The first version required the tail of one chunk and the head of the next to be an
+    EXACT word-sequence match. Whisper does not transcribe the same 0.75 s of audio
+    identically twice, so almost every seam leaked, insertions tripled, and the chunked
+    arms lost six WER points to plumbing rather than to chunking. See
+    `docs/reports/2026-08-03-segmentation.md`.
+
+    This version aligns the two candidate regions with `SequenceMatcher` and cuts at the
+    end of the best-matching block, so a seam still de-duplicates when one side heard
+    "στην" and the other "στη". A match has to cover at least half the shorter region to
+    count, otherwise the chunks genuinely do not overlap in content and nothing is cut.
+    """
+    import difflib
     a, b = prev.split(), nxt.split()
-    best = 0
-    for k in range(min(max_overlap, len(a), len(b)), 0, -1):
-        if [w.lower() for w in a[-k:]] == [w.lower() for w in b[:k]]:
-            best = k
-            break
-    return " ".join(b[best:])
+    if not a or not b:
+        return " ".join(b)
+    la = [w.lower() for w in a]
+    lb = [w.lower() for w in b]
+    best_k, best_r = 0, 0.0
+    for k in range(1, min(max_overlap, len(a), len(b)) + 1):
+        r = difflib.SequenceMatcher(a=la[-k:], b=lb[:k], autojunk=False).ratio()
+        if r > best_r:
+            best_k, best_r = k, r
+    # 0.6 is loose enough for an inflection difference across the seam and tight enough
+    # that two chunks with genuinely different content are left alone.
+    return " ".join(b[best_k:] if best_r >= 0.6 else b)
 
 
 def run():
