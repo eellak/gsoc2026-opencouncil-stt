@@ -126,6 +126,41 @@ hallucination effect should track how talkative a decoder is. Soniox transcribin
 times more unmatched words than it does in clean audio is the single most interesting
 thing in this file, and it cannot be resolved without listening.
 
+## 5. The listening audit: pyannote is right, and the second voice is off-mic
+
+2026-08-03. 60 blinded 12-second clips, 40 centred on a detected overlap event and 20
+drawn from windows with no detected overlap at all, shuffled, no ASR output visible, key
+sealed until the answers came back.
+
+| | |
+|---|---|
+| overlap clips where ≥2 speakers were audible | **40 of 40** (CI95 [1.00, 1.00]) |
+| control clips with exactly one speaker audible | 13 of 20 (CI95 [0.45, 0.85]) |
+
+**Not one false positive in 40.** Whatever else is true of pyannote on Greek council
+audio, when it says two people are talking, two people are talking. That was the single
+largest threat to section 2 — that the diarizer over-detects overlap exactly where the
+audio is bad, manufacturing the association — and it is now the least likely explanation.
+
+The control number is weaker than it looks and must not be read as a miss rate. The
+question asked was "how many speakers do you hear", not "do they speak at the same time",
+so a control clip with two audible speakers is consistent with ordinary turn-taking. What
+it does establish is that a window with zero *detected overlap* is not a single-speaker
+window: about a third of them contain more than one voice inside twelve seconds.
+
+The free-text comments are the most useful thing here, and they were volunteered on only
+four clips: *"ακούγονται και άλλοι στο background χωρίς μικρόφωνα"*, *"δεν ακούγονται στο
+μικρόφωνο"*. The competing speech is largely **off-mic room noise**, not a second
+amplified voice. That reframes the whole category. Off-mic speech is exactly what a human
+transcriber is entitled to leave out, and exactly what a decoder is most likely to
+hallucinate words from, so both explanations of Soniox's insertion spike survive.
+
+**The Soniox question is still open.** Settling it needed the audible words written out so
+they could be matched against the unmatched hypothesis tokens, and 56 of 60 clips have a
+speaker count but no text. The count answers the pyannote question completely; it cannot
+answer this one. What is needed is small and specific: the second speaker's words on the
+~15 clips where they are intelligible at all.
+
 ## What would settle it
 
 Two things, in this order, neither of which needs a GPU.
