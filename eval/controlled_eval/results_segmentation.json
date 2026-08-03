@@ -1,0 +1,125 @@
+{
+ "preregistration": "docs/specs/segmentation-experiment-preregistration.md",
+ "n_windows": 227,
+ "n_meetings": 129,
+ "n_boot": 10000,
+ "tercile_cuts_per_min": [
+  0.8022301999558774,
+  2.8160514935130236
+ ],
+ "systems": {
+  "whisper-large-v3": {
+   "wer": {
+    "arm1": 0.16069764733286745,
+    "arm2": 0.22225133938970418,
+    "arm3": 0.22370719776380155
+   },
+   "primary_arm2_minus_arm3": {
+    "delta": -0.0014558583740973685,
+    "ci95": [
+     -0.01250551324192389,
+     0.010042296595705349
+    ],
+    "excludes_zero": false,
+    "n_clusters": 129,
+    "label": "arm2 - arm3",
+    "wer_a": 0.22225133938970418,
+    "wer_b": 0.22370719776380155,
+    "n": 227
+   },
+   "arm2_minus_arm1": {
+    "delta": 0.06155369205683672,
+    "ci95": [
+     0.05112107736241117,
+     0.0721457902999349
+    ],
+    "excludes_zero": true,
+    "n_clusters": 129,
+    "label": "arm2 - arm1",
+    "wer_a": 0.22225133938970418,
+    "wer_b": 0.16069764733286745,
+    "n": 227
+   },
+   "arm3_minus_arm1": {
+    "delta": 0.06300955043093409,
+    "ci95": [
+     0.05268228889290471,
+     0.07303346123866664
+    ],
+    "excludes_zero": true,
+    "n_clusters": 129,
+    "label": "arm3 - arm1",
+    "wer_a": 0.22370719776380155,
+    "wer_b": 0.16069764733286745,
+    "n": 227
+   },
+   "by_turn_density": {
+    "low": {
+     "delta": -0.0022405101469257505,
+     "ci95": [
+      -0.021950194087036128,
+      0.01738217087883343
+     ],
+     "excludes_zero": false,
+     "n_clusters": 63,
+     "label": "arm2-arm3 [low]",
+     "wer_a": 0.16278167952087552,
+     "wer_b": 0.16502218966780127,
+     "n": 75
+    },
+    "mid": {
+     "delta": 0.017618256535804844,
+     "ci95": [
+      -0.00391322717478481,
+      0.03977959192570937
+     ],
+     "excludes_zero": false,
+     "n_clusters": 61,
+     "label": "arm2-arm3 [mid]",
+     "wer_a": 0.21102561860627786,
+     "wer_b": 0.19340736207047302,
+     "n": 76
+    },
+    "high": {
+     "delta": -0.019951338199513335,
+     "ci95": [
+      -0.04142670519063547,
+      0.002275457976714701
+     ],
+     "excludes_zero": false,
+     "n_clusters": 59,
+     "label": "arm2-arm3 [high]",
+     "wer_a": 0.29466932094669324,
+     "wer_b": 0.31462065914620657,
+     "n": 76
+    }
+   },
+   "by_city": {
+    "argos": 0.008228670420095285,
+    "athens": -0.013831258644536631,
+    "chalandri": -0.012131715771230484,
+    "chania": 0.01501657000828499,
+    "orestiada": -0.019211983067404736,
+    "samothraki": -0.015339027366219282,
+    "sparta": 0.008786722286322907,
+    "vrilissia": -0.018428372739916543,
+    "xylokastro": 0.024129172714078356,
+    "zografou": -0.0013292821876186856
+   },
+   "leave_one_city_out_worst": 0.0006829901307926212,
+   "leave_one_city_out_best": -0.004150291367393949,
+   "gate": {
+    "continue": false,
+    "stop": false,
+    "inconclusive": true,
+    "regression_in_low_stratum": false,
+    "thresholds": {
+     "overall": 0.01,
+     "stratum": 0.02,
+     "regression": 0.005
+    },
+    "note": "Confirmatory pilot on the windows that generated the turn-density hypothesis, not external validation."
+   }
+  }
+ }
+}
