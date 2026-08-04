@@ -11,7 +11,7 @@ first decode.
 
 ## What was asked
 
-The [corpus analysis](2026-08-03-overlap-screen.md#7) found speaker-turn density is a
+The [corpus analysis](2026-08-03-overlap-screen.md#7-the-full-precision-2-pass-the-association-survives-the-variable-does-not) found speaker-turn density is a
 better predictor of window error than overlap, and that overlap adds nothing once turn
 density is known. Turn density is free at inference time. So: **does cutting the audio at
 speaker changes let Whisper decode better?**
