@@ -13,7 +13,7 @@ fusion, and who-said-what mapping. This one goes first because it is the only on
 acts directly on the **strongest measured signal** and can be judged with the metric we
 actually have.
 
-The [corpus analysis](../reports/2026-08-03-overlap-screen.md#7) found speaker-turn
+The [corpus analysis](../reports/2026-08-03-overlap-screen.md#7-the-full-precision-2-pass-the-association-survives-the-variable-does-not) found speaker-turn
 density beats overlap as a predictor of window error, and that overlap adds nothing once
 turn density is known. Turn density is available at inference time for free. So the
 question is no longer "is overlap harmful" — that is the synthetic experiment's job — but

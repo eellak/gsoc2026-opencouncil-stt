@@ -49,7 +49,7 @@ distance from what was said. That is a legitimate product metric — it is what 
 ships — but it is not accuracy, and it has been read as accuracy.
 
 **2. A model that hears better than the published transcript is scored worse for it.** This
-is not hypothetical. The [listening audit](2026-08-03-overlap-screen.md#8) had a human
+is not hypothetical. The [listening audit](2026-08-03-overlap-screen.md#8-the-words-the-reference-does-not-have) had a human
 transcribe second speakers from blinded clips; of the words they heard that the reference
 does not contain, Soniox's transcript held 43% and Scribe's 41%, against a 20% and 17%
 chance baseline (p = 0.0004, Bonferroni-corrected). The reference omits speech that is

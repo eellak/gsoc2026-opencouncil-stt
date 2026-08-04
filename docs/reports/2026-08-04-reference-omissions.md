@@ -68,7 +68,7 @@ timings the stored hypotheses do not carry.
 
 ## What this settles
 
-The [insertion question from the overlap screen](2026-08-03-overlap-screen.md#4) is closed.
+The [insertion question from the overlap screen](2026-08-03-overlap-screen.md#4-does-the-reference-even-contain-the-interjector) is closed.
 Soniox's insertion rate quintupling in high-overlap windows was never evidence of
 hallucination; it was largely evidence of the reference being incomplete exactly where two
 people speak. Two independent audits now say the same thing — the blinded second-speaker
