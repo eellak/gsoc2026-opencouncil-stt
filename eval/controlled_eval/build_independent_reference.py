@@ -166,27 +166,37 @@ HTML = r"""<!doctype html>
 <meta charset="utf-8">
 <title>Γράψε ό,τι ακούς</title>
 <style>
- body{font-family:system-ui,sans-serif;max-width:760px;margin:2rem auto;padding:0 1rem 5rem;
+ body{font-family:system-ui,sans-serif;max-width:760px;margin:2rem auto;padding:0 1rem 6rem;
       line-height:1.5}
  .clip{border:1px solid #ccc;border-radius:8px;padding:1rem;margin:1rem 0}
  .clip.done{border-color:#2a7;background:#f6fdf9}
+ .clip.active{border-color:#26c;box-shadow:0 0 0 2px #26c3}
  textarea{width:100%;font:inherit;padding:.5rem;box-sizing:border-box;min-height:5rem}
- audio{width:100%;margin:.5rem 0}
- #bar{position:sticky;top:0;background:#fff;padding:.6rem 0;border-bottom:1px solid #ddd}
+ audio{width:100%;margin:.4rem 0}
+ .ctrl{display:flex;gap:.35rem;align-items:center;flex-wrap:wrap;margin:.3rem 0}
+ .ctrl button{font:inherit;padding:.35rem .7rem;border-radius:6px;border:1px solid #888;
+        background:#fff;cursor:pointer}
+ .ctrl button:hover{background:#eef}
+ select{font:inherit;padding:.3rem}
+ #bar{position:sticky;top:0;background:#fff;padding:.6rem 0;border-bottom:1px solid #ddd;
+      z-index:50}
  #foot{position:fixed;bottom:0;left:0;right:0;background:#222;color:#eee;padding:8px;
        font:14px sans-serif;z-index:99}
- button{font:inherit;padding:.5rem 1rem;border-radius:6px;border:1px solid #888;
+ #foot button{font:inherit;padding:.4rem .8rem;border-radius:6px;border:1px solid #888;
         background:#fff;cursor:pointer}
  .hint{color:#666;font-size:.85rem}
- kbd{background:#eee;border:1px solid #bbb;border-radius:3px;padding:0 .3rem}
+ kbd{background:#eee;border:1px solid #bbb;border-radius:3px;padding:0 .3rem;
+     font-size:.85em;color:#333}
 </style>
 <h1>Γράψε ό,τι ακούς</h1>
 <p>Είκοσι δευτερόλεπτα το καθένα. Γράψε <b>όλα όσα ακούγονται</b>, όχι μόνο τον βασικό
 ομιλητή. Αν μιλάει και κάποιος άλλος από μακριά ή εκτός μικροφώνου, γράψε και αυτόν.</p>
-<p class="hint">Δεν χρειάζονται τελείες, κεφαλαία ή τονισμός. Γράψε τις λέξεις. Αν κάτι δεν
-ακούγεται καθαρά, βάλε <code>[?]</code> στη θέση του και προχώρα. Αν δεν μιλάει κανείς,
-άφησέ το κενό. Μη σκέφτεσαι τι θα έγραφε το σύστημα, δεν το βλέπεις και δεν πρέπει.
-Η δουλειά σώζεται μόνη της.</p>
+<p class="hint">Δεν χρειάζονται τελείες, κεφαλαία ή τονισμός. Αν κάτι δεν ακούγεται καθαρά,
+βάλε <code>[?]</code> και προχώρα. Αν δεν μιλάει κανείς, άφησέ το κενό. Δεν βλέπεις τι
+έγραψε κάποιο σύστημα και δεν πρέπει.</p>
+<p class="hint"><b>Ενώ γράφεις:</b> <kbd>Ctrl</kbd>+<kbd>Space</kbd> παίζει και σταματάει ·
+<kbd>Ctrl</kbd>+<kbd>←</kbd> πίσω 3 δευτ. · <kbd>Ctrl</kbd>+<kbd>→</kbd> μπροστά 3 δευτ. ·
+<kbd>Ctrl</kbd>+<kbd>↓</kbd> πιο αργά. Τα ίδια κάνουν και τα κουμπιά κάτω από κάθε κλιπ.</p>
 <div id="bar"><b><span id="n">0</span></b>/<span id="tot">0</span> ·
   <span id="words">0</span> λέξεις</div>
 <div id="list"></div>
@@ -194,7 +204,7 @@ HTML = r"""<!doctype html>
 <script>
 const K='refaudit';
 let A=JSON.parse(localStorage.getItem(K)||'{}');
-let timer=null;
+let timer=null, current=null;
 function count(){
   const vals=Object.values(A).filter(v=>(v||'').trim());
   document.getElementById('n').textContent=vals.length;
@@ -206,13 +216,35 @@ function edit(clip,val,el){
   el.closest('.clip').classList.toggle('done',!!val.trim()); count();
   clearTimeout(timer); timer=setTimeout(push,4000);
 }
+function audioOf(el){return el.closest('.clip').querySelector('audio');}
+function focusClip(el){
+  document.querySelectorAll('.clip').forEach(d=>d.classList.remove('active'));
+  const d=el.closest('.clip'); d.classList.add('active'); current=d.querySelector('audio');
+}
+/* Seeking needs the server to answer Range requests. Without that the browser refetches
+   from byte zero and playback jumps back to the start, which is exactly the bug this
+   page had. */
+function nudge(a,dt){ a.currentTime=Math.max(0,Math.min(a.duration||1e9,a.currentTime+dt)); }
+function toggle(a){ if(a.paused){a.play();} else {a.pause();} }
+function speed(a,v){ a.playbackRate=v; }
 (function(m){
   document.getElementById('tot').textContent=m.length;
   document.getElementById('list').innerHTML=m.map((x,i)=>`
    <div class="clip" data-c="${x.clip}">
     <b>${i+1}</b>
-    <audio controls preload="none" src="clips/${x.clip}"></audio>
+    <audio controls preload="metadata" src="clips/${x.clip}"></audio>
+    <div class="ctrl">
+      <button type="button" onclick="nudge(audioOf(this),-3)">◀◀ 3δ</button>
+      <button type="button" onclick="nudge(audioOf(this),-1)">◀ 1δ</button>
+      <button type="button" onclick="toggle(audioOf(this))">▶ / ❚❚</button>
+      <button type="button" onclick="nudge(audioOf(this),3)">3δ ▶▶</button>
+      <select onchange="speed(audioOf(this),parseFloat(this.value))">
+        <option value="1">1x</option><option value="0.75">0.75x</option>
+        <option value="0.5">0.5x</option>
+      </select>
+    </div>
     <textarea placeholder="ό,τι ακούς..."
+      onfocus="focusClip(this)"
       oninput="edit('${x.clip}',this.value,this)"></textarea>
    </div>`).join('');
   m.forEach(x=>{const v=A[x.clip]; if(!v) return;
@@ -220,6 +252,16 @@ function edit(clip,val,el){
     d.querySelector('textarea').value=v; d.classList.add('done');});
   count();
 })(__MANIFEST__);
+document.addEventListener('keydown',e=>{
+  if(!e.ctrlKey && !e.metaKey) return;
+  const a=current || document.querySelector('audio');
+  if(!a) return;
+  if(e.code==='Space'){ e.preventDefault(); toggle(a); }
+  else if(e.key==='ArrowLeft'){ e.preventDefault(); nudge(a,-3); }
+  else if(e.key==='ArrowRight'){ e.preventDefault(); nudge(a,3); }
+  else if(e.key==='ArrowDown'){ e.preventDefault();
+    speed(a, a.playbackRate>0.74?0.75:(a.playbackRate>0.5?0.5:1)); }
+});
 async function push(){
   try{const r=await fetch('/save',{method:'POST',
     headers:{'Content-Type':'application/json'},body:localStorage.getItem(K)||'{}'});
