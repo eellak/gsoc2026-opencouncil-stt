@@ -194,9 +194,11 @@ HTML = r"""<!doctype html>
 <p class="hint">Δεν χρειάζονται τελείες, κεφαλαία ή τονισμός. Αν κάτι δεν ακούγεται καθαρά,
 βάλε <code>[?]</code> και προχώρα. Αν δεν μιλάει κανείς, άφησέ το κενό. Δεν βλέπεις τι
 έγραψε κάποιο σύστημα και δεν πρέπει.</p>
-<p class="hint"><b>Ενώ γράφεις:</b> <kbd>Ctrl</kbd>+<kbd>Space</kbd> παίζει και σταματάει ·
-<kbd>Ctrl</kbd>+<kbd>←</kbd> πίσω 3 δευτ. · <kbd>Ctrl</kbd>+<kbd>→</kbd> μπροστά 3 δευτ. ·
-<kbd>Ctrl</kbd>+<kbd>↓</kbd> πιο αργά. Τα ίδια κάνουν και τα κουμπιά κάτω από κάθε κλιπ.</p>
+<p class="hint"><b>Πλήκτρα, δουλεύουν ενώ γράφεις:</b>
+<kbd>Esc</kbd> παίζει και σταματάει · <kbd>F2</kbd> πίσω 3 δευτ. · <kbd>F4</kbd> μπροστά
+3 δευτ. · <kbd>F8</kbd> αλλάζει ταχύτητα. Όταν ξαναρχίζεις μετά από παύση, γυρίζει μόνο
+του λίγο πίσω. Δεν πειράζονται τα <kbd>Ctrl</kbd>+<kbd>←</kbd>/<kbd>→</kbd>, που τα
+χρειάζεσαι για να κινείσαι μέσα στο κείμενο.</p>
 <div id="bar"><b><span id="n">0</span></b>/<span id="tot">0</span> ·
   <span id="words">0</span> λέξεις</div>
 <div id="list"></div>
@@ -225,7 +227,10 @@ function focusClip(el){
    from byte zero and playback jumps back to the start, which is exactly the bug this
    page had. */
 function nudge(a,dt){ a.currentTime=Math.max(0,Math.min(a.duration||1e9,a.currentTime+dt)); }
-function toggle(a){ if(a.paused){a.play();} else {a.pause();} }
+function toggle(a){
+  if(a.paused){ nudge(a,-0.7); a.play(); }   // back up a little on resume, as pedals do
+  else { a.pause(); }
+}
 function speed(a,v){ a.playbackRate=v; }
 (function(m){
   document.getElementById('tot').textContent=m.length;
@@ -252,16 +257,26 @@ function speed(a,v){ a.playbackRate=v; }
     d.querySelector('textarea').value=v; d.classList.add('done');});
   count();
 })(__MANIFEST__);
+/* Shortcuts a transcriber can actually use. Deliberately NOT Ctrl+arrows: those are
+   word-by-word cursor movement in a textarea and stealing them makes writing worse. Esc
+   and the function keys do nothing inside a text box, so they are free. F1/F3/F5/F6/F7
+   are taken by the browser (help, find, reload, address bar, caret browsing), F2/F4/F8
+   are not. */
 document.addEventListener('keydown',e=>{
-  if(!e.ctrlKey && !e.metaKey) return;
   const a=current || document.querySelector('audio');
   if(!a) return;
-  if(e.code==='Space'){ e.preventDefault(); toggle(a); }
-  else if(e.key==='ArrowLeft'){ e.preventDefault(); nudge(a,-3); }
-  else if(e.key==='ArrowRight'){ e.preventDefault(); nudge(a,3); }
-  else if(e.key==='ArrowDown'){ e.preventDefault();
-    speed(a, a.playbackRate>0.74?0.75:(a.playbackRate>0.5?0.5:1)); }
+  const k=e.key;
+  if(k==='Escape' || (k===' ' && (e.ctrlKey||e.metaKey))){ e.preventDefault(); toggle(a); }
+  else if(k==='F2'){ e.preventDefault(); nudge(a,-3); }
+  else if(k==='F4'){ e.preventDefault(); nudge(a,3); }
+  else if(k==='F8'){ e.preventDefault();
+    const next={1:0.75,0.75:0.5,0.5:1}[a.playbackRate]||1;
+    speed(a,next); flash(next+'x'); }
 });
+function flash(msg){
+  const el=document.getElementById('sync'); el.textContent=msg;
+  setTimeout(()=>{el.textContent='—';},1200);
+}
 async function push(){
   try{const r=await fetch('/save',{method:'POST',
     headers:{'Content-Type':'application/json'},body:localStorage.getItem(K)||'{}'});
