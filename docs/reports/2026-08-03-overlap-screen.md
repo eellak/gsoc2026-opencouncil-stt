@@ -372,3 +372,22 @@ and they still rest on that.
 Levenshtein error types are not semantic labels. A secondary speaker's words can land as
 substitutions, and tie-breaking between equally optimal alignments can move them again.
 Section 4 is built on that machinery and inherits its slack.
+
+---
+
+## The chain
+
+The August reports read in order. The one you are on is marked.
+
+- [Why the fine-tune loses to base](2026-08-02-benchmark-diagnosis.md)
+- [Combining ASR systems, and what does the work](2026-08-02-asr-fusion.md)
+- **Overlapping speech as an error marker** (you are here)
+- [The causal test: overlap costs 0.16 points](2026-08-03-synthetic-overlap.md)
+- [Cutting the audio at speaker changes](2026-08-03-segmentation.md)
+- [The reference is our own transcript](2026-08-03-the-reference-problem.md)
+- [Seven in ten missing words were really said](2026-08-04-reference-omissions.md)
+- [200 hours of meetings we have never seen](2026-08-04-public-meetings.md)
+- [17.5% disagreement with what a human hears](2026-08-04-audio-faithful-reference.md)
+- [The ranking flips](2026-08-04-the-ranking-flips.md)
+- [Synthesis: what we did and why it matters](2026-08-04-what-we-learned.md)
+- [The GSoC delivery plan](../specs/gsoc-delivery-plan.md)
