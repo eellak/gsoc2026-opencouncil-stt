@@ -109,3 +109,7 @@ data/next-batch/calib/
 # diarization venv (pyannote + torch), never commit
 .venv-diar/
 .venv*/
+
+# diagnostic hypothesis dumps carry utterance text (PII)
+eval/diagnose/ctx_hyps.json
+eval/diagnose/*_hyps.json
