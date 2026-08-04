@@ -1,10 +1,32 @@
 # Current State
 
-Last updated: 2026-07-25
+Last updated: 2026-08-04
 
 This is the human and LLM entry point. Read this first, then follow links only as needed.
 
 ## Where We Are Now
+
+**The metric problem, found 2026-08-03/04.** The benchmark's "human reference" **is** the
+published OpenCouncil transcript (WER 0.0008 between them, 223 of 227 windows identical).
+So every WER in this project measures agreement with our own output, not accuracy. A
+blinded listening audit then measured how wrong that output is: where Soniox and Scribe
+independently emit a word the reference lacks, **70.5% of those words were really said**
+(CI 62–79%, 120 clips, 90 meetings). That is **≥1.68% of reference words missing**, and the
+penalty falls hardest on the systems that hear best — Scribe and Soniox are charged 1.68
+WER points for being right, greek-whisper-v3-turbo only 0.53. Reports:
+[the reference problem](docs/reports/2026-08-03-the-reference-problem.md),
+[reference omissions](docs/reports/2026-08-04-reference-omissions.md).
+
+**Overlap is settled and it is not the lever.** A preregistered paired experiment added a
+real interjector to clean audio at natural prevalence: burden **0.16 WER points** against a
+frozen gate of 2.0, so **DiCoW is not worth training for this corpus**
+([report](docs/reports/2026-08-03-synthetic-overlap.md)). The observational screen had said
+the top overlap quartile scores 10 points worse; adding overlap directly recovers 0.16.
+Independently, speaker-turn density beats overlap as an error predictor and overlap adds
+nothing on top of it. Acting on turn density naively does not pay either — cutting audio at
+speaker changes is worth nothing measurable
+([report](docs/reports/2026-08-03-segmentation.md)).
+
 
 The project has moved from **dataset exploration** into **fine-tuning**. The review
 UI is built and in use — it is now a *tool* that produces the curated dataset, not
