@@ -1,0 +1,59 @@
+{
+ "n_items": 95,
+ "n_failed": 1,
+ "failure_reasons": {
+  "mapping_failure": 1
+ },
+ "n_excluded_no_clean_speech": 0,
+ "regular_invariance": {
+  "n_checked": 95,
+  "n_identical": 95
+ },
+ "metric1_absorption": {
+  "exclusive": 0.9895,
+  "regular": 0.9579,
+  "n": 95,
+  "exclusive_ci90_cluster_meeting": [
+   0.9681,
+   1.0
+  ],
+  "n_meetings": 72
+ },
+ "metric2_fragmentation": {
+  "exc_over_reg": {
+   "median": 1.0,
+   "frac_above_1.2": 0.0105
+  },
+  "excC_over_excA": {
+   "median": 1.0,
+   "frac_above_1.2": 0.0105
+  }
+ },
+ "metric3_merge_sim": {
+  "regular": {
+   "single": 1948,
+   "direct": 605,
+   "drop": 165,
+   "guess": 73
+  },
+  "exclusive": {
+   "single": 1953,
+   "direct": 627,
+   "drop": 194,
+   "guess": 17
+  },
+  "guess_plus_drop": {
+   "regular": 238,
+   "exclusive": 211
+  }
+ },
+ "gate": {
+  "absorption_ge_0.80": true,
+  "absorption_beats_regular": true,
+  "frag_medians_le_1.2": true,
+  "frag_frac_above_le_0.10": true,
+  "merge_sim_not_worse": true
+ },
+ "gate_passed": true,
+ "freeze_record": "exclusive_freeze.json"
+}
