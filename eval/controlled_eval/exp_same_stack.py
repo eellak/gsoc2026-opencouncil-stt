@@ -145,6 +145,53 @@ def phase_decode(args) -> None:
         torch.cuda.empty_cache()
 
 
+# ---------------------------------------------------------------- phase: decode-fw
+def phase_decode_fw(args) -> None:
+    """Both models through faster-whisper, on the CPU, with the server's own settings.
+
+    The GPU pass used the chunked transformers pipeline and it broke the base model: 20
+    windows slid into a repetition loop and lost whole chunks, which makes that stack a
+    biased referee no matter which way the number comes out. faster-whisper with
+    `condition_on_previous_text=False` is the guard against exactly that loop, and it is
+    also the stack that produced the benchmark's fine-tune row, so this comparison lands
+    on ground the project already stands on.
+
+    int8, beam 5, no VAD — `oc_asr_server.py` defaults, deliberately not tuned here.
+    Roughly 0.45x realtime on 16 cores, so a full pass over the benchmark windows is a
+    few hours per model and costs nothing.
+    """
+    from faster_whisper import WhisperModel
+
+    clips = sorted(Path(args.clips).glob("*.wav"))[:args.limit or None]
+    out_dir = Path(args.out)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    log(f"{len(clips)} windows")
+
+    for tag, model_path in (("base-fw", "large-v3"), ("finetune-fw", args.ft_model)):
+        if not model_path:
+            continue
+        dest = out_dir / f"{tag}.json"
+        hyps = json.loads(dest.read_text()) if dest.exists() else {}
+        if len(hyps) >= len(clips):
+            log(f"skip {tag}: already decoded")
+            continue
+        model = WhisperModel(model_path, device="cpu", compute_type="int8",
+                             cpu_threads=args.threads)
+        for i, p in enumerate(clips, 1):
+            if p.stem in hyps:
+                continue
+            segs, _ = model.transcribe(str(p), language="el", beam_size=5,
+                                       condition_on_previous_text=False)
+            hyps[p.stem] = "".join(s.text for s in segs).strip()
+            # Written every clip: this runs for hours across cron ticks, and a pass that
+            # cannot be resumed is a pass that gets restarted from zero.
+            dest.write_text(json.dumps(hyps, ensure_ascii=False, indent=1))
+            if i % 10 == 0:
+                log(f"  {tag}: {i}/{len(clips)}")
+        log(f"{tag}: {len(hyps)} windows -> {dest}")
+        del model
+
+
 # -------------------------------------------------------------------- phase: score
 def sdi(ref: list[str], hyp: list[str]) -> tuple[int, int, int]:
     """Global alignment, split into substitutions, deletions, insertions.
@@ -269,6 +316,14 @@ def main() -> None:
     d.add_argument("--adapter")
     d.add_argument("--tag", default="finetune")
     d.set_defaults(fn=phase_decode)
+
+    f = sub.add_parser("decode-fw")
+    f.add_argument("--clips", required=True)
+    f.add_argument("--out", required=True)
+    f.add_argument("--ft-model", default="/home/harold/oc-asr-serve/ct2")
+    f.add_argument("--threads", type=int, default=16)
+    f.add_argument("--limit", type=int, default=0)
+    f.set_defaults(fn=phase_decode_fw)
 
     s = sub.add_parser("score")
     s.add_argument("--hyps", required=True)
