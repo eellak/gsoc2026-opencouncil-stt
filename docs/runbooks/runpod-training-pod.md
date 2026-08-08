@@ -96,3 +96,28 @@ runpodctl get pod                  # verify it is gone
 Per-utterance transcripts are **PII** — they stay out of the repo (the 2026-07-21
 GDPR purge removed exactly this kind of file from the history). Only aggregate
 metrics belong in a tracked results file.
+
+## Missing packages
+
+The pip list above omits two the training script imports: `evaluate` and `jiwer`. A pod
+without them dies at the first eval with `ModuleNotFoundError`, which is a cheap failure
+to prevent and an expensive one to diagnose after the trap has destroyed the log.
+
+## Keeping a finished pod alive on purpose
+
+`run_mixture_arms.sh` terminates the pod on every exit path. That is right for an
+unattended overnight run and wrong when the same GPU is about to be reused for
+inference: transcribing 32 windows with 7 adapters takes minutes there and hours on a
+local CPU. To claim the GPU between the last training step and the shutdown, disable
+both routes the trap can take, from inside the pod:
+
+```bash
+mv /usr/bin/runpodctl /usr/bin/runpodctl.disabled
+echo "127.0.0.1 api.runpod.io" >> /etc/hosts
+```
+
+The trap then prints "could not stop pod" and exits, leaving the machine up.
+
+Doing this **transfers the shutdown obligation to whoever disabled it.** Arm a local
+timer at the same moment, never afterwards — an unattended pod with its own kill switch
+removed is the one failure mode that bills all night.
