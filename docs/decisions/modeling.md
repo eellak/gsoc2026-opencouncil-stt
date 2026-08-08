@@ -3,6 +3,41 @@
 Decisions about what model/technique we actually run, and why. Keep entries short;
 reasoning lives in the reports and handoffs linked from each entry.
 
+## 2026-08-08 — Never compare two models across two decoding stacks
+
+**Decision:** any claim of the form "model X does Y more than model Z" is invalid unless
+both were decoded by the **same** engine with the same settings. Benchmark rows from
+different providers do not qualify, even when the audio and the reference are identical.
+
+**Evidence:** the fine-tune appeared to delete +1.54 points more than base. Re-decoding
+both with one engine gives **+0.19, 90% [−0.50, +0.85]** — the original number sits
+outside the interval. The same base weights produce deletion rates from **3.27 to 23.87**
+depending on the decoder, so the between-stack spread is ten times the difference being
+interpreted. [Report](../reports/2026-08-08-same-stack.md).
+
+**What survives:** the fine-tune's real, measurable gain is **substitutions, −0.61 points,
+CI excludes zero**. It puts the right word in more often. It does not delete more.
+
+**Consequence:** the proposal to retrain on continuous 30-second windows loses its
+motivating evidence. The mechanism stays plausible and would need its own criterion.
+
+## 2026-08-08 — The corrections-to-clean-speech ratio is not the lever
+
+**Decision:** stop spending GPU hours on the mixture ratio. 20/80 and 50/50 are
+indistinguishable on the audio-faithful reference, so pick the ratio on **cost**, and 20%
+corrections is cheaper in human review hours.
+
+**Evidence:** seven preregistered runs, three seed pairs, $24.
+C − A = **−0.24 points, 90% [−0.89, +0.36]**; the deletion guardrail passes at +0.08
+against a 0.5 limit. Gate 1 was not met, so this is inconclusive by the frozen rule, not
+by interpretation. Per-seed differences span **2.1 points** — an order of magnitude above
+the mean effect, which is the number worth remembering.
+[Report](../reports/2026-08-08-mixture-ratio.md) ·
+[preregistration](../specs/mixture-ratio-preregistration.md).
+
+**Caveat kept on the record:** all seven arms share the single-utterance clip shape. If
+window shape dominates, this measured the ratio inside a regime that hides it.
+
 ## 2026-07-25 — Contextual biasing (roster hotwords) is the primary name-accuracy lever
 
 **Decision:** name accuracy is addressed at **inference time** with per-meeting context

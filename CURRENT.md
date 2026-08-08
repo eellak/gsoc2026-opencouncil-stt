@@ -1,10 +1,35 @@
 # Current State
 
-Last updated: 2026-08-04
+Last updated: 2026-08-08
 
 This is the human and LLM entry point. Read this first, then follow links only as needed.
 
 ## Where We Are Now
+
+**The deletion diagnosis was the decoder, 2026-08-08.** The claim that the fine-tune
+deletes 1.54 points more than base came from two benchmark rows produced by two different
+engines: base through the HuggingFace API, ours through our faster-whisper server.
+Re-decoded through one engine the difference is **+0.19, 90% [−0.50, +0.85]**, and the
+same base weights swing between **3.27 and 23.87** deletions depending on the decoder.
+What survives is a real gain in **substitutions, −0.61 points, CI excludes zero**: the
+fine-tune puts the right word in more often. The proposal to retrain on continuous
+30-second windows keeps its plausibility and loses its evidence.
+[Report](docs/reports/2026-08-08-same-stack.md).
+
+**The mixture ratio is not the lever, 2026-08-08.** Seven preregistered runs, three seed
+pairs, $24: 20/80 corrections-to-clean-speech is **indistinguishable** from 50/50
+(C − A = −0.24 points, 90% [−0.89, +0.36]; deletion guardrail passes at +0.08 of 0.5).
+Gate 1 was not met, so this is inconclusive by the frozen rule. The number worth keeping
+is the **2.1-point spread between seeds**, ten times the effect being chased — a single
+seed pair would have "shown" either direction convincingly.
+[Report](docs/reports/2026-08-08-mixture-ratio.md).
+
+**Waiting on ears, not GPUs.** A blinded package of 44 clips is served at
+`:8783` on the tailnet: each marks a span where one system produced nothing and the other
+produced words, with no hint which. If the fine-tune's silences cluster on second speakers
+and the base's do not, the window-shape mechanism stands on its own evidence. Both
+systems drop comparable numbers of runs (99 base, 156 fine-tune), so neither is "the one
+that deletes".
 
 **The metric problem, found 2026-08-03/04.** The benchmark's "human reference" **is** the
 published OpenCouncil transcript (WER 0.0008 between them, 223 of 227 windows identical).
