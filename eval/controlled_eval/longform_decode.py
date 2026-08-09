@@ -52,7 +52,10 @@ def main() -> None:
         segs, info = model.transcribe(
             str(SET / "audio" / row["wav"]), language="el", beam_size=BEAM,
             condition_on_previous_text=True,   # preregistered: the sensitive condition
-            word_timestamps=True, vad_filter=False)
+            # Segment timings only. The timestamp metric matches segment starts and ends to
+            # VAD speech islands, so word-level alignment buys nothing and costs an extra
+            # pass per segment. It also perturbs the segment boundaries being measured.
+            word_timestamps=False, vad_filter=False)
         out = [{"start": float(s.start), "end": float(s.end), "text": s.text}
                for s in segs]
         hyps[row["wav"]] = {"segments": out,
