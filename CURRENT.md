@@ -24,12 +24,18 @@ is the **2.1-point spread between seeds**, ten times the effect being chased —
 seed pair would have "shown" either direction convincingly.
 [Report](docs/reports/2026-08-08-mixture-ratio.md).
 
-**Waiting on ears, not GPUs.** A blinded package of 44 clips is served at
-`:8783` on the tailnet: each marks a span where one system produced nothing and the other
-produced words, with no hint which. If the fine-tune's silences cluster on second speakers
-and the base's do not, the window-shape mechanism stands on its own evidence. Both
-systems drop comparable numbers of runs (99 base, 156 fine-tune), so neither is "the one
-that deletes".
+**The listening test agrees, 2026-08-09.** 44 blinded clips, every one classified. The
+mechanism predicted the fine-tune's silences would fall on second speakers more often than
+base's. They fall there **less** often — 46% vs 60%, −14 points, permutation p = 0.38 — and
+half of the fine-tune's dropped spans are ordinary main-speaker speech. **Two independent
+checks, both negative: the continuous-30-second retrain is not worth running.** It would
+be an expensive fix for a problem that was never measured.
+
+**Where the next hours should go.** The one gain that survives a fair comparison is
+**substitutions, −0.61 points, CI excludes zero** — the fine-tune puts the right word in
+more often, which is what domain adaptation is for. The binding constraint is not the
+model: with 1,236 reference words **no difference under 4.5 points can be seen**. More
+human listening, from more meetings, buys more than any further GPU run.
 
 **The metric problem, found 2026-08-03/04.** The benchmark's "human reference" **is** the
 published OpenCouncil transcript (WER 0.0008 between them, 223 of 227 windows identical).

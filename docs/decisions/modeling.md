@@ -19,7 +19,12 @@ interpreted. [Report](../reports/2026-08-08-same-stack.md).
 CI excludes zero**. It puts the right word in more often. It does not delete more.
 
 **Consequence:** the proposal to retrain on continuous 30-second windows loses its
-motivating evidence. The mechanism stays plausible and would need its own criterion.
+motivating evidence.
+
+**Closed 2026-08-09 — do not run it.** Given its own criterion, it fails that too. In 44
+blinded clips the fine-tune's dropped spans are second-speaker **less** often than base's
+(46% vs 60%, −14 points, permutation p = 0.38), and half are ordinary main-speaker speech.
+Prediction reversed, difference inside the noise, two independent checks negative.
 
 ## 2026-08-08 — The corrections-to-clean-speech ratio is not the lever
 
