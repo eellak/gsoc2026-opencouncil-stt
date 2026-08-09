@@ -37,10 +37,17 @@ a link list back to the others, so you can walk the chain from any entry point.
 | 9 | [17.5% disagreement with audio](2026-08-04-audio-faithful-reference.md) | the published text vs a careful listener, on unseen meetings |
 | 10 | [The ranking flips](2026-08-04-the-ranking-flips.md) | tied on the old metric, fine-tune **+4.9 points** on what a human heard |
 | 11 | [Synthesis](2026-08-04-what-we-learned.md) | the whole arc with diagrams, for a human reader |
+| 12 | [Exclusive diarization](2026-08-08-exclusive-diarization.md) | what the repair buys, measured |
+| 13 | [The mixture ratio](2026-08-08-mixture-ratio.md) | 20/80 vs 50/50 indistinguishable; seed spread is ten times the effect. Inconclusive by the frozen rule |
+| 14 | [The deletions were the decoder](2026-08-08-same-stack.md) | +1.54 becomes **+0.19**, CI contains zero. Never compare two models across two stacks |
+| 15 | [Clip boundaries](2026-08-09-clip-boundaries.md) | 4 of 20 training clips cut their own reference words, all at ≤1.06s |
+| 16 | [Chunking coarsens, timestamps survive](2026-08-09-longform-preflight.md) | on 3.3h of continuous audio the fine-tune loops **less**, emits 100% valid timestamps, and covers **35 points fewer** speech boundaries |
 
 Where it goes next: [the GSoC delivery plan](../specs/gsoc-delivery-plan.md).
 
 Preregistrations, all frozen before their data existed:
 [synthetic overlap](../specs/synthetic-overlap-preregistration.md) ·
 [segmentation](../specs/segmentation-experiment-preregistration.md) ·
-[precision-2 corpus analysis](../specs/precision2-corpus-analysis.md).
+[precision-2 corpus analysis](../specs/precision2-corpus-analysis.md) ·
+[mixture ratio](../specs/mixture-ratio-preregistration.md) ·
+[window shape](../specs/window-shape-preregistration.md).

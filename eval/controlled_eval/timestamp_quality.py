@@ -37,9 +37,17 @@ VAD_THRESHOLD = 0.5
 
 
 def islands(wav: Path) -> list[tuple[float, float]]:
-    from silero_vad import get_speech_timestamps, load_silero_vad, read_audio
+    # Deliberately not silero's own read_audio: it goes through torchaudio, which in
+    # 2.11 requires torchcodec for decoding. These clips are already 16 kHz mono, so the
+    # loader would only be doing work that is already done.
+    import soundfile as sf
+    import torch
+    from silero_vad import get_speech_timestamps, load_silero_vad
+
+    arr, sr = sf.read(str(wav), dtype="float32")
+    assert sr == 16000, f"{wav} is {sr} Hz, expected 16000"
     model = load_silero_vad()
-    ts = get_speech_timestamps(read_audio(str(wav), sampling_rate=16000), model,
+    ts = get_speech_timestamps(torch.from_numpy(arr), model,
                                sampling_rate=16000, threshold=VAD_THRESHOLD,
                                return_seconds=True)
     out: list[list[float]] = []
