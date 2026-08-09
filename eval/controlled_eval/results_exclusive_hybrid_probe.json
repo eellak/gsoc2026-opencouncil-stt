@@ -1,0 +1,19 @@
+{
+ "note": "POST-HOC exploratory, not preregistered, no gate applies",
+ "n_utterances": 718,
+ "n_windows": 25,
+ "drops": {
+  "regular": 12,
+  "exclusive": 21,
+  "hybrid": 11
+ },
+ "guess_branch": {
+  "regular": 190,
+  "exclusive": 44,
+  "hybrid": 46
+ },
+ "hybrid_fellback_to_regular": 10,
+ "hybrid_speaker_differs_from_regular": 51,
+ "net_drops_hybrid_minus_regular_per_100": -0.139,
+ "net_drops_ci95_upper_one_sided": 0.0
+}
