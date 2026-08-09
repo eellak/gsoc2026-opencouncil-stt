@@ -182,6 +182,21 @@ and a no-retrain alternative come first.
   interjector mixed in at set levels, both versions through the same systems, identical
   main-speaker reference. Causal for the manipulation, no new labels. The only cheap
   thing that estimates a burden rather than an association.
+- [x] **pyannoteAI `exclusive` diarization: tested, rejected as a drop-in**
+  ([report](docs/reports/2026-08-08-exclusive-diarization.md),
+  [prereg](docs/specs/exclusive-diarization-preregistration.md)). Phase 1 passed all five
+  frozen conditions (absorption 0.99, no fragmentation, regular timeline byte-identical
+  with and without the flag in 95/95 items). Phase 2 failed the drop-safety gate on real
+  windows: exclusive mode resolves overlap by **deleting** the shorter speaker's segment,
+  and `findBestSpeakerForUtterance` drops any utterance no speaker fully covers, so
+  10 utterances were lost against 1 recovered (+1.94 per 100 at the 95% bound, gate needed
+  under +0.5). No issue, no PR. $1.20 of API spend.
+- [?] **Follow-up: read both timelines instead of swapping them.** Post-hoc on the same
+  data, assigning from the exclusive timeline with the regular one as coverage fallback
+  keeps the guess-branch reduction (190 → 46) and drops one *fewer* utterance than the
+  status quo. Exploratory, no gate, tuned on the cases it is scored against. Blocked on
+  the blinded listening (~30 min, page built and served) that says whether the changed
+  attributions are actually better; without it the follow-up is not worth designing.
 - [ ] **Decide on the vote.** It is deployable today; the cost is three ASR bills instead of
   one. That trade, not the WER, is the question for OpenCouncil. Cheaper shape to explore:
   call the second and third systems only where the first is uncertain.
