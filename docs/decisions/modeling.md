@@ -21,10 +21,30 @@ CI excludes zero**. It puts the right word in more often. It does not delete mor
 **Consequence:** the proposal to retrain on continuous 30-second windows loses its
 motivating evidence.
 
-**Closed 2026-08-09 — do not run it.** Given its own criterion, it fails that too. In 44
-blinded clips the fine-tune's dropped spans are second-speaker **less** often than base's
-(46% vs 60%, −14 points, permutation p = 0.38), and half are ordinary main-speaker speech.
-Prediction reversed, difference inside the noise, two independent checks negative.
+**Closed 2026-08-09 as an explanation of the deletions — do not reopen that.** Given its
+own criterion it fails too. In 44 blinded clips the fine-tune's dropped spans are
+second-speaker **less** often than base's (46% vs 60%, −14 points, permutation p = 0.38),
+and half are ordinary main-speaker speech. Prediction reversed, difference inside the
+noise, two independent checks negative.
+
+**Reopened the same day as a different question, and it is unmeasured.** Read as a blanket
+"do not run it", the entry claims more than the data supports: what was refuted is the
+*deletion mechanism*, not clip shape itself. Clip shape has never been varied in any
+experiment here — the mixture-ratio report says so in its own caveats — so it remains a
+confound sitting under every result this project has produced. The new motivation is
+independent of deletions: the boundary audit found 4 of 20 uniformly sampled training clips
+cut or lose one of their own reference words, all at ≤1.06s, and 25.8% of the corpus is that
+short. Deletions are not a criterion in the new test.
+[Preregistration](../specs/window-shape-preregistration.md) ·
+[handoff](../runbooks/2026-08-09-windows-and-listening-handoff.md).
+
+**Two things that preregistration settled before any GPU time:** every run this project has
+ever done trained under `<|notimestamps|>`, so the six existing mixture adapters are
+historical controls rather than a free control arm — reusing them would smuggle a different
+supervision history into the comparison. And the whole direction can be falsified on CPU
+first: decode the long-form set with base and the three existing adapters, and if the
+adapters show no worse loop burden or timestamp validity than base, the mechanism is absent
+here and the experiment is not funded.
 
 ## 2026-08-08 — The corrections-to-clean-speech ratio is not the lever
 

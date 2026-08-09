@@ -17,6 +17,7 @@ Accepted decisions and open questions, one file per theme. Keep entries short �
 ### Accepted
 
 - [Never compare two models across two decoding stacks](modeling.md#2026-08-08--never-compare-two-models-across-two-decoding-stacks) — 2026-08-08
+  - reopened 2026-08-09 as a **scoped, unmeasured** question about training clip shape — [preregistration](../specs/window-shape-preregistration.md)
 - [The corrections-to-clean-speech ratio is not the lever](modeling.md#2026-08-08--the-corrections-to-clean-speech-ratio-is-not-the-lever) — 2026-08-08
 - [Contextual biasing (roster hotwords) is the primary name-accuracy lever](modeling.md#2026-07-25--contextual-biasing-roster-hotwords-is-the-primary-name-accuracy-lever) — 2026-07-25
 - [The LoRA adapter is not deployed to OpenCouncil](modeling.md#2026-07-25--the-lora-adapter-is-not-deployed-to-opencouncil) — 2026-07-25
