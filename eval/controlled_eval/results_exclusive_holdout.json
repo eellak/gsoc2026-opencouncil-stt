@@ -1,0 +1,18 @@
+{
+ "note": "held-out replication of a post-hoc rule; mechanical effect only, says nothing about whether the changed attributions are correct",
+ "n_windows": 25,
+ "n_utterances": 538,
+ "drops": {
+  "regular": 14,
+  "exclusive": 15,
+  "hybrid": 13
+ },
+ "guess_branch": {
+  "regular": 36,
+  "exclusive": 8,
+  "hybrid": 8
+ },
+ "guess_reduction_hybrid_vs_regular": 0.7778,
+ "speaker_changed_vs_regular": 6,
+ "speaker_changed_frac": 0.0112
+}

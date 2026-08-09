@@ -192,9 +192,16 @@ That is one line in the replay, and the data to test it was already on disk:
 | exclusive (the failed proposal) | 21 | 44 |
 | both, exclusive first | 11 | 46 |
 
-The fallback fires 10 times in 718 utterances. It keeps essentially the whole guess
-reduction and ends up with one fewer drop than the status quo: net −0.14 per 100,
-one-sided 95% upper bound 0.00, so on this corpus it is never worse.
+The fallback fires 10 times in 718 utterances.
+
+Read the two columns differently, because they are not the same kind of claim. The
+drop column is **arithmetic, not evidence**: the hybrid discards an utterance only
+when both timelines discard it, so its drop count can never exceed the regular one.
+11 versus 12 is a theorem with a worked example, and the bootstrap interval on it
+means nothing. Do not sell it as a measured improvement.
+
+The guess column is the empirical part. 190 down to 46 is a real property of these
+timelines, and it is the only thing the hybrid actually buys.
 
 `eval/controlled_eval/exclusive_hybrid_probe.py`. This is exploratory and carries no
 gate. It was written after Phase 2 had already failed, on the same data that produced
@@ -204,8 +211,32 @@ that the change is safe to ship.
 
 One thing it does not settle: the hybrid's entire value is that its 51 changed
 attributions are better than the status quo's. That is exactly what the blinded
-listening answers, and it is now the only thing standing between this and a real
+listening answers, and it is the only thing standing between this and a real
 proposal.
+
+### Held-out replication, and how much smaller the effect gets
+
+Ranks 26 to 50 by turn density, 538 utterances, windows the rule was never tuned on.
+The prediction was committed before the run (`exclusive_holdout_check.py`): a genuine
+effect should reduce the guess branch by 60% or more.
+
+| | top-25 windows | held-out 26-50 |
+|---|---|---|
+| guess reduction | 76% (190 to 46) | **78% (36 to 8)** |
+| guess rate under the status quo | 26.5% of utterances | **6.7%** |
+| utterances whose speaker changes | 7.1% (51 of 718) | **1.1% (6 of 538)** |
+| drops (regular / hybrid) | 12 / 11 | 14 / 13 |
+
+The mechanism replicates almost exactly. The amount of work it does does not.
+
+Turn density in the top-25 runs from 41.5 down to 23.3 per minute; ranks 26 to 50
+span 23.1 to 20.9, against a corpus median of 17.2 over 232 windows. One rank step
+outside the extreme tail and the guess rate falls by a factor of four, and the number
+of attributions the change actually touches falls by a factor of six.
+
+So the honest size of the prize is: a real and free mechanism, doing meaningful work
+on a thin tail of unusually contested meetings and very little elsewhere. Both things
+are true and the second is the one that gets left out of a pitch.
 
 ## Artefacts
 

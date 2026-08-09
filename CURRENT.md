@@ -224,10 +224,13 @@ and a no-retrain alternative come first.
   under +0.5). No issue, no PR. $1.20 of API spend.
 - [?] **Follow-up: read both timelines instead of swapping them.** Post-hoc on the same
   data, assigning from the exclusive timeline with the regular one as coverage fallback
-  keeps the guess-branch reduction (190 → 46) and drops one *fewer* utterance than the
-  status quo. Exploratory, no gate, tuned on the cases it is scored against. Blocked on
-  the blinded listening (~30 min, page built and served) that says whether the changed
-  attributions are actually better; without it the follow-up is not worth designing.
+  keeps the guess-branch reduction (190 → 46). The "one fewer drop" is arithmetic, not
+  evidence: the hybrid drops only where both timelines drop, so it cannot lose. Held-out
+  on ranks 26-50 the mechanism replicates (78% guess reduction vs 76%) but the effect
+  shrinks hard: guess rate 26.5% → 6.7%, changed attributions 7.1% → 1.1%. Real and free,
+  small outside the contested tail. Still blocked on the blinded listening (~30 min, page
+  built and served): nothing here says the changed attributions are *correct*, and
+  production calls `/identify` with voiceprints while this ran on `/diarize`.
 - [ ] **Decide on the vote.** It is deployable today; the cost is three ASR bills instead of
   one. That trade, not the WER, is the question for OpenCouncil. Cheaper shape to explore:
   call the second and third systems only where the first is uncertain.
