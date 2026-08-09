@@ -136,9 +136,23 @@ def used_windows() -> dict[tuple[str, str], list[tuple[float, float]]]:
     return out
 
 
+def bound(name, raw):
+    """A malformed date bound is a typo in the command line, and it should stop the run
+    before it scans 151 meetings and reports an empty pool as though that were the answer."""
+    if not raw:
+        return None
+    try:
+        return datetime.fromisoformat(raw).replace(tzinfo=timezone.utc)
+    except ValueError:
+        sys.exit(f"{name}={raw!r} is not an ISO date")
+
+
+T_FROM, T_TO = bound("DATE_FROM", DATE_FROM), bound("DATE_TO", DATE_TO)
+
+
 def in_date_window(dt_raw) -> bool | None:
     """None when the date is missing or unparseable, so the caller can drop and count it."""
-    if DATE_FROM is None and DATE_TO is None:
+    if T_FROM is None and T_TO is None:
         return True
     if not dt_raw:
         return None
@@ -148,9 +162,9 @@ def in_date_window(dt_raw) -> bool | None:
         return None
     dt = (dt.replace(tzinfo=timezone.utc) if dt.tzinfo is None
           else dt.astimezone(timezone.utc))
-    if DATE_FROM and dt < datetime.fromisoformat(DATE_FROM).replace(tzinfo=timezone.utc):
+    if T_FROM and dt < T_FROM:
         return False
-    if DATE_TO and dt >= datetime.fromisoformat(DATE_TO).replace(tzinfo=timezone.utc):
+    if T_TO and dt >= T_TO:
         return False
     return True
 
@@ -171,9 +185,11 @@ def utterances(rec) -> list[tuple[float, float, str]]:
 
 
 def main():
-    if DATE_FROM and DATE_TO and DATE_FROM >= DATE_TO:
+    if T_FROM and T_TO and T_FROM >= T_TO:
         sys.exit(f"DATE_FROM {DATE_FROM} is not before DATE_TO {DATE_TO}")
-    if OUT_DIR.exists() and any(OUT_DIR.iterdir()):
+    if OUT_DIR.exists() and not OUT_DIR.is_dir():
+        sys.exit(f"{OUT_DIR} exists and is not a directory")
+    if OUT_DIR.is_dir() and any(OUT_DIR.iterdir()):
         sys.exit(f"{OUT_DIR} is not empty; refusing to build over an existing package")
 
     recs = sorted((SC / "meetings").glob("*.json"))
@@ -199,6 +215,9 @@ def main():
         city, mid = m.get("cityId"), m.get("id")
         url = m.get("audioUrl")
         # Cheap identity filters first: never open the audio of a meeting we may not use.
+        # EXCLUDE wins over INCLUDE when both name the same meeting. Barring is the
+        # stronger statement, and a rule that says "never this one" should not be undone
+        # by a list that says "these are allowed".
         if (city, mid) in drop:
             n_excluded += 1
             continue
@@ -251,34 +270,42 @@ def main():
             f"{len(prio)} priority meetings are in the usable pool")
     picks, cities = [], sorted(by_city)
     used = {c: 0 for c in cities}
-    while len(picks) < N_WINDOWS:
-        progressed = False
-        for c in cities:
-            if len(picks) >= N_WINDOWS:
-                break
-            if used[c] >= len(by_city[c]):
-                continue
-            m = by_city[c][used[c]]
-            used[c] += 1
-            progressed = True
-            cs = sorted(m["candidates"], key=lambda t: h("w", m["meeting_id"], t))
-            # Candidate starts sit on a 10 s grid and the window is 20 s, so taking the
-            # first two in hash order could hand out two windows sharing half their audio.
-            taken: list[float] = []
-            for t in cs:
-                if len(taken) >= PER_MEETING or len(picks) >= N_WINDOWS:
+    # Two passes when there is a priority list, because sorting inside each city only makes
+    # May first *within* a city: with a small N_WINDOWS the round-robin could still spend
+    # its budget on an early city's ordinary meetings while a later city's May meeting was
+    # never reached. The first pass draws priority meetings only.
+    for phase in ((True, False) if prio else (False,)):
+        while len(picks) < N_WINDOWS:
+            progressed = False
+            for c in cities:
+                if len(picks) >= N_WINDOWS:
                     break
-                if any(abs(t - u) < MIN_GAP_SEC for u in taken):
+                if used[c] >= len(by_city[c]):
                     continue
-                taken.append(t)
-                picks.append({**{k: m[k] for k in
-                                 ("city_id", "meeting_id", "audio_url", "n_people")},
-                              "start_sec": t, "dur_sec": WINDOW_SEC})
-            if len(taken) < PER_MEETING:
-                log(f"  only {len(taken)}/{PER_MEETING} separated windows in "
-                    f"{m['city_id']}/{m['meeting_id']}")
-        if not progressed:
-            break
+                m = by_city[c][used[c]]
+                if phase and (m["city_id"], m["meeting_id"]) not in prio:
+                    continue          # city's priority meetings are exhausted, wait for pass 2
+                used[c] += 1
+                progressed = True
+                cs = sorted(m["candidates"], key=lambda t: h("w", m["meeting_id"], t))
+                # Candidate starts sit on a 10 s grid and the window is 20 s, so taking
+                # the first two in hash order could hand out two windows that share half
+                # their audio.
+                taken: list[float] = []
+                for t in cs:
+                    if len(taken) >= PER_MEETING or len(picks) >= N_WINDOWS:
+                        break
+                    if any(abs(t - u) < MIN_GAP_SEC for u in taken):
+                        continue
+                    taken.append(t)
+                    picks.append({**{k: m[k] for k in
+                                     ("city_id", "meeting_id", "audio_url", "n_people")},
+                                  "start_sec": t, "dur_sec": WINDOW_SEC})
+                if len(taken) < PER_MEETING:
+                    log(f"  only {len(taken)}/{PER_MEETING} separated windows in "
+                        f"{m['city_id']}/{m['meeting_id']}")
+            if not progressed:
+                break
     # by (city, meeting): meeting ids like `may20_2026` repeat across cities, and counting
     # them alone under-reports the number of clusters the bootstrap actually has.
     log(f"{len(picks)} windows from "
