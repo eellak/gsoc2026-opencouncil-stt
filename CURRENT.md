@@ -1,6 +1,6 @@
 # Current State
 
-Last updated: 2026-08-08
+Last updated: 2026-08-09
 
 This is the human and LLM entry point. Read this first, then follow links only as needed.
 
@@ -13,7 +13,7 @@ Re-decoded through one engine the difference is **+0.19, 90% [−0.50, +0.85]**,
 same base weights swing between **3.27 and 23.87** deletions depending on the decoder.
 What survives is a real gain in **substitutions, −0.61 points, CI excludes zero**: the
 fine-tune puts the right word in more often. The proposal to retrain on continuous
-30-second windows keeps its plausibility and loses its evidence.
+30-second windows loses its evidence here and is closed by the listening test below.
 [Report](docs/reports/2026-08-08-same-stack.md).
 
 **The mixture ratio is not the lever, 2026-08-08.** Seven preregistered runs, three seed
