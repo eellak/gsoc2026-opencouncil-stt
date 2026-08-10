@@ -129,6 +129,8 @@
       "next_action": null,
       "updated_at": "2026-08-10T17:00:00Z",
       "caveats": [
+        "7 of the 260 windows are meetings dated >= 2026-06-01, inside the temporal TEST definition; one of them (win_argos_jun3_2026_855222) supplied 21% of the base comparison. Re-measured on the 39 clean validation windows every conclusion survives: ours 0.1542, vs base -1.87 [-3.35,-0.50], vs broken -1.58 [-2.41,-0.85], vs Scribe +1.12 [-0.54,+2.73], vs Soniox +1.19 [-0.48,+2.70]. Exclude those 7 from any future final measurement.",
+        "argos+orestiada is part of the VALIDATION set, not the test set, and has been scored repeatedly and used to decide which experiments to stop. Treat the number as potentially optimistically biased.",
         "The base-whisper arm runs on the HuggingFace serverless pipeline, a different decoder stack. The -2.30 includes an engine difference.",
         "The broken-adapter arm ran on an RTX 3090 in July, ours on an RTX A4000 today. Measured separately: CPU int8 and CUDA int8 give different tokens from the same artifact, so the device is not neutral.",
         "The reference is OpenCouncil's own published text, so this measures agreement-with-OpenCouncil, not accuracy.",
