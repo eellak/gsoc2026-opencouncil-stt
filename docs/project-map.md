@@ -63,6 +63,7 @@ Review UI:
 ## Reference
 
 - [GSoC proposal](reference/gsoc-proposal.md) — scope, timeline, risks, appendix analysis.
+- [Trained models](reference/trained-models.md) — every adapter, when, what it scored, where the weights are.
 - [Fine-tuning 101](reference/finetuning-101.md) — background and plan.
 - [OpenCouncil meeting JSON](reference/opencouncil-meeting-json.md) — the large meeting JSON shape and CSV join path.
 - [Error taxonomy and routing](reference/error-taxonomy.md) — where each error is best fixed.
