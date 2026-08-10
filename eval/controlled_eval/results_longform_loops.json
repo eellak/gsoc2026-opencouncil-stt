@@ -649,6 +649,217 @@
      "per_10min": 0.0
     }
    ]
+  },
+  "finetune_fixed": {
+   "spans": 20,
+   "words": 24215,
+   "excess": 44,
+   "per_10min": 2.2,
+   "spans_with_any_loop": 4,
+   "worst": [
+    {
+     "wav": "lf_017.wav",
+     "city_id": "chalandri",
+     "meeting_id": "jul2_2026",
+     "words": 885,
+     "excess": 21,
+     "per_10min": 21.0
+    },
+    {
+     "wav": "lf_003.wav",
+     "city_id": "athens",
+     "meeting_id": "jun15_2026",
+     "words": 816,
+     "excess": 10,
+     "per_10min": 10.0
+    },
+    {
+     "wav": "lf_007.wav",
+     "city_id": "papagos-cholargos",
+     "meeting_id": "jun23_2026",
+     "words": 1161,
+     "excess": 8,
+     "per_10min": 8.0
+    },
+    {
+     "wav": "lf_001.wav",
+     "city_id": "argithea",
+     "meeting_id": "jul24_2026",
+     "words": 1031,
+     "excess": 5,
+     "per_10min": 5.0
+    },
+    {
+     "wav": "lf_002.wav",
+     "city_id": "argos",
+     "meeting_id": "may22_2026",
+     "words": 1395,
+     "excess": 0,
+     "per_10min": 0.0
+    }
+   ],
+   "by_span": [
+    {
+     "wav": "lf_001.wav",
+     "city_id": "argithea",
+     "meeting_id": "jul24_2026",
+     "words": 1031,
+     "excess": 5,
+     "per_10min": 5.0
+    },
+    {
+     "wav": "lf_002.wav",
+     "city_id": "argos",
+     "meeting_id": "may22_2026",
+     "words": 1395,
+     "excess": 0,
+     "per_10min": 0.0
+    },
+    {
+     "wav": "lf_003.wav",
+     "city_id": "athens",
+     "meeting_id": "jun15_2026",
+     "words": 816,
+     "excess": 10,
+     "per_10min": 10.0
+    },
+    {
+     "wav": "lf_004.wav",
+     "city_id": "chalandri",
+     "meeting_id": "jul22_2026",
+     "words": 1224,
+     "excess": 0,
+     "per_10min": 0.0
+    },
+    {
+     "wav": "lf_005.wav",
+     "city_id": "chania",
+     "meeting_id": "jun15_2026",
+     "words": 1316,
+     "excess": 0,
+     "per_10min": 0.0
+    },
+    {
+     "wav": "lf_006.wav",
+     "city_id": "orestiada",
+     "meeting_id": "jun15_2026",
+     "words": 1205,
+     "excess": 0,
+     "per_10min": 0.0
+    },
+    {
+     "wav": "lf_007.wav",
+     "city_id": "papagos-cholargos",
+     "meeting_id": "jun23_2026",
+     "words": 1161,
+     "excess": 8,
+     "per_10min": 8.0
+    },
+    {
+     "wav": "lf_008.wav",
+     "city_id": "samothraki",
+     "meeting_id": "jul21_2026",
+     "words": 1290,
+     "excess": 0,
+     "per_10min": 0.0
+    },
+    {
+     "wav": "lf_009.wav",
+     "city_id": "sparta",
+     "meeting_id": "jul15_2026",
+     "words": 1384,
+     "excess": 0,
+     "per_10min": 0.0
+    },
+    {
+     "wav": "lf_010.wav",
+     "city_id": "thira",
+     "meeting_id": "jun29_2026",
+     "words": 1261,
+     "excess": 0,
+     "per_10min": 0.0
+    },
+    {
+     "wav": "lf_011.wav",
+     "city_id": "vrilissia",
+     "meeting_id": "jun3_3_2026",
+     "words": 1263,
+     "excess": 0,
+     "per_10min": 0.0
+    },
+    {
+     "wav": "lf_012.wav",
+     "city_id": "xylokastro",
+     "meeting_id": "jul29_3_2026",
+     "words": 1145,
+     "excess": 0,
+     "per_10min": 0.0
+    },
+    {
+     "wav": "lf_013.wav",
+     "city_id": "zografou",
+     "meeting_id": "jun4_2026",
+     "words": 1140,
+     "excess": 0,
+     "per_10min": 0.0
+    },
+    {
+     "wav": "lf_014.wav",
+     "city_id": "argithea",
+     "meeting_id": "jun25_2026",
+     "words": 1284,
+     "excess": 0,
+     "per_10min": 0.0
+    },
+    {
+     "wav": "lf_015.wav",
+     "city_id": "argos",
+     "meeting_id": "jul21_2026",
+     "words": 1284,
+     "excess": 0,
+     "per_10min": 0.0
+    },
+    {
+     "wav": "lf_016.wav",
+     "city_id": "athens",
+     "meeting_id": "may28_2_2026",
+     "words": 1344,
+     "excess": 0,
+     "per_10min": 0.0
+    },
+    {
+     "wav": "lf_017.wav",
+     "city_id": "chalandri",
+     "meeting_id": "jul2_2026",
+     "words": 885,
+     "excess": 21,
+     "per_10min": 21.0
+    },
+    {
+     "wav": "lf_018.wav",
+     "city_id": "chania",
+     "meeting_id": "jul27_2026",
+     "words": 999,
+     "excess": 0,
+     "per_10min": 0.0
+    },
+    {
+     "wav": "lf_019.wav",
+     "city_id": "orestiada",
+     "meeting_id": "jul21_2026",
+     "words": 1445,
+     "excess": 0,
+     "per_10min": 0.0
+    },
+    {
+     "wav": "lf_020.wav",
+     "city_id": "sparta",
+     "meeting_id": "jun23_2026",
+     "words": 1343,
+     "excess": 0,
+     "per_10min": 0.0
+    }
+   ]
   }
  }
 }

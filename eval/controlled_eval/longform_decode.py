@@ -20,6 +20,7 @@ Env: SET MODEL TAG BEAM
 """
 from __future__ import annotations
 
+import atexit
 import json
 import os
 import sys
@@ -39,6 +40,25 @@ def log(*a):
 def main() -> None:
     manifest = json.loads((SET / "manifest.json").read_text())
     dest = SET / f"hyp_{TAG}.json"
+
+    # One decoder per tag. Two of these ran at once on 2026-08-10 because a supervising
+    # loop restarted what it wrongly believed was dead; each held its own in-memory dict
+    # and overwrote the other's spans, so finished work silently disappeared and the log
+    # printed span 16 before span 15. Unattended runs cannot afford that.
+    lock = SET / f"hyp_{TAG}.lock"
+    try:
+        fd = os.open(lock, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+    except FileExistsError:
+        other = lock.read_text().strip()
+        if other.isdigit() and Path(f"/proc/{other}").exists():
+            sys.exit(f"{TAG}: already decoding as pid {other}; refusing to run twice")
+        log(f"{TAG}: stale lock from pid {other or '?'}, taking it over")
+        lock.unlink()
+        fd = os.open(lock, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+    os.write(fd, str(os.getpid()).encode())
+    os.close(fd)
+    atexit.register(lambda: lock.unlink(missing_ok=True))
+
     hyps = json.loads(dest.read_text()) if dest.exists() else {}
     log(f"{TAG}: {len(manifest)} spans, {len(hyps)} already done, model {MODEL}")
 
@@ -61,7 +81,16 @@ def main() -> None:
         hyps[row["wav"]] = {"segments": out,
                             "text": "".join(s["text"] for s in out).strip(),
                             "decode_sec": round(time.time() - t0, 1)}
-        dest.write_text(json.dumps(hyps, ensure_ascii=False, indent=1))
+        # Merge against what is on disk rather than trusting the in-memory copy, and
+        # rename into place. Belt and braces after the double-decoder incident: the lock
+        # should make this impossible, but losing hours of decoding to a clobbered write
+        # is worse than one extra read.
+        on_disk = json.loads(dest.read_text()) if dest.exists() else {}
+        on_disk.update(hyps)
+        hyps = on_disk
+        tmp = dest.with_suffix(".part")
+        tmp.write_text(json.dumps(hyps, ensure_ascii=False, indent=1))
+        tmp.replace(dest)
         log(f"  {i}/{len(manifest)} {row['wav']} {len(out)} segs "
             f"{time.time()-t0:.0f}s ({(time.time()-t0)/row['dur_sec']:.2f}x RT)")
 
