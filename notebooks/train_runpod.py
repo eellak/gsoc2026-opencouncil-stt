@@ -34,7 +34,16 @@ SAMPLE_N = 60 if SMOKE else None
 SMOKE_TRAIN_MEETINGS = 4 if SMOKE else None
 SMOKE_VAL_MEETINGS = 2 if SMOKE else None
 VAL_REG_PER_MEETING = 8
-SR = 16000; PAD_S = 0.2; MIN_DUR, MAX_DUR = 0.3, 30.0; SEED = 13
+SR = 16000; PAD_S = 0.2; MIN_DUR, MAX_DUR = 0.3, 30.0
+SEED = int(os.environ.get("SEED", "13"))
+# MAX_STEPS pins the optimizer budget so two arms with different row counts still get
+# the same number of updates — without it, mixture ratio and compute move together and
+# neither can be attributed. TRAIN_MANIFEST swaps in one arm's train list while valc /
+# valr stay byte-identical. Both are for the mixture-ratio experiment
+# (docs/specs/mixture-ratio-preregistration.md); unset, behaviour is unchanged.
+MAX_STEPS = int(os.environ.get("MAX_STEPS", "0"))
+TRAIN_MANIFEST = os.environ.get("TRAIN_MANIFEST", "")
+EVAL_STRATEGY = os.environ.get("EVAL_STRATEGY", "epoch")   # "no" to skip
 LORA_R, LORA_ALPHA, LORA_DROPOUT = 32, 64, 0.05  # sweep pick
 LR, TRAIN_BS, GRAD_ACC, EVAL_BS = 1e-4, 2, 4, 4
 EPOCHS = 1 if SMOKE else 2  # sweep: epoch 4 overfit
@@ -210,6 +219,33 @@ def main():
             man = build_manifest(rows, fetch_meeting, dl, cut, ok_span, CLIPS, MAN_PATH,
                                  _sig_str, librosa, sf, log)
 
+    if os.environ.get("BUILD_AND_EXIT"):
+        # The mixture-ratio arms are lists over one shared clip build, so the build has
+        # to finish before the arms can be derived. Stop here rather than train on the
+        # superset, which is not one of the arms.
+        log(f"BUILD_AND_EXIT: manifest ready at {MAN_PATH} "
+            f"(train={len(man['train'])} valc={len(man['valc'])} valr={len(man['valr'])})")
+        return
+
+    if TRAIN_MANIFEST:
+        # Arm override: the clips are already on disk from the superset build, so an
+        # arm is just a different list over the same files. valc/valr are untouched.
+        arm = json.load(open(TRAIN_MANIFEST))["train"]
+        # Check EVERY clip, not a sample. A partial superset build would otherwise
+        # train an arm on whatever happened to survive, and the arm would still look
+        # well-formed in the logs.
+        missing = [c["audio"] for c in arm if not pathlib.Path(c["audio"]).exists()]
+        if missing:
+            sys.exit(f"[train FATAL] TRAIN_MANIFEST references {len(missing)} missing "
+                     f"clips, e.g. {missing[:3]}")
+        base_ids = {c["audio"] for c in man["train"]}
+        stray = [c["audio"] for c in arm if c["audio"] not in base_ids]
+        if stray:
+            sys.exit(f"[train FATAL] TRAIN_MANIFEST has {len(stray)} clips outside the "
+                     f"superset build, e.g. {stray[:3]}")
+        log(f"ARM manifest {TRAIN_MANIFEST}: train {len(man['train'])} -> {len(arm)}")
+        man["train"] = arm
+
     # --- HF datasets + Whisper preprocessing ---
     # NB: decode the wav clips OURSELVES with soundfile rather than datasets'
     # Audio() feature — recent `datasets` routes Audio decoding through torchcodec
@@ -219,6 +255,48 @@ def main():
     from datasets import Dataset
     from transformers import WhisperProcessor
     processor = WhisperProcessor.from_pretrained(MODEL_ID, language=LANGUAGE, task=TASK)
+
+    # PACK_MANIFEST -> train on prebuilt 20-30s packs of consecutive utterances instead of
+    # one clip per utterance. The audio and both targets are assembled locally (pure CPU,
+    # free) by eval/hf_export/assemble_packs.py; here they only get read.
+    #
+    # PACK_ARM picks which target: "p" is native Whisper timestamps, "pn" the same words
+    # with none. The tokenizer's `predict_timestamps` has to agree, because it decides
+    # whether the prefix carries <|notimestamps|> and whether <|X.XX|> encodes as a
+    # timestamp token or as literal text. Getting that wrong trains a plausible-looking
+    # model on the wrong grammar, so it is asserted rather than assumed.
+    PACK_MANIFEST = os.environ.get("PACK_MANIFEST")
+    if PACK_MANIFEST:
+        arm = os.environ.get("PACK_ARM", "p").lower()
+        if arm not in ("p", "pn"):
+            sys.exit(f"[train FATAL] PACK_ARM={arm!r}, expected p or pn")
+        packs = [json.loads(l) for l in open(PACK_MANIFEST) if l.strip()]
+        missing = [r["audio"] for r in packs if not pathlib.Path(r["audio"]).exists()]
+        if missing:
+            sys.exit(f"[train FATAL] {len(missing)} pack audio files missing, "
+                     f"e.g. {missing[:3]}")
+        key = "text_p" if arm == "p" else "text_pn"
+        man["train"] = [{"audio": r["audio"], "text": r[key]} for r in packs]
+        # set_prefix_tokens, not a bare attribute: assigning `predict_timestamps` on the
+        # tokenizer is silently ignored, and the prefix keeps <|notimestamps|> while the
+        # target carries timestamp tokens. That trains a contradiction and nothing warns.
+        processor.tokenizer.set_prefix_tokens(language=LANGUAGE, task=TASK,
+                                              predict_timestamps=(arm == "p"))
+        probe = processor.tokenizer(man["train"][0]["text"]).input_ids
+        ts0 = processor.tokenizer.convert_tokens_to_ids("<|0.00|>")
+        nots = processor.tokenizer.convert_tokens_to_ids("<|notimestamps|>")
+        has_ts = any(t >= ts0 for t in probe)
+        if arm == "p" and (not has_ts or nots in probe):
+            sys.exit("[train FATAL] arm p produced no timestamp tokens, or kept "
+                     "<|notimestamps|>; the tokenizer is in the wrong mode")
+        if arm == "pn" and (has_ts or nots not in probe):
+            sys.exit("[train FATAL] arm pn produced timestamp tokens, or lost "
+                     "<|notimestamps|>; the tokenizer is in the wrong mode")
+        log(f"PACKS arm={arm}: {len(man['train'])} examples, "
+            f"{sum(r['dur_sec'] for r in packs)/3600:.2f} h, "
+            f"mean {sum(r['n_utt'] for r in packs)/len(packs):.1f} utterances/example, "
+            f"probe label {len(probe)} tokens")
+
 
     # Feature cache MUST land on the pod's disk, not RAM: large-v3 features are
     # 128x3000 float32 (~1.5 MB each). Building all ~29k train features in memory
@@ -337,8 +415,13 @@ def main():
     args = Seq2SeqTrainingArguments(
         output_dir=OUT_DIR, per_device_train_batch_size=TRAIN_BS,
         gradient_accumulation_steps=GRAD_ACC, learning_rate=LR, warmup_ratio=0.1,
-        num_train_epochs=EPOCHS, fp16=True, predict_with_generate=True,
-        generation_max_length=225, eval_strategy="epoch",
+        num_train_epochs=EPOCHS, max_steps=(MAX_STEPS or -1),
+        fp16=True, predict_with_generate=True,
+        # Generate-based eval costs ~1.3h a pass and neither val set decides anything
+        # in the mixture-ratio experiment: val_reg's reference IS the unedited text
+        # arm C is fed more of, so it moves for the wrong reason. Skipping it does not
+        # touch the trained weights, so the arms stay comparable.
+        generation_max_length=225, eval_strategy=EVAL_STRATEGY,
         save_strategy="steps", save_steps=SAVE_STEPS, save_total_limit=3,
         logging_steps=20, report_to=[], remove_unused_columns=False,
         label_names=["labels"], load_best_model_at_end=False,
@@ -377,14 +460,21 @@ def main():
                      f"  Point WORK_DIR at a fresh directory.")
     if resume:
         log(f"RESUMING from {resume}")
-    else:
+    elif EVAL_STRATEGY != "no":
+        # The baseline is the UNTRAINED model, so it is byte-identical across arms and
+        # costs ~1.3 h each time. Running it once per arm would burn ~9 h of GPU on a
+        # number we already have. Skipped with the rest of the eval.
         log(f"BASELINE val_corr: {trainer.evaluate(ds_valc)}")
         if ds_valr:
             log(f"BASELINE val_reg: {trainer.evaluate(ds_valr)}")
     trainer.train(resume_from_checkpoint=resume)
-    log(f"AFTER val_corr: {trainer.evaluate(ds_valc)}")
-    if ds_valr:
-        log(f"AFTER val_reg (regression check): {trainer.evaluate(ds_valr)}")
+    if EVAL_STRATEGY != "no":
+        log(f"AFTER val_corr: {trainer.evaluate(ds_valc)}")
+        if ds_valr:
+            log(f"AFTER val_reg (regression check): {trainer.evaluate(ds_valr)}")
+    else:
+        log("eval skipped (EVAL_STRATEGY=no); the decision metric is the "
+            "audio-faithful reference, scored off-pod")
 
     # --- save adapter ---
     processor.tokenizer.clean_up_tokenization_spaces = False
