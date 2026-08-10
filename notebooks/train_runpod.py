@@ -200,8 +200,15 @@ def main():
                                "val_reg_per_mtg": VAL_REG_PER_MEETING,
                                "n_included": len(rows)}, sort_keys=True, ensure_ascii=False)
 
+    # Packs bring their own audio and their own targets, so none of the clip-building
+    # below applies: without this the run downloads hours of meeting mp3s and cuts 29k
+    # clips it will then throw away when the pack override lands further down.
+    PACKS_ONLY = bool(os.environ.get("PACK_MANIFEST"))
     man = None
-    if MAN_PATH.exists():
+    if PACKS_ONLY:
+        log("PACK_MANIFEST set -> skipping the clip build entirely")
+        man = {"train": [], "valc": [], "valr": []}
+    if man is None and MAN_PATH.exists():
         _c = json.load(open(MAN_PATH))
         _spot = [c["audio"] for s in ("train", "valc", "valr") for c in _c.get(s, [])[:5]]
         if _c.get("_sig") == _sig_str and all(pathlib.Path(a).exists() for a in _spot):
@@ -330,9 +337,13 @@ def main():
     # fail-fast: never start a long run on an empty/None train or val set (Codex)
     if ds_train is None or ds_train.num_rows == 0:
         sys.exit("[train FATAL] no training clips built — check manifest/audio")
-    if ds_valc is None or ds_valc.num_rows == 0:
+    # The guard is right for a normal run and wrong for a packs run with eval off: there
+    # the validation clips are never built on purpose, and demanding them would kill the
+    # job over a dataset nothing reads.
+    if (ds_valc is None or ds_valc.num_rows == 0) and not (
+            os.environ.get("PACK_MANIFEST") and EVAL_STRATEGY == "no"):
         sys.exit("[train FATAL] no val_corr clips built — check manifest/audio")
-    log(f"datasets: train={ds_train.num_rows} valc={ds_valc.num_rows} "
+    log(f"datasets: train={ds_train.num_rows} valc={ds_valc.num_rows if ds_valc else 0} "
         f"valr={ds_valr.num_rows if ds_valr else 0}")
 
     # --- collator + metrics ---
@@ -482,8 +493,14 @@ def main():
     json.dump({"model": MODEL_ID, "lora_r": LORA_R, "lr": LR, "epochs": EPOCHS,
                "label_semantics": LABEL_SEMANTICS,
                "seed": SEED, "smoke": SMOKE, "n_train": ds_train.num_rows,
-               "n_val_corr": ds_valc.num_rows,
+               # None when a packs run builds no validation on purpose. This line cost a
+               # completed 2.4-hour arm once: the adapter had already been written, the
+               # metadata had not, and the driver read the non-zero exit as a failed run.
+               "n_val_corr": (ds_valc.num_rows if ds_valc else 0),
                "n_val_reg": (ds_valr.num_rows if ds_valr else 0),
+               "packs": bool(os.environ.get("PACK_MANIFEST")),
+               "pack_arm": os.environ.get("PACK_ARM", ""),
+               "max_steps": MAX_STEPS,
                "val_cities": sorted(VAL_CITIES)},
               open(OUT_DIR + "/run_meta.json", "w"), ensure_ascii=False, indent=2)
     log(f"ACCEPTANCE OK — adapter saved -> {OUT_DIR}")
