@@ -34,6 +34,10 @@ from starlette.responses import JSONResponse
 MODEL_DIR = os.environ.get("OC_ASR_MODEL_DIR", "/home/harold/oc-asr-serve/ct2")
 API_KEY = os.environ.get("OC_ASR_API_KEY", "")
 COMPUTE = os.environ.get("OC_ASR_COMPUTE", "int8")
+# "cpu" on the mini-PC, "cuda" on a GPU pod. Benchmark runs must be served on GPU:
+# on CPU a 120s council window takes ~128s and dies on the ~100s proxy/edge timeout,
+# where the same model on a GPU answers in ~11s.
+DEVICE = os.environ.get("OC_ASR_DEVICE", "cpu")
 LANGUAGE = os.environ.get("OC_ASR_LANGUAGE", "el")
 MAX_BYTES = int(os.environ.get("OC_ASR_MAX_BYTES", str(500 * 1024 * 1024)))
 # Use all CPU cores by default: CTranslate2's default doesn't saturate them, and
@@ -62,8 +66,9 @@ def _get_model():
         with _model_lock:
             if _model is None:
                 from faster_whisper import WhisperModel
-                _model = WhisperModel(MODEL_DIR, device="cpu", compute_type=COMPUTE,
-                                      cpu_threads=CPU_THREADS)
+                kw = {"cpu_threads": CPU_THREADS} if DEVICE == "cpu" else {}
+                _model = WhisperModel(MODEL_DIR, device=DEVICE, compute_type=COMPUTE,
+                                      **kw)
     return _model
 
 

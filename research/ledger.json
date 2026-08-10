@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-10T17:00:00Z",
+  "updated_at": "2026-08-10T19:30:00Z",
   "note": "Authoritative state. Reports under docs/reports/ are immutable evidence; this file says whether their conclusions still stand. When a doc disagrees with this file, this file wins and the doc gets fixed in the same change.",
   "experiments": [
     {
@@ -112,9 +112,9 @@
       "id": "exp-2026-08-10-benchmark-fixed-adapter",
       "title": "The corrected adapter on the OpenCouncil benchmark",
       "question": "Does the corrected (post-label-prefix-fix) adapter beat base whisper and the commercial providers on the 260-window benchmark?",
-      "status": "OPEN",
-      "conclusion": null,
-      "decision": null,
+      "status": "CLOSED",
+      "conclusion": "On the 40 training-disjoint windows (argos+orestiada, 12,194 words) the corrected adapter scores 0.1548 wer-nofillers: statistically indistinguishable from Scribe v2 (+1.14, 90% [-0.58, +2.79]) and Soniox (+1.26, [-0.33, +2.80]), and better than base whisper (-2.30, [-4.02, -0.77]) and than its own broken predecessor (-1.77, [-2.66, -0.98]). 260/260 items, 0 errors, $0.30.",
+      "decision": "The label-prefix fix bought a real 1.77 points on unseen cities, sign consistent (26 windows better / 11 worse / 3 tied). Publish the corrected adapter. Do not read the base comparison as a weights effect - it is cross-stack.",
       "artifact_ids": [
         "artifact-adapter-fixed",
         "artifact-ct2-fixed"
@@ -122,10 +122,18 @@
       "capability_ids": [
         "cap-bench-http-api"
       ],
-      "reports": [],
+      "reports": [
+        "docs/reports/2026-08-10-benchmark-corrected-adapter.md"
+      ],
       "superseded_by": null,
-      "next_action": "Serve artifact-ct2-fixed from a RunPod GPU pod on port 8000, register it as an openai-compatible provider, clone run 2026-07-23-june-benchmark-runpod-gpu-finetune-corre with only the new provider, start, poll, read report.json. Report the argos+orestiada held-out slice separately from the contaminated pool, and check single-window domination before quoting any delta.",
-      "updated_at": "2026-08-10T17:00:00Z"
+      "next_action": null,
+      "updated_at": "2026-08-10T17:00:00Z",
+      "caveats": [
+        "The base-whisper arm runs on the HuggingFace serverless pipeline, a different decoder stack. The -2.30 includes an engine difference.",
+        "The broken-adapter arm ran on an RTX 3090 in July, ours on an RTX A4000 today. Measured separately: CPU int8 and CUDA int8 give different tokens from the same artifact, so the device is not neutral.",
+        "The reference is OpenCouncil's own published text, so this measures agreement-with-OpenCouncil, not accuracy.",
+        "One seed. The mixture experiment measured 2.1 points of per-seed spread, larger than the 1.77 claimed here."
+      ]
     },
     {
       "id": "exp-2026-07-23-fulltrain",

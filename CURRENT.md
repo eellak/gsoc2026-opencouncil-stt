@@ -18,30 +18,31 @@ trained through the label-prefix bug and cannot answer it.
 
 ## Work queue
 
-1. `exp-2026-08-10-benchmark-fixed-adapter` — measure the corrected adapter on the
-   260-window OpenCouncil benchmark, served from a GPU pod, cloned against the July
-   run so all other providers come free. **Done when** `report.json` exists and the
-   argos+orestiada held-out slice is reported separately from the contaminated pool,
-   with single-window domination checked.
+1. Publish `artifact-adapter-fixed` to HuggingFace. The benchmark now prices the
+   delay: the published weights cost **1.77 WER points on unseen cities**. **Done
+   when** the hub weights are the corrected ones.
 2. `exp-2026-07-25-hotwords` — ship contextual biasing at serving time. Both
    independent reviewers ranked it the highest-value remaining direction: it targets
    names directly without retraining. **Done when** name recall is measured on a
    held-out set with the roster wired into the endpoint.
-3. Publish `artifact-adapter-fixed` to HuggingFace. **Done when** the hub weights are
-   the corrected ones. The public model card has promised this since 2026-08-01 and
-   still serves the broken adapter.
+3. Decide whether fidelity-to-audio changes this ranking. The benchmark measures
+   agreement-with-OpenCouncil; the one time both were measured, the ranking flipped.
+   **Done when** the corrected adapter has a fidelity-to-audio number on unseen
+   meetings.
 
 ## Blockers
 
-- Item 3 is blocked on nothing technical — it is a decision, not a task. The
-  corrected weights exist locally.
+- Item 1 is blocked on nothing technical — it is a decision. The corrected weights
+  exist locally and are now measured.
 - The dataset itself remains on **legal hold** (DPO, 2026-07-17): text-level PII
   removal does not anonymise it because each row links audio carrying the voice. See
   [decisions/data.md](docs/decisions/data.md).
 
 ## Recently changed
 
-- `exp-2026-08-10-benchmark-fixed-adapter` opened, 2026-08-10.
+- `exp-2026-08-10-benchmark-fixed-adapter` closed: on unseen cities the corrected
+  adapter is indistinguishable from Scribe and Soniox and beats its broken
+  predecessor by 1.77 points, CI excludes zero, 2026-08-10.
 - `exp-2026-08-10-packed-training` closed STOP; four overstated claims corrected
   after a Codex audit, 2026-08-10.
 - `exp-2026-08-08-same-stack` gained a provenance erratum: its fine-tune arm was the
