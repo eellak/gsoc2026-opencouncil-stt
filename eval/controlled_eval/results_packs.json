@@ -1,0 +1,1092 @@
+{
+ "split": "dev",
+ "results": {
+  "A_ref": {
+   "per_clip": {
+    "rclip_017.wav": {
+     "meeting": "argos/may22_2026",
+     "errors": 1,
+     "ref_words": 33,
+     "sub": 0,
+     "del": 0,
+     "ins": 1
+    },
+    "rclip_018.wav": {
+     "meeting": "athens/may20_2_2026",
+     "errors": 23,
+     "ref_words": 48,
+     "sub": 21,
+     "del": 2,
+     "ins": 0
+    },
+    "rclip_019.wav": {
+     "meeting": "sparta/jul15_2026",
+     "errors": 3,
+     "ref_words": 45,
+     "sub": 1,
+     "del": 1,
+     "ins": 1
+    },
+    "rclip_020.wav": {
+     "meeting": "samothraki/jul21_2026",
+     "errors": 8,
+     "ref_words": 32,
+     "sub": 5,
+     "del": 2,
+     "ins": 1
+    },
+    "rclip_021.wav": {
+     "meeting": "orestiada/jun15_2026",
+     "errors": 3,
+     "ref_words": 42,
+     "sub": 2,
+     "del": 1,
+     "ins": 0
+    },
+    "rclip_022.wav": {
+     "meeting": "xylokastro/jul22_2026",
+     "errors": 16,
+     "ref_words": 29,
+     "sub": 13,
+     "del": 1,
+     "ins": 2
+    },
+    "rclip_023.wav": {
+     "meeting": "chalandri/jul2_2026",
+     "errors": 1,
+     "ref_words": 25,
+     "sub": 0,
+     "del": 1,
+     "ins": 0
+    },
+    "rclip_024.wav": {
+     "meeting": "sparta/jul13_2_2026",
+     "errors": 10,
+     "ref_words": 56,
+     "sub": 7,
+     "del": 1,
+     "ins": 2
+    },
+    "rclip_025.wav": {
+     "meeting": "orestiada/jul21_2026",
+     "errors": 3,
+     "ref_words": 46,
+     "sub": 3,
+     "del": 0,
+     "ins": 0
+    },
+    "rclip_026.wav": {
+     "meeting": "chania/may25_2026",
+     "errors": 8,
+     "ref_words": 27,
+     "sub": 5,
+     "del": 2,
+     "ins": 1
+    },
+    "rclip_027.wav": {
+     "meeting": "argithea/jul24_2026",
+     "errors": 11,
+     "ref_words": 33,
+     "sub": 3,
+     "del": 7,
+     "ins": 1
+    },
+    "rclip_028.wav": {
+     "meeting": "vrilissia/jul22_2026",
+     "errors": 13,
+     "ref_words": 52,
+     "sub": 10,
+     "del": 2,
+     "ins": 1
+    },
+    "rclip_029.wav": {
+     "meeting": "zografou/jun4_2026",
+     "errors": 1,
+     "ref_words": 48,
+     "sub": 1,
+     "del": 0,
+     "ins": 0
+    },
+    "rclip_030.wav": {
+     "meeting": "athens/jun15_2026",
+     "errors": 10,
+     "ref_words": 52,
+     "sub": 7,
+     "del": 3,
+     "ins": 0
+    },
+    "rclip_031.wav": {
+     "meeting": "samothraki/jul31_2026",
+     "errors": 4,
+     "ref_words": 6,
+     "sub": 4,
+     "del": 0,
+     "ins": 0
+    },
+    "rclip_032.wav": {
+     "meeting": "chalandri/jul22_2026",
+     "errors": 1,
+     "ref_words": 32,
+     "sub": 1,
+     "del": 0,
+     "ins": 0
+    },
+    "rclip_033.wav": {
+     "meeting": "argos/jul1_2026",
+     "errors": 6,
+     "ref_words": 15,
+     "sub": 5,
+     "del": 0,
+     "ins": 1
+    },
+    "rclip_034.wav": {
+     "meeting": "argithea/jun25_2026",
+     "errors": 6,
+     "ref_words": 37,
+     "sub": 5,
+     "del": 0,
+     "ins": 1
+    },
+    "rclip_035.wav": {
+     "meeting": "chania/jun15_2026",
+     "errors": 17,
+     "ref_words": 28,
+     "sub": 5,
+     "del": 11,
+     "ins": 1
+    },
+    "rclip_036.wav": {
+     "meeting": "xylokastro/jul29_3_2026",
+     "errors": 5,
+     "ref_words": 33,
+     "sub": 4,
+     "del": 0,
+     "ins": 1
+    },
+    "rclip_037.wav": {
+     "meeting": "chania/jul27_2026",
+     "errors": 10,
+     "ref_words": 33,
+     "sub": 1,
+     "del": 9,
+     "ins": 0
+    },
+    "rclip_038.wav": {
+     "meeting": "argithea/jul25_2026",
+     "errors": 3,
+     "ref_words": 28,
+     "sub": 2,
+     "del": 0,
+     "ins": 1
+    },
+    "rclip_039.wav": {
+     "meeting": "vrilissia/jun3_3_2026",
+     "errors": 4,
+     "ref_words": 47,
+     "sub": 4,
+     "del": 0,
+     "ins": 0
+    },
+    "rclip_040.wav": {
+     "meeting": "orestiada/jun29_2026",
+     "errors": 7,
+     "ref_words": 54,
+     "sub": 3,
+     "del": 4,
+     "ins": 0
+    },
+    "rclip_041.wav": {
+     "meeting": "papagos-cholargos/jun23_2026",
+     "errors": 6,
+     "ref_words": 51,
+     "sub": 4,
+     "del": 0,
+     "ins": 2
+    },
+    "rclip_042.wav": {
+     "meeting": "argos/jun22_2026",
+     "errors": 11,
+     "ref_words": 30,
+     "sub": 7,
+     "del": 4,
+     "ins": 0
+    },
+    "rclip_043.wav": {
+     "meeting": "zografou/jul23_2026",
+     "errors": 10,
+     "ref_words": 24,
+     "sub": 8,
+     "del": 0,
+     "ins": 2
+    },
+    "rclip_044.wav": {
+     "meeting": "argos/jul21_2026",
+     "errors": 12,
+     "ref_words": 49,
+     "sub": 10,
+     "del": 1,
+     "ins": 1
+    },
+    "rclip_045.wav": {
+     "meeting": "vrilissia/jul15_2026",
+     "errors": 17,
+     "ref_words": 61,
+     "sub": 11,
+     "del": 2,
+     "ins": 4
+    },
+    "rclip_046.wav": {
+     "meeting": "sparta/jun23_2026",
+     "errors": 9,
+     "ref_words": 67,
+     "sub": 8,
+     "del": 0,
+     "ins": 1
+    },
+    "rclip_047.wav": {
+     "meeting": "thira/jun29_2026",
+     "errors": 12,
+     "ref_words": 34,
+     "sub": 6,
+     "del": 4,
+     "ins": 2
+    },
+    "rclip_048.wav": {
+     "meeting": "athens/may28_2_2026",
+     "errors": 18,
+     "ref_words": 39,
+     "sub": 13,
+     "del": 2,
+     "ins": 3
+    }
+   },
+   "n_clips": 32,
+   "ref_words": 1236,
+   "wer": 0.21763754045307443,
+   "del_rate": 0.04854368932038835,
+   "sub_rate": 0.1448220064724919,
+   "ins_rate": 0.024271844660194174
+  },
+  "p_s13": {
+   "per_clip": {
+    "rclip_017.wav": {
+     "meeting": "argos/may22_2026",
+     "errors": 1,
+     "ref_words": 33,
+     "sub": 0,
+     "del": 0,
+     "ins": 1
+    },
+    "rclip_018.wav": {
+     "meeting": "athens/may20_2_2026",
+     "errors": 26,
+     "ref_words": 48,
+     "sub": 22,
+     "del": 3,
+     "ins": 1
+    },
+    "rclip_019.wav": {
+     "meeting": "sparta/jul15_2026",
+     "errors": 3,
+     "ref_words": 45,
+     "sub": 1,
+     "del": 1,
+     "ins": 1
+    },
+    "rclip_020.wav": {
+     "meeting": "samothraki/jul21_2026",
+     "errors": 8,
+     "ref_words": 32,
+     "sub": 6,
+     "del": 1,
+     "ins": 1
+    },
+    "rclip_021.wav": {
+     "meeting": "orestiada/jun15_2026",
+     "errors": 5,
+     "ref_words": 42,
+     "sub": 3,
+     "del": 1,
+     "ins": 1
+    },
+    "rclip_022.wav": {
+     "meeting": "xylokastro/jul22_2026",
+     "errors": 25,
+     "ref_words": 29,
+     "sub": 17,
+     "del": 8,
+     "ins": 0
+    },
+    "rclip_023.wav": {
+     "meeting": "chalandri/jul2_2026",
+     "errors": 5,
+     "ref_words": 25,
+     "sub": 4,
+     "del": 1,
+     "ins": 0
+    },
+    "rclip_024.wav": {
+     "meeting": "sparta/jul13_2_2026",
+     "errors": 8,
+     "ref_words": 56,
+     "sub": 6,
+     "del": 0,
+     "ins": 2
+    },
+    "rclip_025.wav": {
+     "meeting": "orestiada/jul21_2026",
+     "errors": 6,
+     "ref_words": 46,
+     "sub": 5,
+     "del": 1,
+     "ins": 0
+    },
+    "rclip_026.wav": {
+     "meeting": "chania/may25_2026",
+     "errors": 15,
+     "ref_words": 27,
+     "sub": 4,
+     "del": 10,
+     "ins": 1
+    },
+    "rclip_027.wav": {
+     "meeting": "argithea/jul24_2026",
+     "errors": 12,
+     "ref_words": 33,
+     "sub": 4,
+     "del": 7,
+     "ins": 1
+    },
+    "rclip_028.wav": {
+     "meeting": "vrilissia/jul22_2026",
+     "errors": 16,
+     "ref_words": 52,
+     "sub": 10,
+     "del": 5,
+     "ins": 1
+    },
+    "rclip_029.wav": {
+     "meeting": "zografou/jun4_2026",
+     "errors": 4,
+     "ref_words": 48,
+     "sub": 1,
+     "del": 3,
+     "ins": 0
+    },
+    "rclip_030.wav": {
+     "meeting": "athens/jun15_2026",
+     "errors": 5,
+     "ref_words": 52,
+     "sub": 5,
+     "del": 0,
+     "ins": 0
+    },
+    "rclip_031.wav": {
+     "meeting": "samothraki/jul31_2026",
+     "errors": 3,
+     "ref_words": 6,
+     "sub": 3,
+     "del": 0,
+     "ins": 0
+    },
+    "rclip_032.wav": {
+     "meeting": "chalandri/jul22_2026",
+     "errors": 3,
+     "ref_words": 32,
+     "sub": 0,
+     "del": 3,
+     "ins": 0
+    },
+    "rclip_033.wav": {
+     "meeting": "argos/jul1_2026",
+     "errors": 7,
+     "ref_words": 15,
+     "sub": 1,
+     "del": 6,
+     "ins": 0
+    },
+    "rclip_034.wav": {
+     "meeting": "argithea/jun25_2026",
+     "errors": 9,
+     "ref_words": 37,
+     "sub": 8,
+     "del": 0,
+     "ins": 1
+    },
+    "rclip_035.wav": {
+     "meeting": "chania/jun15_2026",
+     "errors": 17,
+     "ref_words": 28,
+     "sub": 5,
+     "del": 11,
+     "ins": 1
+    },
+    "rclip_036.wav": {
+     "meeting": "xylokastro/jul29_3_2026",
+     "errors": 5,
+     "ref_words": 33,
+     "sub": 5,
+     "del": 0,
+     "ins": 0
+    },
+    "rclip_037.wav": {
+     "meeting": "chania/jul27_2026",
+     "errors": 11,
+     "ref_words": 33,
+     "sub": 3,
+     "del": 8,
+     "ins": 0
+    },
+    "rclip_038.wav": {
+     "meeting": "argithea/jul25_2026",
+     "errors": 7,
+     "ref_words": 28,
+     "sub": 5,
+     "del": 2,
+     "ins": 0
+    },
+    "rclip_039.wav": {
+     "meeting": "vrilissia/jun3_3_2026",
+     "errors": 4,
+     "ref_words": 47,
+     "sub": 4,
+     "del": 0,
+     "ins": 0
+    },
+    "rclip_040.wav": {
+     "meeting": "orestiada/jun29_2026",
+     "errors": 7,
+     "ref_words": 54,
+     "sub": 2,
+     "del": 5,
+     "ins": 0
+    },
+    "rclip_041.wav": {
+     "meeting": "papagos-cholargos/jun23_2026",
+     "errors": 6,
+     "ref_words": 51,
+     "sub": 5,
+     "del": 0,
+     "ins": 1
+    },
+    "rclip_042.wav": {
+     "meeting": "argos/jun22_2026",
+     "errors": 10,
+     "ref_words": 30,
+     "sub": 5,
+     "del": 5,
+     "ins": 0
+    },
+    "rclip_043.wav": {
+     "meeting": "zografou/jul23_2026",
+     "errors": 8,
+     "ref_words": 24,
+     "sub": 8,
+     "del": 0,
+     "ins": 0
+    },
+    "rclip_044.wav": {
+     "meeting": "argos/jul21_2026",
+     "errors": 15,
+     "ref_words": 49,
+     "sub": 3,
+     "del": 12,
+     "ins": 0
+    },
+    "rclip_045.wav": {
+     "meeting": "vrilissia/jul15_2026",
+     "errors": 15,
+     "ref_words": 61,
+     "sub": 10,
+     "del": 1,
+     "ins": 4
+    },
+    "rclip_046.wav": {
+     "meeting": "sparta/jun23_2026",
+     "errors": 13,
+     "ref_words": 67,
+     "sub": 10,
+     "del": 2,
+     "ins": 1
+    },
+    "rclip_047.wav": {
+     "meeting": "thira/jun29_2026",
+     "errors": 10,
+     "ref_words": 34,
+     "sub": 7,
+     "del": 1,
+     "ins": 2
+    },
+    "rclip_048.wav": {
+     "meeting": "athens/may28_2_2026",
+     "errors": 23,
+     "ref_words": 39,
+     "sub": 10,
+     "del": 10,
+     "ins": 3
+    }
+   },
+   "n_clips": 32,
+   "ref_words": 1236,
+   "wer": 0.2524271844660194,
+   "del_rate": 0.08656957928802589,
+   "sub_rate": 0.14724919093851133,
+   "ins_rate": 0.0186084142394822
+  },
+  "pn_s13": {
+   "per_clip": {
+    "rclip_017.wav": {
+     "meeting": "argos/may22_2026",
+     "errors": 1,
+     "ref_words": 33,
+     "sub": 0,
+     "del": 0,
+     "ins": 1
+    },
+    "rclip_018.wav": {
+     "meeting": "athens/may20_2_2026",
+     "errors": 26,
+     "ref_words": 48,
+     "sub": 22,
+     "del": 4,
+     "ins": 0
+    },
+    "rclip_019.wav": {
+     "meeting": "sparta/jul15_2026",
+     "errors": 3,
+     "ref_words": 45,
+     "sub": 1,
+     "del": 1,
+     "ins": 1
+    },
+    "rclip_020.wav": {
+     "meeting": "samothraki/jul21_2026",
+     "errors": 9,
+     "ref_words": 32,
+     "sub": 6,
+     "del": 1,
+     "ins": 2
+    },
+    "rclip_021.wav": {
+     "meeting": "orestiada/jun15_2026",
+     "errors": 5,
+     "ref_words": 42,
+     "sub": 3,
+     "del": 1,
+     "ins": 1
+    },
+    "rclip_022.wav": {
+     "meeting": "xylokastro/jul22_2026",
+     "errors": 22,
+     "ref_words": 29,
+     "sub": 19,
+     "del": 1,
+     "ins": 2
+    },
+    "rclip_023.wav": {
+     "meeting": "chalandri/jul2_2026",
+     "errors": 1,
+     "ref_words": 25,
+     "sub": 0,
+     "del": 1,
+     "ins": 0
+    },
+    "rclip_024.wav": {
+     "meeting": "sparta/jul13_2_2026",
+     "errors": 8,
+     "ref_words": 56,
+     "sub": 6,
+     "del": 0,
+     "ins": 2
+    },
+    "rclip_025.wav": {
+     "meeting": "orestiada/jul21_2026",
+     "errors": 7,
+     "ref_words": 46,
+     "sub": 6,
+     "del": 1,
+     "ins": 0
+    },
+    "rclip_026.wav": {
+     "meeting": "chania/may25_2026",
+     "errors": 9,
+     "ref_words": 27,
+     "sub": 5,
+     "del": 3,
+     "ins": 1
+    },
+    "rclip_027.wav": {
+     "meeting": "argithea/jul24_2026",
+     "errors": 13,
+     "ref_words": 33,
+     "sub": 5,
+     "del": 7,
+     "ins": 1
+    },
+    "rclip_028.wav": {
+     "meeting": "vrilissia/jul22_2026",
+     "errors": 12,
+     "ref_words": 52,
+     "sub": 10,
+     "del": 2,
+     "ins": 0
+    },
+    "rclip_029.wav": {
+     "meeting": "zografou/jun4_2026",
+     "errors": 5,
+     "ref_words": 48,
+     "sub": 3,
+     "del": 2,
+     "ins": 0
+    },
+    "rclip_030.wav": {
+     "meeting": "athens/jun15_2026",
+     "errors": 8,
+     "ref_words": 52,
+     "sub": 5,
+     "del": 3,
+     "ins": 0
+    },
+    "rclip_031.wav": {
+     "meeting": "samothraki/jul31_2026",
+     "errors": 3,
+     "ref_words": 6,
+     "sub": 3,
+     "del": 0,
+     "ins": 0
+    },
+    "rclip_032.wav": {
+     "meeting": "chalandri/jul22_2026",
+     "errors": 5,
+     "ref_words": 32,
+     "sub": 2,
+     "del": 3,
+     "ins": 0
+    },
+    "rclip_033.wav": {
+     "meeting": "argos/jul1_2026",
+     "errors": 6,
+     "ref_words": 15,
+     "sub": 5,
+     "del": 0,
+     "ins": 1
+    },
+    "rclip_034.wav": {
+     "meeting": "argithea/jun25_2026",
+     "errors": 9,
+     "ref_words": 37,
+     "sub": 8,
+     "del": 0,
+     "ins": 1
+    },
+    "rclip_035.wav": {
+     "meeting": "chania/jun15_2026",
+     "errors": 11,
+     "ref_words": 28,
+     "sub": 7,
+     "del": 0,
+     "ins": 4
+    },
+    "rclip_036.wav": {
+     "meeting": "xylokastro/jul29_3_2026",
+     "errors": 5,
+     "ref_words": 33,
+     "sub": 4,
+     "del": 0,
+     "ins": 1
+    },
+    "rclip_037.wav": {
+     "meeting": "chania/jul27_2026",
+     "errors": 5,
+     "ref_words": 33,
+     "sub": 4,
+     "del": 1,
+     "ins": 0
+    },
+    "rclip_038.wav": {
+     "meeting": "argithea/jul25_2026",
+     "errors": 5,
+     "ref_words": 28,
+     "sub": 3,
+     "del": 1,
+     "ins": 1
+    },
+    "rclip_039.wav": {
+     "meeting": "vrilissia/jun3_3_2026",
+     "errors": 4,
+     "ref_words": 47,
+     "sub": 4,
+     "del": 0,
+     "ins": 0
+    },
+    "rclip_040.wav": {
+     "meeting": "orestiada/jun29_2026",
+     "errors": 8,
+     "ref_words": 54,
+     "sub": 5,
+     "del": 3,
+     "ins": 0
+    },
+    "rclip_041.wav": {
+     "meeting": "papagos-cholargos/jun23_2026",
+     "errors": 5,
+     "ref_words": 51,
+     "sub": 3,
+     "del": 1,
+     "ins": 1
+    },
+    "rclip_042.wav": {
+     "meeting": "argos/jun22_2026",
+     "errors": 9,
+     "ref_words": 30,
+     "sub": 5,
+     "del": 4,
+     "ins": 0
+    },
+    "rclip_043.wav": {
+     "meeting": "zografou/jul23_2026",
+     "errors": 10,
+     "ref_words": 24,
+     "sub": 8,
+     "del": 0,
+     "ins": 2
+    },
+    "rclip_044.wav": {
+     "meeting": "argos/jul21_2026",
+     "errors": 18,
+     "ref_words": 49,
+     "sub": 6,
+     "del": 8,
+     "ins": 4
+    },
+    "rclip_045.wav": {
+     "meeting": "vrilissia/jul15_2026",
+     "errors": 13,
+     "ref_words": 61,
+     "sub": 6,
+     "del": 2,
+     "ins": 5
+    },
+    "rclip_046.wav": {
+     "meeting": "sparta/jun23_2026",
+     "errors": 13,
+     "ref_words": 67,
+     "sub": 12,
+     "del": 0,
+     "ins": 1
+    },
+    "rclip_047.wav": {
+     "meeting": "thira/jun29_2026",
+     "errors": 12,
+     "ref_words": 34,
+     "sub": 6,
+     "del": 4,
+     "ins": 2
+    },
+    "rclip_048.wav": {
+     "meeting": "athens/may28_2_2026",
+     "errors": 23,
+     "ref_words": 39,
+     "sub": 19,
+     "del": 2,
+     "ins": 2
+    }
+   },
+   "n_clips": 32,
+   "ref_words": 1236,
+   "wer": 0.23705501618122976,
+   "del_rate": 0.045307443365695796,
+   "sub_rate": 0.16262135922330098,
+   "ins_rate": 0.02912621359223301
+  },
+  "base": {
+   "per_clip": {
+    "rclip_017.wav": {
+     "meeting": "argos/may22_2026",
+     "errors": 2,
+     "ref_words": 33,
+     "sub": 1,
+     "del": 0,
+     "ins": 1
+    },
+    "rclip_018.wav": {
+     "meeting": "athens/may20_2_2026",
+     "errors": 26,
+     "ref_words": 48,
+     "sub": 24,
+     "del": 1,
+     "ins": 1
+    },
+    "rclip_019.wav": {
+     "meeting": "sparta/jul15_2026",
+     "errors": 3,
+     "ref_words": 45,
+     "sub": 1,
+     "del": 1,
+     "ins": 1
+    },
+    "rclip_020.wav": {
+     "meeting": "samothraki/jul21_2026",
+     "errors": 8,
+     "ref_words": 32,
+     "sub": 3,
+     "del": 1,
+     "ins": 4
+    },
+    "rclip_021.wav": {
+     "meeting": "orestiada/jun15_2026",
+     "errors": 4,
+     "ref_words": 42,
+     "sub": 3,
+     "del": 1,
+     "ins": 0
+    },
+    "rclip_022.wav": {
+     "meeting": "xylokastro/jul22_2026",
+     "errors": 17,
+     "ref_words": 29,
+     "sub": 14,
+     "del": 1,
+     "ins": 2
+    },
+    "rclip_023.wav": {
+     "meeting": "chalandri/jul2_2026",
+     "errors": 2,
+     "ref_words": 25,
+     "sub": 1,
+     "del": 1,
+     "ins": 0
+    },
+    "rclip_024.wav": {
+     "meeting": "sparta/jul13_2_2026",
+     "errors": 56,
+     "ref_words": 56,
+     "sub": 2,
+     "del": 54,
+     "ins": 0
+    },
+    "rclip_025.wav": {
+     "meeting": "orestiada/jul21_2026",
+     "errors": 5,
+     "ref_words": 46,
+     "sub": 4,
+     "del": 1,
+     "ins": 0
+    },
+    "rclip_026.wav": {
+     "meeting": "chania/may25_2026",
+     "errors": 10,
+     "ref_words": 27,
+     "sub": 7,
+     "del": 2,
+     "ins": 1
+    },
+    "rclip_027.wav": {
+     "meeting": "argithea/jul24_2026",
+     "errors": 15,
+     "ref_words": 33,
+     "sub": 5,
+     "del": 7,
+     "ins": 3
+    },
+    "rclip_028.wav": {
+     "meeting": "vrilissia/jul22_2026",
+     "errors": 12,
+     "ref_words": 52,
+     "sub": 11,
+     "del": 1,
+     "ins": 0
+    },
+    "rclip_029.wav": {
+     "meeting": "zografou/jun4_2026",
+     "errors": 1,
+     "ref_words": 48,
+     "sub": 1,
+     "del": 0,
+     "ins": 0
+    },
+    "rclip_030.wav": {
+     "meeting": "athens/jun15_2026",
+     "errors": 6,
+     "ref_words": 52,
+     "sub": 5,
+     "del": 1,
+     "ins": 0
+    },
+    "rclip_031.wav": {
+     "meeting": "samothraki/jul31_2026",
+     "errors": 3,
+     "ref_words": 6,
+     "sub": 2,
+     "del": 0,
+     "ins": 1
+    },
+    "rclip_032.wav": {
+     "meeting": "chalandri/jul22_2026",
+     "errors": 4,
+     "ref_words": 32,
+     "sub": 2,
+     "del": 2,
+     "ins": 0
+    },
+    "rclip_033.wav": {
+     "meeting": "argos/jul1_2026",
+     "errors": 5,
+     "ref_words": 15,
+     "sub": 4,
+     "del": 0,
+     "ins": 1
+    },
+    "rclip_034.wav": {
+     "meeting": "argithea/jun25_2026",
+     "errors": 6,
+     "ref_words": 37,
+     "sub": 5,
+     "del": 0,
+     "ins": 1
+    },
+    "rclip_035.wav": {
+     "meeting": "chania/jun15_2026",
+     "errors": 15,
+     "ref_words": 28,
+     "sub": 9,
+     "del": 1,
+     "ins": 5
+    },
+    "rclip_036.wav": {
+     "meeting": "xylokastro/jul29_3_2026",
+     "errors": 4,
+     "ref_words": 33,
+     "sub": 4,
+     "del": 0,
+     "ins": 0
+    },
+    "rclip_037.wav": {
+     "meeting": "chania/jul27_2026",
+     "errors": 11,
+     "ref_words": 33,
+     "sub": 9,
+     "del": 0,
+     "ins": 2
+    },
+    "rclip_038.wav": {
+     "meeting": "argithea/jul25_2026",
+     "errors": 6,
+     "ref_words": 28,
+     "sub": 5,
+     "del": 0,
+     "ins": 1
+    },
+    "rclip_039.wav": {
+     "meeting": "vrilissia/jun3_3_2026",
+     "errors": 5,
+     "ref_words": 47,
+     "sub": 5,
+     "del": 0,
+     "ins": 0
+    },
+    "rclip_040.wav": {
+     "meeting": "orestiada/jun29_2026",
+     "errors": 11,
+     "ref_words": 54,
+     "sub": 8,
+     "del": 3,
+     "ins": 0
+    },
+    "rclip_041.wav": {
+     "meeting": "papagos-cholargos/jun23_2026",
+     "errors": 7,
+     "ref_words": 51,
+     "sub": 4,
+     "del": 0,
+     "ins": 3
+    },
+    "rclip_042.wav": {
+     "meeting": "argos/jun22_2026",
+     "errors": 9,
+     "ref_words": 30,
+     "sub": 9,
+     "del": 0,
+     "ins": 0
+    },
+    "rclip_043.wav": {
+     "meeting": "zografou/jul23_2026",
+     "errors": 9,
+     "ref_words": 24,
+     "sub": 8,
+     "del": 1,
+     "ins": 0
+    },
+    "rclip_044.wav": {
+     "meeting": "argos/jul21_2026",
+     "errors": 16,
+     "ref_words": 49,
+     "sub": 12,
+     "del": 2,
+     "ins": 2
+    },
+    "rclip_045.wav": {
+     "meeting": "vrilissia/jul15_2026",
+     "errors": 18,
+     "ref_words": 61,
+     "sub": 10,
+     "del": 4,
+     "ins": 4
+    },
+    "rclip_046.wav": {
+     "meeting": "sparta/jun23_2026",
+     "errors": 10,
+     "ref_words": 67,
+     "sub": 8,
+     "del": 1,
+     "ins": 1
+    },
+    "rclip_047.wav": {
+     "meeting": "thira/jun29_2026",
+     "errors": 10,
+     "ref_words": 34,
+     "sub": 7,
+     "del": 1,
+     "ins": 2
+    },
+    "rclip_048.wav": {
+     "meeting": "athens/may28_2_2026",
+     "errors": 22,
+     "ref_words": 39,
+     "sub": 16,
+     "del": 2,
+     "ins": 4
+    }
+   },
+   "n_clips": 32,
+   "ref_words": 1236,
+   "wer": 0.27346278317152106,
+   "del_rate": 0.07200647249190939,
+   "sub_rate": 0.16909385113268607,
+   "ins_rate": 0.032362459546925564
+  }
+ },
+ "comparisons": {
+  "p_s13_vs_A_ref": {
+   "delta": 0.03478964401294499,
+   "lo": 0.0134920634920635,
+   "hi": 0.05779816513761471,
+   "n_meetings": 32,
+   "n_clips": 32
+  },
+  "pn_s13_vs_A_ref": {
+   "delta": 0.01941747572815533,
+   "lo": -0.0022590361445783136,
+   "hi": 0.04124579124579125,
+   "n_meetings": 32,
+   "n_clips": 32
+  },
+  "base_vs_A_ref": {
+   "delta": 0.05582524271844663,
+   "lo": 0.009338521400778205,
+   "hi": 0.12575757575757576,
+   "n_meetings": 32,
+   "n_clips": 32
+  }
+ }
+}

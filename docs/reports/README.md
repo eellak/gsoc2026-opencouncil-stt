@@ -42,6 +42,7 @@ a link list back to the others, so you can walk the chain from any entry point.
 | 14 | [The deletions were the decoder](2026-08-08-same-stack.md) | +1.54 becomes **+0.19**, CI contains zero. Never compare two models across two stacks |
 | 15 | [Clip boundaries](2026-08-09-clip-boundaries.md) | 4 of 20 training clips cut their own reference words, all at ≤1.06s |
 | 16 | [Chunking coarsens, timestamps survive](2026-08-09-longform-preflight.md) | on 3.3h of continuous audio the fine-tune loops **less**, emits 100% valid timestamps, and covers **35 points fewer** speech boundaries |
+| 17 | [Packed training: STOP](2026-08-10-packed-training.md) | packs lose 1.9 WER points to the current adapter and timestamp supervision loses a further 1.5, with deletions nearly doubling |
 
 Where it goes next: [the GSoC delivery plan](../specs/gsoc-delivery-plan.md).
 
