@@ -1,188 +1,114 @@
-# Agent Instructions
+# Agent Protocol
 
-This vault is for the OpenCouncil Greek ASR fine-tuning and dataset exploration project.
+OpenCouncil Greek ASR research (whisper-large-v3 + LoRA). The reports in this repo
+are **evidence of what was concluded on a date**. They are not current project state.
 
-## Role
+## Required start
 
-Be a practical project assistant. Help keep the work organized, current, and actionable.
+Before doing any work, read in this order:
 
-The project is currently in dataset exploration mode, not training mode. Prioritize:
+1. `CURRENT.md` — the active queue and real blockers. Short by design.
+2. `research/ledger.json` — the authoritative state.
 
-- clarifying the current state;
-- organizing notes;
-- preserving decisions and open questions;
-- turning vague meeting notes into concrete next steps;
-- keeping the vault readable by humans and LLMs;
-- supporting the planned correction exploration UI.
+Then search the ledger for the task's question, model, adapter, cache, dataset, or
+service. Follow only the reports, specs, and runbooks linked from matching records.
 
-## Start Here
+Do not read `archive/` unless the ledger points there.
 
-Always read these first:
+## Sources of authority
 
-1. `CURRENT.md`
-2. `docs/decisions/_index.md`
-3. `docs/progress.md`
-4. `docs/roadmap.md`
-5. `docs/project-map.md`
+| File | Authoritative for |
+|---|---|
+| `research/ledger.json` | experiment status, current conclusions, artifact identity and validity, available capabilities |
+| `CURRENT.md` | what is being worked on right now, and what is blocked |
+| `docs/reports/` | immutable narrative evidence — a conclusion here may have been superseded |
+| `docs/reference/` | stable interfaces and concepts |
+| `docs/runbooks/` | reusable procedures |
+| `docs/decisions/` | product and process decisions |
 
-Then follow only the links needed for the task.
+**When files disagree, the ledger wins, and you fix the stale file in the same
+change.** A stale caveat in an index that contradicts its own source document has
+already cost this project real time.
 
-## Meeting Notes Skill
+## Experiment states
 
-When processing raw meeting notes, transcripts, mentor sync notes, or project discussion notes, use the `opencouncil-meeting-notes` skill if available.
+- `OPEN` — unresolved. Work may be proposed. Must have `next_action`.
+- `CLOSED` — answered, **including negative and inconclusive-by-gate results**. Do
+  not rerun without explicitly reopening.
+- `SUPERSEDED` — the conclusion must not be used. `superseded_by` is mandatory.
 
-That skill defines how to:
+An experiment that finishes but raises a new question is `CLOSED`; the new question
+gets its own `OPEN` record.
 
-- create normalized meeting notes under `docs/meetings/`;
-- update `CURRENT.md`, the relevant file under `docs/decisions/`, and `docs/roadmap.md`;
-- update specs and reference notes without duplication;
-- keep Mermaid diagrams and PRD todos synchronized;
-- archive raw or superseded notes.
+**Before proposing or spending money on an experiment**, search the ledger, check
+the matching artifact and capability records, and read the linked reports. Reuse
+existing audio, hypotheses, and results when their provenance matches. A whole
+GPU-funded proposal has already been drafted for an experiment that was finished two
+days earlier and cached on disk.
 
-## Current Project Direction
+## Artifacts
 
-The immediate goal is to combine:
+Refer to models, adapters, datasets, and caches by ledger **artifact ID**, not by
+path or display name alone. Several adapters exist and some are known broken.
 
-- `utterance-edits-may12-26.csv`
-- the large OpenCouncil meeting JSON endpoint
+Never write "the fine-tune" when more than one adapter exists. Name the artifact.
 
-so the project can build a local exploration UI that shows:
+Any artifact behind a conclusion needs a content hash, a validity status, and its
+caveats recorded. An output file whose producing model is unknown is not evidence.
 
-- `before_text` / `after_text` diff;
-- audio playback for the utterance span;
-- meeting, city, speaker, and surrounding utterance context;
-- error category;
-- include/exclude/uncertain decision;
-- aggregate stats over all corrections and selected corrections.
+## External services
 
-Do not treat training, benchmarking, or model selection as the next step unless the user explicitly asks.
+Check `capabilities` in the ledger **before** claiming an operation needs a human or
+that no API exists. For an `AVAILABLE` capability, read its runbook and run the
+documented cheap read-only smoke check before declaring it unavailable.
 
-## Vault Organization Rules
+Credentials live in `.env` (gitignored). The ledger records only the variable name.
 
-- `CURRENT.md` is the short entry point. Update it when the actual current direction changes.
-- `docs/decisions/` holds accepted decisions and open questions, split by theme (`data.md`, `storage.md`, `ui.md`, `audio.md`, `matching.md`) with an `_index.md`. Keep each file concise.
-- `docs/progress.md` is the current status snapshot against the GSoC plan. The plan itself lives in `docs/reference/gsoc-proposal.md` — do not duplicate it.
-- `docs/roadmap.md` is for phases and next milestones.
-- `docs/meetings/` is for normalized meeting notes.
-- `docs/specs/` is for product and implementation specs.
-- `docs/logs/` is for weekly digests and ad-hoc incident logs only. See `docs/logs/_index.md` for cadence rules.
-- `docs/reference/` is for stable technical references and schemas.
-- `archive/` is for raw, superseded, or non-current material.
-- `data/` is for generated data outputs and reports.
-- `scripts/` is for reproducible processing scripts.
+## Reading numbers honestly
 
-Do not scatter important state across random notes. If something changes the plan, update `CURRENT.md` or the relevant file under `docs/decisions/`.
+This project's expensive mistakes were all measurement mistakes, not code mistakes:
 
-## History Tracking
+- **Never compare two models across two stacks.** Same machine, same decoder, same
+  normalization, or it is not a comparison.
+- **Freeze the decode config before you see a number.** Do not adopt whichever beam
+  size wins.
+- **Check single-item domination** before quoting any delta. One window has supplied
+  67% of a headline effect here.
+- **Distinguish the two metrics and never merge them:** *fidelity-to-audio* (WER vs
+  a human who listened — this decides) and *agreement-with-OpenCouncil* (WER vs our
+  own published text — records product compatibility, decides nothing).
+- **Watch the deletion rate.** A model that lowers WER by omitting hard passages
+  looks better and is worse.
 
-Default cadence is a **weekly digest** under `docs/logs/YYYY-MM-DD-weekly.md`, written on Fridays. Skip the week entirely if none of the following happened:
+## Finish protocol
 
-- a canonical doc was updated (`CURRENT.md`, `docs/decisions/**`, `docs/roadmap.md`, `docs/specs/**`);
-- a decision was added, changed, or superseded;
-- an implementation milestone landed;
-- a real ambiguity surfaced that needs a future decision.
+1. Update the matching ledger record in the same change as the work.
+2. Mark displaced conclusions `SUPERSEDED` — do not just add contradicting prose.
+3. Update `CURRENT.md` only if the queue or blockers actually changed.
+4. Run `python3 scripts/check-research-state.py`.
+5. Do not create routine diary, handoff, or progress-log files.
 
-Routine "I reviewed the diff and nothing structural changed" days do not deserve a log entry. Use an ad-hoc dated log (`YYYY-MM-DD-<slug>.md`) only for a significant incident or one-off decision that does not fit a weekly digest.
+## Hard rules
 
-When something does warrant a log:
+- **Transcript text and audio never go in git.** Same PII category as the
+  2026-07-21 history purge. Caches live under `~/.cache/oc-public/`.
+- **The 16 locked evaluation windows stay sealed.**
+- **A GPU pod bills from creation.** Arm a watchdog with a hard deadline *before*
+  uploading anything, and record the pod ID.
+- **If something fails twice the same way, stop.** Kill the pod, write down what
+  broke.
+- Use `rtk <command>` for shell commands in this workspace.
 
-1. Update the relevant canonical note (decisions, spec, roadmap, current).
-2. Add it to the week's digest.
-3. Link the digest from `docs/logs/_index.md` and, if structurally important, from `docs/project-map.md`.
+## Writing
 
-Also update the relevant row in `docs/progress.md` when an implementation milestone changes status. Prefer short decision entries over long narrative.
+Plain Markdown, relative links. Keep canonical notes short and put detail in dated
+reports. Preserve uncertainty explicitly instead of resolving it in prose. Preserve
+markdown checkbox notation (`[ ]`, `[x]`, `[~]`, `[?]`) where it exists. Do not
+rewrite unrelated documents for style.
 
-## Mermaid Diagrams
+## Post-change review
 
-The vault uses Mermaid diagrams as compact project memory. Keep them synchronized with the surrounding text.
-
-Canonical diagrams:
-
-- `CURRENT.md`: current project flow.
-- `docs/roadmap.md`: timeline/phases.
-- `docs/reference/opencouncil-meeting-json.md`: CSV-to-meeting-JSON join path.
-- `docs/specs/exploration-ui.md`: review state/update loop.
-
-Update the relevant diagram when:
-
-- the main project flow changes;
-- roadmap phases are added, removed, renamed, or reordered;
-- the correction-to-utterance matching strategy changes;
-- local storage or review states change;
-- the UI workflow changes.
-
-Do not add decorative diagrams. Add or edit diagrams only when they clarify state, flow, dependencies, or decisions.
-
-## PRD-Style Todos
-
-The vault uses markdown checkboxes as lightweight PRD/task notation.
-
-Use:
-
-- `[ ]` not started
-- `[x]` done
-- `[~]` in progress or partially done
-- `[?]` blocked or needs decision
-
-When editing roadmap, specs, or next-step docs:
-
-- preserve markdown todo notation;
-- update task status when work is completed or blocked;
-- keep acceptance criteria near the relevant task list;
-- do not convert checklists into prose;
-- do not mark tasks done unless the work is actually complete;
-- add new tasks as checkboxes when they represent concrete work.
-
-## Working Style
-
-- Be concrete and concise.
-- If the user is confused, explain the practical difference and why it matters.
-- Do not introduce blockers unless they are real blockers.
-- Separate "needed now" from "useful later".
-- Prefer local prototype steps over production architecture unless the user asks otherwise.
-- Preserve uncertainty explicitly instead of pretending it is resolved.
-
-## Current Clarifications
-
-- We do not need the exact external query that produced the CSV before moving forward.
-- We do not need a new API endpoint for the first prototype.
-- We can use the large meeting JSON endpoint and cache it locally.
-- Range requests are not a first milestone.
-- `TaskStatus.version` is not needed for the first exploration UI.
-- The first UI should work with CSV edit pairs as `before_text -> after_text`.
-
-## Shell Commands
-
-This workspace follows the local RTK instruction:
-
-```bash
-rtk <command>
-```
-
-Use `rtk` before shell commands when working in this vault.
-
-## Post-Change Review
-
-After a complex change (multiple files touched, new dependencies, schema migrations, refactors that cross module boundaries, or anything beyond a trivial fix), run:
-
-```bash
-coderabbit review --prompt-only
-```
-
-Then:
-
-- Read the findings.
-- Categorise each as `critical` (security, data loss, broken build, regression in production code paths), `important` (correctness, type safety, missing fallbacks, perf cliffs), or `nit` (style, naming, comments).
-- **Auto-fix `critical` and `important` findings before declaring the task done**, unless the fix conflicts with a user instruction — in that case, surface the conflict and ask.
-- Leave `nit` findings as notes in the response; do not silently apply them.
-- Do not skip this step on "complex" changes by claiming they are simple. If in doubt, run it.
-
-Do not run on trivial typo/comment edits — it wastes time.
-
-## Editing Rules
-
-- Keep docs in plain Markdown.
-- Prefer relative links inside Markdown notes.
-- Keep canonical notes short; put details in reference notes or dated logs.
-- Do not rewrite unrelated notes just for style.
-- Do not delete uncertainty or context unless it has been superseded and recorded.
+After a complex change (multiple files, new dependencies, schema changes, or
+anything crossing module boundaries), run `coderabbit --agent`. Fix `critical` and
+`important` findings before declaring done; report `nit` findings without applying
+them. Skip for typo and comment edits.

@@ -1,0 +1,718 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-08-10T17:00:00Z",
+  "note": "Authoritative state. Reports under docs/reports/ are immutable evidence; this file says whether their conclusions still stand. When a doc disagrees with this file, this file wins and the doc gets fixed in the same change.",
+  "experiments": [
+    {
+      "id": "exp-2026-07-23-benchmark-first",
+      "title": "First OpenCouncil benchmark run of the fine-tune",
+      "question": "Does the LoRA fine-tune beat commercial ASR on the OpenCouncil benchmark?",
+      "status": "SUPERSEDED",
+      "conclusion": "On the held-out slice the fine-tune tied commercial providers (0.151 vs 0.147-0.154). The apparent win over base whisper was a cross-stack artifact.",
+      "decision": "Do not cite these numbers as model quality. The adapter used carried the label-prefix bug.",
+      "artifact_ids": [
+        "artifact-adapter-july-broken"
+      ],
+      "reports": [
+        "docs/reports/2026-07-23-benchmark-results.md"
+      ],
+      "superseded_by": "exp-2026-08-10-benchmark-fixed-adapter",
+      "next_action": null,
+      "updated_at": "2026-08-10T17:00:00Z"
+    },
+    {
+      "id": "exp-2026-07-31-label-prefix-bug",
+      "title": "Label-prefix bug in the training targets",
+      "question": "Were training targets shifted one position on every sample?",
+      "status": "CLOSED",
+      "conclusion": "Yes. Every run before 2026-08-01 trained on shifted labels.",
+      "decision": "All pre-2026-08-01 adapters are KNOWN_BROKEN. Retrain before citing any of them.",
+      "artifact_ids": [
+        "artifact-adapter-july-broken",
+        "artifact-adapter-fixed"
+      ],
+      "reports": [
+        "docs/reports/2026-07-31-label-prefix-bug.md"
+      ],
+      "superseded_by": null,
+      "next_action": null,
+      "updated_at": "2026-08-10T17:00:00Z"
+    },
+    {
+      "id": "exp-2026-08-08-same-stack",
+      "title": "Base vs fine-tune through one decoder stack",
+      "question": "Is the fine-tune's +1.54 deletion gap a property of the weights or of the decoder?",
+      "status": "CLOSED",
+      "conclusion": "Of the decoder. On a neutral stack the gap collapses to +0.19 with a CI containing zero. The only effect surviving is substitutions, -0.61 [-0.81, -0.40].",
+      "decision": "Never compare two models across two stacks. The continuous-30s-window proposal lost its empirical motivation.",
+      "artifact_ids": [
+        "artifact-bench-240-audio",
+        "artifact-bench-hyps-fw-finetune",
+        "artifact-bench-hyps-fw-base",
+        "artifact-adapter-july-broken"
+      ],
+      "reports": [
+        "docs/reports/2026-08-08-same-stack.md"
+      ],
+      "superseded_by": null,
+      "next_action": null,
+      "caveats": [
+        "The fine-tune arm used artifact-adapter-july-broken, NOT the corrected adapter. Established 2026-08-10 by re-decoding 3 windows and byte-comparing: 3/3 match the broken adapter, 0/3 match the corrected one. The report did not name its artifact."
+      ],
+      "updated_at": "2026-08-10T17:00:00Z"
+    },
+    {
+      "id": "exp-2026-08-08-mixture-ratio",
+      "title": "Mixture ratio 20/80 vs 50/50",
+      "question": "Does a 20/80 corrections-to-backbone mixture beat 50/50?",
+      "status": "CLOSED",
+      "conclusion": "Inconclusive by the frozen rule. C - A = -0.24 points, 90% [-0.89, +0.36]. Per-seed spread is 2.1 points, ten times the effect.",
+      "decision": "Closed by user instruction 2026-08-09: do not reopen. Seed variance dominates at this sample size.",
+      "artifact_ids": [
+        "artifact-adapter-mix-A-s13",
+        "artifact-adapter-mix-C-s13"
+      ],
+      "reports": [
+        "docs/reports/2026-08-08-mixture-ratio.md"
+      ],
+      "specs": [
+        "docs/specs/mixture-ratio-preregistration.md"
+      ],
+      "superseded_by": null,
+      "next_action": null,
+      "updated_at": "2026-08-10T17:00:00Z"
+    },
+    {
+      "id": "exp-2026-08-10-packed-training",
+      "title": "Packed 30s clips, with and without timestamp supervision",
+      "question": "Does training on packed ~30s clips help, and does timestamp supervision help on top?",
+      "status": "CLOSED",
+      "conclusion": "Neither arm beat the corrected single-utterance adapter on 32 dev windows. P - Pn = +1.54 points but the CI contains zero and the per-window sign is not consistent (11 worse / 10 better / 11 tied).",
+      "decision": "STOP: do not buy a second seed for timestamp supervision. The packing infrastructure is built and verified if ever needed again.",
+      "artifact_ids": [
+        "artifact-adapter-p-s13",
+        "artifact-adapter-pn-s13",
+        "artifact-adapter-fixed"
+      ],
+      "reports": [
+        "docs/reports/2026-08-10-packed-training.md"
+      ],
+      "specs": [
+        "docs/specs/window-shape-preregistration.md"
+      ],
+      "superseded_by": null,
+      "next_action": null,
+      "caveats": [
+        "Codex audit 2026-08-10: arithmetic reproduces exactly from raw per-clip counts, but four claims in the original prose overran the evidence and were corrected. The timestamp mechanism is a hypothesis, not a finding.",
+        "The base - A gap of 5.58 points draws 67% of its 69 errors from ONE window (rclip_024). Without it the gap is 1.95 points."
+      ],
+      "updated_at": "2026-08-10T17:00:00Z"
+    },
+    {
+      "id": "exp-2026-08-10-benchmark-fixed-adapter",
+      "title": "The corrected adapter on the OpenCouncil benchmark",
+      "question": "Does the corrected (post-label-prefix-fix) adapter beat base whisper and the commercial providers on the 260-window benchmark?",
+      "status": "OPEN",
+      "conclusion": null,
+      "decision": null,
+      "artifact_ids": [
+        "artifact-adapter-fixed",
+        "artifact-ct2-fixed"
+      ],
+      "capability_ids": [
+        "cap-bench-http-api"
+      ],
+      "reports": [],
+      "superseded_by": null,
+      "next_action": "Serve artifact-ct2-fixed from a RunPod GPU pod on port 8000, register it as an openai-compatible provider, clone run 2026-07-23-june-benchmark-runpod-gpu-finetune-corre with only the new provider, start, poll, read report.json. Report the argos+orestiada held-out slice separately from the contaminated pool, and check single-window domination before quoting any delta.",
+      "updated_at": "2026-08-10T17:00:00Z"
+    },
+    {
+      "id": "exp-2026-07-23-fulltrain",
+      "title": "Full LoRA training run",
+      "question": "Does the full training recipe produce a usable adapter?",
+      "status": "SUPERSEDED",
+      "conclusion": "Reported gains were measured against unfairly-served baselines, and the run carried the label-prefix bug.",
+      "decision": "Do not migrate or cite. Retrained as exp-2026-08-02-fulltrain-corrected.",
+      "reports": [
+        "docs/reports/2026-07-23-fulltrain-run.md"
+      ],
+      "superseded_by": "exp-2026-08-02-fulltrain-corrected",
+      "next_action": null,
+      "updated_at": "2026-08-10T17:00:00Z",
+      "artifact_ids": [
+        "artifact-adapter-july-broken"
+      ]
+    },
+    {
+      "id": "exp-2026-07-25-hotwords",
+      "title": "Contextual biasing with roster hotwords",
+      "question": "Can inference-time biasing get the name accuracy the fine-tune was supposed to buy?",
+      "status": "OPEN",
+      "conclusion": null,
+      "decision": null,
+      "reports": [
+        "docs/reports/2026-07-25-hotwords-biasing.md"
+      ],
+      "superseded_by": null,
+      "next_action": "Both independent reviewers ranked this the highest-value remaining direction. Ship it as a serving-time feature and measure names separately from general WER.",
+      "updated_at": "2026-08-10T17:00:00Z"
+    },
+    {
+      "id": "exp-2026-07-29-gain-decomposition",
+      "title": "Where the fine-tune's gain comes from",
+      "question": "Which part of the training signal produces the measured gain?",
+      "status": "CLOSED",
+      "conclusion": "The gain decomposes into edit-bias from corrections rather than general acoustic adaptation.",
+      "decision": "Treat the correction dataset as a lexical signal, not an acoustic one.",
+      "reports": [
+        "docs/reports/2026-07-29-finetune-gain-decomposition.md"
+      ],
+      "superseded_by": null,
+      "next_action": null,
+      "updated_at": "2026-08-10T17:00:00Z"
+    },
+    {
+      "id": "exp-2026-07-29-lexical-thesis",
+      "title": "The 'lexical costume' thesis",
+      "question": "Is the correction dataset a lexical signal wearing an acoustic costume?",
+      "status": "CLOSED",
+      "conclusion": "Supported. The LLM post-editor reached 0.155 -> 0.119 WER on 50 corrected utterances, better than fine-tuning.",
+      "decision": "Pursue post-editing and biasing over further acoustic fine-tuning.",
+      "reports": [
+        "docs/reports/2026-07-29-lexical-thesis-experiments.md"
+      ],
+      "superseded_by": null,
+      "next_action": null,
+      "updated_at": "2026-08-10T17:00:00Z"
+    },
+    {
+      "id": "exp-2026-08-01-postedit-gate",
+      "title": "A gate for the LLM post-editor",
+      "question": "Can the post-editor be made safe enough to ship?",
+      "status": "CLOSED",
+      "conclusion": "Yes, with a gate. The gate is what makes it work; ungated it occasionally rewrites correct text.",
+      "decision": "Any post-editor ships with its gate.",
+      "reports": [
+        "docs/reports/2026-08-01-postedit-gate.md"
+      ],
+      "superseded_by": null,
+      "next_action": null,
+      "updated_at": "2026-08-10T17:00:00Z"
+    },
+    {
+      "id": "exp-2026-08-02-fulltrain-corrected",
+      "title": "Full run with the corrected objective",
+      "question": "Does fixing the label prefix change the outcome?",
+      "status": "CLOSED",
+      "conclusion": "Same data, same recipe, correct labels. This produced artifact-adapter-fixed.",
+      "decision": "artifact-adapter-fixed supersedes the July weights everywhere.",
+      "reports": [
+        "docs/reports/2026-08-02-fulltrain-corrected.md"
+      ],
+      "superseded_by": null,
+      "next_action": null,
+      "updated_at": "2026-08-10T17:00:00Z",
+      "artifact_ids": [
+        "artifact-adapter-fixed"
+      ]
+    },
+    {
+      "id": "exp-2026-08-02-benchmark-diagnosis",
+      "title": "Why the fine-tune loses to base",
+      "question": "Why does the fine-tune underperform base whisper?",
+      "status": "CLOSED",
+      "conclusion": "48% corrections teach an edit bias; the 52% no-edit rows teach imitation.",
+      "decision": "Rebalance or rethink the mixture. Followed by exp-2026-08-08-mixture-ratio.",
+      "reports": [
+        "docs/reports/2026-08-02-benchmark-diagnosis.md"
+      ],
+      "superseded_by": null,
+      "next_action": null,
+      "updated_at": "2026-08-10T17:00:00Z"
+    },
+    {
+      "id": "exp-2026-08-02-asr-fusion",
+      "title": "Combining ASR systems",
+      "question": "Does combining several ASR systems beat the best single one?",
+      "status": "CLOSED",
+      "conclusion": "Yes. A free 3-way vote beats the best single system by 1.1 points, and the LLM is not what does it.",
+      "decision": "Fusion is a real, cheap win. Not yet productised.",
+      "reports": [
+        "docs/reports/2026-08-02-asr-fusion.md"
+      ],
+      "superseded_by": null,
+      "next_action": null,
+      "updated_at": "2026-08-10T17:00:00Z"
+    },
+    {
+      "id": "exp-2026-08-03-overlap-screen",
+      "title": "Overlap as an error marker",
+      "question": "Does speaker overlap predict transcription error?",
+      "status": "CLOSED",
+      "conclusion": "Overlap is rare (2.2%) but the top quartile scores ~10 points worse, consistently across all seven systems.",
+      "decision": "Worth a causal test, which became exp-2026-08-03-synthetic-overlap.",
+      "reports": [
+        "docs/reports/2026-08-03-overlap-screen.md"
+      ],
+      "superseded_by": null,
+      "next_action": null,
+      "updated_at": "2026-08-10T17:00:00Z"
+    },
+    {
+      "id": "exp-2026-08-03-synthetic-overlap",
+      "title": "The causal overlap test",
+      "question": "Does adding a real interjector actually cost accuracy?",
+      "status": "CLOSED",
+      "conclusion": "Adding a real interjector costs 0.16 points against a frozen gate of 2.0.",
+      "decision": "Overlap-handling (DiCoW) closed. Not worth building.",
+      "reports": [
+        "docs/reports/2026-08-03-synthetic-overlap.md"
+      ],
+      "superseded_by": null,
+      "next_action": null,
+      "updated_at": "2026-08-10T17:00:00Z",
+      "specs": [
+        "docs/specs/synthetic-overlap-preregistration.md"
+      ]
+    },
+    {
+      "id": "exp-2026-08-03-segmentation",
+      "title": "Cutting at speaker changes",
+      "question": "Does segmenting at speaker changes help?",
+      "status": "CLOSED",
+      "conclusion": "Worth nothing measurable. The control arm is what made the number readable.",
+      "decision": "Closed. Keep the control-arm habit.",
+      "reports": [
+        "docs/reports/2026-08-03-segmentation.md"
+      ],
+      "superseded_by": null,
+      "next_action": null,
+      "updated_at": "2026-08-10T17:00:00Z",
+      "specs": [
+        "docs/specs/segmentation-experiment-preregistration.md"
+      ]
+    },
+    {
+      "id": "exp-2026-08-03-reference-problem",
+      "title": "What the benchmark reference actually is",
+      "question": "Is the benchmark reference independent of our pipeline?",
+      "status": "CLOSED",
+      "conclusion": "No. Benchmark reference vs our published transcript: WER 0.0008. It is our own output.",
+      "decision": "The benchmark measures agreement-with-OpenCouncil, not accuracy. It records, it does not decide.",
+      "reports": [
+        "docs/reports/2026-08-03-the-reference-problem.md"
+      ],
+      "superseded_by": null,
+      "next_action": null,
+      "updated_at": "2026-08-10T17:00:00Z"
+    },
+    {
+      "id": "exp-2026-08-04-reference-omissions",
+      "title": "Words the reference lacks",
+      "question": "Were words two systems catch but the reference lacks actually spoken?",
+      "status": "CLOSED",
+      "conclusion": "70.5% of them were really spoken.",
+      "decision": "The published reference under-transcribes. Build an audio-faithful reference.",
+      "reports": [
+        "docs/reports/2026-08-04-reference-omissions.md"
+      ],
+      "superseded_by": null,
+      "next_action": null,
+      "updated_at": "2026-08-10T17:00:00Z"
+    },
+    {
+      "id": "exp-2026-08-04-public-meetings",
+      "title": "Untouched public meetings",
+      "question": "How much unseen council audio is reachable?",
+      "status": "CLOSED",
+      "conclusion": "The public API yields 151 untouched meetings with speaker rosters, ~200 hours.",
+      "decision": "This is the pool for any future evaluation cohort.",
+      "reports": [
+        "docs/reports/2026-08-04-public-meetings.md"
+      ],
+      "superseded_by": null,
+      "next_action": null,
+      "updated_at": "2026-08-10T17:00:00Z"
+    },
+    {
+      "id": "exp-2026-08-04-audio-faithful-reference",
+      "title": "An audio-faithful reference",
+      "question": "How far is the published text from what a careful listener hears?",
+      "status": "CLOSED",
+      "conclusion": "17.5% disagreement with audio on unseen meetings.",
+      "decision": "Fidelity-to-audio becomes the deciding metric.",
+      "reports": [
+        "docs/reports/2026-08-04-audio-faithful-reference.md"
+      ],
+      "superseded_by": null,
+      "next_action": null,
+      "updated_at": "2026-08-10T17:00:00Z"
+    },
+    {
+      "id": "exp-2026-08-04-ranking-flips",
+      "title": "The ranking flips",
+      "question": "Does the model ranking change under an audio-faithful reference?",
+      "status": "CLOSED",
+      "conclusion": "Yes. Tied on the old metric, the fine-tune is +4.9 points on what a human heard.",
+      "decision": "Never rank on agreement-with-OpenCouncil alone.",
+      "reports": [
+        "docs/reports/2026-08-04-the-ranking-flips.md"
+      ],
+      "superseded_by": null,
+      "next_action": null,
+      "updated_at": "2026-08-10T17:00:00Z"
+    },
+    {
+      "id": "exp-2026-08-04-synthesis",
+      "title": "Synthesis of the August arc",
+      "question": "What did the arc establish?",
+      "status": "CLOSED",
+      "conclusion": "Narrative synthesis of experiments 1-11 with diagrams, written for a human reader.",
+      "decision": "Entry point for anyone new to the arc.",
+      "reports": [
+        "docs/reports/2026-08-04-what-we-learned.md"
+      ],
+      "superseded_by": null,
+      "next_action": null,
+      "updated_at": "2026-08-10T17:00:00Z"
+    },
+    {
+      "id": "exp-2026-08-08-exclusive-diarization",
+      "title": "pyannoteAI exclusive diarization",
+      "question": "Does exclusive diarization repair overlap well enough to ship?",
+      "status": "CLOSED",
+      "conclusion": "Passes the screen, fails the production gate on drop safety.",
+      "decision": "Do not ship.",
+      "reports": [
+        "docs/reports/2026-08-08-exclusive-diarization.md"
+      ],
+      "superseded_by": null,
+      "next_action": null,
+      "updated_at": "2026-08-10T17:00:00Z",
+      "specs": [
+        "docs/specs/exclusive-diarization-preregistration.md"
+      ]
+    },
+    {
+      "id": "exp-2026-08-09-clip-boundaries",
+      "title": "Training clip boundaries",
+      "question": "Do training clips cut their own reference words?",
+      "status": "CLOSED",
+      "conclusion": "4 of 20 clips cut their own reference words, all at <=1.06s.",
+      "decision": "Pad clip boundaries in any future clip build.",
+      "reports": [
+        "docs/reports/2026-08-09-clip-boundaries.md"
+      ],
+      "superseded_by": null,
+      "next_action": null,
+      "updated_at": "2026-08-10T17:00:00Z"
+    },
+    {
+      "id": "exp-2026-08-09-longform-preflight",
+      "title": "Long-form chunking preflight",
+      "question": "Does chunked decoding damage the fine-tune, and do timestamps survive?",
+      "status": "CLOSED",
+      "conclusion": "On 3.3h of continuous audio the fine-tune loops less, emits 100% valid timestamps, and covers 35 points fewer speech boundaries.",
+      "decision": "Chunking coarsens but does not break. Preflight killed the window-shape arm cheaply.",
+      "reports": [
+        "docs/reports/2026-08-09-longform-preflight.md"
+      ],
+      "superseded_by": null,
+      "next_action": null,
+      "updated_at": "2026-08-10T17:00:00Z",
+      "caveats": [
+        "The first version of this report measured the WRONG adapter (a ct2 built before the label-prefix fix) and was retracted, then re-measured. The retraction was itself too broad."
+      ]
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact-adapter-july-broken",
+      "kind": "lora_adapter",
+      "description": "First full-training LoRA adapter, whisper-large-v3, r32 q/v, 7242 steps.",
+      "status": "KNOWN_BROKEN",
+      "locations": [
+        {
+          "host": "minipc",
+          "path": "/home/harold/oc-train-checkpoints/adapter"
+        }
+      ],
+      "hash": {
+        "algorithm": "sha256-file-v1",
+        "file": "adapter_model.safetensors",
+        "value": "ff3ba0b334551ed3"
+      },
+      "caveats": [
+        "Trained with the label-prefix bug (targets shifted one position). See exp-2026-07-31-label-prefix-bug.",
+        "This is the adapter behind the published HF weights AND behind the fine-tune arm of exp-2026-08-08-same-stack."
+      ],
+      "replaced_by": "artifact-adapter-fixed",
+      "verified_at": "2026-08-10T17:00:00Z"
+    },
+    {
+      "id": "artifact-adapter-fixed",
+      "kind": "lora_adapter",
+      "description": "Same recipe, retrained after the label-prefix fix. The best model we have.",
+      "status": "ACTIVE",
+      "locations": [
+        {
+          "host": "minipc",
+          "path": "/home/harold/oc-asr-serve/adapter-fixed-2026-08-01"
+        }
+      ],
+      "hash": {
+        "algorithm": "sha256-file-v1",
+        "file": "adapter_model.safetensors",
+        "value": "ea8f03230846888f"
+      },
+      "caveats": [
+        "NOT yet uploaded to HuggingFace. The public model card has promised a replacement since 2026-08-01 and still serves the broken weights.",
+        "Its only measurement is 32 dev windows (WER 0.2176). Never measured on the OpenCouncil benchmark - that is exp-2026-08-10-benchmark-fixed-adapter."
+      ],
+      "replaced_by": null,
+      "verified_at": "2026-08-10T17:00:00Z"
+    },
+    {
+      "id": "artifact-ct2-fixed",
+      "kind": "ct2_model",
+      "description": "CTranslate2 int8 build of artifact-adapter-fixed merged into whisper-large-v3. This is what the serving endpoint loads.",
+      "status": "ACTIVE",
+      "locations": [
+        {
+          "host": "minipc",
+          "path": "/home/harold/oc-asr-serve/ct2-fixed"
+        }
+      ],
+      "hash": {
+        "algorithm": "sha256-file-v1",
+        "file": "model.bin",
+        "value": "8a1a3b257d0c1bdb"
+      },
+      "produced_by": null,
+      "replaced_by": null,
+      "verified_at": "2026-08-10T17:00:00Z"
+    },
+    {
+      "id": "artifact-ct2-july-broken",
+      "kind": "ct2_model",
+      "description": "CTranslate2 int8 build of artifact-adapter-july-broken.",
+      "status": "KNOWN_BROKEN",
+      "locations": [
+        {
+          "host": "minipc",
+          "path": "/home/harold/oc-asr-serve/ct2"
+        }
+      ],
+      "hash": {
+        "algorithm": "sha256-file-v1",
+        "file": "model.bin",
+        "value": "dfffde80906f2cd5"
+      },
+      "replaced_by": "artifact-ct2-fixed",
+      "verified_at": "2026-08-10T17:00:00Z",
+      "caveats": [
+        "Built from artifact-adapter-july-broken, which carries the label-prefix bug.",
+        "Served at asr.haroldpoi.dev until 2026-08-10."
+      ]
+    },
+    {
+      "id": "artifact-adapter-p-s13",
+      "kind": "lora_adapter",
+      "description": "Packed 30s clips WITH whisper timestamp supervision, seed 13, 2600 steps.",
+      "status": "HISTORICAL",
+      "locations": [
+        {
+          "host": "minipc",
+          "path": "/home/harold/oc-pack-adapters/p_s13"
+        }
+      ],
+      "hash": {
+        "algorithm": "sha256-file-v1",
+        "file": "adapter_model.safetensors",
+        "value": "a2b7a0e4129e9fa3"
+      },
+      "caveats": [
+        "Worse than artifact-adapter-fixed on the dev set. See exp-2026-08-10-packed-training."
+      ],
+      "verified_at": "2026-08-10T17:00:00Z"
+    },
+    {
+      "id": "artifact-adapter-pn-s13",
+      "kind": "lora_adapter",
+      "description": "Packed 30s clips, NO timestamp supervision, seed 13, 2600 steps.",
+      "status": "HISTORICAL",
+      "locations": [
+        {
+          "host": "minipc",
+          "path": "/home/harold/oc-pack-adapters/pn_s13"
+        }
+      ],
+      "hash": {
+        "algorithm": "sha256-file-v1",
+        "file": "adapter_model.safetensors",
+        "value": "06c18b64f95a3aa1"
+      },
+      "verified_at": "2026-08-10T17:00:00Z"
+    },
+    {
+      "id": "artifact-adapter-mix-A-s13",
+      "kind": "lora_adapter",
+      "description": "Mixture control arm, 50/50, seed 13. Six sibling adapters exist (A/C x s13/s29/s47 plus C1_s13).",
+      "status": "HISTORICAL",
+      "locations": [
+        {
+          "host": "minipc",
+          "path": "/home/harold/oc-mix-adapters/adapter_A_s13"
+        }
+      ],
+      "hash": {
+        "algorithm": "sha256-file-v1",
+        "file": "adapter_model.safetensors",
+        "value": "307429b47cbd328d"
+      },
+      "caveats": [
+        "Never measured as a standalone model; only the paired A-vs-C contrast was scored."
+      ],
+      "verified_at": "2026-08-10T17:00:00Z"
+    },
+    {
+      "id": "artifact-adapter-mix-C-s13",
+      "kind": "lora_adapter",
+      "description": "Mixture treatment arm, 20/80, seed 13.",
+      "status": "HISTORICAL",
+      "locations": [
+        {
+          "host": "minipc",
+          "path": "/home/harold/oc-mix-adapters/adapter_C_s13"
+        }
+      ],
+      "hash": {
+        "algorithm": "sha256-file-v1",
+        "file": "adapter_model.safetensors",
+        "value": "a8596144e8ed29cd"
+      },
+      "verified_at": "2026-08-10T17:00:00Z"
+    },
+    {
+      "id": "artifact-bench-240-audio",
+      "kind": "audio_cache",
+      "description": "240 of the benchmark's 260 windows, cut from cached meeting mp3s. The other 20 have no local audio.",
+      "status": "ACTIVE",
+      "locations": [
+        {
+          "host": "minipc",
+          "path": "/home/harold/.cache/oc-public/bench_windows"
+        }
+      ],
+      "hash": {
+        "algorithm": "none",
+        "value": null
+      },
+      "caveats": [
+        "Never in git: verbatim council audio, same PII category as the 2026-07-21 purge."
+      ],
+      "verified_at": "2026-08-10T17:00:00Z"
+    },
+    {
+      "id": "artifact-bench-hyps-fw-finetune",
+      "kind": "hypotheses",
+      "description": "Fine-tune hypotheses for the 240 benchmark windows, faster-whisper int8 beam 5.",
+      "status": "HISTORICAL",
+      "locations": [
+        {
+          "host": "minipc",
+          "path": "/home/harold/.cache/oc-public/bench_hyps_fw/finetune-fw.json"
+        }
+      ],
+      "produced_by": "artifact-adapter-july-broken",
+      "caveats": [
+        "Produced by the BROKEN adapter. Established 2026-08-10 by byte-comparison, 3/3 match. Do not attribute to artifact-adapter-fixed.",
+        "Hypothesis text: never hashed into git, never committed. Identity is established by its produced_by artifact."
+      ],
+      "verified_at": "2026-08-10T17:00:00Z",
+      "hash": {
+        "algorithm": "none",
+        "value": null
+      }
+    },
+    {
+      "id": "artifact-bench-hyps-fw-base",
+      "kind": "hypotheses",
+      "description": "Base whisper-large-v3 hypotheses for the same 240 windows, same stack.",
+      "status": "HISTORICAL",
+      "locations": [
+        {
+          "host": "minipc",
+          "path": "/home/harold/.cache/oc-public/bench_hyps_fw/base-fw.json"
+        }
+      ],
+      "produced_by": null,
+      "verified_at": "2026-08-10T17:00:00Z",
+      "hash": {
+        "algorithm": "none",
+        "value": null
+      },
+      "caveats": [
+        "Hypothesis text: never hashed into git, never committed. Identity is established by its produced_by artifact."
+      ]
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "cap-bench-http-api",
+      "title": "OpenCouncil transcription benchmark HTTP API",
+      "status": "AVAILABLE",
+      "purpose": "Register providers, clone a frozen benchmark run, start it, poll it, and read scored results - with no human in the browser.",
+      "runbook": "docs/runbooks/benchmark-api.md",
+      "skill_file": ".claude/skills/transcription-benchmark/SKILL.md",
+      "base_url": "https://bench.opencouncil.gr",
+      "auth_env": "BENCH_API_KEY",
+      "operations": [
+        "list_providers",
+        "put_providers",
+        "set_provider_key",
+        "test_providers",
+        "clone_run",
+        "start_run",
+        "poll_run",
+        "read_report"
+      ],
+      "notes": [
+        "report.json and /report are PUBLIC - no key needed to read results.",
+        "Cloning copies every existing provider's results for free. You pay only for the new provider.",
+        "An agent must not claim 'a human must start the run' without first trying this."
+      ],
+      "last_verified_at": "2026-08-10T17:00:00Z"
+    },
+    {
+      "id": "cap-runpod-gpu-pod",
+      "title": "RunPod GPU pod, on demand",
+      "status": "AVAILABLE",
+      "purpose": "Training runs and GPU serving for benchmark runs.",
+      "runbook": "docs/runbooks/runpod-training-pod.md",
+      "auth_env": "RUNPOD_API_KEY",
+      "notes": [
+        "Bills continuously from creation, not per GPU-second. Arm a watchdog with a hard deadline BEFORE uploading anything.",
+        "Expose 8000/http at CREATE time if the pod must serve. Ports cannot be assumed; a pod with only 22/tcp is unreachable by the benchmark.",
+        "The RunPod HTTP proxy cuts a request at ~100s. On GPU a 120s council window decodes in ~11s, so this is a CPU-only problem. Measured: mini-PC CPU 128.1s mean, 22 timeouts; RunPod GPU 11.3s mean, 260/260 clean.",
+        "4090 / 3090 / A5000 community capacity is frequently unavailable. RTX A4000 at $0.17/hr has been the reliable fallback for inference."
+      ],
+      "last_verified_at": "2026-08-10T17:00:00Z"
+    },
+    {
+      "id": "cap-self-hosted-asr",
+      "title": "Self-hosted ASR endpoint",
+      "status": "AVAILABLE",
+      "purpose": "Serve the fine-tune over HTTP, OpenAI-compatible, so it can act as a benchmark provider.",
+      "runbook": "docs/runbooks/self-hosted-asr-endpoint.md",
+      "code": "serve/oc-asr/oc_asr_server.py",
+      "auth_env": "OC_ASR_API_KEY",
+      "notes": [
+        "CPU on the mini-PC is too slow to serve the benchmark: it times out behind Cloudflare's ~100s edge.",
+        "Serves artifact-ct2-fixed since 2026-08-10; before that it served the broken build."
+      ],
+      "last_verified_at": "2026-08-10T17:00:00Z"
+    }
+  ]
+}

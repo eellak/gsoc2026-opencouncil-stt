@@ -1,5 +1,10 @@
 # Reports
 
+> **This index describes what each report concluded on its date. It does not say
+> whether that conclusion still stands.** For status — `OPEN` / `CLOSED` /
+> `SUPERSEDED` — and for which model artifact produced a number, read
+> [`research/ledger.json`](../../research/ledger.json). The ledger wins on conflict.
+
 Committed report **snapshots** — curated deliverables meant to be read and kept in
 git. This is not where generated artifacts go.
 
