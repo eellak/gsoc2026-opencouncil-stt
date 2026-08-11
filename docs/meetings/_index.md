@@ -11,6 +11,7 @@ This folder contains normalized meeting notes. Raw notes or transcripts should e
 | 2026-06-02 | [Finetuning attempt + split discussion](2026-06-02.md) | normalized from raw notes + Discord | end-to-end pipeline, split-by-meeting, baseline-first, audio-normalization + benchmark open questions |
 | 2026-06-16 | [Benchmark walkthrough + split mechanics](2026-06-16.md) | normalized from sync transcript | provider results (Scribe best), temporal test set, seeded train/val split, smoke-pipeline next steps, prefetch-bug fix plan |
 | 2026-06-23 | [Mentor sync — get concrete on training](2026-06-23-mentor-sync.md) | normalized from voice transcript | HIR likely dropped (WER standard), split CSV deliverable, granularity + humanReview-cutoff + curation-bias open questions, Thu/Fri calls |
+| 2026-07-21 | [DLE GDPR + RunPod setup](2026-07-21.md) | normalized from meeting notes | dataset legal hold, repo history purge, blog without dataset, RunPod training setup |
 
 ## Meeting Note Rules
 

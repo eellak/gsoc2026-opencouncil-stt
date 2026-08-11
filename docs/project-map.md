@@ -44,6 +44,7 @@ Fine-tuning / dataset:
 
 - [Dataset split and publish plan](specs/dataset-split-and-publish-plan.md)
 - [Whisper hyperparameter sweep](specs/whisper-hyperparam-sweep.md)
+- [Clip alignment audit](specs/clip-alignment-audit.md)
 - [Fine-tuning dry-run plan](specs/finetuning-dryrun-plan.md)
 - [Meeting trust cutoff plan](specs/meeting-trust-cutoff-plan.md)
 - [Mini-PC fine-tune autoresearch](specs/minipc-finetune-autoresearch.md)
@@ -75,6 +76,7 @@ Review UI:
 ## Reports (committed snapshots)
 
 - [Month #1 — June 2026](reports/month-1-2026-06.md) — narrative progress journal (part 1 of 3).
+- [Full large-v3 LoRA run](reports/2026-07-23-fulltrain-run.md) — 2026-07-22 training result, OOM fix, inference harness, and HF adapter publication.
 - [Diarization-conditioned ASR review](reports/diarization-conditioned-asr-review.md)
 - [Fix-task experiment report (HTML)](reports/fix-task-experiment-report.html) — self-contained public report of the fix-task chain.
 - [Research findings (simple)](reports/research-findings-simple.md)
@@ -83,6 +85,7 @@ See [docs/reports/README.md](reports/README.md) for what belongs here vs. in `da
 
 ## Runbooks
 
+- [Build canonical split on-box brief](runbooks/build-canonical-split-onbox-brief.md)
 - [Eval harness on-box brief](runbooks/eval-harness-onbox-brief.md)
 - [Next-batch selection on-box brief](runbooks/next-batch-selection-onbox-brief.md)
 - [VPS inventory](runbooks/vps-inventory.md)
