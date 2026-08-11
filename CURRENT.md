@@ -1,6 +1,11 @@
 # Current Work
 
-Last updated: 2026-08-10
+Last updated: 2026-08-11
+
+**Active plan:** [`docs/specs/2026-08-11-endgame-handoff-plan.md`](docs/specs/2026-08-11-endgame-handoff-plan.md)
+— Codex-reviewed handoff plan for the final 12 days: decode-threshold ablation,
+DS-WER (Milestone 2), correction-only dataset ablation, final report. It reorders
+the queue below; queue item 2 (hotwords/name repair) keeps its own plan and gate.
 
 Canonical research state: [`research/ledger.json`](research/ledger.json).
 Agent protocol: [`CLAUDE.md`](CLAUDE.md).
@@ -29,6 +34,12 @@ trained through the label-prefix bug and cannot answer it.
    agreement-with-OpenCouncil; the one time both were measured, the ranking flipped.
    **Done when** the corrected adapter has a fidelity-to-audio number on unseen
    meetings.
+
+## Open product decision (needs a human, before leave)
+
+Do transcripts keep filled pauses («εεε») and false starts? This defines what a
+public record is; until answered, every listening hour produces incompatible data.
+Not a technical decision — see the handoff plan's "Unresolved product decision".
 
 ## Blockers
 
