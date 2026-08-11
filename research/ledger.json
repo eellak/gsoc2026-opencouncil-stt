@@ -1,6 +1,6 @@
 {
  "schema_version": 1,
- "updated_at": "2026-08-11T00:00:00Z",
+ "updated_at": "2026-08-12T00:00:00Z",
  "note": "Authoritative state. Reports under docs/reports/ are immutable evidence; this file says whether their conclusions still stand. When a doc disagrees with this file, this file wins and the doc gets fixed in the same change.",
  "experiments": [
   {
@@ -511,6 +511,37 @@
     "Codex timed out on the full research prompt; questions 3, 5 and 6 of the prompt have no second reader."
    ],
    "updated_at": "2026-08-11T00:00:00Z"
+  },
+  {
+   "id": "exp-2026-08-12-ds-wer",
+   "title": "DS-WER against proposal Milestone 2",
+   "question": "Does the corrected adapter reach the proposal's Milestone 2 target of >=15% relative DS-WER improvement over Gladia?",
+   "status": "CLOSED",
+   "conclusion": "On the 39 frozen validation windows (31 meetings, 250 reference term occurrences) DS-WER is: Soniox 0.3280, Scribe v2 0.3720, ours (artifact-ct2-fixed) 0.4880, base whisper 0.5400, Gladia 0.5880. Relative improvement over Gladia +17.0%, so the >=15% target is MET on the point estimate that the plan defined it on - but the 95% meeting-block interval on the absolute delta is [-0.1869, +0.0040] and includes zero. Excluding the two roll-call windows our DS-WER (0.4751) is indistinguishable from base whisper's (0.4696). Our error profile on names is 90 substitutions to 28 deletions.",
+   "decision": "Report Milestone 2 as met on the preregistered point-estimate definition and never without the interval. The standing finding is not the milestone: on domain terms we make ~50% more errors than Soniox in relative terms, and they are substitutions rather than deletions, which prices exp-2026-07-25-hotwords as the highest-value open direction.",
+   "artifact_ids": [
+    "artifact-ct2-fixed"
+   ],
+   "capability_ids": [
+    "cap-bench-http-api"
+   ],
+   "reports": [
+    "docs/reports/2026-08-12-ds-wer.md"
+   ],
+   "specs": [
+    "docs/specs/2026-08-11-endgame-handoff-plan.md"
+   ],
+   "superseded_by": null,
+   "next_action": null,
+   "updated_at": "2026-08-12T00:00:00Z",
+   "caveats": [
+    "Retrospectively specified metric: the term lists were written after the 2026-08-11 error analysis existed. The only guard is procedural - lists generated mechanically from OpenCouncil's public city registry, inflections from fixed suffix rules in code, committed before any scoring.",
+    "The term lists cover roster surnames and the two city-name terms only. Community names, settlements and local acronyms are excluded because no frozen public source enumerates them, so every DS-WER here is a LOWER BOUND on domain-term error.",
+    "The reference is OpenCouncil's own published text: this measures agreement-with-OpenCouncil, not fidelity-to-audio.",
+    "The denominator is concentrated: 4 of 39 windows carry 134 of the 250 term occurrences. Leave-one-window-out moves the delta vs Gladia from -0.100 to -0.069 (31%) without reversing its sign.",
+    "The base-whisper arm ran on the HuggingFace serverless pipeline, a different decoder stack. Its comparison is not a clean weights comparison.",
+    "argos+orestiada is VALIDATION, scored repeatedly and used to stop experiments. One seed, one run - the same run as exp-2026-08-10-benchmark-fixed-adapter."
+   ]
   }
  ],
  "artifacts": [
