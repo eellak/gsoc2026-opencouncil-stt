@@ -434,6 +434,20 @@
       "caveats": [
         "The first version of this report measured the WRONG adapter (a ct2 built before the label-prefix fix) and was retracted, then re-measured. The retraction was itself too broad."
       ]
+    },
+    {
+      "id": "exp-2026-08-11-training-brief",
+      "title": "Consolidated training brief",
+      "question": "What has been tried, on what data, with what result - as one document?",
+      "status": "CLOSED",
+      "conclusion": "Dataset: 22.47h train (11.16h human corrections + 11.32h unverified no_edit labels), 2.79s mean clip, 209 meetings, 9 cities, Aug 2024 - May 2026. Ten adapters trained. Only the label-prefix fix produced a measured gain.",
+      "decision": "Use this as the input document when designing the next training run.",
+      "reports": [
+        "docs/reports/2026-08-11-training-brief.md"
+      ],
+      "superseded_by": null,
+      "next_action": null,
+      "updated_at": "2026-08-11T00:00:00Z"
     }
   ],
   "artifacts": [
