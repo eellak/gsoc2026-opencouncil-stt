@@ -1,6 +1,6 @@
 # Current Work
 
-Last updated: 2026-08-11
+Last updated: 2026-08-12
 
 **Active plan:** [`docs/specs/2026-08-11-endgame-handoff-plan.md`](docs/specs/2026-08-11-endgame-handoff-plan.md)
 — Codex-reviewed handoff plan for the final 12 days: decode-threshold ablation,
@@ -35,11 +35,15 @@ trained through the label-prefix bug and cannot answer it.
    **Done when** the corrected adapter has a fidelity-to-audio number on unseen
    meetings.
 
-## Open product decision (needs a human, before leave)
+## Product decision: answered 2026-08-12 — transcripts are **clean**
 
-Do transcripts keep filled pauses («εεε») and false starts? This defines what a
-public record is; until answered, every listening hour produces incompatible data.
-Not a technical decision — see the handoff plan's "Unresolved product decision".
+Filled pauses («εεε») and false starts are **stripped**. Asked and answered once, per
+the handoff plan. This is the standard future listening hours should be produced
+against, so that they are compatible with each other.
+
+Nothing frozen was changed on the strength of it: the benchmark normalizer, the
+existing labels and the 2026-08 evaluation freeze all stay exactly as they were. The
+decision governs new data collection, not any number already measured.
 
 ## Blockers
 
@@ -49,8 +53,27 @@ Not a technical decision — see the handoff plan's "Unresolved product decision
   removal does not anonymise it because each row links audio carrying the voice. See
   [decisions/data.md](docs/decisions/data.md).
 
+## Endgame plan — where the four workstreams stand (2026-08-12)
+
+- **Task 0 — evaluation freeze: done.**
+  [`research/eval-freeze-2026-08/manifest.json`](research/eval-freeze-2026-08/manifest.json)
+  fixes 39 validation windows (31 meetings, 11,911 reference tokens) and 7 temporal
+  holdout windows. The plan's "minus the 7" was wrong; the rule catches one window in
+  argos/orestiada, so it is 40 − 1.
+- **Workstream 2 — DS-WER: closed.** `exp-2026-08-12-ds-wer`. Milestone 2 met on the
+  point estimate (+17.0% vs Gladia), interval includes zero.
+- **Workstream 1 — decode ablation: running.** `exp-2026-08-12-decode-ablation`,
+  39 windows × 6 arms on CPU. First pass discarded and re-run after the seed was
+  moved from `(arm, window)` to `window` — see the prereg.
+- **Workstream 3 — correction-only: training.** `exp-2026-08-13-correction-only`,
+  pod `ul4z0drp5owiac` (A40), hard deadline `2026-08-12T11:53:25+03:00`.
+- **Workstream 4 — final report: not started**, waits on 1 and 3.
+
 ## Recently changed
 
+- `exp-2026-08-12-ds-wer` closed: on domain terms we sit at 0.488 against Soniox
+  0.328 and Scribe 0.372, far worse than our tie with them on overall WER, and our
+  name errors are substitutions not deletions, 2026-08-12.
 - `exp-2026-08-10-benchmark-fixed-adapter` closed: on unseen cities the corrected
   adapter is indistinguishable from Scribe and Soniox and beats its broken
   predecessor by 1.77 points, CI excludes zero, 2026-08-10.
