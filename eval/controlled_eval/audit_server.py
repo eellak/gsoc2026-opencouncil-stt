@@ -11,19 +11,44 @@ transcription, where you replay the same three seconds twenty times. This handle
 implements single-range `bytes=` requests, which is all an audio element needs.
 
 POST /save writes the current localStorage blob to answers.json next to this file, and
-refuses to overwrite real work with an empty payload.
+refuses to overwrite real work with an empty payload. It also merges rather than replaces:
+a debounced save and a `sendBeacon` on unload can arrive out of order, and a plain
+last-writer-wins would let the older of the two erase decisions. Per key, the entry with
+the newer client timestamp survives. No audit ever deletes a key, so merging cannot
+resurrect something the reviewer removed.
 """
 import http.server
 import json
+import math
 import os
 import pathlib
 import re
 import socketserver
 
-ROOT = pathlib.Path(__file__).resolve().parent
+# AUDIT_DIR lets a package that lives outside the repo be served by this same handler.
+# Audit packages hold council audio and transcripts, so they must not sit in git; the
+# default stays the script's own directory so the older audits keep working unchanged.
+ROOT = pathlib.Path(os.environ.get("AUDIT_DIR") or pathlib.Path(__file__).parent).resolve()
 OUT = ROOT / "answers.json"
 PORT = int(os.environ.get("PORT", "8780"))
 RANGE_RE = re.compile(r"^bytes=(\d*)-(\d*)$")
+
+
+def merge_answers(prev, new):
+    """Union of both, newer client timestamp wins. Older audits store bare strings with
+    no timestamp; there the incoming value wins, which is what they did before."""
+    out = dict(prev)
+    for k, v in new.items():
+        old = out.get(k)
+        if isinstance(v, dict) and isinstance(old, dict):
+            try:
+                a, b = float(old.get("t") or 0), float(v.get("t") or 0)
+                if math.isfinite(a) and math.isfinite(b) and a > b:
+                    continue
+            except (TypeError, ValueError, OverflowError):
+                pass                                   # no usable timestamp: incoming wins
+        out[k] = v
+    return out
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
@@ -99,16 +124,36 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         except json.JSONDecodeError:
             self.send_error(400)
             return
+        if not isinstance(data, dict):
+            self.send_error(400)
+            return
+        prev = {}
+        if OUT.exists():
+            try:
+                prev = json.loads(OUT.read_text())
+            except json.JSONDecodeError:
+                prev = {}
         # never let an empty autosave clobber real work
-        if not data and OUT.exists() and json.loads(OUT.read_text()):
+        if not data and prev:
             self.send_response(200)
             self.send_header("Content-Length", "4")
             self.end_headers()
             self.wfile.write(b"skip")
             return
+        data = merge_answers(prev, data)
         tmp = OUT.with_suffix(".part")
-        tmp.write_text(json.dumps(data, ensure_ascii=False, indent=1))
+        with open(tmp, "w") as f:
+            json.dump(data, f, ensure_ascii=False, indent=1)
+            f.flush()
+            os.fsync(f.fileno())
         tmp.replace(OUT)
+        # The rename itself needs the directory synced, or a crash can leave neither name
+        # pointing at the new file. An hour of clicking is worth two syscalls.
+        d = os.open(str(ROOT), os.O_RDONLY)
+        try:
+            os.fsync(d)
+        finally:
+            os.close(d)
         self.send_response(200)
         self.send_header("Content-Length", "2")
         self.end_headers()
