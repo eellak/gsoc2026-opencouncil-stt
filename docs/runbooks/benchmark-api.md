@@ -87,8 +87,18 @@ magnitude under it. Serve on GPU, concurrency 1.
 unreachable by the benchmark and cannot be fixed without recreating it. The provider
 URL is then `https://<podId>-8000.proxy.runpod.net/v1`.
 
-**Disable your old provider instances.** Stale entries pointing at dead pod URLs
-(`oc-runpod-finetune`, `oc-minipc-finetune`) will be re-run and fail if left enabled.
+**Disable your old provider instances.** Stale entries pointing at dead pod URLs will be
+re-run and fail if left enabled. Removing them from `/api/config/providers` is safe —
+completed runs keep their own copy of the results and the `configSnapshot`, so history
+survives.
+
+**Deleting a provider does not clean up past leaderboards.** For the same reason: a
+completed run's report still lists every provider that ever ran in it. There is no
+documented endpoint that removes one — `POST /api/runs/:id/providers` only adds. Decide
+which providers belong in a run *before* you start it.
+
+**Rename the `label`, never the `id`.** The `instanceId` is the key a completed run uses
+to attach its results; changing it orphans the measurement you paid for.
 
 ## Reading the result honestly
 
