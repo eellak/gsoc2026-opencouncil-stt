@@ -448,6 +448,24 @@
       "superseded_by": null,
       "next_action": null,
       "updated_at": "2026-08-11T00:00:00Z"
+    },
+    {
+      "id": "exp-2026-08-11-error-analysis",
+      "title": "Where the gap to Scribe actually is",
+      "question": "What kinds of errors separate our adapter from Scribe v2, and which are worth attacking?",
+      "status": "CLOSED",
+      "conclusion": "The 1.12-point gap is concentrated, not diffuse: the 8 worst windows account for 193 errors while the total gap is 133, so we are ahead in aggregate on the other 31. Four patterns: 2 decoder-degeneration windows, 2 name-dense windows (roll call, agenda), lost short speaker turns, and number/protocol formatting. 21.6% of our substitution errors are person or place names, almost all off by 1-2 characters. Style conventions favour US, not Scribe, so the true acoustic gap is larger than 1.12.",
+      "decision": "Do not retrain to close this gap. A per-meeting name lexicon (~0.4-0.6 pts) plus anti-hallucination decoding config (~0.5 pts) attack ~0.9-1.1 of the 1.12 points with no training. Diacritics, generic spell post-editing and reference-style mimicry are dead ends.",
+      "reports": [
+        "docs/reports/2026-08-11-error-analysis-vs-scribe.md"
+      ],
+      "superseded_by": null,
+      "next_action": null,
+      "caveats": [
+        "Per-window we lose on 24 and win on 12; the aggregate favours us on the non-worst windows only because our wins are larger. Not 'broadly better with exceptions'.",
+        "The a/b/c split (60-65% genuine / 15-20% style / 15-20% bad reference) is a qualitative estimate from 8 windows, not a measurement."
+      ],
+      "updated_at": "2026-08-11T00:00:00Z"
     }
   ],
   "artifacts": [
