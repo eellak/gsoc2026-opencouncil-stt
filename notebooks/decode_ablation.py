@@ -98,8 +98,22 @@ def rows(which: str) -> list[dict]:
 
 
 def seed_for(arm: str, window_id: str) -> int:
-    """Stable per-(arm, window) seed. Positive fallback temperatures sample."""
-    h = hashlib.sha256(f"{arm}|{window_id}".encode()).digest()
+    """Stable per-WINDOW seed, deliberately independent of the arm.
+
+    Positive fallback temperatures sample, so without a seed the arms are not
+    reproducible. The handoff plan asked for a seed derived from (arm, window_id) -
+    that reproduces, but it also makes every arm draw a *different* random sequence,
+    so an arm whose knob changed nothing still came out with different text. Measured
+    before scoring: with the no-speech gate never firing on these 39 windows, arm B
+    should have been byte-identical to the control and differed on 4 windows - the
+    exact 4 that reached a sampling temperature.
+
+    Seeding on the window alone is common random numbers: the standard paired-design
+    variance reduction. An inert knob now produces identical output, and any
+    difference is attributable to the knob rather than to the draw.
+    """
+    _ = arm  # deliberately unused; see above
+    h = hashlib.sha256(window_id.encode()).digest()
     return int.from_bytes(h[:4], "big")
 
 

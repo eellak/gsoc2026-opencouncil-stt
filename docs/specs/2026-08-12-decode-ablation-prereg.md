@@ -83,8 +83,28 @@ The rest of the plan's semantics check out against the same source: the compress
 and logprob thresholds trigger a retry at the next fallback temperature and never
 discard output on their own (`transcribe.py:1479-1500`), and positive fallback
 temperatures switch to `beam_size=1` sampling (`transcribe.py:1432-1444`), which is
-why every window is preceded by `ctranslate2.set_random_seed(seed)` with a seed
-derived deterministically from `(arm, window_id)`.
+why every window is preceded by `ctranslate2.set_random_seed(seed)`.
+
+### Seeding — a second correction to the handoff plan
+
+The plan asks for a seed derived from `(arm, window_id)`. That reproduces, but it
+gives every arm a different random sequence, so an arm whose knob changed nothing
+still comes out with different text.
+
+This was measured, and it is why the first decode pass was discarded. Amended
+2026-08-12 after arms A and B had been decoded and **before any WER was computed**:
+the no-speech gate fired **zero** times across all 39 windows, so arm B
+(`no_speech_threshold=0.8`) could not differ from the control by mechanism — and it
+differed on 4 windows, exactly the 4 that reached a sampling temperature. That was
+the seed, not the knob.
+
+The seed is therefore derived from **`window_id` alone**. This is common random
+numbers, the standard variance reduction for a paired design: an inert knob now
+produces byte-identical output, and any difference is attributable to the knob.
+
+The discarded pass is kept out of the repo and is not scored. Nothing from it enters
+any number here; the only thing carried forward is the diagnostic that motivated the
+amendment.
 
 `WhisperModel.transcribe` is used, not `BatchedInferencePipeline`. The segment
 generator is consumed fully before any result is recorded.
