@@ -1,0 +1,516 @@
+{
+ "name": "eval-freeze-2026-08",
+ "frozen_at": "2026-08-11",
+ "purpose": "The evaluation set for exp-2026-08-12-decode-ablation, exp-2026-08-12-ds-wer and exp-2026-08-13-correction-only. Frozen before any arm was decoded.",
+ "source_run": "2026-08-10-corrected-adapter-label-prefix-fix-vs-ju",
+ "selection_rule": "cityId in {argos, orestiada} (the only training-disjoint benchmark cities), minus every window whose meeting is dated on or after 2026-06-01 (the temporal TEST boundary). 40 - 1 = 39.",
+ "resampling_block": "meeting_id",
+ "normalizer": {
+  "module": "eval.controlled_eval.scoring",
+  "function": "wtoks",
+  "filler_strip_regex": "^(ε{2,}|μ{2,}|α{2,}|ο{3,}|χμ+|εμ+|μχ+|χ{2,})$",
+  "note": "The benchmark's own wer-nofillers normalizer runs server-side and is not importable. This is the project's frozen scorer plus an explicit filler set - a stand-in, not the benchmark's implementation. Numbers are comparable across our arms, not byte-identical to the benchmark leaderboard."
+ },
+ "environment": {
+  "python": "3.12.3",
+  "faster_whisper": "1.2.1",
+  "ctranslate2": "4.8.1",
+  "numpy": "2.4.6",
+  "venv": ".venv-eval",
+  "device": "cpu",
+  "compute_type": "int8",
+  "cpu_threads": 16,
+  "host": "minipc",
+  "note": "One device for every arm of every comparison. CPU int8 and CUDA int8 give different tokens from the same artifact (exp-2026-08-10-benchmark-fixed-adapter caveat 4), so no number here may be compared against a GPU-produced one."
+ },
+ "artifacts": {
+  "artifact-ct2-fixed": {
+   "path": "/home/harold/oc-asr-serve/ct2-fixed",
+   "file": "model.bin",
+   "sha256_16": "8a1a3b257d0c1bdb",
+   "ledger_sha256_16": "8a1a3b257d0c1bdb"
+  },
+  "artifact-adapter-fixed": {
+   "path": "/home/harold/oc-asr-serve/adapter-fixed-2026-08-01",
+   "file": "adapter_model.safetensors",
+   "sha256_16": "ea8f03230846888f",
+   "ledger_sha256_16": "ea8f03230846888f"
+  }
+ },
+ "code_sha": "2ec7554f05e2cc1c542ea77a96e12b66ffab4a5d",
+ "eval_windows": [
+  {
+   "window_id": "win_argos_apr24_2026_1015557",
+   "city": "argos",
+   "meeting_id": "apr24_2026",
+   "start_sec": 1015.557,
+   "duration_sec": 140.854,
+   "ref_tokens": 243,
+   "ref_tokens_raw": 243,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_argos_apr30_2_2026_1264428",
+   "city": "argos",
+   "meeting_id": "apr30_2_2026",
+   "start_sec": 1264.428,
+   "duration_sec": 148.027,
+   "ref_tokens": 255,
+   "ref_tokens_raw": 255,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_argos_apr7_2026_960810",
+   "city": "argos",
+   "meeting_id": "apr7_2026",
+   "start_sec": 960.81,
+   "duration_sec": 136.8,
+   "ref_tokens": 390,
+   "ref_tokens_raw": 390,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_argos_aug14_2025_203808",
+   "city": "argos",
+   "meeting_id": "aug14_2025",
+   "start_sec": 203.808,
+   "duration_sec": 147.733,
+   "ref_tokens": 248,
+   "ref_tokens_raw": 248,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_argos_aug29_2025_2731295",
+   "city": "argos",
+   "meeting_id": "aug29_2025",
+   "start_sec": 2731.295,
+   "duration_sec": 149.378,
+   "ref_tokens": 250,
+   "ref_tokens_raw": 250,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_argos_dec23_2025_581922",
+   "city": "argos",
+   "meeting_id": "dec23_2025",
+   "start_sec": 581.922,
+   "duration_sec": 145.847,
+   "ref_tokens": 245,
+   "ref_tokens_raw": 245,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_argos_dec3_2025_1151733",
+   "city": "argos",
+   "meeting_id": "dec3_2025",
+   "start_sec": 1151.733,
+   "duration_sec": 147.354,
+   "ref_tokens": 234,
+   "ref_tokens_raw": 234,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_argos_dec5_2025_996850",
+   "city": "argos",
+   "meeting_id": "dec5_2025",
+   "start_sec": 996.85,
+   "duration_sec": 143.677,
+   "ref_tokens": 289,
+   "ref_tokens_raw": 289,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_argos_feb27_2_2026_1959208",
+   "city": "argos",
+   "meeting_id": "feb27_2_2026",
+   "start_sec": 1959.208,
+   "duration_sec": 146.577,
+   "ref_tokens": 296,
+   "ref_tokens_raw": 296,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_argos_feb6_2026_2558764",
+   "city": "argos",
+   "meeting_id": "feb6_2026",
+   "start_sec": 2558.764,
+   "duration_sec": 149.585,
+   "ref_tokens": 384,
+   "ref_tokens_raw": 384,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_argos_jan30_2026_204180",
+   "city": "argos",
+   "meeting_id": "jan30_2026",
+   "start_sec": 204.18,
+   "duration_sec": 105.971,
+   "ref_tokens": 287,
+   "ref_tokens_raw": 287,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_argos_mar10_2026_365531",
+   "city": "argos",
+   "meeting_id": "mar10_2026",
+   "start_sec": 365.531,
+   "duration_sec": 148.278,
+   "ref_tokens": 288,
+   "ref_tokens_raw": 288,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_argos_may22_2026_1650387",
+   "city": "argos",
+   "meeting_id": "may22_2026",
+   "start_sec": 1650.387,
+   "duration_sec": 145.17,
+   "ref_tokens": 242,
+   "ref_tokens_raw": 242,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_argos_nov11_2025_2213920",
+   "city": "argos",
+   "meeting_id": "nov11_2025",
+   "start_sec": 2213.92,
+   "duration_sec": 146.722,
+   "ref_tokens": 313,
+   "ref_tokens_raw": 313,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_argos_nov26_2025_2806748",
+   "city": "argos",
+   "meeting_id": "nov26_2025",
+   "start_sec": 2806.748,
+   "duration_sec": 142.143,
+   "ref_tokens": 245,
+   "ref_tokens_raw": 245,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_argos_oct31__2_2025_2353650",
+   "city": "argos",
+   "meeting_id": "oct31__2_2025",
+   "start_sec": 2353.65,
+   "duration_sec": 149.675,
+   "ref_tokens": 244,
+   "ref_tokens_raw": 244,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_argos_sep10_2025_573077",
+   "city": "argos",
+   "meeting_id": "sep10_2025",
+   "start_sec": 573.077,
+   "duration_sec": 149.784,
+   "ref_tokens": 393,
+   "ref_tokens_raw": 393,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_argos_sep15_2025_1373248",
+   "city": "argos",
+   "meeting_id": "sep15_2025",
+   "start_sec": 1373.248,
+   "duration_sec": 146.95,
+   "ref_tokens": 233,
+   "ref_tokens_raw": 233,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_argos_sep24_2025_371824",
+   "city": "argos",
+   "meeting_id": "sep24_2025",
+   "start_sec": 371.824,
+   "duration_sec": 149.263,
+   "ref_tokens": 313,
+   "ref_tokens_raw": 313,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_orestiada_apr27_2026_3878225",
+   "city": "orestiada",
+   "meeting_id": "apr27_2026",
+   "start_sec": 3878.225,
+   "duration_sec": 149.617,
+   "ref_tokens": 346,
+   "ref_tokens_raw": 346,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_orestiada_apr27_2026_6555813",
+   "city": "orestiada",
+   "meeting_id": "apr27_2026",
+   "start_sec": 6555.813,
+   "duration_sec": 147.319,
+   "ref_tokens": 322,
+   "ref_tokens_raw": 322,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_orestiada_apr28_2026_1872686",
+   "city": "orestiada",
+   "meeting_id": "apr28_2026",
+   "start_sec": 1872.686,
+   "duration_sec": 147.192,
+   "ref_tokens": 323,
+   "ref_tokens_raw": 323,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_orestiada_apr28_2026_2309943",
+   "city": "orestiada",
+   "meeting_id": "apr28_2026",
+   "start_sec": 2309.943,
+   "duration_sec": 148.762,
+   "ref_tokens": 304,
+   "ref_tokens_raw": 304,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_orestiada_apr28_3_2026_1291909",
+   "city": "orestiada",
+   "meeting_id": "apr28_3_2026",
+   "start_sec": 1291.909,
+   "duration_sec": 148.648,
+   "ref_tokens": 315,
+   "ref_tokens_raw": 315,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_orestiada_apr7_2026_3737815",
+   "city": "orestiada",
+   "meeting_id": "apr7_2026",
+   "start_sec": 3737.815,
+   "duration_sec": 149.681,
+   "ref_tokens": 315,
+   "ref_tokens_raw": 315,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_orestiada_dec11_2025_2_300211",
+   "city": "orestiada",
+   "meeting_id": "dec11_2025_2",
+   "start_sec": 300.211,
+   "duration_sec": 148.659,
+   "ref_tokens": 357,
+   "ref_tokens_raw": 357,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_orestiada_dec11_2025_600052",
+   "city": "orestiada",
+   "meeting_id": "dec11_2025",
+   "start_sec": 600.052,
+   "duration_sec": 148.688,
+   "ref_tokens": 377,
+   "ref_tokens_raw": 377,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_orestiada_feb11_2026_149776",
+   "city": "orestiada",
+   "meeting_id": "feb11_2026",
+   "start_sec": 149.776,
+   "duration_sec": 144.689,
+   "ref_tokens": 363,
+   "ref_tokens_raw": 363,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_orestiada_feb27_2026_305602",
+   "city": "orestiada",
+   "meeting_id": "feb27_2026",
+   "start_sec": 305.602,
+   "duration_sec": 146.227,
+   "ref_tokens": 354,
+   "ref_tokens_raw": 354,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_orestiada_feb27_2026_6534554",
+   "city": "orestiada",
+   "meeting_id": "feb27_2026",
+   "start_sec": 6534.554,
+   "duration_sec": 146.93,
+   "ref_tokens": 382,
+   "ref_tokens_raw": 382,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_orestiada_jan21_2026_7536686",
+   "city": "orestiada",
+   "meeting_id": "jan21_2026",
+   "start_sec": 7536.686,
+   "duration_sec": 132.904,
+   "ref_tokens": 344,
+   "ref_tokens_raw": 344,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_orestiada_jan21_2026_7985300",
+   "city": "orestiada",
+   "meeting_id": "jan21_2026",
+   "start_sec": 7985.3,
+   "duration_sec": 149.22,
+   "ref_tokens": 351,
+   "ref_tokens_raw": 351,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_orestiada_mar23_2026_6383163",
+   "city": "orestiada",
+   "meeting_id": "mar23_2026",
+   "start_sec": 6383.163,
+   "duration_sec": 146.105,
+   "ref_tokens": 308,
+   "ref_tokens_raw": 308,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_orestiada_mar23_2026_7271847",
+   "city": "orestiada",
+   "meeting_id": "mar23_2026",
+   "start_sec": 7271.847,
+   "duration_sec": 149.448,
+   "ref_tokens": 280,
+   "ref_tokens_raw": 280,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_orestiada_mar3_2026_1332463",
+   "city": "orestiada",
+   "meeting_id": "mar3_2026",
+   "start_sec": 1332.463,
+   "duration_sec": 149.385,
+   "ref_tokens": 287,
+   "ref_tokens_raw": 287,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_orestiada_mar3_2026_150289",
+   "city": "orestiada",
+   "meeting_id": "mar3_2026",
+   "start_sec": 150.289,
+   "duration_sec": 148.745,
+   "ref_tokens": 296,
+   "ref_tokens_raw": 296,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_orestiada_mar3_2_2026_3959237",
+   "city": "orestiada",
+   "meeting_id": "mar3_2_2026",
+   "start_sec": 3959.237,
+   "duration_sec": 146.124,
+   "ref_tokens": 316,
+   "ref_tokens_raw": 316,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_orestiada_may18_2026_2809949",
+   "city": "orestiada",
+   "meeting_id": "may18_2026",
+   "start_sec": 2809.949,
+   "duration_sec": 150.181,
+   "ref_tokens": 297,
+   "ref_tokens_raw": 297,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_orestiada_may18_2026_7271113",
+   "city": "orestiada",
+   "meeting_id": "may18_2026",
+   "start_sec": 7271.113,
+   "duration_sec": 140.205,
+   "ref_tokens": 282,
+   "ref_tokens_raw": 282,
+   "audio_local": true
+  }
+ ],
+ "holdout_windows": [
+  {
+   "window_id": "win_argos_jun3_2026_855222",
+   "city": "argos",
+   "meeting_id": "jun3_2026",
+   "start_sec": 855.222,
+   "duration_sec": 144.077,
+   "ref_tokens": 291,
+   "ref_tokens_raw": 291,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_sparta_jun9_2026_0",
+   "city": "sparta",
+   "meeting_id": "jun9_2026",
+   "start_sec": 0,
+   "duration_sec": 149.359,
+   "ref_tokens": 330,
+   "ref_tokens_raw": 330,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_sparta_jun9_2026_434241",
+   "city": "sparta",
+   "meeting_id": "jun9_2026",
+   "start_sec": 434.241,
+   "duration_sec": 148.986,
+   "ref_tokens": 320,
+   "ref_tokens_raw": 320,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_vrilissia_jun3_2_2026_4904",
+   "city": "vrilissia",
+   "meeting_id": "jun3_2_2026",
+   "start_sec": 4.904,
+   "duration_sec": 147.868,
+   "ref_tokens": 211,
+   "ref_tokens_raw": 211,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_vrilissia_jun3_3_2026_8277907",
+   "city": "vrilissia",
+   "meeting_id": "jun3_3_2026",
+   "start_sec": 8277.907,
+   "duration_sec": 145.327,
+   "ref_tokens": 338,
+   "ref_tokens_raw": 338,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_xylokastro_jun3_2026_1029425",
+   "city": "xylokastro",
+   "meeting_id": "jun3_2026",
+   "start_sec": 1029.425,
+   "duration_sec": 144.656,
+   "ref_tokens": 294,
+   "ref_tokens_raw": 294,
+   "audio_local": true
+  },
+  {
+   "window_id": "win_zografou_jun4_2026_6168559",
+   "city": "zografou",
+   "meeting_id": "jun4_2026",
+   "start_sec": 6168.559,
+   "duration_sec": 149.253,
+   "ref_tokens": 317,
+   "ref_tokens_raw": 317,
+   "audio_local": true
+  }
+ ],
+ "totals": {
+  "eval_windows": 39,
+  "eval_ref_tokens": 11911,
+  "eval_meetings": 31,
+  "eval_audio_missing": [],
+  "holdout_windows": 7,
+  "holdout_ref_tokens": 2101,
+  "holdout_meetings": 5,
+  "holdout_audio_missing": []
+ },
+ "holdout_caveat": "6 of the 7 holdout windows are in cities that ARE in the training set (sparta, vrilissia, xylokastro, zografou). They are a temporal holdout, not a training-disjoint one. That is acceptable for a within-model decode-config comparison, where both arms share the same weights, and is NOT acceptable for any model-vs-model claim."
+}
