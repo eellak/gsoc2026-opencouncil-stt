@@ -39,7 +39,8 @@ function readFilter(url: URL): QueueFilter | null {
 	const queueName = url.searchParams.get('queue');
 	const QUEUE_LABELS: Record<string, string> = {
 		nb2: 'batch-2 (auto-selected)',
-		nb2audio: 'audio-verified (balanced)'
+		nb2audio: 'audio-verified (balanced)',
+		gap1: 'deletion-gap candidates'
 	};
 	if (queueName && queueName in QUEUE_LABELS) {
 		return { query: `queue=${queueName}`, label: QUEUE_LABELS[queueName] };
