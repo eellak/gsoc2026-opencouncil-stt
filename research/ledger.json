@@ -1,6 +1,6 @@
 {
  "schema_version": 1,
- "updated_at": "2026-08-12T05:00:00Z",
+ "updated_at": "2026-08-12T06:30:00Z",
  "note": "Authoritative state. Reports under docs/reports/ are immutable evidence; this file says whether their conclusions still stand. When a doc disagrees with this file, this file wins and the doc gets fixed in the same change.",
  "experiments": [
   {
@@ -807,6 +807,32 @@
    "caveats": [
     "Hypothesis text: never hashed into git, never committed. Identity is established by its produced_by artifact."
    ]
+  },
+  {
+   "id": "artifact-adapter-correction-only",
+   "kind": "lora_adapter",
+   "description": "Same recipe as artifact-adapter-fixed, trained on the 13,929 'correction' rows only (11.156h). The arm of exp-2026-08-13-correction-only.",
+   "status": "ACTIVE",
+   "locations": [
+    {
+     "host": "minipc",
+     "path": "/home/harold/oc-correction-only/adapter"
+    }
+   ],
+   "hash": {
+    "algorithm": "sha256-file-v1",
+    "file": "adapter_model.safetensors",
+    "value": "a11ea77c3a0b3318"
+   },
+   "produced_by": null,
+   "replaced_by": null,
+   "caveats": [
+    "Trained on RunPod pod ul4z0drp5owiac (A40), 2026-08-12, seed 13, 2 epochs, 3,484 steps. Source manifest data/hf-dataset/public/train.parquet f37d3532b4b60389, filtered train 2d2f636b19e6a67c, validation 3a8ac9b394e67e1d.",
+    "Half the optimizer steps of artifact-adapter-fixed (3,484 vs 7,242), because epochs were held fixed and the data halved. That is part of what the experiment measures, not a controlled-compute comparison.",
+    "In-training eval numbers (val_corr wer_norm 47.17 -> 30.00, val_reg 15.31 -> 5.71) are NOT the experiment's result: val_reg's labels are the old pipeline's unverified output, so improvement there measures imitation of the old system. The decision is made on the 39 frozen windows.",
+    "One seed. exp-2026-08-08-mixture-ratio measured 2.1 points of per-seed spread."
+   ],
+   "verified_at": "2026-08-12T06:30:00Z"
   }
  ],
  "capabilities": [
