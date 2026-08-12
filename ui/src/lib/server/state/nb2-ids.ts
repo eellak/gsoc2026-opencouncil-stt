@@ -7,13 +7,18 @@
  *
  *   nb2      — auto-selected batch-2 (interestingness + LLM triage), ~13k
  *   nb2audio — city-balanced, per-item AUDIO-VERIFIED (Soniox), randomized order
+ *   gap1     — deletion/coverage gap candidates (2026-08-12 mining), ranked:
+ *              restored-speech rows first, then rapid-turn/interjections, then
+ *              name-dense; validation-split rows deliberately excluded
  */
 import nb2 from './nb2-ids.json';
 import nb2audio from './nb2audio-ids.json';
+import gap1 from './gap1-ids.json';
 
 const REGISTRY: Record<string, string[]> = {
 	nb2: nb2 as string[],
-	nb2audio: nb2audio as string[]
+	nb2audio: nb2audio as string[],
+	gap1: gap1 as string[]
 };
 
 const _sets: Record<string, Set<string>> = {};
