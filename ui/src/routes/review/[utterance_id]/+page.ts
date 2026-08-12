@@ -40,7 +40,8 @@ function readFilter(url: URL): QueueFilter | null {
 	const QUEUE_LABELS: Record<string, string> = {
 		nb2: 'batch-2 (auto-selected)',
 		nb2audio: 'audio-verified (balanced)',
-		gap1: 'deletion-gap candidates'
+		gap1: 'deletion-gap candidates',
+		gap2: 'deletion-gap (new, unreviewed)'
 	};
 	if (queueName && queueName in QUEUE_LABELS) {
 		return { query: `queue=${queueName}`, label: QUEUE_LABELS[queueName] };

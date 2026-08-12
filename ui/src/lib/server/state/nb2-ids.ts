@@ -10,15 +10,20 @@
  *   gap1     — deletion/coverage gap candidates (2026-08-12 mining), ranked:
  *              restored-speech rows first, then rapid-turn/interjections, then
  *              name-dense; validation-split rows deliberately excluded
+ *   gap2     — UNREVIEWED deletion-shaped rows (2026-08-13 corpus mining, top
+ *              2000 of 12,949 by restored-words score; val cities excluded) —
+ *              fresh material to judge, unlike gap1 which is mostly re-audit
  */
 import nb2 from './nb2-ids.json';
 import nb2audio from './nb2audio-ids.json';
 import gap1 from './gap1-ids.json';
+import gap2 from './gap2-ids.json';
 
 const REGISTRY: Record<string, string[]> = {
 	nb2: nb2 as string[],
 	nb2audio: nb2audio as string[],
-	gap1: gap1 as string[]
+	gap1: gap1 as string[],
+	gap2: gap2 as string[]
 };
 
 const _sets: Record<string, Set<string>> = {};
