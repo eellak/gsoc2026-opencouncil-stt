@@ -1,6 +1,6 @@
 {
  "schema_version": 1,
- "updated_at": "2026-08-12T08:00:00Z",
+ "updated_at": "2026-08-12T09:00:00Z",
  "note": "Authoritative state. Reports under docs/reports/ are immutable evidence; this file says whether their conclusions still stand. When a doc disagrees with this file, this file wins and the doc gets fixed in the same change.",
  "experiments": [
   {
@@ -608,6 +608,41 @@
     "CPU int8, one machine for both arms. The control arm is eval-A.json from exp-2026-08-12-decode-ablation: same machine, environment, config, seeds and day.",
     "39 validation windows, reference is OpenCouncil's published text: agreement-with-OpenCouncil, not fidelity-to-audio.",
     "Pod ul4z0drp5owiac, A40, ~6h, ~$2.70. Terminated and verified dead; the armed hard deadline was never reached."
+   ]
+  },
+  {
+   "id": "exp-2026-08-20-final-report",
+   "title": "Final report: does domain fine-tuning of whisper-large-v3 pay for Greek council transcription?",
+   "question": "Taking every measurement in this ledger together, does the corrected adapter improve Greek council transcription enough to matter, and what remains open?",
+   "status": "CLOSED",
+   "conclusion": "Yes, but modestly and not where it was hoped. artifact-adapter-fixed ties Scribe v2 and Soniox on unseen cities, beats base whisper by 1.87 points and its broken predecessor by 1.58. Three independent cheap levers were tested this cycle and none paid: decode thresholds (the no-speech gate never fires; removing the temperature fallback is worse), label purity (dropping all no_edit rows gives +0.0015 WER, inside noise fourteen times larger), and data scale (prior research: ~1300h for ~0.5 points). What remains points one way and two independent measurements agree on it: names, wrong by one or two characters - 21.6% of error tokens, and a 90-substitution to 28-deletion profile on domain terms. That is a decode-time name lexicon, not more training.",
+   "decision": "Ship the corrected adapter to HuggingFace (a decision, not a task - the public weights are still the broken ones and cost 1.58-1.77 points). Spend the remaining effort on exp-2026-07-25-hotwords / the name-lexicon arm of exp-2026-08-11-name-repair. Do not rerun decode-threshold work, correction-only filtering, or data-scale arguments - all three are closed.",
+   "artifact_ids": [
+    "artifact-adapter-fixed",
+    "artifact-ct2-fixed",
+    "artifact-adapter-correction-only"
+   ],
+   "capability_ids": [
+    "cap-bench-http-api",
+    "cap-self-hosted-asr",
+    "cap-runpod-gpu-pod"
+   ],
+   "reports": [
+    "docs/reports/2026-08-20-final-report.md"
+   ],
+   "specs": [
+    "docs/specs/2026-08-11-endgame-handoff-plan.md"
+   ],
+   "superseded_by": null,
+   "next_action": null,
+   "updated_at": "2026-08-12T09:00:00Z",
+   "caveats": [
+    "Every headline number rests on argos+orestiada, which is VALIDATION and has been scored repeatedly and used to stop experiments. Treat as optimistically biased.",
+    "All benchmark references are OpenCouncil's published text: agreement-with-OpenCouncil, not fidelity-to-audio. The one time fidelity-to-audio was measured the ranking flipped (exp-2026-08-04-ranking-flips), and artifact-adapter-fixed still has no fidelity-to-audio number.",
+    "One seed throughout, against a measured 2.1-point per-seed spread - larger than most effects reported.",
+    "Cross-stack comparisons: base whisper on HuggingFace serverless, broken adapter on RTX 3090, corrected on A4000, workstreams 1-3 on CPU int8. CPU int8 and CUDA int8 give different tokens from the same artifact.",
+    "Workstreams 1-3 are scored with the project's frozen normalizer, not the benchmark's server-side wer-nofillers implementation.",
+    "The dataset remains on DPO legal hold (2026-07-17): not publishable. Text-level PII removal does not anonymise it because each row links audio carrying the voice."
    ]
   }
  ],

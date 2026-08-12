@@ -2,10 +2,14 @@
 
 Last updated: 2026-08-12
 
-**Active plan:** [`docs/specs/2026-08-11-endgame-handoff-plan.md`](docs/specs/2026-08-11-endgame-handoff-plan.md)
-— Codex-reviewed handoff plan for the final 12 days: decode-threshold ablation,
-DS-WER (Milestone 2), correction-only dataset ablation, final report. It reorders
-the queue below; queue item 2 (hotwords/name repair) keeps its own plan and gate.
+**The endgame plan is finished.** All four workstreams of
+[`docs/specs/2026-08-11-endgame-handoff-plan.md`](docs/specs/2026-08-11-endgame-handoff-plan.md)
+are closed, 2026-08-12. Read
+[`docs/reports/2026-08-20-final-report.md`](docs/reports/2026-08-20-final-report.md)
+first — it is the answer to the project's question, with its limits.
+
+What is left is the queue below: one decision (publish), one experiment (name
+lexicon), one gap (fidelity-to-audio).
 
 Canonical research state: [`research/ledger.json`](research/ledger.json).
 Agent protocol: [`CLAUDE.md`](CLAUDE.md).
@@ -27,9 +31,12 @@ trained through the label-prefix bug and cannot answer it.
    delay: the published weights cost **1.77 WER points on unseen cities**. **Done
    when** the hub weights are the corrected ones.
 2. `exp-2026-07-25-hotwords` — ship contextual biasing at serving time. Both
-   independent reviewers ranked it the highest-value remaining direction: it targets
-   names directly without retraining. **Done when** name recall is measured on a
-   held-out set with the roster wired into the endpoint.
+   independent reviewers ranked it the highest-value remaining direction, and this
+   cycle **priced it**: our domain-term errors are 90 substitutions to 28 deletions
+   (`exp-2026-08-12-ds-wer`), i.e. the name is written, just wrong by a character or
+   two. That is what a lexicon repairs. It is also the only cheap lever left — the
+   other three are closed below. **Done when** name recall is measured on a held-out
+   set with the roster wired into the endpoint.
 3. Decide whether fidelity-to-audio changes this ranking. The benchmark measures
    agreement-with-OpenCouncil; the one time both were measured, the ranking flipped.
    **Done when** the corrected adapter has a fidelity-to-audio number on unseen
@@ -53,24 +60,32 @@ decision governs new data collection, not any number already measured.
   removal does not anonymise it because each row links audio carrying the voice. See
   [decisions/data.md](docs/decisions/data.md).
 
-## Endgame plan — where the four workstreams stand (2026-08-12)
+## Three closed doors — do not reopen without a reason
 
-- **Task 0 — evaluation freeze: done.**
-  [`research/eval-freeze-2026-08/manifest.json`](research/eval-freeze-2026-08/manifest.json)
-  fixes 39 validation windows (31 meetings, 11,911 reference tokens) and 7 temporal
-  holdout windows. The plan's "minus the 7" was wrong; the rule catches one window in
-  argos/orestiada, so it is 40 − 1.
-- **Workstream 2 — DS-WER: closed.** `exp-2026-08-12-ds-wer`. Milestone 2 met on the
-  point estimate (+17.0% vs Gladia), interval includes zero.
-- **Workstream 1 — decode ablation: running.** `exp-2026-08-12-decode-ablation`,
-  39 windows × 6 arms on CPU. First pass discarded and re-run after the seed was
-  moved from `(arm, window)` to `window` — see the prereg.
-- **Workstream 3 — correction-only: training.** `exp-2026-08-13-correction-only`,
-  pod `ul4z0drp5owiac` (A40), hard deadline `2026-08-12T11:53:25+03:00`.
-- **Workstream 4 — final report: not started**, waits on 1 and 3.
+Each cost real time this cycle and each is answered in the ledger:
+
+- **Decode thresholds** (`exp-2026-08-12-decode-ablation`). The no-speech gate fires
+  **zero** times on the 39 windows, so it cannot be causing our deletions; removing
+  the temperature fallback makes every metric worse.
+- **Label purity** (`exp-2026-08-13-correction-only`). Dropping all `no_edit` rows
+  moves WER by +0.0015, against a known 2.1-point per-seed spread.
+- **Data scale** (`exp-2026-08-11-wer-levers-research`). The dominant residual error
+  is homophone orthography the audio cannot decide; ~1300h buys ~0.5 points.
+
+The 2026-08 evaluation freeze
+([`manifest.json`](research/eval-freeze-2026-08/manifest.json)) is the substrate for
+all three: 39 validation windows, 31 meetings, 11,911 reference tokens. Its 7
+temporal holdout windows are **still sealed** — no arm ever passed a gate that would
+have released them.
 
 ## Recently changed
 
+- `exp-2026-08-20-final-report` closed: the answer is yes-but-modestly, and what
+  remains points at names rather than at audio, 2026-08-12.
+- `exp-2026-08-13-correction-only` closed: dropping the unverified half buys nothing,
+  labelled suggestive; `artifact-adapter-correction-only` registered, 2026-08-12.
+- `exp-2026-08-12-decode-ablation` closed: no threshold ships; six arms collapse into
+  two behaviours, 2026-08-12.
 - `exp-2026-08-12-ds-wer` closed: on domain terms we sit at 0.488 against Soniox
   0.328 and Scribe 0.372, far worse than our tie with them on overall WER, and our
   name errors are substitutions not deletions, 2026-08-12.
