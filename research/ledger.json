@@ -1,6 +1,6 @@
 {
  "schema_version": 1,
- "updated_at": "2026-08-12T06:30:00Z",
+ "updated_at": "2026-08-12T08:00:00Z",
  "note": "Authoritative state. Reports under docs/reports/ are immutable evidence; this file says whether their conclusions still stand. When a doc disagrees with this file, this file wins and the doc gets fixed in the same change.",
  "experiments": [
   {
@@ -574,6 +574,40 @@
     "beam_size=5 (the code default) throughout; the mini-PC deployment serves with OC_ASR_BEAM=2. Beam was held fixed and not examined, so no arm's result transfers to a beam-2 deployment unchecked.",
     "word_timestamps=False while the server passes True. Held identical across arms.",
     "39 validation windows (argos+orestiada), repeatedly scored; reference is OpenCouncil's published text. Scored with the project's frozen normalizer, not the benchmark's server-side wer-nofillers implementation."
+   ]
+  },
+  {
+   "id": "exp-2026-08-13-correction-only",
+   "title": "Training on the human-corrected rows only",
+   "question": "Under the fixed two-epoch recipe, what does dropping all no_edit rows from the training set do?",
+   "status": "CLOSED",
+   "conclusion": "Nothing worth having, and the result is SUGGESTIVE only. On the 39 frozen windows the correction-only adapter scores micro-WER 0.1604 against the control's 0.1589: +0.00151 [-0.00761, +0.01018], deletions +0.00378 [-0.00376, +0.01212], insertions +0.00101 [-0.00232, +0.00435]. Every sign is worse, every interval crosses zero, per-window head-to-head is 18 better / 1 tie / 20 worse, and removing one window reverses the sign of the WER delta. The measured difference (0.15 points) is fourteen times smaller than the 2.1-point per-seed spread already known from exp-2026-08-08-mixture-ratio. One interesting pattern, itself inside the noise: substitutions fall (938 -> 899) while deletions rise (715 -> 760).",
+   "decision": "Do not rebuild the training set by dropping no_edit rows - it is not the cheap win it looked like. Answering the actual label-provenance question needs a design that holds hours and optimizer steps constant and runs three seeds per arm; below that the noise swallows the signal, as it did here.",
+   "artifact_ids": [
+    "artifact-adapter-correction-only",
+    "artifact-ct2-fixed",
+    "artifact-adapter-fixed"
+   ],
+   "capability_ids": [
+    "cap-runpod-gpu-pod"
+   ],
+   "reports": [
+    "docs/reports/2026-08-13-correction-only.md"
+   ],
+   "specs": [
+    "docs/specs/2026-08-13-correction-only-preregistration.md",
+    "docs/specs/2026-08-11-endgame-handoff-plan.md"
+   ],
+   "superseded_by": null,
+   "next_action": null,
+   "updated_at": "2026-08-12T08:00:00Z",
+   "caveats": [
+    "SUGGESTIVE, not decisive, in either direction: one seed per arm against a measured 2.1-point per-seed spread. Preregistered as such before any number existed.",
+    "Dropping no_edit changed label provenance, dataset size (22.5h -> 11.2h), optimizer steps (7,242 -> 3,484), example difficulty and speaker/city mix at once. It measures the effect of dropping those rows under a fixed two-epoch recipe; it is NOT a fixed-compute control and does not isolate 'do unverified labels hurt'.",
+    "The in-training eval numbers (val_corr 47.17 -> 30.00, val_reg 15.31 -> 5.71) are NOT the result. val_reg's labels are the old pipeline's unverified output, so gains there measure imitation of the old system - the very thing under suspicion.",
+    "CPU int8, one machine for both arms. The control arm is eval-A.json from exp-2026-08-12-decode-ablation: same machine, environment, config, seeds and day.",
+    "39 validation windows, reference is OpenCouncil's published text: agreement-with-OpenCouncil, not fidelity-to-audio.",
+    "Pod ul4z0drp5owiac, A40, ~6h, ~$2.70. Terminated and verified dead; the armed hard deadline was never reached."
    ]
   }
  ],
