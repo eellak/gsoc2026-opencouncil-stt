@@ -22,8 +22,12 @@ echo "armed: pod $POD will be terminated at $(date -d @$DEADLINE -Is) ($REASON)"
 
 while [ "$(date +%s)" -lt "$DEADLINE" ]; do
   sleep 60
-  # Already gone? Then there is nothing to guard and idling costs nothing.
-  if ! runpodctl get pod "$POD" >/dev/null 2>&1; then
+  # Already gone? Then there is nothing to guard.
+  # Match the id in the OUTPUT, not the exit status: `runpodctl get pod <id>`
+  # exits 0 for a pod that does not exist, printing only the header row. Measured
+  # on 2.7.2 - the first version of this script trusted the exit status and never
+  # stood down.
+  if ! runpodctl get pod "$POD" 2>/dev/null | grep -q "$POD"; then
     echo "$(date -Is) pod $POD no longer exists - watchdog standing down"
     exit 0
   fi
