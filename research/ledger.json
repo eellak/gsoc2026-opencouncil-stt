@@ -1,6 +1,6 @@
 {
  "schema_version": 1,
- "updated_at": "2026-08-12T00:00:00Z",
+ "updated_at": "2026-08-12T05:00:00Z",
  "note": "Authoritative state. Reports under docs/reports/ are immutable evidence; this file says whether their conclusions still stand. When a doc disagrees with this file, this file wins and the doc gets fixed in the same change.",
  "experiments": [
   {
@@ -479,12 +479,13 @@
     "docs/specs/2026-08-11-name-repair-plan.md"
    ],
    "superseded_by": null,
-   "next_action": "Run the feasibility audit FIRST (analysis script, no production code): of the ~73 missed gold name mentions, how many are recoverable by edit distance, and how many stay uniquely selectable with the full roster as distractors. Gate: >=15% selectable under the conservative rule AND >=80% of oracle-repairable pick the right person. Do not build anything until that passes.",
+   "next_action": "Run the feasibility audit FIRST (analysis script, no production code): of the ~73 missed gold name mentions, how many are recoverable by edit distance, and how many stay uniquely selectable with the full roster as distractors. Gate: >=15% selectable under the conservative rule AND >=80% of oracle-repairable pick the right person. Do not build anything until that passes. The decoder arm is out of scope - exp-2026-08-12-decode-ablation closed it. exp-2026-08-12-ds-wer prices the prize: our domain-term errors are 90 substitutions to 28 deletions, which is the profile a lexicon repairs.",
    "caveats": [
     "Codex review: the decoder work is NOT one config - no_speech_threshold deletes speech, temperature fallback generates new garbage, overlap merge duplicates words. Separate ablations, and it does not go first.",
-    "The right comparison is paired against our own current system on identical weights, not against Scribe. Seed variance then does not enter."
+    "The right comparison is paired against our own current system on identical weights, not against Scribe. Seed variance then does not enter.",
+    "The decoder-ablation half of this question is ANSWERED by exp-2026-08-12-decode-ablation (2026-08-12) and should not be rerun: no_speech_threshold cannot delete speech here because the gate fires zero times on the 39 validation windows, and removing the temperature fallback makes deletions and insertions worse, not better. What remains open is only the name-lexicon arm, which keeps its own gate in docs/specs/2026-08-11-name-repair-plan.md."
    ],
-   "updated_at": "2026-08-11T00:00:00Z"
+   "updated_at": "2026-08-12T05:00:00Z"
   },
   {
    "id": "exp-2026-08-11-wer-levers-research",
@@ -541,6 +542,38 @@
     "The denominator is concentrated: 4 of 39 windows carry 134 of the 250 term occurrences. Leave-one-window-out moves the delta vs Gladia from -0.100 to -0.069 (31%) without reversing its sign.",
     "The base-whisper arm ran on the HuggingFace serverless pipeline, a different decoder stack. Its comparison is not a clean weights comparison.",
     "argos+orestiada is VALIDATION, scored repeatedly and used to stop experiments. One seed, one run - the same run as exp-2026-08-10-benchmark-fixed-adapter."
+   ]
+  },
+  {
+   "id": "exp-2026-08-12-decode-ablation",
+   "title": "Decode thresholds against the deletion rate",
+   "question": "Does moving one of the faster-whisper decode thresholds the server leaves at default lower our deletion rate without costing WER?",
+   "status": "CLOSED",
+   "conclusion": "No. Six preregistered arms on the 39 frozen windows collapse into TWO distinct decode behaviours. The no-speech gate fired ZERO times across all 39 windows, so arms B (no_speech_threshold=0.8) and C (None, primary) are byte-identical to the control and could not have changed a token; arm E (log_prob_threshold=None) is identical too, because its fallback trigger fired only twice and both times on segments the compression threshold had already sent to fallback. Arms D (temperature=[0.0], primary) and F (compression_ratio_threshold=None) are identical to each other and differ from the control on 3 of 39 windows: micro-WER +0.00042 [-0.00460,+0.00492], deletion rate +0.00235 [-0.00100,+0.00773], insertion rate +0.00025 [-0.00057,+0.00124]. All three point estimates are WORSE and all three intervals cross zero. No arm passes its gate. Control: WER 0.1589, deletions 0.0600, insertions 0.0201, 715 D to 240 I.",
+   "decision": "The served decode configuration stays as it is. The finding that matters is mechanistic, not statistical: our deletions are not produced by segment skipping (the gate never fires) and not by the temperature fallback (removing it increases them). The 'deletions are the cheap half' direction from exp-2026-08-11-wer-levers-research does not survive at the decode-config level. The 7 temporal holdout windows were NOT decoded and remain sealed, because the prereg only releases them to confirm an arm that passed.",
+   "artifact_ids": [
+    "artifact-ct2-fixed"
+   ],
+   "capability_ids": [
+    "cap-self-hosted-asr"
+   ],
+   "reports": [
+    "docs/reports/2026-08-12-decode-ablation.md"
+   ],
+   "specs": [
+    "docs/specs/2026-08-12-decode-ablation-prereg.md",
+    "docs/specs/2026-08-11-endgame-handoff-plan.md"
+   ],
+   "superseded_by": null,
+   "next_action": null,
+   "updated_at": "2026-08-12T05:00:00Z",
+   "caveats": [
+    "The first decode pass was discarded unscored: the plan's (arm, window) seed gave each arm a different random sequence, so arm B differed from the control on the 4 windows that reached a sampling temperature despite being mechanically inert. Re-run with a window-only seed (common random numbers).",
+    "Arm D's insertion-rate delta is dominated by one window: removing win_argos_dec5_2025_996850 reverses its sign. The whole D/F result rests on the 3 windows where fallback reached temperature > 0.",
+    "CPU int8, 16 threads - not the CUDA pod that produced the benchmark row. Comparisons hold within the experiment only.",
+    "beam_size=5 (the code default) throughout; the mini-PC deployment serves with OC_ASR_BEAM=2. Beam was held fixed and not examined, so no arm's result transfers to a beam-2 deployment unchecked.",
+    "word_timestamps=False while the server passes True. Held identical across arms.",
+    "39 validation windows (argos+orestiada), repeatedly scored; reference is OpenCouncil's published text. Scored with the project's frozen normalizer, not the benchmark's server-side wer-nofillers implementation."
    ]
   }
  ],
