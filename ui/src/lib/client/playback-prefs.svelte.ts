@@ -2,6 +2,10 @@ const AUTOPLAY_KEY = 'oc:review:autoplay';
 const LOOP_KEY = 'oc:review:loop';
 const LOOP_GAP_KEY = 'oc:review:loopGapMs';
 const NUDGE_STEP_KEY = 'oc:review:nudgeStepMs';
+const SPEED_KEY = 'oc:review:speed';
+
+// Playback-rate ladder for quick skimming of long clips. `s` cycles through it.
+export const SPEEDS = [1, 1.25, 1.5, 1.75, 2, 2.5, 3] as const;
 
 const LOOP_GAP_MIN = 0;
 const LOOP_GAP_MAX = 3000;
@@ -39,12 +43,30 @@ function createPlaybackPrefs() {
 	let loop = $state(getBool(LOOP_KEY, false));
 	let loopGapMs = $state(getInt(LOOP_GAP_KEY, LOOP_GAP_DEFAULT, LOOP_GAP_MIN, LOOP_GAP_MAX));
 	let nudgeStepMs = $state(snapNudgeStep(getInt(NUDGE_STEP_KEY, NUDGE_STEP_DEFAULT, NUDGE_STEP_MIN, NUDGE_STEP_MAX)));
+	let speed = $state(readSpeed());
+
+	function readSpeed(): number {
+		if (typeof localStorage === 'undefined') return 1;
+		const v = Number(localStorage.getItem(SPEED_KEY));
+		return (SPEEDS as readonly number[]).includes(v) ? v : 1;
+	}
 
 	return {
 		get autoplay() { return autoplay; },
 		get loop() { return loop; },
 		get loopGapMs() { return loopGapMs; },
 		get nudgeStepMs() { return nudgeStepMs; },
+		get speed() { return speed; },
+		setSpeed(v: number) {
+			if (!(SPEEDS as readonly number[]).includes(v)) return;
+			speed = v;
+			if (typeof localStorage !== 'undefined') localStorage.setItem(SPEED_KEY, String(v));
+		},
+		cycleSpeed(dir: 1 | -1 = 1) {
+			const i = (SPEEDS as readonly number[]).indexOf(speed);
+			const next = SPEEDS[(i + dir + SPEEDS.length) % SPEEDS.length];
+			this.setSpeed(next);
+		},
 		toggleAutoplay() {
 			autoplay = !autoplay;
 			if (typeof localStorage !== 'undefined') localStorage.setItem(AUTOPLAY_KEY, String(autoplay));

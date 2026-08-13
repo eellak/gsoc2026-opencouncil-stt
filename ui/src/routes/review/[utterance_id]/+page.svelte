@@ -141,6 +141,11 @@
 	// See `audio-pool.svelte.ts` for the element-swap rationale.
 	let audioSlot: HTMLDivElement | null = $state(null);
 	const audioEl = $derived(audioPool.state.activeEl);
+	// Keep the active element at the chosen skim speed — re-applies on every
+	// element swap (navigation) and on every speed change.
+	$effect(() => {
+		if (audioEl) audioEl.playbackRate = playbackPrefs.speed;
+	});
 	let audioReady = $state(false);
 	let audioReadyFlash = $state(false);
 	let audioAutoplayReady = $state(false);
@@ -742,6 +747,7 @@
 		if (k === ' ') { e.preventDefault(); togglePlay(); }
 		if (k === 'a') { e.preventDefault(); playbackPrefs.toggleAutoplay(); }
 		if (k === 'l') { e.preventDefault(); playbackPrefs.toggleLoop(); }
+		if (k === 's') { e.preventDefault(); playbackPrefs.cycleSpeed(e.shiftKey ? -1 : 1); }
 		if (e.key === '/') { e.preventDefault(); paletteOpen = true; return; }
 		// Segment fine-sync. Use physical key codes so the brackets work on the
 		// Greek layout too (where e.key would differ). Shift targets the end.
@@ -1013,6 +1019,12 @@
 					<kbd>↑</kbd><kbd>↓</kbd>
 				</label>
 				<span class="hint">segment: {(regionEnd - regionStart).toFixed(2)}s of {item.end.toFixed(1)}s</span>
+				<button
+					type="button"
+					class="speed-btn"
+					title="Playback speed — s cycles, Shift+s back"
+					onclick={() => playbackPrefs.cycleSpeed(1)}
+				>{playbackPrefs.speed}× <kbd>s</kbd></button>
 			</div>
 			<div class="audio-wrap" class:loading={!audioReady}>
 				<!--
@@ -1294,6 +1306,17 @@
 		to { --sweep-angle: 360deg; }
 	}
 	.audio-toolbar .hint { color: var(--text-3, #94a3b8); font-size: 0.78rem; margin-left: auto; }
+	.speed-btn {
+		border: 1px solid var(--border, #cbd5e1);
+		background: var(--bg-2, transparent);
+		color: var(--text-2, inherit);
+		border-radius: 6px;
+		font-size: 0.78rem;
+		padding: 0.1rem 0.45rem;
+		cursor: pointer;
+		font-variant-numeric: tabular-nums;
+	}
+	.speed-btn kbd { font-size: 0.62rem; padding: 0 0.22rem; }
 	.native-player { width: 100%; height: 36px; display: block; }
 	.audio-wrap { position: relative; }
 	.audio-skeleton {
