@@ -16,19 +16,24 @@
  *   gap3     — gap2 candidates that PASSED Soniox audio verification (>=70% of
  *              the restored words audible in the clip ±3s); fixed-seed shuffle
  *              so the head of the queue is a random audit sample
+ *   gap4     — wave-2 VERIFIED items in the small-but-clean cell (found_frac
+ *              >=0.85 but 2-4 added words) — a calibration audit sample; the
+ *              cell is NOT auto-accepted until this audit passes
  */
 import nb2 from './nb2-ids.json';
 import nb2audio from './nb2audio-ids.json';
 import gap1 from './gap1-ids.json';
 import gap2 from './gap2-ids.json';
 import gap3 from './gap3-ids.json';
+import gap4 from './gap4-ids.json';
 
 const REGISTRY: Record<string, string[]> = {
 	nb2: nb2 as string[],
 	nb2audio: nb2audio as string[],
 	gap1: gap1 as string[],
 	gap2: gap2 as string[],
-	gap3: gap3 as string[]
+	gap3: gap3 as string[],
+	gap4: gap4 as string[]
 };
 
 const _sets: Record<string, Set<string>> = {};

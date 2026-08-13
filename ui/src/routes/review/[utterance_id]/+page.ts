@@ -42,7 +42,8 @@ function readFilter(url: URL): QueueFilter | null {
 		nb2audio: 'audio-verified (balanced)',
 		gap1: 'deletion-gap candidates',
 		gap2: 'deletion-gap (new, unreviewed)',
-		gap3: 'deletion-gap (audio-verified)'
+		gap3: 'deletion-gap (audio-verified)',
+		gap4: 'deletion-gap (small, calibration)'
 	};
 	if (queueName && queueName in QUEUE_LABELS) {
 		return { query: `queue=${queueName}`, label: QUEUE_LABELS[queueName] };
