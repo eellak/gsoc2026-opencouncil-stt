@@ -27,16 +27,31 @@ trained through the label-prefix bug and cannot answer it.
 
 ## Work queue
 
+0. **Serving-stack ladder: CLOSED 2026-08-12** — one survivor.
+   [`docs/reports/2026-08-12-serving-stack-ladder.md`](docs/reports/2026-08-12-serving-stack-ladder.md).
+   E (post-hoc name repair) is real: −0.25 on validation, −0.08 pooled / −0.28
+   unseen on the one frozen benchmark look, all CIs exclude zero. B, C, D all
+   rejected with evidence. Standing finding: **the deletions live in the
+   weights** (thresholds never fire, audio is covered, words absent from all 8
+   beam hypotheses) — no serving-time technique reaches them; Scribe is not
+   beatable without targeted retraining. Remaining task: deploy E behind the
+   Βήμα-3 shadow gates (`exp-2026-08-11-name-repair`, OPEN).
 1. Publish `artifact-adapter-fixed` to HuggingFace. The benchmark now prices the
    delay: the published weights cost **1.77 WER points on unseen cities**. **Done
    when** the hub weights are the corrected ones.
-2. `exp-2026-07-25-hotwords` — ship contextual biasing at serving time. Both
-   independent reviewers ranked it the highest-value remaining direction, and this
-   cycle **priced it**: our domain-term errors are 90 substitutions to 28 deletions
-   (`exp-2026-08-12-ds-wer`), i.e. the name is written, just wrong by a character or
-   two. That is what a lexicon repairs. It is also the only cheap lever left — the
-   other three are closed below. **Done when** name recall is measured on a held-out
-   set with the roster wired into the endpoint.
+1b. `exp-2026-08-13-targeted-deletion-training` — OPEN, **candidate supply
+   unblocked 2026-08-13**: user audited 228 gap3 items (94.7% accept overall);
+   the calibrated strict stratum (found_frac≥0.85 ∧ n_added≥5, 97.4% agreement)
+   was bulk-accepted (324 items, username=auto-verifier) with user consent —
+   ~540 verified deletion examples so far. Soniox verification of the remaining
+   ~10.9k unreviewed deletion-shaped rows is running (expected +1,500–2,000).
+   Recipe is frozen (Codex-reviewed 55/25/10/10, 3 seeds/arm, deletion gate +
+   insertion guard); +78h trusted clean backbone available at zero human cost.
+   Next: preregistration spec once the verification wave lands.
+2. Name work continues as the **post-hoc roster repair** arm of
+   `exp-2026-08-11-name-repair` (inside the ladder above). Decode-time hotword
+   biasing is closed: it lifts name recall 51→65% but costs +0.34 WER in
+   deletions and fails its preregistered gate.
 3. Decide whether fidelity-to-audio changes this ranking. The benchmark measures
    agreement-with-OpenCouncil; the one time both were measured, the ranking flipped.
    **Done when** the corrected adapter has a fidelity-to-audio number on unseen

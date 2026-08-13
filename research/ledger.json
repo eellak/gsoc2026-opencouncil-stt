@@ -1,6 +1,6 @@
 {
  "schema_version": 1,
- "updated_at": "2026-08-12T09:00:00Z",
+ "updated_at": "2026-08-12T20:00:00Z",
  "note": "Authoritative state. Reports under docs/reports/ are immutable evidence; this file says whether their conclusions still stand. When a doc disagrees with this file, this file wins and the doc gets fixed in the same change.",
  "experiments": [
   {
@@ -158,15 +158,26 @@
    "id": "exp-2026-07-25-hotwords",
    "title": "Contextual biasing with roster hotwords",
    "question": "Can inference-time biasing get the name accuracy the fine-tune was supposed to buy?",
-   "status": "OPEN",
-   "conclusion": null,
-   "decision": null,
+   "status": "CLOSED",
+   "conclusion": "Measured properly on the corrected adapter (artifact-ct2-fixed, 39 frozen validation windows, CPU int8, preregistered hash-ordered 160-token surname hotwords, meeting-clustered bootstrap): biasing does lift names - mention recall 51.2%->65.4%, precision 93.3%->96.4%, substitutions -82 with CI excluding zero - but it CAUSES deletions: +133 (del_rate +0.0112 [+0.0020,+0.0207], CI excludes zero). Net WER +0.34 points [-0.61,+1.31]; fails the preregistered non-inferiority gate (upper bound +0.0131 vs margin +0.0010). The mechanism is prompt-induced skipping: hotwords share the 448-token decoder context. The 2026-07-25 name-subset signal is confirmed directionally, but the WER cost lands on the deletion side, our worst error class.",
+   "decision": "Do not ship decode-time hotword biasing. The post-hoc roster repair arm of exp-2026-08-11-name-repair delivers name correction (-30 subs, -0.25 WER, CI excludes zero, zero collateral) with no decode cost and no deletion penalty; name work continues there. The preregistered exploratory 200-token secondary was NOT run: the failure mechanism (longer prompt -> more skipping) predicts it is worse, and the primary already failed its gate.",
    "reports": [
     "docs/reports/2026-07-25-hotwords-biasing.md"
    ],
    "superseded_by": null,
-   "next_action": "Both independent reviewers ranked this the highest-value remaining direction. Ship it as a serving-time feature and measure names separately from general WER.",
-   "updated_at": "2026-08-10T17:00:00Z"
+   "next_action": null,
+   "updated_at": "2026-08-12T13:00:00Z",
+   "specs": [
+    "docs/specs/2026-08-12-serving-stack-plan.md"
+   ],
+   "artifact_ids": [
+    "artifact-ct2-fixed"
+   ],
+   "caveats": [
+    "Stack: CPU int8, beam=5, faster-whisper `hotwords` param (not initial_prompt). The mini-PC serves beam=2 on GPU; magnitudes do not transfer unchecked, but the deletion mechanism is decoder-context arithmetic and should.",
+    "160-token budget holds ~20 of 32-36 roster surnames per meeting (hash-decorrelated exclusions); full coverage is impossible under faster-whisper's 223-token hotword cap.",
+    "Raw results: ~/.cache/oc-public/serving-stack/results-B-eval.json (eval-B-hotwords.json hypotheses). Harness scripts/serving_stack/hotwords_arm.py, 26 tests."
+   ]
   },
   {
    "id": "exp-2026-07-29-gain-decomposition",
@@ -476,16 +487,17 @@
    "decision": null,
    "reports": [],
    "specs": [
-    "docs/specs/2026-08-11-name-repair-plan.md"
+    "docs/specs/2026-08-11-name-repair-plan.md",
+    "docs/specs/2026-08-12-serving-stack-plan.md"
    ],
    "superseded_by": null,
-   "next_action": "Run the feasibility audit FIRST (analysis script, no production code): of the ~73 missed gold name mentions, how many are recoverable by edit distance, and how many stay uniquely selectable with the full roster as distractors. Gate: >=15% selectable under the conservative rule AND >=80% of oracle-repairable pick the right person. Do not build anything until that passes. The decoder arm is out of scope - exp-2026-08-12-decode-ablation closed it. exp-2026-08-12-ds-wer prices the prize: our domain-term errors are 90 substitutions to 28 deletions, which is the profile a lexicon repairs.",
+   "next_action": "The E arm is measured and survives everywhere it can fire (validation -0.25; benchmark look pooled -0.08, unseen -0.28; holdout no-op for lack of rosters). What remains is DEPLOYMENT: wire per-meeting roster + per-city term files (now exist for all 10 benchmark cities, mechanically generated and hash-frozen 2026-08-12) into the serving endpoint in shadow mode, add the v2 alias fix for the two registry-vs-reference orthography conflicts (Αδραχτάς/Καδόλου), and judge the Βήμα-3 gates on untouched meetings. See docs/reports/2026-08-12-serving-stack-ladder.md.",
    "caveats": [
     "Codex review: the decoder work is NOT one config - no_speech_threshold deletes speech, temperature fallback generates new garbage, overlap merge duplicates words. Separate ablations, and it does not go first.",
     "The right comparison is paired against our own current system on identical weights, not against Scribe. Seed variance then does not enter.",
     "The decoder-ablation half of this question is ANSWERED by exp-2026-08-12-decode-ablation (2026-08-12) and should not be rerun: no_speech_threshold cannot delete speech here because the gate fires zero times on the 39 validation windows, and removing the temperature fallback makes deletions and insertions worse, not better. What remains open is only the name-lexicon arm, which keeps its own gate in docs/specs/2026-08-11-name-repair-plan.md."
    ],
-   "updated_at": "2026-08-12T05:00:00Z"
+   "updated_at": "2026-08-12T19:00:00Z"
   },
   {
    "id": "exp-2026-08-11-wer-levers-research",
@@ -644,6 +656,59 @@
     "Workstreams 1-3 are scored with the project's frozen normalizer, not the benchmark's server-side wer-nofillers implementation.",
     "The dataset remains on DPO legal hold (2026-07-17): not publishable. Text-level PII removal does not anonymise it because each row links audio carrying the voice."
    ]
+  },
+  {
+   "id": "exp-2026-08-12-serving-stack",
+   "title": "Serving-stack ladder: shifted-window consensus decode and N-best rescoring",
+   "question": "Can decode-time interventions (insertion-only shifted-window merge; constrained N-best rescoring) plus the name arms compose into a stack that beats Scribe v2 on the benchmark, with each step's delta measured?",
+   "status": "CLOSED",
+   "conclusion": "One survivor out of four arms. E (post-hoc roster name repair): -0.00252 WER on the 39 validation windows [-0.00437,-0.00107], and on the ONE frozen benchmark look (E applied to the saved 260-window hypotheses of oc-runpod-fixed-2026-08-10, paired, local frozen scorer) -0.00077 pooled [-0.00124,-0.00033], -0.00279 on unseen cities - reproducing the validation number. B hotwords: rejected (+0.34 WER via +133 deletions, CI excludes zero, despite name recall 51->65%). C shifted-window decode: no-go, never built - 91.3% of deletions sit inside decoder-covered spans. D N-best selector: oracle ceiling 0.0071 exists but the preregistered KenLM selector recovered 0% (all 31 LOMO folds chose lambda=0 outright). STANDING FINDING, three independent measurements: the deletions are a property of the adapter weights - thresholds never fire, the audio is covered, and the missing words are absent from all 8 beam hypotheses (22/741 = 3% present). No serving-time technique reaches them. Holdout (opened once): control 0.1147, E fired zero times (no rosters for June-2026 meetings) - E's value is gated on roster availability.",
+   "decision": "Deploy E (engineering task, gated by the Βήμα-3 shadow gates of exp-2026-08-11-name-repair, which stays OPEN for deployment + the v2 orthography-conflict aliases). Do not pursue B, C, or D further. Do not claim a Scribe win: E covers ~0.08 of the ~0.74-point pooled gap; the rest is weight-level deletions, reachable only by targeted retraining (deletion/coverage hard examples), which is a product decision, not a serving change. The planned 2-run GPU benchmark ladder was replaced by the paired text-transform look on the existing bench row - cleaner comparison, zero GPU cost.",
+   "reports": [
+    "docs/reports/2026-08-12-serving-stack-ladder.md"
+   ],
+   "specs": [
+    "docs/specs/2026-08-12-serving-stack-plan.md"
+   ],
+   "artifact_ids": [
+    "artifact-ct2-fixed"
+   ],
+   "capability_ids": [
+    "cap-self-hosted-asr",
+    "cap-bench-http-api",
+    "cap-runpod-gpu-pod"
+   ],
+   "superseded_by": null,
+   "next_action": null,
+   "caveats": [
+    "Development only on the 39 validation windows; 4-5 arms on the same set carries winner's-curse risk - gates frozen before numbers, benchmark is the single confirmatory stage.",
+    "The existing bench row oc-runpod-fixed-2026-08-10 is a different pod/stack; ladder deltas compare only same-pod runs."
+   ],
+   "updated_at": "2026-08-12T19:00:00Z"
+  },
+  {
+   "id": "exp-2026-08-13-targeted-deletion-training",
+   "title": "Targeted retraining against within-span deletions",
+   "question": "Does a deletion-targeted training mix (55% expanded clean backbone / 25% verified deletion-coverage hard examples / 10% names / 10% other), 3 seeds per arm vs an expanded-pool neutral control, lower the deletion rate without raising insertions or WER?",
+   "status": "OPEN",
+   "conclusion": null,
+   "decision": null,
+   "reports": [],
+   "specs": [],
+   "artifact_ids": [
+    "artifact-adapter-fixed"
+   ],
+   "capability_ids": [
+    "cap-runpod-gpu-pod"
+   ],
+   "superseded_by": null,
+   "next_action": "Candidate supply UNBLOCKED 2026-08-13: user audited 228 random items of the gap3 queue (Soniox audio-VERIFIED subset of 2,000 unreviewed deletion-shaped rows) - overall accept 94.7% (216/228), narrowly under the preregistered 95% bulk-accept gate. POST-HOC STRATIFIED RULE adopted with user consent (recorded here BEFORE application): auto-accept only found_frac>=0.85 AND n_added>=5, where user agreement is 97.4% (147/151); complement stratum (89.6%, 69/77) is NOT auto-accepted and is left unreviewed. Rule thresholds were not tuned on the audit (0.85 = verifier's own match threshold, 5 = pool median n_added). Applied as username=auto-verifier PATCHes so provenance is separable from human labels. Same rule extends mining: run Soniox verification over the remaining ~10,949 unreviewed deletion-shaped rows and auto-accept strict-stratum passers (expected +1,500-2,000 examples), with a final user spot-check. THEN: preregistration spec + backbone expansion + pods per the frozen recipe below. Reality check from mining: ~85% of bucket A is ALREADY in training and the adapter deletes despite it - the new levers are (a) curation + oversampling/per-token loss weighting of verified rows (cap 2 presentations/epoch), (b) +78h train-city trusted clean backbone at zero human cost (backbone-headroom-2026-08-12.json; per-city caps advised - 60% skew to chania/athens), (c) NEW human collection routed 40% to deletion/coverage segments if volume beyond ~800 usable rows is wanted. 135 bucket-A rows are in the validation split - NEVER train on them. Recipe frozen after Codex review 2026-08-12: 55/25/10/10 final sampling probabilities, mutually exclusive buckets, A/B with A = expanded-pool neutral control, 3 seeds/arm, matched updates/LR/token exposure, plain CE (optional third arm: 1.5-2x restored-span token weighting + length-normalized margin vs the deletion variant), gates: deletion upper bound < 0, WER < +0.001, insertions AND substitutions each < +0.0005, frozen guard set for hallucination tracking. Audit 200-300 pseudo-clean rows (stratified to short turns/speaker changes) before admitting new backbone - no_edit means uncorrected, not correct.",
+   "caveats": [
+    "Per-seed spread 2.1 WER points: single-seed results from this experiment are screens, never conclusions.",
+    "Mining artifacts: gap-candidates-2026-08-12.{md,jsonl}, gap-mining-summary, backbone-headroom (all under data/reports/finetune-research/, gitignored).",
+    "Auto-accepted labels (username=auto-verifier) carry ~2.6% expected contamination (audit-calibrated); exclude or down-weight them if a later gate failure implicates label quality."
+   ],
+   "updated_at": "2026-08-13T10:00:00Z"
   }
  ],
  "artifacts": [
