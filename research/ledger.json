@@ -1,6 +1,6 @@
 {
  "schema_version": 1,
- "updated_at": "2026-08-12T20:00:00Z",
+ "updated_at": "2026-08-14T22:00:00Z",
  "note": "Authoritative state. Reports under docs/reports/ are immutable evidence; this file says whether their conclusions still stand. When a doc disagrees with this file, this file wins and the doc gets fixed in the same change.",
  "experiments": [
   {
@@ -702,13 +702,44 @@
     "cap-runpod-gpu-pod"
    ],
    "superseded_by": null,
-   "next_action": "Candidate supply UNBLOCKED 2026-08-13: user audited 228 random items of the gap3 queue (Soniox audio-VERIFIED subset of 2,000 unreviewed deletion-shaped rows) - overall accept 94.7% (216/228), narrowly under the preregistered 95% bulk-accept gate. POST-HOC STRATIFIED RULE adopted with user consent (recorded here BEFORE application): auto-accept only found_frac>=0.85 AND n_added>=5, where user agreement is 97.4% (147/151); complement stratum (89.6%, 69/77) is NOT auto-accepted and is left unreviewed. Rule thresholds were not tuned on the audit (0.85 = verifier's own match threshold, 5 = pool median n_added). Applied as username=auto-verifier PATCHes so provenance is separable from human labels. Same rule extends mining: run Soniox verification over the remaining ~10,949 unreviewed deletion-shaped rows and auto-accept strict-stratum passers (expected +1,500-2,000 examples), with a final user spot-check. THEN: preregistration spec + backbone expansion + pods per the frozen recipe below. Reality check from mining: ~85% of bucket A is ALREADY in training and the adapter deletes despite it - the new levers are (a) curation + oversampling/per-token loss weighting of verified rows (cap 2 presentations/epoch), (b) +78h train-city trusted clean backbone at zero human cost (backbone-headroom-2026-08-12.json; per-city caps advised - 60% skew to chania/athens), (c) NEW human collection routed 40% to deletion/coverage segments if volume beyond ~800 usable rows is wanted. 135 bucket-A rows are in the validation split - NEVER train on them. Recipe frozen after Codex review 2026-08-12: 55/25/10/10 final sampling probabilities, mutually exclusive buckets, A/B with A = expanded-pool neutral control, 3 seeds/arm, matched updates/LR/token exposure, plain CE (optional third arm: 1.5-2x restored-span token weighting + length-normalized margin vs the deletion variant), gates: deletion upper bound < 0, WER < +0.001, insertions AND substitutions each < +0.0005, frozen guard set for hallucination tracking. Audit 200-300 pseudo-clean rows (stratified to short turns/speaker changes) before admitting new backbone - no_edit means uncorrected, not correct.",
+   "next_action": "Candidate supply UNBLOCKED 2026-08-13: user audited 228 random items of the gap3 queue (Soniox audio-VERIFIED subset of 2,000 unreviewed deletion-shaped rows) - overall accept 94.7% (216/228), narrowly under the preregistered 95% bulk-accept gate. POST-HOC STRATIFIED RULE adopted with user consent (recorded here BEFORE application): auto-accept only found_frac>=0.85 AND n_added>=5, where user agreement is 97.4% (147/151); complement stratum (89.6%, 69/77) is NOT auto-accepted and is left unreviewed. Rule thresholds were not tuned on the audit (0.85 = verifier's own match threshold, 5 = pool median n_added). Applied as username=auto-verifier PATCHes so provenance is separable from human labels. RULE EXTENDED 2026-08-14 after a second dedicated audit (gap4 queue, 117 fresh user judgments on the small-but-clean cell found_frac>=0.85 & n_added in 2-4): accept 112/117 = 95.7% (pooled with the 29 prior-cell judgments: 140/146 = 95.9%), passing the 95% gate - the cell is now auto-accepted alongside the strict stratum. Same rule extends mining: run Soniox verification over the remaining ~10,949 unreviewed deletion-shaped rows and auto-accept strict-stratum passers (expected +1,500-2,000 examples), with a final user spot-check. THEN: preregistration spec + backbone expansion + pods per the frozen recipe below. Reality check from mining: ~85% of bucket A is ALREADY in training and the adapter deletes despite it - the new levers are (a) curation + oversampling/per-token loss weighting of verified rows (cap 2 presentations/epoch), (b) +78h train-city trusted clean backbone at zero human cost (backbone-headroom-2026-08-12.json; per-city caps advised - 60% skew to chania/athens), (c) NEW human collection routed 40% to deletion/coverage segments if volume beyond ~800 usable rows is wanted. 135 bucket-A rows are in the validation split - NEVER train on them. Recipe frozen after Codex review 2026-08-12: 55/25/10/10 final sampling probabilities, mutually exclusive buckets, A/B with A = expanded-pool neutral control, 3 seeds/arm, matched updates/LR/token exposure, plain CE (optional third arm: 1.5-2x restored-span token weighting + length-normalized margin vs the deletion variant), gates: deletion upper bound < 0, WER < +0.001, insertions AND substitutions each < +0.0005, frozen guard set for hallucination tracking. Audit 200-300 pseudo-clean rows (stratified to short turns/speaker changes) before admitting new backbone - no_edit means uncorrected, not correct.",
    "caveats": [
     "Per-seed spread 2.1 WER points: single-seed results from this experiment are screens, never conclusions.",
     "Mining artifacts: gap-candidates-2026-08-12.{md,jsonl}, gap-mining-summary, backbone-headroom (all under data/reports/finetune-research/, gitignored).",
     "Auto-accepted labels (username=auto-verifier) carry ~2.6% expected contamination (audit-calibrated); exclude or down-weight them if a later gate failure implicates label quality."
    ],
-   "updated_at": "2026-08-13T10:00:00Z"
+   "updated_at": "2026-08-14T09:00:00Z"
+  },
+  {
+   "id": "exp-2026-08-14-hparl-probe",
+   "title": "HParl audio-vs-text faithfulness probe and Soniox alignment filter",
+   "question": "Are the HParl transcripts faithful to their own audio, and can a Soniox-alignment filter carve a usable training subset out of them?",
+   "status": "OPEN",
+   "conclusion": "Usable audio, unusable targets. On 100 random utterances (16 speakers, shards test-00000 seed 20260814 n=40 and train-00023 seed 7 n=60) verified against Soniox: rows without a [UNK] placeholder disagree at 6.1% WER with a 1.9% deletion rate and a 53% exact-match rate - i.e. the feared editorial-rewrite defect is NOT present at segment level. What disqualifies the corpus is target format: 52-60% of rows in each of three shards read carry at least one [UNK] placeholder over real speech (drives the pooled 7.7% deletion rate), and ZERO rows in any shard carry an accent or punctuation mark - the references are lowercase, unaccented, unpunctuated, while our labels are accented, punctuated clean-verbatim. Segments are ~3s-boundary alignment windows (median 4.7s / 9 tokens), so words are chopped at the edges. Storage is not a constraint: 32 kbps mono MP3 is 4.1 kB/s, ~1.8 GB for the full ~120h. ADDENDUM same day: the ML-processed mirror Elormiden/Hellenic-greek-parliamentary-speech (92,133 clips, 13.8 GB) is the usable one - 99.9% of rows are ACCENTED and none carry [UNK], but 59% carry <spoken_noise> markers and 0% carry punctuation. Filter run (eval/hparl2_filter.py, 150 random rows of test-00000, seed 20260814, tags stripped, alignment = 1 - WER on greek_normalize tokens): pooled WER 0.093 (sub .047 / del .028 / ins .018); align>=0.95 keeps 49% of rows = 50% of audio (~60h of 120h), align>=0.90 keeps 59%, align>=0.80 keeps 81%. TWO CAVEATS ON THAT 60h: (a) median row is 9 reference tokens so >=0.95 is effectively an exact-match test - it selects easy audio and yields a Soniox-agreement sample, not a random one; (b) <spoken_noise> is NOT the discriminator, keep rate is 48% on tagged vs 52% on untagged rows. The lowercase/unpunctuated target problem survives the filter untouched. ddamianos/hparl local cache deleted 2026-08-14. PUNCTUATION STAGE 2026-08-14: eval/hparl2_punctuate.py builds the label as dataset-words + Soniox-punctuation. Deterministic transfer() marks 96% of the 74 kept rows but copies Soniox's terminal period onto fragments (64/74 end in a final mark). gpt-5.6-luna (via the codex bridge, batches of 25, low effort) was run under a HARD WORD GUARD - output is accepted only if its greek_normalize token sequence is identical to the dataset transcript: 74/74 passed, zero words changed. It differs from transfer() on 61/74 rows, and judges only 19/74 (26%) of segments to be COMPLETE SENTENCES, with terminal punctuation matching that judgement 19/19. Three quarters of this corpus's segments are fragments; a naive punctuation pass would teach a sentence end every ~5s.",
+   "decision": "Do not stage HParl as-is. Two routes if it is ever revisited: (a) audio-only with pseudo-labels, which is vendor distillation and inherits the vendor's deletions - not recommended while exp-2026-08-13-targeted-deletion-training is trying to remove exactly that failure mode; (b) keep only [UNK]-free rows (~45%, ~54h) and restore accents+punctuation, accepting that the restoration model then sets the label standard. Ranking from 2026-08-11 stands: the 199 in-domain hours precede this. Licence still unverified at source (HF mirror cc-by-4.0 vs CLARIN 1602 reported CC BY-NC 4.0). 2026-08-14: filter + local review page built (eval/hparl2_filter.py, scripts/hparl2_review_page.py); user audit of a stratified 38-row sample pending before any keep-rate is trusted.",
+   "reports": [
+    "docs/reports/2026-08-14-hparl-audio-text-probe.md"
+   ],
+   "specs": [
+    "docs/specs/2026-08-14-hparl-stage1-prereg.md"
+   ],
+   "artifact_ids": [
+    "artifact-pack-hparl2-v1"
+   ],
+   "capability_ids": [],
+   "superseded_by": null,
+   "next_action": "Pilot filter pass RUNNING since 2026-08-14 (10k rows, 357 per shard x 28 shards, seed 20260814, append to ~/.cache/oc-public/hparl2/filtered.jsonl, log pilot.log) - free but slow (~37 rows/min ASR plus a ~460MB range-read per shard). WHEN IT LANDS: confirm the keep rate across all shards (150 rows of one shard gave 49%), rerun eval/hparl2_punctuate.py --llm over the kept set, then close the open items in docs/specs/2026-08-14-hparl-stage1-prereg.md before any GPU spend. User verdict on the punctuation sample (verbal, 2026-08-14): good, occasional comma where a period belongs; prompt rule 3 added for it and NOT yet re-measured. User's exported gate verdicts have not been received, so the 0.95 gate is still uncalibrated against human judgement. PACK FORMAT LANDED 2026-08-14: scripts/build_training_pack.py + docs/reference/external-source-packs.md define a reusable pack contract (audio/ + train.jsonl + meta.json + README), consumed by notebooks/train_runpod.py as PACK_MANIFEST/PACK_ARM=pn. artifact-pack-hparl2-v1 is the pilot build; rebuild it after the filter pass finishes.",
+   "caveats": [
+    "Soniox is a second opinion, not ground truth; the 6.1% no-UNK disagreement is an upper bound on infidelity and includes Soniox's own errors on chamber audio.",
+    "100 utterances from 2 of 52 shards, 16 speakers. The [UNK] and stripped-orthography findings were confirmed corpus-wide on 3 full shards (text column only, 4,767 rows); the WER numbers were not.",
+    "Probe outputs (probe.jsonl, probe_train23.jsonl), clips and MP3s live under ~/.cache/oc-public/hparl/ - not in git.",
+    "The 49% keep rate is measured on one test shard of the Elormiden mirror, 150 rows, and has not been checked against a human listening to the audio.",
+    "Licence conflict persists in the Elormiden mirror itself: YAML says cc-by-4.0, its own README body says CC BY-NC 4.0 (non-commercial).",
+    "gpt-5.6-luna is reachable only through the codex bridge (allowlisted model, low effort). No OpenAI API key exists in this workspace, so there is no direct-API path and no per-token cost accounting; throughput is the bridge's 3-concurrent worker.",
+    "The word guard proves the LLM changed no words. It does NOT prove the punctuation or the complete/fragment judgement is right - that needs the human spot-check on the phase-2 review page.",
+    "Soniox realtime concurrency was MEASURED 2026-08-14, not assumed: 3 workers = 43.6 rows/min (2.8x realtime), 12 = 126, 24 = 127, 40 = 176 rows/min, zero errors at every level on 20-30 clip batches. The inherited '3 workers' from the gap2 verifier was costing ~3x. Pilot now runs at 16 workers and the bottleneck moved to the ~460MB per-shard parquet range-read."
+   ],
+   "updated_at": "2026-08-14T22:00:00Z"
   }
  ],
  "artifacts": [
@@ -967,6 +998,35 @@
     "One seed. exp-2026-08-08-mixture-ratio measured 2.1 points of per-seed spread."
    ],
    "verified_at": "2026-08-12T06:30:00Z"
+  },
+  {
+   "id": "artifact-pack-hparl2-v1",
+   "kind": "training_pack",
+   "description": "Supplementary training pack from HParl (Elormiden mirror): Soniox-verified rows (align>=0.95) with punctuation/casing restored under a word guard. PILOT BUILD - 74 rows / 0.10 h, will be rebuilt when the 10k-row filter pass lands. Format contract: docs/reference/external-source-packs.md.",
+   "status": "ACTIVE",
+   "locations": [
+    {
+     "host": "minipc",
+     "path": "/home/harold/.cache/oc-public/training-sets/hparl2-v1"
+    }
+   ],
+   "hash": {
+    "algorithm": "sha256-file-v1",
+    "file": "train.jsonl",
+    "value": "a6c724d1d75efe6b"
+   },
+   "caveats": [
+    "PILOT BUILD, not the final pack: 74 rows / 0.10 h from the first 150-row sample.",
+    "The align>=0.95 admission gate is effectively an exact-match test on a median 9-token row: it selects easy audio and yields a Soniox-agreement sample, not a random one.",
+    "Only ~26% of segments are complete sentences; the rest are fragments. Targets are punctuated accordingly (open-ended), but training on fragments risks teaching truncation - the deletion rate is the metric to watch.",
+    "Punctuation and casing come from Soniox + gpt-5.6-luna, not from a human. The word guard proves no word was changed; it does not prove the punctuation is right.",
+    "No word-level timestamps exist for this source, so the timestamped training arm (PACK_ARM=p) is not available - use pn.",
+    "Licence DISPUTED at the mirror (YAML cc-by-4.0 vs its own README CC BY-NC 4.0); CLARIN 1602 not checked at source.",
+    "Out of domain (parliament, not municipal council): this is a stage-1 adaptation input, never in-domain data.",
+    "Pilot-sized. Do not quote hours from it until the full filter pass is done."
+   ],
+   "replaced_by": null,
+   "verified_at": "2026-08-14T22:00:00Z"
   }
  ],
  "capabilities": [
