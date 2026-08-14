@@ -1,6 +1,6 @@
 {
  "schema_version": 1,
- "updated_at": "2026-08-14T22:00:00Z",
+ "updated_at": "2026-08-15T07:40:00Z",
  "note": "Authoritative state. Reports under docs/reports/ are immutable evidence; this file says whether their conclusions still stand. When a doc disagrees with this file, this file wins and the doc gets fixed in the same change.",
  "experiments": [
   {
@@ -702,33 +702,36 @@
     "cap-runpod-gpu-pod"
    ],
    "superseded_by": null,
-   "next_action": "Candidate supply UNBLOCKED 2026-08-13: user audited 228 random items of the gap3 queue (Soniox audio-VERIFIED subset of 2,000 unreviewed deletion-shaped rows) - overall accept 94.7% (216/228), narrowly under the preregistered 95% bulk-accept gate. POST-HOC STRATIFIED RULE adopted with user consent (recorded here BEFORE application): auto-accept only found_frac>=0.85 AND n_added>=5, where user agreement is 97.4% (147/151); complement stratum (89.6%, 69/77) is NOT auto-accepted and is left unreviewed. Rule thresholds were not tuned on the audit (0.85 = verifier's own match threshold, 5 = pool median n_added). Applied as username=auto-verifier PATCHes so provenance is separable from human labels. RULE EXTENDED 2026-08-14 after a second dedicated audit (gap4 queue, 117 fresh user judgments on the small-but-clean cell found_frac>=0.85 & n_added in 2-4): accept 112/117 = 95.7% (pooled with the 29 prior-cell judgments: 140/146 = 95.9%), passing the 95% gate - the cell is now auto-accepted alongside the strict stratum. Same rule extends mining: run Soniox verification over the remaining ~10,949 unreviewed deletion-shaped rows and auto-accept strict-stratum passers (expected +1,500-2,000 examples), with a final user spot-check. THEN: preregistration spec + backbone expansion + pods per the frozen recipe below. Reality check from mining: ~85% of bucket A is ALREADY in training and the adapter deletes despite it - the new levers are (a) curation + oversampling/per-token loss weighting of verified rows (cap 2 presentations/epoch), (b) +78h train-city trusted clean backbone at zero human cost (backbone-headroom-2026-08-12.json; per-city caps advised - 60% skew to chania/athens), (c) NEW human collection routed 40% to deletion/coverage segments if volume beyond ~800 usable rows is wanted. 135 bucket-A rows are in the validation split - NEVER train on them. Recipe frozen after Codex review 2026-08-12: 55/25/10/10 final sampling probabilities, mutually exclusive buckets, A/B with A = expanded-pool neutral control, 3 seeds/arm, matched updates/LR/token exposure, plain CE (optional third arm: 1.5-2x restored-span token weighting + length-normalized margin vs the deletion variant), gates: deletion upper bound < 0, WER < +0.001, insertions AND substitutions each < +0.0005, frozen guard set for hallucination tracking. Audit 200-300 pseudo-clean rows (stratified to short turns/speaker changes) before admitting new backbone - no_edit means uncorrected, not correct.",
+   "next_action": "VERIFICATION WAVE COMPLETE 2026-08-15 (gap-verify-final-summary-2026-08-15.json): 12,946 deletion-shaped rows audio-verified via Soniox; tiers VERIFIED 4,894 / BOUNDARY 4,043 / MIDDLE 985 / REJECT 3,015; 2,643 rule passers auto-accepted (username=auto-verifier) under the two calibrated rules recorded above; with user manual includes the deletion-hard supply is ~2,950 examples. Pending: user spot-check of 40 random auto-accepted items (queue gap5); optional BOUNDARY recovery pass (4,043 recoverable via adjusted_start/end). THEN: write the preregistration spec (55/25/10/10 recipe frozen below), expand backbone (+78h with per-city caps, 200-300-row pseudo-clean audit), launch 3-seed A/B pods per RunPod rules (watchdog before upload, record pod ID).",
    "caveats": [
     "Per-seed spread 2.1 WER points: single-seed results from this experiment are screens, never conclusions.",
     "Mining artifacts: gap-candidates-2026-08-12.{md,jsonl}, gap-mining-summary, backbone-headroom (all under data/reports/finetune-research/, gitignored).",
     "Auto-accepted labels (username=auto-verifier) carry ~2.6% expected contamination (audit-calibrated); exclude or down-weight them if a later gate failure implicates label quality."
    ],
-   "updated_at": "2026-08-14T09:00:00Z"
+   "updated_at": "2026-08-15T08:00:00Z"
   },
   {
    "id": "exp-2026-08-14-hparl-probe",
    "title": "HParl audio-vs-text faithfulness probe and Soniox alignment filter",
    "question": "Are the HParl transcripts faithful to their own audio, and can a Soniox-alignment filter carve a usable training subset out of them?",
    "status": "OPEN",
-   "conclusion": "Usable audio, unusable targets. On 100 random utterances (16 speakers, shards test-00000 seed 20260814 n=40 and train-00023 seed 7 n=60) verified against Soniox: rows without a [UNK] placeholder disagree at 6.1% WER with a 1.9% deletion rate and a 53% exact-match rate - i.e. the feared editorial-rewrite defect is NOT present at segment level. What disqualifies the corpus is target format: 52-60% of rows in each of three shards read carry at least one [UNK] placeholder over real speech (drives the pooled 7.7% deletion rate), and ZERO rows in any shard carry an accent or punctuation mark - the references are lowercase, unaccented, unpunctuated, while our labels are accented, punctuated clean-verbatim. Segments are ~3s-boundary alignment windows (median 4.7s / 9 tokens), so words are chopped at the edges. Storage is not a constraint: 32 kbps mono MP3 is 4.1 kB/s, ~1.8 GB for the full ~120h. ADDENDUM same day: the ML-processed mirror Elormiden/Hellenic-greek-parliamentary-speech (92,133 clips, 13.8 GB) is the usable one - 99.9% of rows are ACCENTED and none carry [UNK], but 59% carry <spoken_noise> markers and 0% carry punctuation. Filter run (eval/hparl2_filter.py, 150 random rows of test-00000, seed 20260814, tags stripped, alignment = 1 - WER on greek_normalize tokens): pooled WER 0.093 (sub .047 / del .028 / ins .018); align>=0.95 keeps 49% of rows = 50% of audio (~60h of 120h), align>=0.90 keeps 59%, align>=0.80 keeps 81%. TWO CAVEATS ON THAT 60h: (a) median row is 9 reference tokens so >=0.95 is effectively an exact-match test - it selects easy audio and yields a Soniox-agreement sample, not a random one; (b) <spoken_noise> is NOT the discriminator, keep rate is 48% on tagged vs 52% on untagged rows. The lowercase/unpunctuated target problem survives the filter untouched. ddamianos/hparl local cache deleted 2026-08-14. PUNCTUATION STAGE 2026-08-14: eval/hparl2_punctuate.py builds the label as dataset-words + Soniox-punctuation. Deterministic transfer() marks 96% of the 74 kept rows but copies Soniox's terminal period onto fragments (64/74 end in a final mark). gpt-5.6-luna (via the codex bridge, batches of 25, low effort) was run under a HARD WORD GUARD - output is accepted only if its greek_normalize token sequence is identical to the dataset transcript: 74/74 passed, zero words changed. It differs from transfer() on 61/74 rows, and judges only 19/74 (26%) of segments to be COMPLETE SENTENCES, with terminal punctuation matching that judgement 19/19. Three quarters of this corpus's segments are fragments; a naive punctuation pass would teach a sentence end every ~5s.",
+   "conclusion": "Usable audio, unusable targets. On 100 random utterances (16 speakers, shards test-00000 seed 20260814 n=40 and train-00023 seed 7 n=60) verified against Soniox: rows without a [UNK] placeholder disagree at 6.1% WER with a 1.9% deletion rate and a 53% exact-match rate - i.e. the feared editorial-rewrite defect is NOT present at segment level. What disqualifies the corpus is target format: 52-60% of rows in each of three shards read carry at least one [UNK] placeholder over real speech (drives the pooled 7.7% deletion rate), and ZERO rows in any shard carry an accent or punctuation mark - the references are lowercase, unaccented, unpunctuated, while our labels are accented, punctuated clean-verbatim. Segments are ~3s-boundary alignment windows (median 4.7s / 9 tokens), so words are chopped at the edges. Storage is not a constraint: 32 kbps mono MP3 is 4.1 kB/s, ~1.8 GB for the full ~120h. ADDENDUM same day: the ML-processed mirror Elormiden/Hellenic-greek-parliamentary-speech (92,133 clips, 13.8 GB) is the usable one - 99.9% of rows are ACCENTED and none carry [UNK], but 59% carry <spoken_noise> markers and 0% carry punctuation. Filter run (eval/hparl2_filter.py, 150 random rows of test-00000, seed 20260814, tags stripped, alignment = 1 - WER on greek_normalize tokens): pooled WER 0.093 (sub .047 / del .028 / ins .018); align>=0.95 keeps 49% of rows = 50% of audio (~60h of 120h), align>=0.90 keeps 59%, align>=0.80 keeps 81%. TWO CAVEATS ON THAT 60h: (a) median row is 9 reference tokens so >=0.95 is effectively an exact-match test - it selects easy audio and yields a Soniox-agreement sample, not a random one; (b) <spoken_noise> is NOT the discriminator, keep rate is 48% on tagged vs 52% on untagged rows. The lowercase/unpunctuated target problem survives the filter untouched. ddamianos/hparl local cache deleted 2026-08-14. PUNCTUATION STAGE 2026-08-14: eval/hparl2_punctuate.py builds the label as dataset-words + Soniox-punctuation. Deterministic transfer() marks 96% of the 74 kept rows but copies Soniox's terminal period onto fragments (64/74 end in a final mark). gpt-5.6-luna (via the codex bridge, batches of 25, low effort) was run under a HARD WORD GUARD - output is accepted only if its greek_normalize token sequence is identical to the dataset transcript: 74/74 passed, zero words changed. It differs from transfer() on 61/74 rows, and judges only 19/74 (26%) of segments to be COMPLETE SENTENCES, with terminal punctuation matching that judgement 19/19. Three quarters of this corpus's segments are fragments; a naive punctuation pass would teach a sentence end every ~5s. PILOT PASS LANDED 2026-08-14: 10,133 rows across all 28 shards. keep@0.95 = 46.3% (vs 49% on the 150-row sample), pooled WER 0.100 (sub .052 / del .030 / ins .017), 6.18h kept of 13.57h processed, per-shard keep rate 42-52% (median 46%) - extrapolates to ~55h of the 120h. CORRECTION: the earlier claim that <spoken_noise> is NOT a discriminator was an n=150 artifact. At n=10,133 tagged rows keep 40.8% vs untagged 54.1%. The tag is real signal (it marks audio the transcript does not spell out, and the ASR hears it), but it is not sufficient - 41% of tagged rows pass - so admission stays with the alignment score. HUMAN CALIBRATION LANDED 2026-08-14 (43 judged rows, exported from the review page, fetched from the laptop; the two review rounds separated by regenerating both page item lists from their seeds - 29 gate judgements, 13 punctuation judgements, 1 ambiguous and excluded). THE 0.95 GATE IS TOO STRICT: precision is perfect (6/6 kept rows accepted) but 57% of the rows it DROPPED were judged good. By band: align 1.00 100% good (n=6), 0.85-0.95 88% (n=8), 0.50-0.85 75% (n=8), <0.50 0% (n=7) - the cliff is at ~0.50, not 0.95. On the pilot that costs hours: 0.95 keeps 46% of rows / 6.18h, 0.90 keeps 61% / 8.81h, 0.85 keeps 72% / 10.50h (extrapolating 55h vs 78h vs 93h of the 120h). NOT ADOPTED: 6-8 rows per band is a signal, not a calibration, and the page shows the alignment score so the judgement was not blind. Punctuation round: 11/13 accepted (85%), both rejections at align 1.00 i.e. punctuation complaints not row-quality ones. PACK REBUILT 2026-08-14: 4,546 rows / 6.12 h, sha256(train.jsonl)=275516c4fd269af0, 26.2% complete sentences, 145 rows dropped for <3 tokens. Punctuation pass over all 4,693 kept rows: 4,663 LLM outputs accepted, 30 (0.6%) word-guard rejected and fell back to deterministic transfer; the LLM differs from transfer on 88% of rows. BLIND CALIBRATION LANDED 2026-08-14, 62/62 judged, and it overturns the gate. Good control (>0.99) passes 6/6 yes. Band 0.80-0.95: 25/25 yes. Band 0.50-0.80: 22 yes / 3 idk / 0 no. BAD CONTROL (<0.40) FAILS: 3 yes / 1 idk / 2 no - half the rows scored below 0.40 do say their text. They are 1-2s clips where Soniox returned something unrelated, so a low alignment score mostly means SONIOX FAILED, not that the label is wrong: the gate has been measuring ASR confidence and charging the corpus for it. Against the 62 judgements: align>=0.95 admits 6 and throws away 50 good rows; >=0.85 admits 26, throws away 30; >=0.50 admits 56 with ZERO bad rows and throws away 3; >=0.50 + dur>=1.5s admits 53 (51 yes / 2 idk / 0 no) and throws away 5. Both 'no' rows are align 0.00 AND under 1.5s, so a duration floor removes the failure mode. The 4 'don't know' rows are boundary clipping ('the start was cut, I heard half the first word') and ALL FOUR carry a missing first/last reference token - but those flags also fire on 28 human-approved rows, so edge flags are a DOWN-WEIGHTING signal, not an admission rule. Pilot yield: >=0.50 + dur>=1.5s keeps 93% of rows / 13.22h of 13.57h, extrapolating ~117h of the 120h vs 55h at the current gate. hparl2-v2 BUILT 2026-08-14 at the preregistered gate: 9,334 rows / 13.16 h (11.66 h weighted), sha256=29f4fe806b88e80a, 24.2% edge-clipped at weight 0.5, 22.8% complete sentences; 439 rows dropped under 1.5s, 102 under 3 tokens. 2.2x the hours of v1 from the same pilot audio.",
    "decision": "Do not stage HParl as-is. Two routes if it is ever revisited: (a) audio-only with pseudo-labels, which is vendor distillation and inherits the vendor's deletions - not recommended while exp-2026-08-13-targeted-deletion-training is trying to remove exactly that failure mode; (b) keep only [UNK]-free rows (~45%, ~54h) and restore accents+punctuation, accepting that the restoration model then sets the label standard. Ranking from 2026-08-11 stands: the 199 in-domain hours precede this. Licence still unverified at source (HF mirror cc-by-4.0 vs CLARIN 1602 reported CC BY-NC 4.0). 2026-08-14: filter + local review page built (eval/hparl2_filter.py, scripts/hparl2_review_page.py); user audit of a stratified 38-row sample pending before any keep-rate is trusted.",
    "reports": [
-    "docs/reports/2026-08-14-hparl-audio-text-probe.md"
+    "docs/reports/2026-08-14-hparl-audio-text-probe.md",
+    "docs/runbooks/external-corpus-to-training-pack.md",
+    "docs/reference/external-source-packs.md"
    ],
    "specs": [
     "docs/specs/2026-08-14-hparl-stage1-prereg.md"
    ],
    "artifact_ids": [
-    "artifact-pack-hparl2-v1"
+    "artifact-pack-hparl2-v1",
+    "artifact-pack-hparl2-v2"
    ],
    "capability_ids": [],
    "superseded_by": null,
-   "next_action": "Pilot filter pass RUNNING since 2026-08-14 (10k rows, 357 per shard x 28 shards, seed 20260814, append to ~/.cache/oc-public/hparl2/filtered.jsonl, log pilot.log) - free but slow (~37 rows/min ASR plus a ~460MB range-read per shard). WHEN IT LANDS: confirm the keep rate across all shards (150 rows of one shard gave 49%), rerun eval/hparl2_punctuate.py --llm over the kept set, then close the open items in docs/specs/2026-08-14-hparl-stage1-prereg.md before any GPU spend. User verdict on the punctuation sample (verbal, 2026-08-14): good, occasional comma where a period belongs; prompt rule 3 added for it and NOT yet re-measured. User's exported gate verdicts have not been received, so the 0.95 gate is still uncalibrated against human judgement. PACK FORMAT LANDED 2026-08-14: scripts/build_training_pack.py + docs/reference/external-source-packs.md define a reusable pack contract (audio/ + train.jsonl + meta.json + README), consumed by notebooks/train_runpod.py as PACK_MANIFEST/PACK_ARM=pn. artifact-pack-hparl2-v1 is the pilot build; rebuild it after the filter pass finishes.",
+   "next_action": "1) Write the training-arm preregistration into docs/specs/2026-08-14-hparl-stage1-prereg.md open items and close them: licence at CLARIN 1602 (blocks use), and decide the hours actually used. 2) The sampler MUST honour the `weight` field or 24.2% of v2 trains at full strength - verify before any run. 3) Optional: full-corpus filter pass (~12h ASR at 16 workers) to take v2 from 13h to the ~117h the gate implies. 4) Apply the calibrated gate to the STOMA/CV/EuroSpeech packs, with drop-vs-weight decided PER SOURCE (EuroSpeech drops: its edge-flagged slice sits at WER 0.627).",
    "caveats": [
     "Soniox is a second opinion, not ground truth; the 6.1% no-UNK disagreement is an upper bound on infidelity and includes Soniox's own errors on chamber audio.",
     "100 utterances from 2 of 52 shards, 16 speakers. The [UNK] and stripped-orthography findings were confirmed corpus-wide on 3 full shards (text column only, 4,767 rows); the WER numbers were not.",
@@ -737,9 +740,47 @@
     "Licence conflict persists in the Elormiden mirror itself: YAML says cc-by-4.0, its own README body says CC BY-NC 4.0 (non-commercial).",
     "gpt-5.6-luna is reachable only through the codex bridge (allowlisted model, low effort). No OpenAI API key exists in this workspace, so there is no direct-API path and no per-token cost accounting; throughput is the bridge's 3-concurrent worker.",
     "The word guard proves the LLM changed no words. It does NOT prove the punctuation or the complete/fragment judgement is right - that needs the human spot-check on the phase-2 review page.",
-    "Soniox realtime concurrency was MEASURED 2026-08-14, not assumed: 3 workers = 43.6 rows/min (2.8x realtime), 12 = 126, 24 = 127, 40 = 176 rows/min, zero errors at every level on 20-30 clip batches. The inherited '3 workers' from the gap2 verifier was costing ~3x. Pilot now runs at 16 workers and the bottleneck moved to the ~460MB per-shard parquet range-read."
+    "Soniox realtime concurrency was MEASURED 2026-08-14, not assumed: 3 workers = 43.6 rows/min (2.8x realtime), 12 = 126, 24 = 127, 40 = 176 rows/min, zero errors at every level on 20-30 clip batches. The inherited '3 workers' from the gap2 verifier was costing ~3x. Pilot now runs at 16 workers and the bottleneck moved to the ~460MB per-shard parquet range-read.",
+    "Cross-source comparison of keep rates is invalid without controlling segment length: align>=0.95 is exact match at hparl2's median 10 ref tokens but tolerates 1-2 errors at EuroSpeech's median 31.",
+    "The align>=0.95 gate was never validated before use; the first human calibration says it discards usable audio at roughly a 1:1 rate with what it keeps. Any hours figure quoted from the 0.95 pack is a floor, not the corpus's yield.",
+    "The blind round accepted 56/62 rows in a sample deliberately enriched with low-alignment rows. Part of that is real (Soniox blamed for its own errors), part is the question asked: judges were told to ignore truncation, so clipped-but-correct rows score as good, and clipped audio is NOT a harmless training label. n=62 with 6 rows per control is enough to say 0.95 is wrong; not enough to fix the exact floor.",
+    "The HParl licence problem is the CLARIN/ILSP COMPILATION's CC BY-NC terms, not the underlying parliamentary proceedings - EuroSpeech reaches the same speech under n.2121/1993 art. 2(5) with commercial use open. If the NC term is not cleared, the answer is to switch parliament sources, not to abandon the domain."
    ],
-   "updated_at": "2026-08-14T22:00:00Z"
+   "updated_at": "2026-08-15T04:00:00Z"
+  },
+  {
+   "id": "exp-2026-08-14-external-packs",
+   "title": "External Greek corpora as stage-1 packs: STOMA, EuroSpeech-el, Common Voice Scripted 26.0",
+   "question": "Do additional external Greek speech corpora, admitted through the pack pipeline and used as stage-1 adaptation before the frozen in-domain stage-2 recipe, lower agreement-WER on the 39 frozen validation windows without a deletion-rate regression?",
+   "status": "OPEN",
+   "conclusion": "PILOT RESULTS 2026-08-14 (n=50/150/150, no human audio check): STOMA keep@0.95=70% (WER .049, del .003), CV Scripted el keep=65% (WER .075, del .004) - both read-speech, errors are almost purely substitutions, i.e. Soniox mishearing rather than text-audio mismatch. EuroSpeech greece keep=23% (WER .285) BUT the boundary-edge flags explain it: edge-flagged rows (33% of the sample) keep 0% at WER .627 / del .275, while clean-edge rows keep 35% at WER .102 and del .019 - the same 1.9% deletion rate measured on HParl's placeholder-free rows. EuroSpeech's minutes are as faithful as HParl's; the headline was alignment slop, mostly at the END (last ref token missing on 26% of rows, first on 7%). The Codex-suggested edge flags are load-bearing, not decoration. ds_wer preselect calibration is monotone (keep 100/43/35/13% for ds_wer <.05/.05-.10/.10-.20/>=.20) so it can prioritise Soniox spend but must never admit a row; top two bins have n=10 total, so no threshold may be fitted yet. CAVEAT: the 0.95 gate is not comparable across sources - at a median 6-10 ref tokens it is exact match, at EuroSpeech's median 31 it tolerates one or two errors. GATE CORRECTION 2026-08-14: the align>=0.95 rule these keep rates were measured against was overturned by the hparl2 blind calibration (it mostly measures whether Soniox succeeded on a 1-2s clip). Rescored against the preregistered replacement (align>=0.50 AND dur>=1.5s, edges down-weighted not rejected): STOMA 70%->100%, CV 65%->99%, EuroSpeech 23%->85%; dropping clipped-edge rows instead costs 100->88%, 99->85%, 85->66%. EuroSpeech was the most distorted, as its boundary analysis predicted. These are rescorings of the existing pilots, not new runs, and no human has judged a STOMA/CV/EuroSpeech clip - the calibration was done on hparl2 and is carried across on the argument that the failure mode belongs to the verifier, not the corpus. LICENCE CORRECTION 2026-08-14 (user-raised, verified on the HF card): EuroSpeech is NOT blocked the way HParl is. HParl's restriction is the CLARIN/ILSP PACKAGING (compilation offered CC BY-NC); EuroSpeech claims no licence of its own and cites, for Greece, n.2121/1993 art. 2(5) (official State texts fall outside copyright) plus art. 25(1)(b) - a statutory exception on the underlying proceedings, so there is no NC term to clear and commercial use is open. The earlier framing 'needs the same legal call as HParl' was wrong. Narrower items still for a lawyer: whether the cited articles cover the AUDIO and not only transcripts, and whether the disco-eth compilation imposes anything itself (its card disclaims responsibility for the licence table's accuracy). CONSEQUENCE: Greek parliamentary speech was never the blocked resource - one compilation's terms were. EuroSpeech offers the same domain at 20x the hours with commercial use open, so it should supersede hparl2 as the parliament source rather than sit behind it.",
+   "decision": null,
+   "reports": [
+    "docs/reports/2026-08-15-external-sources-probe.md"
+   ],
+   "specs": [
+    "docs/specs/2026-08-15-external-packs-screens-prereg.md"
+   ],
+   "artifact_ids": [
+    "artifact-pack-cv-v2",
+    "artifact-pack-stoma-v2",
+    "artifact-pack-cv-v1",
+    "artifact-pack-stoma-v1"
+   ],
+   "capability_ids": [
+    "cap-runpod-gpu-pod"
+   ],
+   "superseded_by": null,
+   "next_action": "FULL PASSES RUNNING since 2026-08-14 ~17:50: stoma all 14,552 rows; cv all ~13.9k validated-minus-dev/test rows (official train split is only 2,037; dev/test held out as potential third-party benchmarks; original MP3 bytes kept, no second lossy transcode); eurospeech 59 spread train shards with --preselect-ds-wer 0.15 --explore-frac 0.18 (~19k Soniox calls, target ~30h admitted). Pilot results (150 rows each, rescored after the Latin-homoglyph fix): stoma keep 72% (edge 9%), cv keep 65%, eurospeech keep 23% overall / 35% on clean-edge rows (33% of rows are boundary-clipped, mostly at the END; clean-edge deletion rate 0.019 matches HParl). ds_wer calibration is monotone (<=0.15 -> ~40-50%% keep, >0.20 -> 13%%). WHEN PASSES LAND: build packs stoma-v1/cv-v1/eurospeech-v1, register artifacts with sha256, run the eurospeech<->hparl2 normalized-text overlap check, then execute the frozen screen design in docs/specs/2026-08-15-external-packs-screens-prereg.md (5 arms, one shared seed, dose-equalized stage 1, promotion rule preregistered, 3-seed confirmation only for survivors). No pod before the spec's section-6 items close.",
+   "caveats": [
+    "EuroSpeech licence UNRESOLVED: HF card 'other', per-country pointer to Greek copyright law (n.2121/1993) for parliament proceedings - same legal call as HParl before any commercial shipping.",
+    "EuroSpeech overlaps hparl2 in domain and possibly in sessions (both Hellenic Parliament): never use both packs without cross-pack dedupe. EuroSpeech solves both HParl defects (fragments at ~3s boundaries, no punctuation), so it likely supersedes hparl2 as the parliament source if its keep rate holds.",
+    "The eurospeech ds_wer field is Whisper-family-derived: preselecting on it biases toward Whisper-easy audio. Calibration (keep-rate by ds_wer bin) plus an exploration lane is the mitigation, recorded before any full pass.",
+    "Per-seed spread is 2.1 WER points: all single-seed screens are screens, never conclusions.",
+    "Filter caches under ~/.cache/oc-public/{stoma,eurospeech-el}/ - never in git.",
+    "Infra note recorded per the fails-twice rule: both long HF-parquet passes (stoma ~2.2h, eurospeech ~6.7h) died with 'httpx client has been closed' from the fsspec-cached HfFileSystem singleton. Fix in eval/ext_filter.py: HfFileSystem(skip_instance_cache=True) per shard. Resumes are lossless via --append."
+   ],
+   "updated_at": "2026-08-15T07:40:00Z"
   }
  ],
  "artifacts": [
@@ -1002,7 +1043,7 @@
   {
    "id": "artifact-pack-hparl2-v1",
    "kind": "training_pack",
-   "description": "Supplementary training pack from HParl (Elormiden mirror): Soniox-verified rows (align>=0.95) with punctuation/casing restored under a word guard. PILOT BUILD - 74 rows / 0.10 h, will be rebuilt when the 10k-row filter pass lands. Format contract: docs/reference/external-source-packs.md.",
+   "description": "Supplementary training pack from HParl (Elormiden mirror): Soniox-verified rows (align>=0.95) with punctuation/casing restored under a word guard. 4,502 rows / 6.01 h, built from the 10,133-row pilot filter pass. Format contract: docs/reference/external-source-packs.md.",
    "status": "ACTIVE",
    "locations": [
     {
@@ -1013,20 +1054,151 @@
    "hash": {
     "algorithm": "sha256-file-v1",
     "file": "train.jsonl",
-    "value": "a6c724d1d75efe6b"
+    "value": "a14890e693402c03"
    },
    "caveats": [
-    "PILOT BUILD, not the final pack: 74 rows / 0.10 h from the first 150-row sample.",
+    "Built at align>=0.95, a gate the first human calibration says is TOO STRICT (57% of dropped rows judged good). The 6.12 h here is a floor, not the corpus's yield; a 0.85 pack would be ~10.5 h on the same pilot. Blind re-calibration pending.",
     "The align>=0.95 admission gate is effectively an exact-match test on a median 9-token row: it selects easy audio and yields a Soniox-agreement sample, not a random one.",
     "Only ~26% of segments are complete sentences; the rest are fragments. Targets are punctuated accordingly (open-ended), but training on fragments risks teaching truncation - the deletion rate is the metric to watch.",
     "Punctuation and casing come from Soniox + gpt-5.6-luna, not from a human. The word guard proves no word was changed; it does not prove the punctuation is right.",
     "No word-level timestamps exist for this source, so the timestamped training arm (PACK_ARM=p) is not available - use pn.",
     "Licence DISPUTED at the mirror (YAML cc-by-4.0 vs its own README CC BY-NC 4.0); CLARIN 1602 not checked at source.",
     "Out of domain (parliament, not municipal council): this is a stage-1 adaptation input, never in-domain data.",
-    "Pilot-sized. Do not quote hours from it until the full filter pass is done."
+    "Pilot-sized. Do not quote hours from it until the full filter pass is done.",
+    "26.2% of rows are complete sentences; the rest are honest open-ended fragments. Word guard: 4,663/4,693 LLM outputs accepted, 30 (0.6%) fell back to deterministic transfer.",
+    "Rebuilt 2026-08-14 after the edge check was made to actually fire for this source (it silently no-opped before, because hparl2 rows carry no first/last_ref_missing field): 44 clipped-edge rows removed, 4,546 -> 4,502 rows."
    ],
    "replaced_by": null,
-   "verified_at": "2026-08-14T22:00:00Z"
+   "verified_at": "2026-08-15T02:30:00Z"
+  },
+  {
+   "id": "artifact-pack-cv-v1",
+   "kind": "training_pack",
+   "description": "Supplementary training pack from Common Voice Scripted Speech 26.0 Greek (Mozilla Data Collective, CC0): community-validated rows minus official dev/test, Soniox-verified (align>=0.95 + clean edges), labels verbatim, original MP3 bytes. 8,619 rows / 9.72 h. Format contract: docs/reference/external-source-packs.md.",
+   "status": "HISTORICAL",
+   "locations": [
+    {
+     "host": "minipc",
+     "path": "/home/harold/.cache/oc-public/training-sets/cv-v1"
+    }
+   ],
+   "hash": {
+    "algorithm": "sha256-file-v1",
+    "file": "train.jsonl",
+    "value": "16e560a06e74e263"
+   },
+   "caveats": [
+    "Read prompts, consumer microphones, 454 speakers: stage-1 adaptation input only.",
+    "At a median 6-token row, align>=0.95 is exact-match: kept set is a Soniox-agreement sample, not random.",
+    "~43% of prompts carry terminal punctuation; labels kept verbatim, so the pack may under-teach final periods.",
+    "Dedupe key is (text, client_id): the same prompt by another contributor is retained deliberately.",
+    "MDC terms: no re-hosting, no speaker re-identification. CC0 otherwise.",
+    "No word-level timestamps: PACK_ARM=p unavailable, use pn."
+   ],
+   "replaced_by": "artifact-pack-cv-v2",
+   "verified_at": "2026-08-14T20:10:00Z"
+  },
+  {
+   "id": "artifact-pack-hparl2-v2",
+   "kind": "training_pack",
+   "description": "Supplementary training pack from HParl (Elormiden mirror) at the CALIBRATED gate: align>=0.50 AND dur>=1.5s AND >=3 tokens, clipped-edge rows admitted with edge_clipped=true and weight=0.5. 9,334 rows / 13.16 h (11.66 h weighted), 24.2% edge-clipped, 22.8% complete sentences. This is the arm; artifact-pack-hparl2-v1 (align>=0.95, 6.01 h) is kept so the gate itself can be tested. Gate preregistered in docs/specs/2026-08-14-hparl-stage1-prereg.md BEFORE any WER was seen. Format contract: docs/reference/external-source-packs.md.",
+   "status": "ACTIVE",
+   "locations": [
+    {
+     "host": "minipc",
+     "path": "/home/harold/.cache/oc-public/training-sets/hparl2-v2"
+    }
+   ],
+   "hash": {
+    "algorithm": "sha256-file-v1",
+    "file": "train.jsonl",
+    "value": "29f4fe806b88e80a"
+   },
+   "caveats": [
+    "The gate rests on 62 blind human judgements with 6 rows per control - enough to show align>=0.95 was wrong, not enough to fix the exact floor at 0.50.",
+    "Judges were told to ignore truncation, so clipped-but-correct rows counted as good. That is why 24.2% of this pack carries weight=0.5 rather than being excluded; a sampler that ignores the weight field trains on them at full strength.",
+    "Word guard on the punctuation stage rejected 344/9,835 (3.5%) LLM outputs overall, but the rate is ~7% among the newly admitted lower-alignment rows vs 0.6% at align>=0.95: where Soniox is more wrong, the LLM is more tempted to reword. Rejected rows fall back to deterministic transfer.",
+    "One punctuation batch failed to parse as JSON; those rows kept the deterministic transfer.",
+    "Out of domain (parliament, not municipal council): stage-1 adaptation input, never in-domain data.",
+    "Licence DISPUTED at the mirror (YAML cc-by-4.0 vs its own README CC BY-NC 4.0); CLARIN 1602 not checked at source.",
+    "No word-level timestamps: PACK_ARM=p unavailable, use pn."
+   ],
+   "replaced_by": null,
+   "verified_at": "2026-08-15T03:00:00Z"
+  },
+  {
+   "id": "artifact-pack-stoma-v1",
+   "kind": "training_pack",
+   "description": "Supplementary training pack from STOMA (aangelakis/STOMA, CC-BY-4.0): all 14,402 rows Soniox-verified, admitted at align>=0.95 + clean edges after deterministic Latin-homoglyph repair. 10,346 rows / 16.83 h studio read speech, 6 speakers, 99% complete sentences. Format contract: docs/reference/external-source-packs.md.",
+   "status": "HISTORICAL",
+   "locations": [
+    {
+     "host": "minipc",
+     "path": "/home/harold/.cache/oc-public/training-sets/stoma-v1"
+    }
+   ],
+   "hash": {
+    "algorithm": "sha256-file-v1",
+    "file": "train.jsonl",
+    "value": "6de129ec17d52079"
+   },
+   "caveats": [
+    "Studio read speech, 6 speakers, no spontaneity or meeting acoustics: stage-1 adaptation input only.",
+    "Two main speakers contribute ~64% of rows (full sentence set); four secondary speakers repeat a subset. Dedupe key is (text, speaker_id), so cross-speaker repeats are retained deliberately - balance at the sampler if needed.",
+    "Labels are the corpus's own accented punctuated sentences after deterministic Latin-homoglyph repair (fix_homoglyphs); Soniox verifies words, not punctuation.",
+    "At a median 9-token row, align>=0.95 is near-exact-match: kept set is a Soniox-agreement sample, not random.",
+    "No word-level timestamps: PACK_ARM=p unavailable, use pn."
+   ],
+   "replaced_by": "artifact-pack-stoma-v2",
+   "verified_at": "2026-08-14T22:30:00Z"
+  },
+  {
+   "id": "artifact-pack-stoma-v2",
+   "kind": "training_pack",
+   "description": "STOMA pack rebuilt under the harmonized gate: 14,407 rows / 24.19 h (was 10,346 / 16.83 under align>=0.95+edge-drop). Labels verbatim after Latin-homoglyph repair; edge-clipped rows kept with weight 0.5.",
+   "status": "ACTIVE",
+   "locations": [
+    {
+     "host": "minipc",
+     "path": "/home/harold/.cache/oc-public/training-sets/stoma-v2"
+    }
+   ],
+   "hash": {
+    "algorithm": "sha256-file-v1",
+    "file": "train.jsonl",
+    "value": "8f455a66499dad67"
+   },
+   "caveats": [
+    "Gate: min_align 0.5 + dur>=1.5s + edge_policy=flag (weight 0.5), harmonized with the hparl2 blind calibration finding that align>=0.95 on short clips mostly measures Soniox failure. The calibration was done on hparl2 and carried across on the argument that the failure mode belongs to the verifier, not the corpus - no human has audited STOMA/CV clips.",
+    "No word-level timestamps: PACK_ARM=p unavailable, use pn.",
+    "Studio read speech, 6 speakers; two mains contribute ~64% of rows. Stage-1 input only."
+   ],
+   "replaced_by": null,
+   "verified_at": "2026-08-15T07:40:00Z"
+  },
+  {
+   "id": "artifact-pack-cv-v2",
+   "kind": "training_pack",
+   "description": "Common Voice Scripted 26.0 el pack rebuilt under the harmonized gate: 12,971 rows / 15.11 h (was 8,619 / 9.72). Validated minus dev/test; original MP3 bytes; labels verbatim.",
+   "status": "ACTIVE",
+   "locations": [
+    {
+     "host": "minipc",
+     "path": "/home/harold/.cache/oc-public/training-sets/cv-v2"
+    }
+   ],
+   "hash": {
+    "algorithm": "sha256-file-v1",
+    "file": "train.jsonl",
+    "value": "c2f60869103b75e4"
+   },
+   "caveats": [
+    "Gate: min_align 0.5 + dur>=1.5s + edge_policy=flag (weight 0.5), harmonized with the hparl2 blind calibration finding that align>=0.95 on short clips mostly measures Soniox failure. The calibration was done on hparl2 and carried across on the argument that the failure mode belongs to the verifier, not the corpus - no human has audited STOMA/CV clips.",
+    "No word-level timestamps: PACK_ARM=p unavailable, use pn.",
+    "Read prompts, 454 community speakers; ~43% carry terminal punctuation (labels verbatim). MDC terms: no re-hosting, no re-identification. Stage-1 input only."
+   ],
+   "replaced_by": null,
+   "verified_at": "2026-08-15T07:40:00Z"
   }
  ],
  "capabilities": [

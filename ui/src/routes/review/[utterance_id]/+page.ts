@@ -43,7 +43,8 @@ function readFilter(url: URL): QueueFilter | null {
 		gap1: 'deletion-gap candidates',
 		gap2: 'deletion-gap (new, unreviewed)',
 		gap3: 'deletion-gap (audio-verified)',
-		gap4: 'deletion-gap (small, calibration)'
+		gap4: 'deletion-gap (small, calibration)',
+		gap5: 'deletion-gap (final spot-check)'
 	};
 	if (queueName && queueName in QUEUE_LABELS) {
 		return { query: `queue=${queueName}`, label: QUEUE_LABELS[queueName] };

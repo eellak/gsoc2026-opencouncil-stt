@@ -19,6 +19,8 @@
  *   gap4     — wave-2 VERIFIED items in the small-but-clean cell (found_frac
  *              >=0.85 but 2-4 added words) — a calibration audit sample; the
  *              cell is NOT auto-accepted until this audit passes
+ *   gap5     — final spot-check: 40 random items from the full auto-accepted
+ *              set (both waves, both calibrated cells), fixed-seed sample
  */
 import nb2 from './nb2-ids.json';
 import nb2audio from './nb2audio-ids.json';
@@ -26,6 +28,7 @@ import gap1 from './gap1-ids.json';
 import gap2 from './gap2-ids.json';
 import gap3 from './gap3-ids.json';
 import gap4 from './gap4-ids.json';
+import gap5 from './gap5-ids.json';
 
 const REGISTRY: Record<string, string[]> = {
 	nb2: nb2 as string[],
@@ -33,7 +36,8 @@ const REGISTRY: Record<string, string[]> = {
 	gap1: gap1 as string[],
 	gap2: gap2 as string[],
 	gap3: gap3 as string[],
-	gap4: gap4 as string[]
+	gap4: gap4 as string[],
+	gap5: gap5 as string[]
 };
 
 const _sets: Record<string, Set<string>> = {};
