@@ -694,7 +694,9 @@
    "conclusion": null,
    "decision": null,
    "reports": [],
-   "specs": [],
+   "specs": [
+    "docs/specs/2026-08-15-targeted-deletion-training-prereg.md"
+   ],
    "artifact_ids": [
     "artifact-adapter-fixed"
    ],
@@ -702,13 +704,13 @@
     "cap-runpod-gpu-pod"
    ],
    "superseded_by": null,
-   "next_action": "VERIFICATION WAVE COMPLETE 2026-08-15 (gap-verify-final-summary-2026-08-15.json): 12,946 deletion-shaped rows audio-verified via Soniox; tiers VERIFIED 4,894 / BOUNDARY 4,043 / MIDDLE 985 / REJECT 3,015; 2,643 rule passers auto-accepted (username=auto-verifier) under the two calibrated rules recorded above; with user manual includes the deletion-hard supply is ~2,950 examples. Spot-check PASSED 2026-08-15: 39/40 include (97.5%), one exclude applied; deletion-hard supply CLOSED at ~2,950 examples. PSEUDO-CLEAN AUDIT DONE 2026-08-15 (backbone-pseudoclean-audit-2026-08-15.json): 300 stratified headroom rows Soniox-scored, overall pass 80.7% (hard stratum 74.0% - a lower bound due to no padded fallback on the transcript side; uniform 87.3%); dominant failure modes are timestamp misalignment and spans longer than their text (extra-speech). Proposed admission rule for new backbone: duration>=2s AND not speaker-change-adjacent (audit pass ~88%), per-city caps ~+5h/city. Pending: optional BOUNDARY recovery pass (4,043 recoverable via adjusted_start/end). THEN: write the preregistration spec (55/25/10/10 recipe frozen below), expand backbone (+78h with per-city caps, 200-300-row pseudo-clean audit), launch 3-seed A/B pods per RunPod rules (watchdog before upload, record pod ID).",
+   "next_action": "Prereg spec FROZEN v2 2026-08-15 (Codex-reviewed, job a23a41d8, 37 findings folded in: row-level sampling defined for both arms, paired seeds 101-103, wild cluster bootstrap over 31 meetings, one-sided noninferiority UBs on ALL gates, leave-one-MEETING-out, seed-consistency gate, numeric hallucination gate, final-step checkpoint, median-seed shipping rule, run-validity + exposure attestation). REMAINING BEFORE PODS: (1) FINAL BACKBONE AUDIT GATE - compose backbone (existing_keep + seeded headroom subset, seed 20260816), run 250-row risk-stratified Soniox audit, require >=90% pass; (2) build per-seed sample manifests + hashes; (3) launch 3-seed A/B pods per RunPod rules.",
    "caveats": [
     "Per-seed spread 2.1 WER points: single-seed results from this experiment are screens, never conclusions.",
     "Mining artifacts: gap-candidates-2026-08-12.{md,jsonl}, gap-mining-summary, backbone-headroom (all under data/reports/finetune-research/, gitignored).",
     "Auto-accepted labels (username=auto-verifier) carry ~2.6% expected contamination (audit-calibrated); exclude or down-weight them if a later gate failure implicates label quality."
    ],
-   "updated_at": "2026-08-15T14:00:00Z"
+   "updated_at": "2026-08-15T18:00:00Z"
   },
   {
    "id": "exp-2026-08-14-hparl-probe",
