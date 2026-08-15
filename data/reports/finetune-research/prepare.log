@@ -48,3 +48,5 @@
 [15:48:40] DONE clips=900 by_split={'val_corr': 56, 'val_reg': 113, 'train': 279, 'train_noedit': 452} minutes={'val_corr': 4.4, 'val_reg': 4.9, 'train': 16.9, 'train_noedit': 19.5} in 707s
 [15:48:40]   -> /home/harold/opencouncil-fine-tuning/data/asr/manifest.jsonl
   -> /home/harold/opencouncil-fine-tuning/data/asr/dataset_stats.json
+[23:30:11]   decode FAIL chania__jan19_2026.mp3: CalledProcessError Command '['ffmpeg', '-nostdin', '-loglevel', 'error', '-i', 
+[15:33:44]   decode FAIL chania__jan19_2026.mp3: CalledProcessError Command '['ffmpeg', '-nostdin', '-loglevel', 'error', '-i', 

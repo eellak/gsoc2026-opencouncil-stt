@@ -1,0 +1,505 @@
+{
+ "city": "chalandri",
+ "version": 1,
+ "source": {
+  "url": [
+   "https://opencouncil.gr/api/cities/chalandri/people",
+   "https://opencouncil.gr/api/cities/chalandri"
+  ],
+  "retrieved": "2026-08-11",
+  "note": "OpenCouncil public city registry. No transcript text, no provider hypothesis."
+ },
+ "rule": {
+  "included": [
+   "surnames of every person in the city's OpenCouncil roster",
+   "the city name and the municipality name"
+  ],
+  "excluded": [
+   "community and settlement names",
+   "local acronyms",
+   "generic civic vocabulary",
+   "given names"
+  ],
+  "excluded_because": "no frozen public source enumerates them; building the list from transcripts would fit the metric to the data it scores. DS-WER computed against this list is a LOWER BOUND on domain-term error.",
+  "aliases_from": "fixed Greek suffix rules in scripts/build_ds_wer_terms.py::inflect - never hand-added",
+  "alias_normalization": "aliases are stored already normalized by the frozen scorer (eval.controlled_eval.scoring.wtoks plus the frozen filler strip); the matcher uses that same normalizer. No stemming.",
+  "min_alias_chars": 4,
+  "collision_rule": "one term per distinct surname (roster duplicates are merged, not treated as a conflict); after that an alias may map to exactly one term id, and aliases claimed by more than one term are dropped from all of them"
+ },
+ "meetings_in_scope": [
+  "apr1_2026",
+  "apr29_2026",
+  "apr29_2_2026",
+  "dec17_2025",
+  "dec3_2025",
+  "feb11_2026",
+  "feb25_2026",
+  "jan14_2026",
+  "jan14_2_2026",
+  "mar11_2026",
+  "mar26_2026",
+  "may13_2026",
+  "may25_2026",
+  "nov12_2025",
+  "nov19_2025",
+  "nov26_2025",
+  "oct15_2_2025",
+  "oct29_2025",
+  "oct8_2025",
+  "sep24_2025"
+ ],
+ "terms": [
+  {
+   "id": "person:αγαπητου",
+   "canonical": "Αγαπητού",
+   "klass": "person_surname",
+   "covers": [
+    "Χρύσα Αγαπητού"
+   ],
+   "aliases": [
+    "αγαπητου"
+   ]
+  },
+  {
+   "id": "person:αγγελης",
+   "canonical": "Αγγελής",
+   "klass": "person_surname",
+   "covers": [
+    "Κωνσταντίνος Αγγελής"
+   ],
+   "aliases": [
+    "αγγελη",
+    "αγγελης"
+   ]
+  },
+  {
+   "id": "person:αγγελικη",
+   "canonical": "Αγγελική",
+   "klass": "person_surname",
+   "covers": [
+    "Βλάχου Αγγελική"
+   ],
+   "aliases": [
+    "αγγελικη"
+   ]
+  },
+  {
+   "id": "person:αθανασατου",
+   "canonical": "Αθανασάτου",
+   "klass": "person_surname",
+   "covers": [
+    "Ιωάννα Αθανασάτου"
+   ],
+   "aliases": [
+    "αθανασατου"
+   ]
+  },
+  {
+   "id": "person:αλεξανδρη",
+   "canonical": "Αλεξανδρή",
+   "klass": "person_surname",
+   "covers": [
+    "Θεοδώρα Αλεξανδρή"
+   ],
+   "aliases": [
+    "αλεξανδρη"
+   ]
+  },
+  {
+   "id": "person:αλουπη",
+   "canonical": "Αλούπη",
+   "klass": "person_surname",
+   "covers": [
+    "Χρυσαυγή Αλούπη"
+   ],
+   "aliases": [
+    "αλουπη"
+   ]
+  },
+  {
+   "id": "person:βασιλοπουλος",
+   "canonical": "Βασιλόπουλος",
+   "klass": "person_surname",
+   "covers": [
+    "Δημήτριος Βασιλόπουλος"
+   ],
+   "aliases": [
+    "βασιλοπουλε",
+    "βασιλοπουλο",
+    "βασιλοπουλος",
+    "βασιλοπουλου"
+   ]
+  },
+  {
+   "id": "person:γαβρας",
+   "canonical": "Γαβράς",
+   "klass": "person_surname",
+   "covers": [
+    "Κωνσταντίνος Γαβράς"
+   ],
+   "aliases": [
+    "γαβρα",
+    "γαβρας"
+   ]
+  },
+  {
+   "id": "person:γερολυματος",
+   "canonical": "Γερολυμάτος",
+   "klass": "person_surname",
+   "covers": [
+    "Κωνσταντίνος Γερολυμάτος"
+   ],
+   "aliases": [
+    "γερολυματε",
+    "γερολυματο",
+    "γερολυματος",
+    "γερολυματου"
+   ]
+  },
+  {
+   "id": "person:γκασουκα",
+   "canonical": "Γκασούκα",
+   "klass": "person_surname",
+   "covers": [
+    "Δήμητρα Γκασούκα"
+   ],
+   "aliases": [
+    "γκασουκα"
+   ]
+  },
+  {
+   "id": "person:ευθυμιου",
+   "canonical": "Ευθυμίου",
+   "klass": "person_surname",
+   "covers": [
+    "Κωνσταντίνος Ευθυμίου"
+   ],
+   "aliases": [
+    "ευθυμιου"
+   ]
+  },
+  {
+   "id": "person:ζορμπα",
+   "canonical": "Ζορμπά",
+   "klass": "person_surname",
+   "covers": [
+    "Βούλα Ζορμπά"
+   ],
+   "aliases": [
+    "ζορμπα"
+   ]
+  },
+  {
+   "id": "person:καλλη",
+   "canonical": "Κάλλη",
+   "klass": "person_surname",
+   "covers": [
+    "Ειρήνη Κάλλη"
+   ],
+   "aliases": [
+    "καλλη"
+   ]
+  },
+  {
+   "id": "person:καμπουρη",
+   "canonical": "Καμπούρη",
+   "klass": "person_surname",
+   "covers": [
+    "Ιωάννα Καμπούρη"
+   ],
+   "aliases": [
+    "καμπουρη"
+   ]
+  },
+  {
+   "id": "person:καραγιαννη",
+   "canonical": "Καραγιάννη",
+   "klass": "person_surname",
+   "covers": [
+    "Τάνια Καραγιάννη"
+   ],
+   "aliases": [
+    "καραγιαννη"
+   ]
+  },
+  {
+   "id": "person:καρατζα",
+   "canonical": "Καρατζά",
+   "klass": "person_surname",
+   "covers": [
+    "Κονδυλία Καρατζά"
+   ],
+   "aliases": [
+    "καρατζα"
+   ]
+  },
+  {
+   "id": "person:κιακος",
+   "canonical": "Κιάκος",
+   "klass": "person_surname",
+   "covers": [
+    "Χρήστος Κιάκος"
+   ],
+   "aliases": [
+    "κιακε",
+    "κιακο",
+    "κιακος",
+    "κιακου"
+   ]
+  },
+  {
+   "id": "person:κουρασης",
+   "canonical": "Κουράσης",
+   "klass": "person_surname",
+   "covers": [
+    "Ιωάννης Κουράσης",
+    "Ευθύμιος Κουράσης"
+   ],
+   "aliases": [
+    "κουραση",
+    "κουρασης"
+   ]
+  },
+  {
+   "id": "person:κρανιδης",
+   "canonical": "Κρανίδης",
+   "klass": "person_surname",
+   "covers": [
+    "Εμμανουήλ Κρανίδης"
+   ],
+   "aliases": [
+    "κρανιδη",
+    "κρανιδης"
+   ]
+  },
+  {
+   "id": "person:λαδοπουλος",
+   "canonical": "Λαδόπουλος",
+   "klass": "person_surname",
+   "covers": [
+    "Ιωάννης Λαδόπουλος"
+   ],
+   "aliases": [
+    "λαδοπουλε",
+    "λαδοπουλο",
+    "λαδοπουλος",
+    "λαδοπουλου"
+   ]
+  },
+  {
+   "id": "person:λαμπροπουλος",
+   "canonical": "Λαμπρόπουλος",
+   "klass": "person_surname",
+   "covers": [
+    "Παναγιώτης Λαμπρόπουλος"
+   ],
+   "aliases": [
+    "λαμπροπουλε",
+    "λαμπροπουλο",
+    "λαμπροπουλος",
+    "λαμπροπουλου"
+   ]
+  },
+  {
+   "id": "person:λερτα",
+   "canonical": "Λέρτα",
+   "klass": "person_surname",
+   "covers": [
+    "Έπη Λέρτα"
+   ],
+   "aliases": [
+    "λερτα"
+   ]
+  },
+  {
+   "id": "person:λυμπερατος",
+   "canonical": "Λυμπεράτος",
+   "klass": "person_surname",
+   "covers": [
+    "Γεράσιμος Λυμπεράτος"
+   ],
+   "aliases": [
+    "λυμπερατε",
+    "λυμπερατο",
+    "λυμπερατος",
+    "λυμπερατου"
+   ]
+  },
+  {
+   "id": "person:μαυραγανης",
+   "canonical": "Μαυραγάνης",
+   "klass": "person_surname",
+   "covers": [
+    "Αλέξιος Μαυραγάνης"
+   ],
+   "aliases": [
+    "μαυραγανη",
+    "μαυραγανης"
+   ]
+  },
+  {
+   "id": "person:μαυρουδης",
+   "canonical": "Μαυρουδής",
+   "klass": "person_surname",
+   "covers": [
+    "Χάρης Μαυρουδής"
+   ],
+   "aliases": [
+    "μαυρουδη",
+    "μαυρουδης"
+   ]
+  },
+  {
+   "id": "person:μαχαιρα",
+   "canonical": "Μαχαίρα",
+   "klass": "person_surname",
+   "covers": [
+    "Χριστίνα Μαχαίρα"
+   ],
+   "aliases": [
+    "μαχαιρα"
+   ]
+  },
+  {
+   "id": "person:παντελιδακης",
+   "canonical": "Παντελιδάκης",
+   "klass": "person_surname",
+   "covers": [
+    "Ελευθέριος Παντελιδάκης"
+   ],
+   "aliases": [
+    "παντελιδακη",
+    "παντελιδακης"
+   ]
+  },
+  {
+   "id": "person:παπαγεωργιου",
+   "canonical": "Παπαγεωργίου",
+   "klass": "person_surname",
+   "covers": [
+    "Ιωάννης Παπαγεωργίου"
+   ],
+   "aliases": [
+    "παπαγεωργιου"
+   ]
+  },
+  {
+   "id": "person:παπαγιαννακη",
+   "canonical": "Παπαγιαννάκη",
+   "klass": "person_surname",
+   "covers": [
+    "Νίκη Παπαγιαννάκη"
+   ],
+   "aliases": [
+    "παπαγιαννακη"
+   ]
+  },
+  {
+   "id": "person:ρουσσος",
+   "canonical": "Ρούσσος",
+   "klass": "person_surname",
+   "covers": [
+    "Σίμος Ρούσσος"
+   ],
+   "aliases": [
+    "ρουσσε",
+    "ρουσσο",
+    "ρουσσος",
+    "ρουσσου"
+   ]
+  },
+  {
+   "id": "person:ρωμας",
+   "canonical": "Ρώμας",
+   "klass": "person_surname",
+   "covers": [
+    "Χάρης Ρώμας"
+   ],
+   "aliases": [
+    "ρωμα",
+    "ρωμας"
+   ]
+  },
+  {
+   "id": "person:σουσου",
+   "canonical": "Σούσου",
+   "klass": "person_surname",
+   "covers": [
+    "Άννα Σούσου"
+   ],
+   "aliases": [
+    "σουσου"
+   ]
+  },
+  {
+   "id": "person:τσιαμπας",
+   "canonical": "Τσιαμπάς",
+   "klass": "person_surname",
+   "covers": [
+    "Θάνος Τσιαμπάς"
+   ],
+   "aliases": [
+    "τσιαμπα",
+    "τσιαμπας"
+   ]
+  },
+  {
+   "id": "person:φωτεινος",
+   "canonical": "Φωτεινός",
+   "klass": "person_surname",
+   "covers": [
+    "Σπυρίδων Φωτεινός"
+   ],
+   "aliases": [
+    "φωτεινο",
+    "φωτεινος"
+   ]
+  },
+  {
+   "id": "person:χριστουλακης",
+   "canonical": "Χριστουλάκης",
+   "klass": "person_surname",
+   "covers": [
+    "Δημήτριος Χριστουλάκης"
+   ],
+   "aliases": [
+    "χριστουλακη",
+    "χριστουλακης"
+   ]
+  },
+  {
+   "id": "person:χριστουλη",
+   "canonical": "Χριστούλη",
+   "klass": "person_surname",
+   "covers": [
+    "Έλενα Χριστούλη"
+   ],
+   "aliases": [
+    "χριστουλη"
+   ]
+  },
+  {
+   "id": "place:city_name",
+   "canonical": "Χαλάνδρι",
+   "klass": "place_name",
+   "covers": [
+    "Χαλάνδρι"
+   ],
+   "aliases": [
+    "χαλανδρι"
+   ]
+  },
+  {
+   "id": "place:municipality_name",
+   "canonical": "Δήμος Χαλανδρίου",
+   "klass": "place_name",
+   "covers": [
+    "Δήμος Χαλανδρίου"
+   ],
+   "aliases": [
+    "δημος χαλανδριου"
+   ]
+  }
+ ],
+ "dropped_aliases": []
+}

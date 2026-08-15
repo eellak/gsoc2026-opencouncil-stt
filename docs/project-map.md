@@ -71,6 +71,7 @@ Review UI:
 - [Dynamic vocabulary and entities](reference/dynamic-vocabulary-and-entities.md) — names/places/acronyms feeding post-correction.
 - [Fix-task prompt v2 (verbatim)](reference/fix-task-prompt-v2.md) — the exact current fixTranscript prompt.
 - [Audio segmentation](reference/audio-segmentation.md) · [Training-unit granularity](reference/training-unit-granularity.md) · [UI error categories](reference/ui-error-categories.md)
+- [External source packs](reference/external-source-packs.md) — the format an outside speech corpus enters a fine-tune as.
 - [Disaster recovery](reference/disaster-recovery.md) · [Oracle VM](reference/oracle-vm.md)
 
 ## Reports (committed snapshots)
@@ -85,6 +86,7 @@ See [docs/reports/README.md](reports/README.md) for what belongs here vs. in `da
 
 ## Runbooks
 
+- [External corpus → training pack](runbooks/external-corpus-to-training-pack.md) — the whole procedure: licence check, Soniox filter, target repair, human review, pack, train.
 - [Build canonical split on-box brief](runbooks/build-canonical-split-onbox-brief.md)
 - [Eval harness on-box brief](runbooks/eval-harness-onbox-brief.md)
 - [Next-batch selection on-box brief](runbooks/next-batch-selection-onbox-brief.md)

@@ -1,0 +1,258 @@
+{
+ "city": "samothraki",
+ "version": 1,
+ "source": {
+  "url": [
+   "https://opencouncil.gr/api/cities/samothraki/people",
+   "https://opencouncil.gr/api/cities/samothraki"
+  ],
+  "retrieved": "2026-08-11",
+  "note": "OpenCouncil public city registry. No transcript text, no provider hypothesis."
+ },
+ "rule": {
+  "included": [
+   "surnames of every person in the city's OpenCouncil roster",
+   "the city name and the municipality name"
+  ],
+  "excluded": [
+   "community and settlement names",
+   "local acronyms",
+   "generic civic vocabulary",
+   "given names"
+  ],
+  "excluded_because": "no frozen public source enumerates them; building the list from transcripts would fit the metric to the data it scores. DS-WER computed against this list is a LOWER BOUND on domain-term error.",
+  "aliases_from": "fixed Greek suffix rules in scripts/build_ds_wer_terms.py::inflect - never hand-added",
+  "alias_normalization": "aliases are stored already normalized by the frozen scorer (eval.controlled_eval.scoring.wtoks plus the frozen filler strip); the matcher uses that same normalizer. No stemming.",
+  "min_alias_chars": 4,
+  "collision_rule": "one term per distinct surname (roster duplicates are merged, not treated as a conflict); after that an alias may map to exactly one term id, and aliases claimed by more than one term are dropped from all of them"
+ },
+ "meetings_in_scope": [
+  "apr6_2026",
+  "dec15_2025",
+  "dec29_2025",
+  "feb24_2026",
+  "jan28_2026",
+  "mar4_2026",
+  "may15_2026",
+  "may6_2026",
+  "may9_2026",
+  "nov19_2025"
+ ],
+ "terms": [
+  {
+   "id": "person:βασιλειαδου",
+   "canonical": "Βασιλειάδου",
+   "klass": "person_surname",
+   "covers": [
+    "Σωτηρία Βασιλειάδου"
+   ],
+   "aliases": [
+    "βασιλειαδου"
+   ]
+  },
+  {
+   "id": "person:βιτσας",
+   "canonical": "Βίτσας",
+   "klass": "person_surname",
+   "covers": [
+    "Αθανάσιος Βίτσας"
+   ],
+   "aliases": [
+    "βιτσα",
+    "βιτσας"
+   ]
+  },
+  {
+   "id": "person:γαλατουμος",
+   "canonical": "Γαλατούμος",
+   "klass": "person_surname",
+   "covers": [
+    "Νικόλαος Γαλατούμος"
+   ],
+   "aliases": [
+    "γαλατουμε",
+    "γαλατουμο",
+    "γαλατουμος",
+    "γαλατουμου"
+   ]
+  },
+  {
+   "id": "person:γληνιας",
+   "canonical": "Γλήνιας",
+   "klass": "person_surname",
+   "covers": [
+    "Ιωάννης Γλήνιας"
+   ],
+   "aliases": [
+    "γληνια",
+    "γληνιας"
+   ]
+  },
+  {
+   "id": "person:γρηγοραινας",
+   "canonical": "Γρηγόραινας",
+   "klass": "person_surname",
+   "covers": [
+    "Ιωάννης Γρηγόραινας"
+   ],
+   "aliases": [
+    "γρηγοραινα",
+    "γρηγοραινας"
+   ]
+  },
+  {
+   "id": "person:θεοδωρου",
+   "canonical": "Θεοδώρου",
+   "klass": "person_surname",
+   "covers": [
+    "Ιωάννης Θεοδώρου"
+   ],
+   "aliases": [
+    "θεοδωρου"
+   ]
+  },
+  {
+   "id": "person:καλαιτζη",
+   "canonical": "Καλαϊτζή",
+   "klass": "person_surname",
+   "covers": [
+    "Αικατερίνη Καλαϊτζή"
+   ],
+   "aliases": [
+    "καλαιτζη"
+   ]
+  },
+  {
+   "id": "person:κυλιμος",
+   "canonical": "Κυλίμος",
+   "klass": "person_surname",
+   "covers": [
+    "Νικόλαος Κυλίμος"
+   ],
+   "aliases": [
+    "κυλιμε",
+    "κυλιμο",
+    "κυλιμος",
+    "κυλιμου"
+   ]
+  },
+  {
+   "id": "person:μαμουγιωργης",
+   "canonical": "Μαμουγιώργης",
+   "klass": "person_surname",
+   "covers": [
+    "Πέτρος Μαμουγιώργης"
+   ],
+   "aliases": [
+    "μαμουγιωργη",
+    "μαμουγιωργης"
+   ]
+  },
+  {
+   "id": "person:παπας",
+   "canonical": "Παπάς",
+   "klass": "person_surname",
+   "covers": [
+    "Παναγιώτης Παπάς"
+   ],
+   "aliases": [
+    "παπα",
+    "παπας"
+   ]
+  },
+  {
+   "id": "person:προξενος",
+   "canonical": "Πρόξενος",
+   "klass": "person_surname",
+   "covers": [
+    "Χρήστος Πρόξενος"
+   ],
+   "aliases": [
+    "προξενε",
+    "προξενο",
+    "προξενος",
+    "προξενου"
+   ]
+  },
+  {
+   "id": "person:σαλαμανη",
+   "canonical": "Σαλαμανή",
+   "klass": "person_surname",
+   "covers": [
+    "Τριανταφυλλιά Σαλαμανή"
+   ],
+   "aliases": [
+    "σαλαμανη"
+   ]
+  },
+  {
+   "id": "person:σαραντου",
+   "canonical": "Σαράντου",
+   "klass": "person_surname",
+   "covers": [
+    "Δημήτριος Σαράντου"
+   ],
+   "aliases": [
+    "σαραντου"
+   ]
+  },
+  {
+   "id": "person:σκαρλατιδης",
+   "canonical": "Σκαρλατίδης",
+   "klass": "person_surname",
+   "covers": [
+    "Αθανάσιος Σκαρλατίδης"
+   ],
+   "aliases": [
+    "σκαρλατιδη",
+    "σκαρλατιδης"
+   ]
+  },
+  {
+   "id": "person:τολιου",
+   "canonical": "Τόλιου",
+   "klass": "person_surname",
+   "covers": [
+    "Βασιλική Τόλιου"
+   ],
+   "aliases": [
+    "τολιου"
+   ]
+  },
+  {
+   "id": "person:τσιαουσης",
+   "canonical": "Τσιαούσης",
+   "klass": "person_surname",
+   "covers": [
+    "Χρήστος Τσιαούσης"
+   ],
+   "aliases": [
+    "τσιαουση",
+    "τσιαουσης"
+   ]
+  },
+  {
+   "id": "place:city_name",
+   "canonical": "Σαμοθράκη",
+   "klass": "place_name",
+   "covers": [
+    "Σαμοθράκη"
+   ],
+   "aliases": [
+    "σαμοθρακη"
+   ]
+  },
+  {
+   "id": "place:municipality_name",
+   "canonical": "Δήμος Σαμοθράκης",
+   "klass": "place_name",
+   "covers": [
+    "Δήμος Σαμοθράκης"
+   ],
+   "aliases": [
+    "δημος σαμοθρακης"
+   ]
+  }
+ ],
+ "dropped_aliases": []
+}

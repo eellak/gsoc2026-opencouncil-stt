@@ -1,6 +1,6 @@
 # Current Work
 
-Last updated: 2026-08-12
+Last updated: 2026-08-14
 
 **The endgame plan is finished.** All four workstreams of
 [`docs/specs/2026-08-11-endgame-handoff-plan.md`](docs/specs/2026-08-11-endgame-handoff-plan.md)
@@ -95,6 +95,16 @@ have released them.
 
 ## Recently changed
 
+- `exp-2026-08-14-hparl-probe` closed: HParl's minutes *are* faithful to their audio
+  (6.1% Soniox disagreement on placeholder-free rows), but ~55% of rows carry `[UNK]`
+  over real speech and no row anywhere carries an accent or punctuation mark. Usable
+  audio, unusable targets; the corpus stays deprioritised, 2026-08-14. Addendum: the
+  ML-processed mirror (`Elormiden/…`) is accented and `[UNK]`-free; a Soniox
+  alignment filter at ≥0.95 keeps 49% of rows (≈60h), punctuation restored by
+  `gpt-5.6-luna` under a word guard (74/74 clean, only 26% of segments are complete
+  sentences). Record reopened OPEN: 10k-row pilot filter running, preregistration at
+  [`docs/specs/2026-08-14-hparl-stage1-prereg.md`](docs/specs/2026-08-14-hparl-stage1-prereg.md),
+  no GPU spend authorised, 2026-08-14.
 - `exp-2026-08-20-final-report` closed: the answer is yes-but-modestly, and what
   remains points at names rather than at audio, 2026-08-12.
 - `exp-2026-08-13-correction-only` closed: dropping the unverified half buys nothing,

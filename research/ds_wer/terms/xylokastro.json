@@ -1,0 +1,407 @@
+{
+ "city": "xylokastro",
+ "version": 1,
+ "source": {
+  "url": [
+   "https://opencouncil.gr/api/cities/xylokastro/people",
+   "https://opencouncil.gr/api/cities/xylokastro"
+  ],
+  "retrieved": "2026-08-11",
+  "note": "OpenCouncil public city registry. No transcript text, no provider hypothesis."
+ },
+ "rule": {
+  "included": [
+   "surnames of every person in the city's OpenCouncil roster",
+   "the city name and the municipality name"
+  ],
+  "excluded": [
+   "community and settlement names",
+   "local acronyms",
+   "generic civic vocabulary",
+   "given names"
+  ],
+  "excluded_because": "no frozen public source enumerates them; building the list from transcripts would fit the metric to the data it scores. DS-WER computed against this list is a LOWER BOUND on domain-term error.",
+  "aliases_from": "fixed Greek suffix rules in scripts/build_ds_wer_terms.py::inflect - never hand-added",
+  "alias_normalization": "aliases are stored already normalized by the frozen scorer (eval.controlled_eval.scoring.wtoks plus the frozen filler strip); the matcher uses that same normalizer. No stemming.",
+  "min_alias_chars": 4,
+  "collision_rule": "one term per distinct surname (roster duplicates are merged, not treated as a conflict); after that an alias may map to exactly one term id, and aliases claimed by more than one term are dropped from all of them"
+ },
+ "meetings_in_scope": [
+  "apr29_2026",
+  "aug27_2024",
+  "dec19_2024",
+  "dec22_2025",
+  "feb24_2025",
+  "feb25_2026",
+  "jul28_2025",
+  "jun25_2025",
+  "jun3_2026",
+  "mar12_2025",
+  "mar26_2025",
+  "mar30_2026",
+  "mar30_2_2026",
+  "may28_2025",
+  "may4_2026",
+  "may7_2025",
+  "nov24_2025",
+  "oct13_2025",
+  "oct29_2025",
+  "sep1_2025"
+ ],
+ "terms": [
+  {
+   "id": "person:αγγελιδης",
+   "canonical": "Αγγελίδης",
+   "klass": "person_surname",
+   "covers": [
+    "Απόστολος Αγγελίδης"
+   ],
+   "aliases": [
+    "αγγελιδη",
+    "αγγελιδης"
+   ]
+  },
+  {
+   "id": "person:αλογογιαννης",
+   "canonical": "Αλογογιάννης",
+   "klass": "person_surname",
+   "covers": [
+    "Βλάσιος Αλογογιάννης"
+   ],
+   "aliases": [
+    "αλογογιαννη",
+    "αλογογιαννης"
+   ]
+  },
+  {
+   "id": "person:αποστολοπουλος",
+   "canonical": "Αποστολόπουλος",
+   "klass": "person_surname",
+   "covers": [
+    "Σπυρίδων Αποστολόπουλος"
+   ],
+   "aliases": [
+    "αποστολοπουλε",
+    "αποστολοπουλο",
+    "αποστολοπουλος",
+    "αποστολοπουλου"
+   ]
+  },
+  {
+   "id": "person:βασιλατος",
+   "canonical": "Βασιλάτος",
+   "klass": "person_surname",
+   "covers": [
+    "Ανδρέας Βασιλάτος"
+   ],
+   "aliases": [
+    "βασιλατε",
+    "βασιλατο",
+    "βασιλατος",
+    "βασιλατου"
+   ]
+  },
+  {
+   "id": "person:γιαννος",
+   "canonical": "Γιάννος",
+   "klass": "person_surname",
+   "covers": [
+    "Νικόλαος Γιάννος"
+   ],
+   "aliases": [
+    "γιαννε",
+    "γιαννο",
+    "γιαννος",
+    "γιαννου"
+   ]
+  },
+  {
+   "id": "person:γκιατας",
+   "canonical": "Γκιάτας",
+   "klass": "person_surname",
+   "covers": [
+    "Ευριπίδης Γκιάτας"
+   ],
+   "aliases": [
+    "γκιατα",
+    "γκιατας"
+   ]
+  },
+  {
+   "id": "person:γκιοκας",
+   "canonical": "Γκιόκας",
+   "klass": "person_surname",
+   "covers": [
+    "Γεώργιος Γκιόκας"
+   ],
+   "aliases": [
+    "γκιοκα",
+    "γκιοκας"
+   ]
+  },
+  {
+   "id": "person:διαμαντοπουλος",
+   "canonical": "Διαμαντόπουλος",
+   "klass": "person_surname",
+   "covers": [
+    "Χαράλαμπος Διαμαντόπουλος"
+   ],
+   "aliases": [
+    "διαμαντοπουλε",
+    "διαμαντοπουλο",
+    "διαμαντοπουλος",
+    "διαμαντοπουλου"
+   ]
+  },
+  {
+   "id": "person:θεοδωρος",
+   "canonical": "Θεόδωρος",
+   "klass": "person_surname",
+   "covers": [
+    "Μπακώλης Θεόδωρος"
+   ],
+   "aliases": [
+    "θεοδωρε",
+    "θεοδωρο",
+    "θεοδωρος",
+    "θεοδωρου"
+   ]
+  },
+  {
+   "id": "person:καζανης",
+   "canonical": "Καζάνης",
+   "klass": "person_surname",
+   "covers": [
+    "Δημήτριος Καζάνης"
+   ],
+   "aliases": [
+    "καζανη",
+    "καζανης"
+   ]
+  },
+  {
+   "id": "person:καλυβας",
+   "canonical": "Καλύβας",
+   "klass": "person_surname",
+   "covers": [
+    "Παναγιώτης Καλύβας"
+   ],
+   "aliases": [
+    "καλυβα",
+    "καλυβας"
+   ]
+  },
+  {
+   "id": "person:καραβας",
+   "canonical": "Καραβάς",
+   "klass": "person_surname",
+   "covers": [
+    "Ανδρέας Καραβάς",
+    "Σπυρίδων Καραβάς"
+   ],
+   "aliases": [
+    "καραβα",
+    "καραβας"
+   ]
+  },
+  {
+   "id": "person:κεκερης",
+   "canonical": "Κεκερής",
+   "klass": "person_surname",
+   "covers": [
+    "Νικόλαος Κεκερής"
+   ],
+   "aliases": [
+    "κεκερη",
+    "κεκερης"
+   ]
+  },
+  {
+   "id": "person:κολοκυθας",
+   "canonical": "Κολοκυθάς",
+   "klass": "person_surname",
+   "covers": [
+    "Χρήστος Κολοκυθάς"
+   ],
+   "aliases": [
+    "κολοκυθα",
+    "κολοκυθας"
+   ]
+  },
+  {
+   "id": "person:κονδης",
+   "canonical": "Κόνδης",
+   "klass": "person_surname",
+   "covers": [
+    "Χαράλαμπος Κόνδης"
+   ],
+   "aliases": [
+    "κονδη",
+    "κονδης"
+   ]
+  },
+  {
+   "id": "person:λαουδης",
+   "canonical": "Λαούδης",
+   "klass": "person_surname",
+   "covers": [
+    "Δημήτριος Λαούδης"
+   ],
+   "aliases": [
+    "λαουδη",
+    "λαουδης"
+   ]
+  },
+  {
+   "id": "person:λασκος",
+   "canonical": "Λάσκος",
+   "klass": "person_surname",
+   "covers": [
+    "Νικόλαος Λάσκος"
+   ],
+   "aliases": [
+    "λασκε",
+    "λασκο",
+    "λασκος",
+    "λασκου"
+   ]
+  },
+  {
+   "id": "person:λοντος",
+   "canonical": "Λόντος",
+   "klass": "person_surname",
+   "covers": [
+    "Αναστάσιος Λόντος"
+   ],
+   "aliases": [
+    "λοντε",
+    "λοντο",
+    "λοντος",
+    "λοντου"
+   ]
+  },
+  {
+   "id": "person:μεγαριτης",
+   "canonical": "Μεγαρίτης",
+   "klass": "person_surname",
+   "covers": [
+    "Ανέστης Μεγαρίτης"
+   ],
+   "aliases": [
+    "μεγαριτη",
+    "μεγαριτης"
+   ]
+  },
+  {
+   "id": "person:μενουνου",
+   "canonical": "Μενούνου",
+   "klass": "person_surname",
+   "covers": [
+    "Ελίνα Μενούνου"
+   ],
+   "aliases": [
+    "μενουνου"
+   ]
+  },
+  {
+   "id": "person:μετεβελης",
+   "canonical": "Μετεβέλης",
+   "klass": "person_surname",
+   "covers": [
+    "Σπυρίδων Μετεβέλης",
+    "Γεώργιος Μετεβελής"
+   ],
+   "aliases": [
+    "μετεβελη",
+    "μετεβελης"
+   ]
+  },
+  {
+   "id": "person:μπρακουλιας",
+   "canonical": "Μπρακούλιας",
+   "klass": "person_surname",
+   "covers": [
+    "Θεοφάνης Μπρακούλιας"
+   ],
+   "aliases": [
+    "μπρακουλια",
+    "μπρακουλιας"
+   ]
+  },
+  {
+   "id": "person:πρωτοπαπας",
+   "canonical": "Πρωτόπαπας",
+   "klass": "person_surname",
+   "covers": [
+    "Χρήστος Πρωτόπαπας"
+   ],
+   "aliases": [
+    "πρωτοπαπα",
+    "πρωτοπαπας"
+   ]
+  },
+  {
+   "id": "person:σκερος",
+   "canonical": "Σκέρος",
+   "klass": "person_surname",
+   "covers": [
+    "Ιωάννης Σκέρος"
+   ],
+   "aliases": [
+    "σκερε",
+    "σκερο",
+    "σκερος",
+    "σκερου"
+   ]
+  },
+  {
+   "id": "person:σταματουλης",
+   "canonical": "Σταματούλης",
+   "klass": "person_surname",
+   "covers": [
+    "Ιωάννης Σταματούλης"
+   ],
+   "aliases": [
+    "σταματουλη",
+    "σταματουλης"
+   ]
+  },
+  {
+   "id": "person:τσιωτος",
+   "canonical": "Τσιώτος",
+   "klass": "person_surname",
+   "covers": [
+    "Βλάσης Τσιώτος"
+   ],
+   "aliases": [
+    "τσιωτε",
+    "τσιωτο",
+    "τσιωτος",
+    "τσιωτου"
+   ]
+  },
+  {
+   "id": "place:city_name",
+   "canonical": "Ξυλόκαστρο - Ευρωστίνη",
+   "klass": "place_name",
+   "covers": [
+    "Ξυλόκαστρο - Ευρωστίνη"
+   ],
+   "aliases": [
+    "ξυλοκαστρο ευρωστινη"
+   ]
+  },
+  {
+   "id": "place:municipality_name",
+   "canonical": "Δήμος Ξυλόκαστρο - Ευρωστίνη",
+   "klass": "place_name",
+   "covers": [
+    "Δήμος Ξυλόκαστρο - Ευρωστίνη"
+   ],
+   "aliases": [
+    "δημος ξυλοκαστρο ευρωστινη"
+   ]
+  }
+ ],
+ "dropped_aliases": []
+}

@@ -1,0 +1,1871 @@
+{
+ "city": "athens",
+ "version": 1,
+ "source": {
+  "url": [
+   "https://opencouncil.gr/api/cities/athens/people",
+   "https://opencouncil.gr/api/cities/athens"
+  ],
+  "retrieved": "2026-08-11",
+  "note": "OpenCouncil public city registry. No transcript text, no provider hypothesis."
+ },
+ "rule": {
+  "included": [
+   "surnames of every person in the city's OpenCouncil roster",
+   "the city name and the municipality name"
+  ],
+  "excluded": [
+   "community and settlement names",
+   "local acronyms",
+   "generic civic vocabulary",
+   "given names"
+  ],
+  "excluded_because": "no frozen public source enumerates them; building the list from transcripts would fit the metric to the data it scores. DS-WER computed against this list is a LOWER BOUND on domain-term error.",
+  "aliases_from": "fixed Greek suffix rules in scripts/build_ds_wer_terms.py::inflect - never hand-added",
+  "alias_normalization": "aliases are stored already normalized by the frozen scorer (eval.controlled_eval.scoring.wtoks plus the frozen filler strip); the matcher uses that same normalizer. No stemming.",
+  "min_alias_chars": 4,
+  "collision_rule": "one term per distinct surname (roster duplicates are merged, not treated as a conflict); after that an alias may map to exactly one term id, and aliases claimed by more than one term are dropped from all of them"
+ },
+ "meetings_in_scope": [
+  "apr1_2026",
+  "apr20_2026",
+  "apr20_3_2026",
+  "apr21_2026",
+  "apr22_2026",
+  "apr30_2026",
+  "feb11_2026",
+  "feb16_2026",
+  "feb18_2_2026",
+  "feb19_2026",
+  "feb19_3_2026",
+  "feb26_2026",
+  "feb26_2_2026",
+  "feb9_2_2026",
+  "jan14_2026",
+  "jan19_2_2026",
+  "jan22_2026",
+  "jan26_2026",
+  "jan26_2_2026",
+  "mar18_2026",
+  "mar19_2026",
+  "mar23_2026",
+  "mar9_1_2026",
+  "mar9_2026",
+  "mar9_2_2026",
+  "may18_3_2026",
+  "may20_2026",
+  "may20_2_2026",
+  "may25_2026",
+  "may25_3_2026",
+  "may28_2_2026",
+  "may29_2026",
+  "may7_2026",
+  "may7_2_2026"
+ ],
+ "terms": [
+  {
+   "id": "person:αβραμιδης",
+   "canonical": "Αβραμίδης",
+   "klass": "person_surname",
+   "covers": [
+    "Νικόλαος Αβραμίδης"
+   ],
+   "aliases": [
+    "αβραμιδη",
+    "αβραμιδης"
+   ]
+  },
+  {
+   "id": "person:αγγελιδακης",
+   "canonical": "Αγγελιδάκης",
+   "klass": "person_surname",
+   "covers": [
+    "Παναγιώτης Αγγελιδάκης"
+   ],
+   "aliases": [
+    "αγγελιδακη",
+    "αγγελιδακης"
+   ]
+  },
+  {
+   "id": "person:αγρογιαννη_μουκριωτου",
+   "canonical": "Αγρογιάννη-Μουκριωτού",
+   "klass": "person_surname",
+   "covers": [
+    "Ζαχαρία (Ζαχαρούλα) Αγρογιάννη-Μουκριωτού"
+   ],
+   "aliases": [
+    "αγρογιαννη μουκριωτου"
+   ]
+  },
+  {
+   "id": "person:αδαμοπουλου",
+   "canonical": "Αδαμοπούλου",
+   "klass": "person_surname",
+   "covers": [
+    "Μαριγώ Αδαμοπούλου"
+   ],
+   "aliases": [
+    "αδαμοπουλου"
+   ]
+  },
+  {
+   "id": "person:αθανασακης",
+   "canonical": "Αθανασάκης",
+   "klass": "person_surname",
+   "covers": [
+    "Σπύρος Αθανασάκης"
+   ],
+   "aliases": [
+    "αθανασακη",
+    "αθανασακης"
+   ]
+  },
+  {
+   "id": "person:αλβερτη",
+   "canonical": "Αλβέρτη",
+   "klass": "person_surname",
+   "covers": [
+    "Αλεξάνδρα Έβερτ Αλβέρτη"
+   ],
+   "aliases": [
+    "αλβερτη"
+   ]
+  },
+  {
+   "id": "person:αλεβυζακη",
+   "canonical": "Αλεβυζάκη",
+   "klass": "person_surname",
+   "covers": [
+    "Δέσποινα Αλεβυζάκη"
+   ],
+   "aliases": [
+    "αλεβυζακη"
+   ]
+  },
+  {
+   "id": "person:αμανατιδου",
+   "canonical": "Αμανατίδου",
+   "klass": "person_surname",
+   "covers": [
+    "Παναγιώτα Αμανατίδου"
+   ],
+   "aliases": [
+    "αμανατιδου"
+   ]
+  },
+  {
+   "id": "person:ανδρικοπουλου",
+   "canonical": "Ανδρικοπούλου",
+   "klass": "person_surname",
+   "covers": [
+    "Νίκη Ανδρικοπούλου"
+   ],
+   "aliases": [
+    "ανδρικοπουλου"
+   ]
+  },
+  {
+   "id": "person:αννα",
+   "canonical": "Άννα",
+   "klass": "person_surname",
+   "covers": [
+    "Φιλίνη Άννα"
+   ],
+   "aliases": [
+    "αννα"
+   ]
+  },
+  {
+   "id": "person:αντωνατος",
+   "canonical": "Αντωνάτος",
+   "klass": "person_surname",
+   "covers": [
+    "Αναστάσιος Αντωνάτος"
+   ],
+   "aliases": [
+    "αντωνατε",
+    "αντωνατο",
+    "αντωνατος",
+    "αντωνατου"
+   ]
+  },
+  {
+   "id": "person:αποστολοπουλος",
+   "canonical": "Αποστολόπουλος",
+   "klass": "person_surname",
+   "covers": [
+    "Γεώργιος Αποστολόπουλος"
+   ],
+   "aliases": [
+    "αποστολοπουλε",
+    "αποστολοπουλο",
+    "αποστολοπουλος",
+    "αποστολοπουλου"
+   ]
+  },
+  {
+   "id": "person:αρβανιτης",
+   "canonical": "Αρβανίτης",
+   "klass": "person_surname",
+   "covers": [
+    "Σπυρίδων Αρβανίτης"
+   ],
+   "aliases": [
+    "αρβανιτης"
+   ]
+  },
+  {
+   "id": "person:αργυρελλη",
+   "canonical": "Αργυρέλλη",
+   "klass": "person_surname",
+   "covers": [
+    "Ιωάννα Αργυρέλλη"
+   ],
+   "aliases": [
+    "αργυρελλη"
+   ]
+  },
+  {
+   "id": "person:αυγερινος",
+   "canonical": "Αυγερινός",
+   "klass": "person_surname",
+   "covers": [
+    "Εμμανουήλ Αυγερινός"
+   ],
+   "aliases": [
+    "αυγερινο",
+    "αυγερινος"
+   ]
+  },
+  {
+   "id": "person:αυγητιδου_παπακωστα",
+   "canonical": "Αυγητίδου-Παπακώστα",
+   "klass": "person_surname",
+   "covers": [
+    "Γεωργία Αυγητίδου-Παπακώστα"
+   ],
+   "aliases": [
+    "αυγητιδου παπακωστα"
+   ]
+  },
+  {
+   "id": "person:βαλσαμακη",
+   "canonical": "Βαλσαμάκη",
+   "klass": "person_surname",
+   "covers": [
+    "Αικατερίνη Βαλσαμάκη"
+   ],
+   "aliases": [
+    "βαλσαμακη"
+   ]
+  },
+  {
+   "id": "person:βαρδη",
+   "canonical": "Βαρδή",
+   "klass": "person_surname",
+   "covers": [
+    "Πολυξένη Βαρδή"
+   ],
+   "aliases": [
+    "βαρδη"
+   ]
+  },
+  {
+   "id": "person:βασιλειου",
+   "canonical": "Βασιλείου",
+   "klass": "person_surname",
+   "covers": [
+    "Χριστίνα Βασιλείου"
+   ],
+   "aliases": [
+    "βασιλειου"
+   ]
+  },
+  {
+   "id": "person:βασιος",
+   "canonical": "Βάσιος",
+   "klass": "person_surname",
+   "covers": [
+    "Φώτιος Βάσιος"
+   ],
+   "aliases": [
+    "βασιε",
+    "βασιο",
+    "βασιος",
+    "βασιου"
+   ]
+  },
+  {
+   "id": "person:βατσακης",
+   "canonical": "Βατσάκης",
+   "klass": "person_surname",
+   "covers": [
+    "Γεώργιος Βατσάκης"
+   ],
+   "aliases": [
+    "βατσακη",
+    "βατσακης"
+   ]
+  },
+  {
+   "id": "person:βελεγρακης",
+   "canonical": "Βελεγράκης",
+   "klass": "person_surname",
+   "covers": [
+    "Εμμανουήλ Βελεγράκης"
+   ],
+   "aliases": [
+    "βελεγρακη",
+    "βελεγρακης"
+   ]
+  },
+  {
+   "id": "person:βερα",
+   "canonical": "Βέρα",
+   "klass": "person_surname",
+   "covers": [
+    "Λυδία Βέρα"
+   ],
+   "aliases": [
+    "βερα"
+   ]
+  },
+  {
+   "id": "person:βλαχου",
+   "canonical": "Βλάχου",
+   "klass": "person_surname",
+   "covers": [
+    "Αγορή Βλάχου",
+    "Άννα Βλάχου"
+   ],
+   "aliases": [
+    "βλαχου"
+   ]
+  },
+  {
+   "id": "person:βολοναση",
+   "canonical": "Βολονάση",
+   "klass": "person_surname",
+   "covers": [
+    "Χαρούλα Βολονάση"
+   ],
+   "aliases": [
+    "βολοναση"
+   ]
+  },
+  {
+   "id": "person:βουλγαρακης",
+   "canonical": "Βουλγαράκης",
+   "klass": "person_surname",
+   "covers": [
+    "Γεώργιος Βουλγαράκης"
+   ],
+   "aliases": [
+    "βουλγαρακη",
+    "βουλγαρακης"
+   ]
+  },
+  {
+   "id": "person:βουλγαρη",
+   "canonical": "Βουλγάρη",
+   "klass": "person_surname",
+   "covers": [
+    "Ανδριανή Βουλγάρη"
+   ],
+   "aliases": [
+    "βουλγαρη"
+   ]
+  },
+  {
+   "id": "person:βουρδουμπας",
+   "canonical": "Βουρδουμπάς",
+   "klass": "person_surname",
+   "covers": [
+    "Χάρης Βουρδουμπάς"
+   ],
+   "aliases": [
+    "βουρδουμπα",
+    "βουρδουμπας"
+   ]
+  },
+  {
+   "id": "person:βουτυρακου",
+   "canonical": "Βουτυράκου",
+   "klass": "person_surname",
+   "covers": [
+    "Διάνα Βουτυράκου"
+   ],
+   "aliases": [
+    "βουτυρακου"
+   ]
+  },
+  {
+   "id": "person:βωβου",
+   "canonical": "Βώβου",
+   "klass": "person_surname",
+   "covers": [
+    "Διονυσία Βώβου"
+   ],
+   "aliases": [
+    "βωβου"
+   ]
+  },
+  {
+   "id": "person:γαβριλη",
+   "canonical": "Γαβρίλη",
+   "klass": "person_surname",
+   "covers": [
+    "Δάφνη Γαβρίλη"
+   ],
+   "aliases": [
+    "γαβριλη"
+   ]
+  },
+  {
+   "id": "person:γαζη",
+   "canonical": "Γαζή",
+   "klass": "person_surname",
+   "covers": [
+    "Ευαγγελία Γαζή"
+   ],
+   "aliases": [
+    "γαζη"
+   ]
+  },
+  {
+   "id": "person:γαιτανη",
+   "canonical": "Γαϊτάνη",
+   "klass": "person_surname",
+   "covers": [
+    "Σοφία Γαϊτάνη"
+   ],
+   "aliases": [
+    "γαιτανη"
+   ]
+  },
+  {
+   "id": "person:γαρμπιδακης",
+   "canonical": "Γαρμπιδάκης",
+   "klass": "person_surname",
+   "covers": [
+    "Νικόλαος Γαρμπιδάκης"
+   ],
+   "aliases": [
+    "γαρμπιδακη",
+    "γαρμπιδακης"
+   ]
+  },
+  {
+   "id": "person:γεννηματα",
+   "canonical": "Γεννηματά",
+   "klass": "person_surname",
+   "covers": [
+    "Ιωάννα Γεννηματά"
+   ],
+   "aliases": [
+    "γεννηματα"
+   ]
+  },
+  {
+   "id": "person:γεωργατος_ιατριδης",
+   "canonical": "Γεωργάτος-Ιατρίδης",
+   "klass": "person_surname",
+   "covers": [
+    "Δημήτριος Γεωργάτος-Ιατρίδης"
+   ],
+   "aliases": [
+    "γεωργατος ιατριδη",
+    "γεωργατος ιατριδης"
+   ]
+  },
+  {
+   "id": "person:γεωργιαδης",
+   "canonical": "Γεωργιάδης",
+   "klass": "person_surname",
+   "covers": [
+    "Θωμάς Γεωργιάδης"
+   ],
+   "aliases": [
+    "γεωργιαδη",
+    "γεωργιαδης"
+   ]
+  },
+  {
+   "id": "person:γιακουματου",
+   "canonical": "Γιακουμάτου",
+   "klass": "person_surname",
+   "covers": [
+    "Ελένη Γιακουμάτου"
+   ],
+   "aliases": [
+    "γιακουματου"
+   ]
+  },
+  {
+   "id": "person:γιαννα",
+   "canonical": "Γιάννα",
+   "klass": "person_surname",
+   "covers": [
+    "Μπέττυ Γιάννα"
+   ],
+   "aliases": [
+    "γιαννα"
+   ]
+  },
+  {
+   "id": "person:γιαννακοπουλος",
+   "canonical": "Γιαννακόπουλος",
+   "klass": "person_surname",
+   "covers": [
+    "Νικόλαος Γιαννακόπουλος"
+   ],
+   "aliases": [
+    "γιαννακοπουλε",
+    "γιαννακοπουλο",
+    "γιαννακοπουλος",
+    "γιαννακοπουλου"
+   ]
+  },
+  {
+   "id": "person:γιανναρος",
+   "canonical": "Γιάνναρος",
+   "klass": "person_surname",
+   "covers": [
+    "Γεώργιος-Κωνσταντίνος Γιάνναρος"
+   ],
+   "aliases": [
+    "γιανναρε",
+    "γιανναρο",
+    "γιανναρος",
+    "γιανναρου"
+   ]
+  },
+  {
+   "id": "person:γιαννοπουλος",
+   "canonical": "Γιαννόπουλος",
+   "klass": "person_surname",
+   "covers": [
+    "Ευάγγελος Γιαννόπουλος"
+   ],
+   "aliases": [
+    "γιαννοπουλε",
+    "γιαννοπουλο",
+    "γιαννοπουλος"
+   ]
+  },
+  {
+   "id": "person:γιουργιωτου",
+   "canonical": "Γιουργιώτου",
+   "klass": "person_surname",
+   "covers": [
+    "Γεωργία Γιουργιώτου"
+   ],
+   "aliases": [
+    "γιουργιωτου"
+   ]
+  },
+  {
+   "id": "person:γιωτης",
+   "canonical": "Γιώτης",
+   "klass": "person_surname",
+   "covers": [
+    "Χαράλαμπος Γιώτης"
+   ],
+   "aliases": [
+    "γιωτη",
+    "γιωτης"
+   ]
+  },
+  {
+   "id": "person:γκαγκακη_δημητριαδου",
+   "canonical": "Γκαγκάκη-Δημητριάδου",
+   "klass": "person_surname",
+   "covers": [
+    "Αικατερίνη Γκαγκάκη-Δημητριάδου"
+   ],
+   "aliases": [
+    "γκαγκακη δημητριαδου"
+   ]
+  },
+  {
+   "id": "person:γραμματικογιαννης",
+   "canonical": "Γραμματικογιάννης",
+   "klass": "person_surname",
+   "covers": [
+    "Ανδρέας Γραμματικογιάννης"
+   ],
+   "aliases": [
+    "γραμματικογιαννη",
+    "γραμματικογιαννης"
+   ]
+  },
+  {
+   "id": "person:γριβα",
+   "canonical": "Γρίβα",
+   "klass": "person_surname",
+   "covers": [
+    "Σοφία Γρίβα"
+   ],
+   "aliases": [
+    "γριβα"
+   ]
+  },
+  {
+   "id": "person:δεδουσης",
+   "canonical": "Δεδούσης",
+   "klass": "person_surname",
+   "covers": [
+    "Πέτρος Δεδούσης"
+   ],
+   "aliases": [
+    "δεδουση",
+    "δεδουσης"
+   ]
+  },
+  {
+   "id": "person:δεκαβαλλας",
+   "canonical": "Δεκαβάλλας",
+   "klass": "person_surname",
+   "covers": [
+    "Κωνσταντίνος Δεκαβάλλας"
+   ],
+   "aliases": [
+    "δεκαβαλλα",
+    "δεκαβαλλας"
+   ]
+  },
+  {
+   "id": "person:δεπουντη",
+   "canonical": "Δεπούντη",
+   "klass": "person_surname",
+   "covers": [
+    "Μαρία Δεπούντη"
+   ],
+   "aliases": [
+    "δεπουντη"
+   ]
+  },
+  {
+   "id": "person:δημου",
+   "canonical": "Δήμου",
+   "klass": "person_surname",
+   "covers": [
+    "Βασίλειος Δήμου",
+    "Δημήτριος Δήμου"
+   ],
+   "aliases": [
+    "δημου"
+   ]
+  },
+  {
+   "id": "person:διαμαντης",
+   "canonical": "Διαμάντης",
+   "klass": "person_surname",
+   "covers": [
+    "Γεώργιος Διαμάντης"
+   ],
+   "aliases": [
+    "διαμαντη",
+    "διαμαντης"
+   ]
+  },
+  {
+   "id": "person:δουκας",
+   "canonical": "Δούκας",
+   "klass": "person_surname",
+   "covers": [
+    "Χάρης Δούκας"
+   ],
+   "aliases": [
+    "δουκα",
+    "δουκας"
+   ]
+  },
+  {
+   "id": "person:δουρου",
+   "canonical": "Δούρου",
+   "klass": "person_surname",
+   "covers": [
+    "Όλγα Δούρου"
+   ],
+   "aliases": [
+    "δουρου"
+   ]
+  },
+  {
+   "id": "person:δρουλια",
+   "canonical": "Δρούλια",
+   "klass": "person_surname",
+   "covers": [
+    "Παναγιώτα Δρούλια"
+   ],
+   "aliases": [
+    "δρουλια"
+   ]
+  },
+  {
+   "id": "person:ευαγγελιδου",
+   "canonical": "Ευαγγελίδου",
+   "klass": "person_surname",
+   "covers": [
+    "Μαρία Ευαγγελίδου"
+   ],
+   "aliases": [
+    "ευαγγελιδου"
+   ]
+  },
+  {
+   "id": "person:ευθυμιου",
+   "canonical": "Ευθυμίου",
+   "klass": "person_surname",
+   "covers": [
+    "Δημήτριος Ευθυμίου"
+   ],
+   "aliases": [
+    "ευθυμιου"
+   ]
+  },
+  {
+   "id": "person:ζαφειρης",
+   "canonical": "Ζαφείρης",
+   "klass": "person_surname",
+   "covers": [
+    "Ιωάννης Ζαφείρης"
+   ],
+   "aliases": [
+    "ζαφειρη",
+    "ζαφειρης"
+   ]
+  },
+  {
+   "id": "person:ζαχαρακης",
+   "canonical": "Ζαχαράκης",
+   "klass": "person_surname",
+   "covers": [
+    "Μελέτης Ζαχαράκης"
+   ],
+   "aliases": [
+    "ζαχαρακη",
+    "ζαχαρακης"
+   ]
+  },
+  {
+   "id": "person:ζαχαριαδης",
+   "canonical": "Ζαχαριάδης",
+   "klass": "person_surname",
+   "covers": [
+    "Κώστας Ζαχαριάδης"
+   ],
+   "aliases": [
+    "ζαχαριαδη",
+    "ζαχαριαδης"
+   ]
+  },
+  {
+   "id": "person:ζαχαροπουλου",
+   "canonical": "Ζαχαροπούλου",
+   "klass": "person_surname",
+   "covers": [
+    "Αθανασία Ζαχαροπούλου",
+    "Μαρία Ζαχαροπούλου"
+   ],
+   "aliases": [
+    "ζαχαροπουλου"
+   ]
+  },
+  {
+   "id": "person:ζοντιρος",
+   "canonical": "Ζοντίρος",
+   "klass": "person_surname",
+   "covers": [
+    "Παναγιώτης Ζοντίρος"
+   ],
+   "aliases": [
+    "ζοντιρε",
+    "ζοντιρο",
+    "ζοντιρος",
+    "ζοντιρου"
+   ]
+  },
+  {
+   "id": "person:ζωντηρου",
+   "canonical": "Ζωντήρου",
+   "klass": "person_surname",
+   "covers": [
+    "Ελένη Ζωντήρου"
+   ],
+   "aliases": [
+    "ζωντηρου"
+   ]
+  },
+  {
+   "id": "person:ζωντου",
+   "canonical": "Ζώντου",
+   "klass": "person_surname",
+   "covers": [
+    "Μαρίνα Ζώντου"
+   ],
+   "aliases": [
+    "ζωντου"
+   ]
+  },
+  {
+   "id": "person:ιατρου",
+   "canonical": "Ιατρού",
+   "klass": "person_surname",
+   "covers": [
+    "Δήμητρα Ιατρού"
+   ],
+   "aliases": [
+    "ιατρου"
+   ]
+  },
+  {
+   "id": "person:ιωαννης",
+   "canonical": "Ιωάννης",
+   "klass": "person_surname",
+   "covers": [
+    "Βακουντούζης Ιωάννης"
+   ],
+   "aliases": [
+    "ιωαννη",
+    "ιωαννης"
+   ]
+  },
+  {
+   "id": "person:καββαθας",
+   "canonical": "Καββαθάς",
+   "klass": "person_surname",
+   "covers": [
+    "Τρύφωνας Καββαθάς"
+   ],
+   "aliases": [
+    "καββαθα",
+    "καββαθας"
+   ]
+  },
+  {
+   "id": "person:καβετσου",
+   "canonical": "Καβέτσου",
+   "klass": "person_surname",
+   "covers": [
+    "Κωνσταντίνα Καβέτσου"
+   ],
+   "aliases": [
+    "καβετσου"
+   ]
+  },
+  {
+   "id": "person:καζαντη",
+   "canonical": "Καζάντη",
+   "klass": "person_surname",
+   "covers": [
+    "Μαρία Καζάντη"
+   ],
+   "aliases": [
+    "καζαντη"
+   ]
+  },
+  {
+   "id": "person:καλαμποκας",
+   "canonical": "Καλαμπόκας",
+   "klass": "person_surname",
+   "covers": [
+    "Εμμανουήλ Καλαμπόκας"
+   ],
+   "aliases": [
+    "καλαμποκα",
+    "καλαμποκας"
+   ]
+  },
+  {
+   "id": "person:καλλιτσης",
+   "canonical": "Καλλίτσης",
+   "klass": "person_surname",
+   "covers": [
+    "Νικόλαος Καλλίτσης"
+   ],
+   "aliases": [
+    "καλλιτση",
+    "καλλιτσης"
+   ]
+  },
+  {
+   "id": "person:κανελλοπουλου",
+   "canonical": "Κανελλοπούλου",
+   "klass": "person_surname",
+   "covers": [
+    "Θεοδώρα Κανελλοπούλου"
+   ],
+   "aliases": [
+    "κανελλοπουλου"
+   ]
+  },
+  {
+   "id": "person:καποδιστριας",
+   "canonical": "Καποδίστριας",
+   "klass": "person_surname",
+   "covers": [
+    "Παναγιώτης Καποδίστριας"
+   ],
+   "aliases": [
+    "καποδιστρια",
+    "καποδιστριας"
+   ]
+  },
+  {
+   "id": "person:καρτσουνης",
+   "canonical": "Καρτσούνης",
+   "klass": "person_surname",
+   "covers": [
+    "Κωνσταντίνος Καρτσούνης"
+   ],
+   "aliases": [
+    "καρτσουνη",
+    "καρτσουνης"
+   ]
+  },
+  {
+   "id": "person:καρυδας",
+   "canonical": "Καρύδας",
+   "klass": "person_surname",
+   "covers": [
+    "Δημήτριος–Ευάγγελος Καρύδας"
+   ],
+   "aliases": [
+    "καρυδα",
+    "καρυδας"
+   ]
+  },
+  {
+   "id": "person:κεγκος",
+   "canonical": "Κέγκος",
+   "klass": "person_surname",
+   "covers": [
+    "Φίλιππος Κέγκος"
+   ],
+   "aliases": [
+    "κεγκε",
+    "κεγκο",
+    "κεγκος",
+    "κεγκου"
+   ]
+  },
+  {
+   "id": "person:κελεπουρη",
+   "canonical": "Κελεπούρη",
+   "klass": "person_surname",
+   "covers": [
+    "Αναστασία Κελεπούρη"
+   ],
+   "aliases": [
+    "κελεπουρη"
+   ]
+  },
+  {
+   "id": "person:κεφαλα",
+   "canonical": "Κεφαλά",
+   "klass": "person_surname",
+   "covers": [
+    "Πολυξένη Κεφαλά"
+   ],
+   "aliases": [
+    "κεφαλα"
+   ]
+  },
+  {
+   "id": "person:κεχαγια",
+   "canonical": "Κεχαγιά",
+   "klass": "person_surname",
+   "covers": [
+    "Χριστίνα Κεχαγιά"
+   ],
+   "aliases": [
+    "κεχαγια"
+   ]
+  },
+  {
+   "id": "person:κλειτσα",
+   "canonical": "Κλείτσα",
+   "klass": "person_surname",
+   "covers": [
+    "Όλγα Κλείτσα"
+   ],
+   "aliases": [
+    "κλειτσα"
+   ]
+  },
+  {
+   "id": "person:κολλατος",
+   "canonical": "Κολλάτος",
+   "klass": "person_surname",
+   "covers": [
+    "Ευγένιος Κολλάτος"
+   ],
+   "aliases": [
+    "κολλατε",
+    "κολλατο",
+    "κολλατος",
+    "κολλατου"
+   ]
+  },
+  {
+   "id": "person:κολλιοπουλος",
+   "canonical": "Κολλιόπουλος",
+   "klass": "person_surname",
+   "covers": [
+    "Διονύσιος Κολλιόπουλος"
+   ],
+   "aliases": [
+    "κολλιοπουλε",
+    "κολλιοπουλο",
+    "κολλιοπουλος",
+    "κολλιοπουλου"
+   ]
+  },
+  {
+   "id": "person:κορκας",
+   "canonical": "Κόρκας",
+   "klass": "person_surname",
+   "covers": [
+    "Γεώργιος Κόρκας"
+   ],
+   "aliases": [
+    "κορκα",
+    "κορκας"
+   ]
+  },
+  {
+   "id": "person:κουτσουμπα",
+   "canonical": "Κουτσούμπα",
+   "klass": "person_surname",
+   "covers": [
+    "Χριστίνα Κουτσούμπα"
+   ],
+   "aliases": [
+    "κουτσουμπα"
+   ]
+  },
+  {
+   "id": "person:κουφακης",
+   "canonical": "Κουφάκης",
+   "klass": "person_surname",
+   "covers": [
+    "Παναγιώτης Κουφάκης"
+   ],
+   "aliases": [
+    "κουφακη",
+    "κουφακης"
+   ]
+  },
+  {
+   "id": "person:λαγος",
+   "canonical": "Λάγος",
+   "klass": "person_surname",
+   "covers": [
+    "Ευστάθιος Λάγος"
+   ],
+   "aliases": [
+    "λαγε",
+    "λαγο",
+    "λαγος",
+    "λαγου"
+   ]
+  },
+  {
+   "id": "person:λαλιωτης",
+   "canonical": "Λαλιώτης",
+   "klass": "person_surname",
+   "covers": [
+    "Νικόλαος Λαλιώτης"
+   ],
+   "aliases": [
+    "λαλιωτη",
+    "λαλιωτης"
+   ]
+  },
+  {
+   "id": "person:λιγνος",
+   "canonical": "Λιγνός",
+   "klass": "person_surname",
+   "covers": [
+    "Γεράσιμος Λιγνός"
+   ],
+   "aliases": [
+    "λιγνο",
+    "λιγνος"
+   ]
+  },
+  {
+   "id": "person:λιμνιωτακη",
+   "canonical": "Λιμνιωτάκη",
+   "klass": "person_surname",
+   "covers": [
+    "Δέσποινα Λιμνιωτάκη"
+   ],
+   "aliases": [
+    "λιμνιωτακη"
+   ]
+  },
+  {
+   "id": "person:λοκα",
+   "canonical": "Λόκα",
+   "klass": "person_surname",
+   "covers": [
+    "Μαρία Λόκα"
+   ],
+   "aliases": [
+    "λοκα"
+   ]
+  },
+  {
+   "id": "person:μαγειρου",
+   "canonical": "Μαγείρου",
+   "klass": "person_surname",
+   "covers": [
+    "Ελένη Μαγείρου"
+   ],
+   "aliases": [
+    "μαγειρου"
+   ]
+  },
+  {
+   "id": "person:μαντζαβινου",
+   "canonical": "Μαντζαβίνου",
+   "klass": "person_surname",
+   "covers": [
+    "Ελένη Μαντζαβίνου"
+   ],
+   "aliases": [
+    "μαντζαβινου"
+   ]
+  },
+  {
+   "id": "person:μαρκουιζος",
+   "canonical": "Μαρκουίζος",
+   "klass": "person_surname",
+   "covers": [
+    "Ηρακλής Μαρκουίζος"
+   ],
+   "aliases": [
+    "μαρκουιζε",
+    "μαρκουιζο",
+    "μαρκουιζος",
+    "μαρκουιζου"
+   ]
+  },
+  {
+   "id": "person:μεγαλοοικονομου_νακου",
+   "canonical": "Μεγαλοοικονόμου–Νάκου",
+   "klass": "person_surname",
+   "covers": [
+    "Ελένη Μεγαλοοικονόμου–Νάκου"
+   ],
+   "aliases": [
+    "μεγαλοοικονομου νακου"
+   ]
+  },
+  {
+   "id": "person:μελετη",
+   "canonical": "Μελέτη",
+   "klass": "person_surname",
+   "covers": [
+    "Μαρία Μαργαρίτα Μελέτη"
+   ],
+   "aliases": [
+    "μελετη"
+   ]
+  },
+  {
+   "id": "person:μητροπουλου_κατσικη",
+   "canonical": "Μητροπούλου-Κατσίκη",
+   "klass": "person_surname",
+   "covers": [
+    "Γερασιμούλα Μητροπούλου-Κατσίκη"
+   ],
+   "aliases": [
+    "μητροπουλου κατσικη"
+   ]
+  },
+  {
+   "id": "person:μοναστηριωτης",
+   "canonical": "Μοναστηριώτης",
+   "klass": "person_surname",
+   "covers": [
+    "Αναστάσιος Μοναστηριώτης"
+   ],
+   "aliases": [
+    "μοναστηριωτη",
+    "μοναστηριωτης"
+   ]
+  },
+  {
+   "id": "person:μπακογιαννης",
+   "canonical": "Μπακογιάννης",
+   "klass": "person_surname",
+   "covers": [
+    "Κώστας Μπακογιάννης"
+   ],
+   "aliases": [
+    "μπακογιαννη",
+    "μπακογιαννης"
+   ]
+  },
+  {
+   "id": "person:μπαρκα",
+   "canonical": "Μπάρκα",
+   "klass": "person_surname",
+   "covers": [
+    "Βασιλική Μπάρκα"
+   ],
+   "aliases": [
+    "μπαρκα"
+   ]
+  },
+  {
+   "id": "person:μπεη_καραμποτσου",
+   "canonical": "Μπέη-Καραμπότσου",
+   "klass": "person_surname",
+   "covers": [
+    "Ρωξάνη-Ευαγγελία Μπέη-Καραμπότσου"
+   ],
+   "aliases": [
+    "μπεη καραμποτσου"
+   ]
+  },
+  {
+   "id": "person:νετος",
+   "canonical": "Νέτος",
+   "klass": "person_surname",
+   "covers": [
+    "Γεώργιος Νέτος"
+   ],
+   "aliases": [
+    "νετε",
+    "νετο",
+    "νετος",
+    "νετου"
+   ]
+  },
+  {
+   "id": "person:νταφερ",
+   "canonical": "Νταφέρ",
+   "klass": "person_surname",
+   "covers": [
+    "Χαμντί Νταφέρ"
+   ],
+   "aliases": [
+    "νταφερ"
+   ]
+  },
+  {
+   "id": "person:ξυνελης",
+   "canonical": "Ξυνέλης",
+   "klass": "person_surname",
+   "covers": [
+    "Παναγιώτης Ξυνέλης"
+   ],
+   "aliases": [
+    "ξυνελη",
+    "ξυνελης"
+   ]
+  },
+  {
+   "id": "person:παλλα",
+   "canonical": "Πάλλα",
+   "klass": "person_surname",
+   "covers": [
+    "Λυδία Πάλλα"
+   ],
+   "aliases": [
+    "παλλα"
+   ]
+  },
+  {
+   "id": "person:πανοπουλος",
+   "canonical": "Πανόπουλος",
+   "klass": "person_surname",
+   "covers": [
+    "Απόστολος Πανόπουλος"
+   ],
+   "aliases": [
+    "πανοπουλε",
+    "πανοπουλο",
+    "πανοπουλος",
+    "πανοπουλου"
+   ]
+  },
+  {
+   "id": "person:παντελιδου",
+   "canonical": "Παντελίδου",
+   "klass": "person_surname",
+   "covers": [
+    "Ροδομαρία Δομάζου Παντελίδου"
+   ],
+   "aliases": [
+    "παντελιδου"
+   ]
+  },
+  {
+   "id": "person:παπαγεωργιου",
+   "canonical": "Παπαγεωργίου",
+   "klass": "person_surname",
+   "covers": [
+    "Χρυσούλα Παπαγεωργίου"
+   ],
+   "aliases": [
+    "παπαγεωργιου"
+   ]
+  },
+  {
+   "id": "person:παπαδακης",
+   "canonical": "Παπαδάκης",
+   "klass": "person_surname",
+   "covers": [
+    "Κώστας Παπαδάκης"
+   ],
+   "aliases": [
+    "παπαδακη",
+    "παπαδακης"
+   ]
+  },
+  {
+   "id": "person:παπαδοπουλου",
+   "canonical": "Παπαδοπούλου",
+   "klass": "person_surname",
+   "covers": [
+    "Ελένη Παπαδοπούλου"
+   ],
+   "aliases": [
+    "παπαδοπουλου"
+   ]
+  },
+  {
+   "id": "person:παπαχρηστου",
+   "canonical": "Παπαχρήστου",
+   "klass": "person_surname",
+   "covers": [
+    "Σοφία Παπαχρήστου"
+   ],
+   "aliases": [
+    "παπαχρηστου"
+   ]
+  },
+  {
+   "id": "person:παππας",
+   "canonical": "Παππάς",
+   "klass": "person_surname",
+   "covers": [
+    "Αθανάσιος Παππάς"
+   ],
+   "aliases": [
+    "παππα",
+    "παππας"
+   ]
+  },
+  {
+   "id": "person:περδικος",
+   "canonical": "Πέρδικος",
+   "klass": "person_surname",
+   "covers": [
+    "Πρόδρομος Πέρδικος"
+   ],
+   "aliases": [
+    "περδικε",
+    "περδικο",
+    "περδικος",
+    "περδικου"
+   ]
+  },
+  {
+   "id": "person:πετρακη",
+   "canonical": "Πετράκη",
+   "klass": "person_surname",
+   "covers": [
+    "Αναστασία Πετράκη"
+   ],
+   "aliases": [
+    "πετρακη"
+   ]
+  },
+  {
+   "id": "person:πετρος",
+   "canonical": "Πέτρος",
+   "klass": "person_surname",
+   "covers": [
+    "Κωνσταντίνου Πέτρος"
+   ],
+   "aliases": [
+    "πετρε",
+    "πετρο",
+    "πετρος",
+    "πετρου"
+   ]
+  },
+  {
+   "id": "person:πλατανιας",
+   "canonical": "Πλατανιάς",
+   "klass": "person_surname",
+   "covers": [
+    "Αθανάσιος Πλατανιάς"
+   ],
+   "aliases": [
+    "πλατανια",
+    "πλατανιας"
+   ]
+  },
+  {
+   "id": "person:ποθητος",
+   "canonical": "Ποθητός",
+   "klass": "person_surname",
+   "covers": [
+    "Γεώργιος Ποθητός"
+   ],
+   "aliases": [
+    "ποθητο",
+    "ποθητος"
+   ]
+  },
+  {
+   "id": "person:πολυζωη",
+   "canonical": "Πολυζώη",
+   "klass": "person_surname",
+   "covers": [
+    "Ελένη Πολυζώη"
+   ],
+   "aliases": [
+    "πολυζωη"
+   ]
+  },
+  {
+   "id": "person:πρεζερακου",
+   "canonical": "Πρεζεράκου",
+   "klass": "person_surname",
+   "covers": [
+    "Καλλιόπη Πρεζεράκου"
+   ],
+   "aliases": [
+    "πρεζερακου"
+   ]
+  },
+  {
+   "id": "person:πρωτοψαλτης",
+   "canonical": "Πρωτοψάλτης",
+   "klass": "person_surname",
+   "covers": [
+    "Ιωάννης Πρωτοψάλτης"
+   ],
+   "aliases": [
+    "πρωτοψαλτη",
+    "πρωτοψαλτης"
+   ]
+  },
+  {
+   "id": "person:ραπτακης",
+   "canonical": "Ραπτάκης",
+   "klass": "person_surname",
+   "covers": [
+    "Βασίλειος Ραπτάκης"
+   ],
+   "aliases": [
+    "ραπτακη",
+    "ραπτακης"
+   ]
+  },
+  {
+   "id": "person:σακελλαριου",
+   "canonical": "Σακελλαρίου",
+   "klass": "person_surname",
+   "covers": [
+    "Θεοπίστη Σακελλαρίου"
+   ],
+   "aliases": [
+    "σακελλαριου"
+   ]
+  },
+  {
+   "id": "person:σιδερης",
+   "canonical": "Σιδέρης",
+   "klass": "person_surname",
+   "covers": [
+    "Κωνσταντίνος Σιδέρης"
+   ],
+   "aliases": [
+    "σιδερης"
+   ]
+  },
+  {
+   "id": "person:σκιαδας",
+   "canonical": "Σκιαδάς",
+   "klass": "person_surname",
+   "covers": [
+    "Ελευθέριος Σκιαδάς"
+   ],
+   "aliases": [
+    "σκιαδα",
+    "σκιαδας"
+   ]
+  },
+  {
+   "id": "person:σκουμπουρδη",
+   "canonical": "Σκουμπουρδή",
+   "klass": "person_surname",
+   "covers": [
+    "Άρτεμις Σκουμπουρδή"
+   ],
+   "aliases": [
+    "σκουμπουρδη"
+   ]
+  },
+  {
+   "id": "person:σμερου",
+   "canonical": "Σμέρου",
+   "klass": "person_surname",
+   "covers": [
+    "Γεωργία Σμέρου"
+   ],
+   "aliases": [
+    "σμερου"
+   ]
+  },
+  {
+   "id": "person:σοφιανος",
+   "canonical": "Σοφιανός",
+   "klass": "person_surname",
+   "covers": [
+    "Νίκος Σοφιανός"
+   ],
+   "aliases": [
+    "σοφιανο",
+    "σοφιανος"
+   ]
+  },
+  {
+   "id": "person:σταμου",
+   "canonical": "Στάμου",
+   "klass": "person_surname",
+   "covers": [
+    "Σταυριάννη Στάμου"
+   ],
+   "aliases": [
+    "σταμου"
+   ]
+  },
+  {
+   "id": "person:στρατηγακη",
+   "canonical": "Στρατηγάκη",
+   "klass": "person_surname",
+   "covers": [
+    "Μαρία Στρατηγάκη"
+   ],
+   "aliases": [
+    "στρατηγακη"
+   ]
+  },
+  {
+   "id": "person:τεντομας",
+   "canonical": "Τεντόμας",
+   "klass": "person_surname",
+   "covers": [
+    "Χρήστος Τεντόμας"
+   ],
+   "aliases": [
+    "τεντομα",
+    "τεντομας"
+   ]
+  },
+  {
+   "id": "person:τσαλικη",
+   "canonical": "Τσαλίκη",
+   "klass": "person_surname",
+   "covers": [
+    "Νεραντζούλα Τσαλίκη"
+   ],
+   "aliases": [
+    "τσαλικη"
+   ]
+  },
+  {
+   "id": "person:τσαρος",
+   "canonical": "Τσαρός",
+   "klass": "person_surname",
+   "covers": [
+    "Περικλής Τσαρός"
+   ],
+   "aliases": [
+    "τσαρο",
+    "τσαρος"
+   ]
+  },
+  {
+   "id": "person:τσαρουχα",
+   "canonical": "Τσαρουχά",
+   "klass": "person_surname",
+   "covers": [
+    "Μαρία Τσαρουχά"
+   ],
+   "aliases": [
+    "τσαρουχα"
+   ]
+  },
+  {
+   "id": "person:τσιμπλακη",
+   "canonical": "Τσιμπλάκη",
+   "klass": "person_surname",
+   "covers": [
+    "Παναγιώτα Τσιμπλάκη"
+   ],
+   "aliases": [
+    "τσιμπλακη"
+   ]
+  },
+  {
+   "id": "person:τσουκατου",
+   "canonical": "Τσουκάτου",
+   "klass": "person_surname",
+   "covers": [
+    "Αγγελική Τσουκάτου"
+   ],
+   "aliases": [
+    "τσουκατου"
+   ]
+  },
+  {
+   "id": "person:φελεκης",
+   "canonical": "Φελέκης",
+   "klass": "person_surname",
+   "covers": [
+    "Ιωάννης Φελέκης"
+   ],
+   "aliases": [
+    "φελεκη",
+    "φελεκης"
+   ]
+  },
+  {
+   "id": "person:φιλοσοφου",
+   "canonical": "Φιλοσόφου",
+   "klass": "person_surname",
+   "covers": [
+    "Σωτηρία Φιλοσόφου"
+   ],
+   "aliases": [
+    "φιλοσοφου"
+   ]
+  },
+  {
+   "id": "person:φουντζουλα",
+   "canonical": "Φούντζουλα",
+   "klass": "person_surname",
+   "covers": [
+    "Ασήμω Φούντζουλα"
+   ],
+   "aliases": [
+    "φουντζουλα"
+   ]
+  },
+  {
+   "id": "person:φουσεκη_παπαπροκοπιου",
+   "canonical": "Φουσέκη-Παπαπροκοπίου",
+   "klass": "person_surname",
+   "covers": [
+    "Ευσταθία Φουσέκη-Παπαπροκοπίου"
+   ],
+   "aliases": [
+    "φουσεκη παπαπροκοπιου"
+   ]
+  },
+  {
+   "id": "person:φραγκιουδακη_κωνσταντακη",
+   "canonical": "Φραγκιουδάκη–Κωνσταντάκη",
+   "klass": "person_surname",
+   "covers": [
+    "Κυριακή Φραγκιουδάκη–Κωνσταντάκη"
+   ],
+   "aliases": [
+    "φραγκιουδακη κωνσταντακη"
+   ]
+  },
+  {
+   "id": "person:φωτακη",
+   "canonical": "Φωτάκη",
+   "klass": "person_surname",
+   "covers": [
+    "Κωνσταντίνα Φωτάκη"
+   ],
+   "aliases": [
+    "φωτακη"
+   ]
+  },
+  {
+   "id": "person:χαλικια",
+   "canonical": "Χαλικιά",
+   "klass": "person_surname",
+   "covers": [
+    "Ειρήνη Αγλαΐα Χαλικιά"
+   ],
+   "aliases": [
+    "χαλικια"
+   ]
+  },
+  {
+   "id": "person:χαραλαμπος",
+   "canonical": "Χαράλαμπος",
+   "klass": "person_surname",
+   "covers": [
+    "Γιαννακόπουλος Χαράλαμπος"
+   ],
+   "aliases": [
+    "χαραλαμπε",
+    "χαραλαμπο",
+    "χαραλαμπος",
+    "χαραλαμπου"
+   ]
+  },
+  {
+   "id": "person:χαρλαυτης",
+   "canonical": "Χαρλαύτης",
+   "klass": "person_surname",
+   "covers": [
+    "Παναγιώτης-Πάρης Χαρλαύτης"
+   ],
+   "aliases": [
+    "χαρλαυτη",
+    "χαρλαυτης"
+   ]
+  },
+  {
+   "id": "person:χειμωνας",
+   "canonical": "Χειμωνάς",
+   "klass": "person_surname",
+   "covers": [
+    "Αθανάσιος Χειμωνάς"
+   ],
+   "aliases": [
+    "χειμωνα",
+    "χειμωνας"
+   ]
+  },
+  {
+   "id": "person:χρηστος",
+   "canonical": "Χρήστος",
+   "klass": "person_surname",
+   "covers": [
+    "Κομνηνός Χρήστος"
+   ],
+   "aliases": [
+    "χρηστε",
+    "χρηστο",
+    "χρηστος",
+    "χρηστου"
+   ]
+  },
+  {
+   "id": "person:χριστοφοριδης",
+   "canonical": "Χριστοφορίδης",
+   "klass": "person_surname",
+   "covers": [
+    "Ιωάννης Χριστοφορίδης"
+   ],
+   "aliases": [
+    "χριστοφοριδη",
+    "χριστοφοριδης"
+   ]
+  },
+  {
+   "id": "person:χρυσογελος",
+   "canonical": "Χρυσόγελος",
+   "klass": "person_surname",
+   "covers": [
+    "Νικόλαος Χρυσόγελος"
+   ],
+   "aliases": [
+    "χρυσογελε",
+    "χρυσογελο",
+    "χρυσογελος",
+    "χρυσογελου"
+   ]
+  },
+  {
+   "id": "person:ψημμενου",
+   "canonical": "Ψημμένου",
+   "klass": "person_surname",
+   "covers": [
+    "Γιαννούλα Ψημμένου"
+   ],
+   "aliases": [
+    "ψημμενου"
+   ]
+  },
+  {
+   "id": "place:city_name",
+   "canonical": "Αθήνα",
+   "klass": "place_name",
+   "covers": [
+    "Αθήνα"
+   ],
+   "aliases": [
+    "αθηνα"
+   ]
+  },
+  {
+   "id": "place:municipality_name",
+   "canonical": "Δήμος Αθηναίων",
+   "klass": "place_name",
+   "covers": [
+    "Δήμος Αθηναίων"
+   ],
+   "aliases": [
+    "δημος αθηναιων"
+   ]
+  }
+ ],
+ "dropped_aliases": [
+  {
+   "alias": "Αρβανίτη",
+   "reason": "collision",
+   "term": "person:αρβανιτη"
+  },
+  {
+   "alias": "Αρβανίτη",
+   "reason": "collision",
+   "term": "person:αρβανιτης"
+  },
+  {
+   "alias": "Γιαννόπουλου",
+   "reason": "collision",
+   "term": "person:γιαννοπουλος"
+  },
+  {
+   "alias": "Γιαννοπούλου",
+   "reason": "collision",
+   "term": "person:γιαννοπουλου"
+  },
+  {
+   "alias": "Σιδερή",
+   "reason": "collision",
+   "term": "person:σιδερη"
+  },
+  {
+   "alias": "Σιδέρη",
+   "reason": "collision",
+   "term": "person:σιδερης"
+  },
+  {
+   "alias": "Αρβανίτη",
+   "reason": "no_usable_alias",
+   "term": "person:αρβανιτη"
+  },
+  {
+   "alias": "Γιαννοπούλου",
+   "reason": "no_usable_alias",
+   "term": "person:γιαννοπουλου"
+  },
+  {
+   "alias": "Σιδερή",
+   "reason": "no_usable_alias",
+   "term": "person:σιδερη"
+  }
+ ]
+}
