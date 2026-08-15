@@ -1,0 +1,3487 @@
+{
+ "city": "orestiada",
+ "version": 2,
+ "supersedes": "research/ds_wer/terms/orestiada.json (v1, 2026-08-11)",
+ "retrieved": "2026-08-15",
+ "cuts": {
+  "entities": [
+   "person_surname",
+   "person_full_name",
+   "org_party",
+   "org_body",
+   "place_city",
+   "place_municipality",
+   "place_admin_unit",
+   "place_settlement_osm"
+  ],
+  "procedure": [
+   "procedural",
+   "org_body_generic"
+  ],
+  "all": [
+   "person_surname",
+   "person_full_name",
+   "org_party",
+   "org_body",
+   "place_city",
+   "place_municipality",
+   "place_admin_unit",
+   "place_settlement_osm",
+   "procedural",
+   "org_body_generic"
+  ]
+ },
+ "primary_cut": "entities",
+ "provenance": {
+  "opencouncil_people": {
+   "url": "https://opencouncil.gr/api/cities/orestiada/people",
+   "sha256": "eb7a4af873bfb6362c517d6530d85ecb39c010040510f3ae667700317c66f163",
+   "n_people": 33
+  },
+  "opencouncil_city": {
+   "url": "https://opencouncil.gr/api/cities/orestiada",
+   "sha256": "5b79e84d926758a61f79317e269bc95dfe7c9364a781361d6a39c41b57c32917"
+  },
+  "elstat2021": {
+   "url": "https://www.statistics.gr/documents/20181/17286366/APOF_APOT_MON_DHM_KOIN.pdf/41ae8e6c-5860-b58e-84f7-b64f9bc53ec4",
+   "heading": "ΔΗΜΟΣ ΟΡΕΣΤΙΑΔΑΣ",
+   "n_units": 34,
+   "sha256": "f6348894338358a119ea7d2bc892e27495521a08fd23c09e4326ec39328397eb"
+  },
+  "osm": {
+   "endpoint": "https://overpass-api.de/api/interpreter",
+   "query": "[out:json][timeout:120];rel(2345114);map_to_area->.a;(node[\"place\"~\"^(city|town|village|hamlet|suburb|quarter)$\"](area.a););out tags meta;",
+   "sha256": "8c1a1c974a236e179a7433250ffe10564ea89ce4b26669af14812bad63c15c04",
+   "relation": 2345114,
+   "retrieved": "2026-08-15",
+   "n_elements": 47,
+   "merged_into_elstat": 22,
+   "osm_only_terms": 24,
+   "elements": [
+    {
+     "type": "node",
+     "id": 299263482,
+     "version": 31,
+     "timestamp": "2025-02-02T18:41:00Z",
+     "place": "town",
+     "name": "Ορεστιάδα",
+     "name_el": "Ορεστιάδα"
+    },
+    {
+     "type": "node",
+     "id": 299263609,
+     "version": 14,
+     "timestamp": "2025-02-02T18:41:00Z",
+     "place": "town",
+     "name": "Νέα Βύσσα",
+     "name_el": "Νέα Βύσσα"
+    },
+    {
+     "type": "node",
+     "id": 299264626,
+     "version": 20,
+     "timestamp": "2026-05-23T19:38:46Z",
+     "place": "hamlet",
+     "name": "Δίλοφος",
+     "name_el": "Δίλοφος"
+    },
+    {
+     "type": "node",
+     "id": 299265038,
+     "version": 20,
+     "timestamp": "2023-09-01T08:32:30Z",
+     "place": "village",
+     "name": "Ρίζια",
+     "name_el": "Ρίζια"
+    },
+    {
+     "type": "node",
+     "id": 299266542,
+     "version": 16,
+     "timestamp": "2023-08-22T02:05:10Z",
+     "place": "village",
+     "name": "Νεοχώρι",
+     "name_el": "Νεοχώρι"
+    },
+    {
+     "type": "node",
+     "id": 299266545,
+     "version": 9,
+     "timestamp": "2022-12-10T01:13:49Z",
+     "place": "village",
+     "name": "Νέος Πύργος",
+     "name_el": "Νέος Πύργος"
+    },
+    {
+     "type": "node",
+     "id": 299266548,
+     "version": 17,
+     "timestamp": "2023-08-22T02:05:10Z",
+     "place": "village",
+     "name": "Σάκκος",
+     "name_el": "Σάκκος"
+    },
+    {
+     "type": "node",
+     "id": 299266549,
+     "version": 17,
+     "timestamp": "2023-08-22T02:05:10Z",
+     "place": "village",
+     "name": "Καβύλη",
+     "name_el": "Καβύλη"
+    },
+    {
+     "type": "node",
+     "id": 299266559,
+     "version": 17,
+     "timestamp": "2023-08-22T02:05:10Z",
+     "place": "village",
+     "name": "Στέρνα",
+     "name_el": "Στέρνα"
+    },
+    {
+     "type": "node",
+     "id": 299266593,
+     "version": 17,
+     "timestamp": "2023-08-22T02:05:10Z",
+     "place": "village",
+     "name": "Φυλάκιο",
+     "name_el": "Φυλάκιο"
+    },
+    {
+     "type": "node",
+     "id": 299266596,
+     "version": 13,
+     "timestamp": "2023-08-22T02:05:10Z",
+     "place": "village",
+     "name": "Ελιά",
+     "name_el": "Ελιά"
+    },
+    {
+     "type": "node",
+     "id": 301029012,
+     "version": 19,
+     "timestamp": "2023-09-14T20:03:38Z",
+     "place": "village",
+     "name": "Κριός",
+     "name_el": "Κριός"
+    },
+    {
+     "type": "node",
+     "id": 301029269,
+     "version": 21,
+     "timestamp": "2025-01-20T10:43:56Z",
+     "place": "village",
+     "name": "Μαράσια",
+     "name_el": "Μαράσια"
+    },
+    {
+     "type": "node",
+     "id": 301030303,
+     "version": 14,
+     "timestamp": "2023-08-22T02:05:10Z",
+     "place": "village",
+     "name": "Αμμόβουνο",
+     "name_el": "Αμμόβουνο"
+    },
+    {
+     "type": "node",
+     "id": 301031194,
+     "version": 19,
+     "timestamp": "2023-08-22T02:05:10Z",
+     "place": "village",
+     "name": "Λεπτή",
+     "name_el": "Λεπτή"
+    },
+    {
+     "type": "node",
+     "id": 1533293010,
+     "version": 14,
+     "timestamp": "2023-09-14T19:59:38Z",
+     "place": "village",
+     "name": "Άρζος",
+     "name_el": "Άρζος"
+    },
+    {
+     "type": "node",
+     "id": 1533293011,
+     "version": 13,
+     "timestamp": "2023-08-22T02:05:10Z",
+     "place": "village",
+     "name": "Κέραμος",
+     "name_el": "Κέραμος"
+    },
+    {
+     "type": "node",
+     "id": 1770245609,
+     "version": 18,
+     "timestamp": "2023-08-22T02:05:10Z",
+     "place": "village",
+     "name": "Καστανιές",
+     "name_el": "Καστανιές"
+    },
+    {
+     "type": "node",
+     "id": 1806255061,
+     "version": 12,
+     "timestamp": "2023-08-22T02:05:10Z",
+     "place": "village",
+     "name": "Αμπελάκια",
+     "name_el": "Αμπελάκια"
+    },
+    {
+     "type": "node",
+     "id": 1806255062,
+     "version": 11,
+     "timestamp": "2023-08-22T02:05:10Z",
+     "place": "village",
+     "name": "Βάλτος",
+     "name_el": "Βάλτος"
+    },
+    {
+     "type": "node",
+     "id": 1806255065,
+     "version": 11,
+     "timestamp": "2023-08-22T02:05:10Z",
+     "place": "hamlet",
+     "name": "Γαλήνη",
+     "name_el": "Γαλήνη"
+    },
+    {
+     "type": "node",
+     "id": 1806255068,
+     "version": 13,
+     "timestamp": "2023-09-14T20:00:37Z",
+     "place": "village",
+     "name": "Δίκαια",
+     "name_el": "Δίκαια"
+    },
+    {
+     "type": "node",
+     "id": 1806255079,
+     "version": 11,
+     "timestamp": "2023-08-22T02:05:10Z",
+     "place": "village",
+     "name": "Ζώνη",
+     "name_el": "Ζώνη"
+    },
+    {
+     "type": "node",
+     "id": 1806255080,
+     "version": 12,
+     "timestamp": "2024-04-23T10:58:06Z",
+     "place": "village",
+     "name": "Θεραπειό",
+     "name_el": "Θεραπειό"
+    },
+    {
+     "type": "node",
+     "id": 1806255082,
+     "version": 13,
+     "timestamp": "2023-08-22T02:05:10Z",
+     "place": "village",
+     "name": "Θούριο",
+     "name_el": "Θούριο"
+    },
+    {
+     "type": "node",
+     "id": 1806255085,
+     "version": 12,
+     "timestamp": "2023-09-14T20:02:41Z",
+     "place": "village",
+     "name": "Καναδάς",
+     "name_el": "Καναδάς"
+    },
+    {
+     "type": "node",
+     "id": 1806255096,
+     "version": 13,
+     "timestamp": "2023-08-22T02:05:10Z",
+     "place": "village",
+     "name": "Κυπρίνος",
+     "name_el": "Κυπρίνος"
+    },
+    {
+     "type": "node",
+     "id": 1806255109,
+     "version": 13,
+     "timestamp": "2023-08-22T02:05:10Z",
+     "place": "village",
+     "name": "Κόμαρα",
+     "name_el": "Κόμαρα"
+    },
+    {
+     "type": "node",
+     "id": 1806255111,
+     "version": 12,
+     "timestamp": "2023-09-01T09:30:53Z",
+     "place": "village",
+     "name": "Μεγάλη Δοξιπάρα",
+     "name_el": "Μεγάλη Δοξιπάρα"
+    },
+    {
+     "type": "node",
+     "id": 1806255116,
+     "version": 10,
+     "timestamp": "2023-08-22T02:05:10Z",
+     "place": "village",
+     "name": "Μηλιά",
+     "name_el": "Μηλιά"
+    },
+    {
+     "type": "node",
+     "id": 1806255155,
+     "version": 12,
+     "timestamp": "2025-04-28T07:29:52Z",
+     "place": "village",
+     "name": "Μικρή Δοξιπάρα",
+     "name_el": "Μικρή Δοξιπάρα"
+    },
+    {
+     "type": "node",
+     "id": 1806255157,
+     "version": 12,
+     "timestamp": "2025-05-10T20:14:13Z",
+     "place": "village",
+     "name": "Νέο Χειμώνιο",
+     "name_el": "Νέο Χειμώνιο"
+    },
+    {
+     "type": "node",
+     "id": 1806255159,
+     "version": 13,
+     "timestamp": "2024-01-06T00:00:28Z",
+     "place": "village",
+     "name": "Ορμένιο",
+     "name_el": "Ορμένιο"
+    },
+    {
+     "type": "node",
+     "id": 1806255173,
+     "version": 11,
+     "timestamp": "2023-08-22T02:05:10Z",
+     "place": "village",
+     "name": "Πάλλη",
+     "name_el": "Πάλλη"
+    },
+    {
+     "type": "node",
+     "id": 1806255202,
+     "version": 3,
+     "timestamp": "2022-09-07T08:36:54Z",
+     "place": "hamlet",
+     "name": "Παλαιά Σαγήνη",
+     "name_el": "Παλαιά Σαγήνη"
+    },
+    {
+     "type": "node",
+     "id": 1806255207,
+     "version": 12,
+     "timestamp": "2023-08-22T02:05:10Z",
+     "place": "village",
+     "name": "Παταγή",
+     "name_el": "Παταγή"
+    },
+    {
+     "type": "node",
+     "id": 1806255215,
+     "version": 14,
+     "timestamp": "2023-08-22T02:05:10Z",
+     "place": "village",
+     "name": "Πεντάλοφος",
+     "name_el": "Πεντάλοφος"
+    },
+    {
+     "type": "node",
+     "id": 1806255226,
+     "version": 14,
+     "timestamp": "2023-08-22T02:05:10Z",
+     "place": "village",
+     "name": "Πετρωτά",
+     "name_el": "Πετρωτά"
+    },
+    {
+     "type": "node",
+     "id": 1806255240,
+     "version": 13,
+     "timestamp": "2023-08-22T02:05:10Z",
+     "place": "village",
+     "name": "Πλάτη",
+     "name_el": "Πλάτη"
+    },
+    {
+     "type": "node",
+     "id": 1806255271,
+     "version": 11,
+     "timestamp": "2023-08-22T02:05:10Z",
+     "place": "village",
+     "name": "Σπήλαιο",
+     "name_el": "Σπήλαιο"
+    },
+    {
+     "type": "node",
+     "id": 1806255274,
+     "version": 13,
+     "timestamp": "2026-01-28T01:06:13Z",
+     "place": "village",
+     "name": "Πτελέα",
+     "name_el": "Πτελέα"
+    },
+    {
+     "type": "node",
+     "id": 1806255277,
+     "version": 10,
+     "timestamp": "2023-08-22T02:05:10Z",
+     "place": "village",
+     "name": "Χανδράς",
+     "name_el": "Χανδράς"
+    },
+    {
+     "type": "node",
+     "id": 1806255279,
+     "version": 10,
+     "timestamp": "2023-08-22T02:05:10Z",
+     "place": "village",
+     "name": "Χελιδόνα",
+     "name_el": "Χελιδόνα"
+    },
+    {
+     "type": "node",
+     "id": 9283675660,
+     "version": 3,
+     "timestamp": "2023-09-14T20:06:03Z",
+     "place": "hamlet",
+     "name": "Γυαλιά Έβρου",
+     "name_el": "Γυαλιά Έβρου"
+    },
+    {
+     "type": "node",
+     "id": 9385756189,
+     "version": 1,
+     "timestamp": "2022-01-02T14:36:01Z",
+     "place": "hamlet",
+     "name": "Σ.Ο.Α. Στρατοπέδου Σταθάτου",
+     "name_el": null
+    },
+    {
+     "type": "node",
+     "id": 13621785437,
+     "version": 3,
+     "timestamp": "2026-06-25T22:13:36Z",
+     "place": "village",
+     "name": "Βέργη",
+     "name_el": "Βέργη"
+    },
+    {
+     "type": "node",
+     "id": 13621785438,
+     "version": 3,
+     "timestamp": "2026-06-25T22:13:36Z",
+     "place": "village",
+     "name": "Νεφέλη",
+     "name_el": "Νεφέλη"
+    }
+   ]
+  },
+  "modelreg": {
+   "url": "https://www.ypes.gr/wp-content/uploads/2025/01/apof2804-20250120-fek-109B-20250121.pdf",
+   "sha256": "e6b3b2ca7566ea9d934451b719546fa264a4c3b8a1e1f81c48dda18943ce477a"
+  }
+ },
+ "rule": {
+  "never": "no term is taken from, or filtered by, any model output, decode, provider hypothesis or error analysis",
+  "common_word_stoplist": {
+   "applies_to": [
+    "person_surname",
+    "person_full_name",
+    "org_party",
+    "org_body",
+    "place_city",
+    "place_municipality",
+    "place_admin_unit",
+    "place_settlement_osm"
+   ],
+   "rule_a": "normalized alias (whole alias, any length) occurs >= 5 times in the 220 benchmark windows (66912 tokens) of the eight cities that are NOT argos/orestiada. Rejection only.",
+   "rule_a_sensitivity_alias_rejections": {
+    "3": 2,
+    "5": 2,
+    "10": 0
+   },
+   "rule_b": "single-token place/organisation alias is a lowercase (common-noun) headword of el_GR hunspell (https://raw.githubusercontent.com/LibreOffice/dictionaries/master/el_GR/el_GR.dic)",
+   "rule_b_deviation": "Codex advised recording rule_b as a diagnostic only. It is enforced here because the seen-city corpus is ~67k tokens, too small for rule_a to reject Γυμνό/Εξοχή/Λίμνες/Αεροδρόμιο; every rule_b rejection is listed in dropped_aliases."
+  },
+  "given_names": "standalone given names are NOT terms; full names are atomic multi-token terms instead (G6)",
+  "aliases_from": "fixed Greek suffix rules in scripts/build_ds_wer_terms.py::inflect for single-token person names and their full-name cross product; otherwise the source string verbatim",
+  "osm_merge_rule": "an OSM nominative merges into the ELSTAT community term when the normalized first tokens share a >= 5 character prefix and the match is unique; otherwise it becomes a separate place_settlement_osm term",
+  "alias_normalization": "aliases are stored already normalized by the frozen scorer (eval.controlled_eval.eval_freeze.ftoks); the matcher uses the same normalizer",
+  "min_alias_chars": 4,
+  "collision_rule": "an alias claimed by more than one term is dropped from every term that claims it"
+ },
+ "same_entity_merges": [
+  {
+   "kept": "body:δημοτικη_επιτροπη",
+   "klass": "org_body_generic",
+   "absorbed": [
+    "proc:δημοτικη_επιτροπη"
+   ]
+  },
+  {
+   "kept": "body:δημοτικο_συμβουλιο",
+   "klass": "org_body_generic",
+   "absorbed": [
+    "proc:δημοτικο_συμβουλιο"
+   ]
+  },
+  {
+   "kept": "place:city_name",
+   "klass": "place_city",
+   "absorbed": [
+    "admin:ορεστιαδος"
+   ]
+  }
+ ],
+ "meetings_in_scope": [
+  "apr27_2026",
+  "apr28_2026",
+  "apr28_3_2026",
+  "apr7_2026",
+  "dec11_2025",
+  "dec11_2025_2",
+  "feb11_2026",
+  "feb27_2026",
+  "jan21_2026",
+  "mar23_2026",
+  "mar3_2026",
+  "mar3_2_2026",
+  "may18_2026"
+ ],
+ "terms": [
+  {
+   "id": "admin:αμπελακιων",
+   "canonical": "Αμπελακίων",
+   "klass": "place_admin_unit",
+   "cut": "entities",
+   "source": "elstat2021:ΔΗΜΟΣ ΟΡΕΣΤΙΑΔΑΣ/community",
+   "covers": [
+    "osm:Αμπελάκια",
+    "Δημοτική Κοινότητα Αμπελακίων"
+   ],
+   "aliases": [
+    "αμπελακιων",
+    "δημοτικη κοινοτητα αμπελακιων"
+   ]
+  },
+  {
+   "id": "admin:αρζου",
+   "canonical": "Άρζου",
+   "klass": "place_admin_unit",
+   "cut": "entities",
+   "source": "elstat2021:ΔΗΜΟΣ ΟΡΕΣΤΙΑΔΑΣ/community",
+   "covers": [
+    "Δημοτική Κοινότητα Άρζου"
+   ],
+   "aliases": [
+    "αρζου",
+    "δημοτικη κοινοτητα αρζου"
+   ]
+  },
+  {
+   "id": "admin:βαλτου",
+   "canonical": "Βάλτου",
+   "klass": "place_admin_unit",
+   "cut": "entities",
+   "source": "elstat2021:ΔΗΜΟΣ ΟΡΕΣΤΙΑΔΑΣ/community",
+   "covers": [
+    "osm:Βάλτος",
+    "Δημοτική Κοινότητα Βάλτου"
+   ],
+   "aliases": [
+    "δημοτικη κοινοτητα βαλτου"
+   ]
+  },
+  {
+   "id": "admin:βυσσας",
+   "canonical": "ΒΥΣΣΑΣ",
+   "klass": "place_admin_unit",
+   "cut": "entities",
+   "source": "elstat2021:ΔΗΜΟΣ ΟΡΕΣΤΙΑΔΑΣ/municipal_unit",
+   "covers": [
+    "ΔΗΜΟΤΙΚΗ ΕΝΟΤΗΤΑ ΒΥΣΣΑΣ"
+   ],
+   "aliases": [
+    "βυσσας",
+    "δημοτικη ενοτητα βυσσας"
+   ]
+  },
+  {
+   "id": "admin:γαληνης",
+   "canonical": "Γαλήνης",
+   "klass": "place_admin_unit",
+   "cut": "entities",
+   "source": "elstat2021:ΔΗΜΟΣ ΟΡΕΣΤΙΑΔΑΣ/community",
+   "covers": [
+    "osm:Γαλήνη",
+    "Δημοτική Κοινότητα Γαλήνης"
+   ],
+   "aliases": [
+    "δημοτικη κοινοτητα γαληνης"
+   ]
+  },
+  {
+   "id": "admin:δικαιων",
+   "canonical": "Δικαίων",
+   "klass": "place_admin_unit",
+   "cut": "entities",
+   "source": "elstat2021:ΔΗΜΟΣ ΟΡΕΣΤΙΑΔΑΣ/community",
+   "covers": [
+    "osm:Δίκαια",
+    "Δημοτική Κοινότητα Δικαίων"
+   ],
+   "aliases": [
+    "δημοτικη κοινοτητα δικαιων"
+   ]
+  },
+  {
+   "id": "admin:ελαιας",
+   "canonical": "Ελαίας",
+   "klass": "place_admin_unit",
+   "cut": "entities",
+   "source": "elstat2021:ΔΗΜΟΣ ΟΡΕΣΤΙΑΔΑΣ/community",
+   "covers": [
+    "Δημοτική Κοινότητα Ελαίας"
+   ],
+   "aliases": [
+    "δημοτικη κοινοτητα ελαιας"
+   ]
+  },
+  {
+   "id": "admin:ζωνης",
+   "canonical": "Ζώνης",
+   "klass": "place_admin_unit",
+   "cut": "entities",
+   "source": "elstat2021:ΔΗΜΟΣ ΟΡΕΣΤΙΑΔΑΣ/community",
+   "covers": [
+    "Δημοτική Κοινότητα Ζώνης"
+   ],
+   "aliases": [
+    "δημοτικη κοινοτητα ζωνης"
+   ]
+  },
+  {
+   "id": "admin:θεραπειο",
+   "canonical": "Θεραπειό",
+   "klass": "place_admin_unit",
+   "cut": "entities",
+   "source": "elstat2021:ΔΗΜΟΣ ΟΡΕΣΤΙΑΔΑΣ/community",
+   "covers": [
+    "Δημοτική Κοινότητα Θεραπειό"
+   ],
+   "aliases": [
+    "δημοτικη κοινοτητα θεραπειο",
+    "θεραπειο"
+   ]
+  },
+  {
+   "id": "admin:θουριου",
+   "canonical": "Θουρίου",
+   "klass": "place_admin_unit",
+   "cut": "entities",
+   "source": "elstat2021:ΔΗΜΟΣ ΟΡΕΣΤΙΑΔΑΣ/community",
+   "covers": [
+    "osm:Θούριο",
+    "Δημοτική Κοινότητα Θουρίου"
+   ],
+   "aliases": [
+    "δημοτικη κοινοτητα θουριου"
+   ]
+  },
+  {
+   "id": "admin:καβυλης",
+   "canonical": "Καβύλης",
+   "klass": "place_admin_unit",
+   "cut": "entities",
+   "source": "elstat2021:ΔΗΜΟΣ ΟΡΕΣΤΙΑΔΑΣ/community",
+   "covers": [
+    "osm:Καβύλη",
+    "Δημοτική Κοινότητα Καβύλης"
+   ],
+   "aliases": [
+    "δημοτικη κοινοτητα καβυλης",
+    "καβυλη",
+    "καβυλης"
+   ]
+  },
+  {
+   "id": "admin:καστανεων",
+   "canonical": "Καστανεών",
+   "klass": "place_admin_unit",
+   "cut": "entities",
+   "source": "elstat2021:ΔΗΜΟΣ ΟΡΕΣΤΙΑΔΑΣ/community",
+   "covers": [
+    "osm:Καστανιές",
+    "Δημοτική Κοινότητα Καστανεών"
+   ],
+   "aliases": [
+    "δημοτικη κοινοτητα καστανεων",
+    "καστανεων"
+   ]
+  },
+  {
+   "id": "admin:κομαρων",
+   "canonical": "Κομάρων",
+   "klass": "place_admin_unit",
+   "cut": "entities",
+   "source": "elstat2021:ΔΗΜΟΣ ΟΡΕΣΤΙΑΔΑΣ/community",
+   "covers": [
+    "osm:Κόμαρα",
+    "Δημοτική Κοινότητα Κομάρων"
+   ],
+   "aliases": [
+    "δημοτικη κοινοτητα κομαρων",
+    "κομαρα",
+    "κομαρων"
+   ]
+  },
+  {
+   "id": "admin:κυπρινος",
+   "canonical": "Κυπρίνος",
+   "klass": "place_admin_unit",
+   "cut": "entities",
+   "source": "elstat2021:ΔΗΜΟΣ ΟΡΕΣΤΙΑΔΑΣ/community",
+   "covers": [
+    "Δημοτική Κοινότητα Κυπρίνος"
+   ],
+   "aliases": [
+    "δημοτικη κοινοτητα κυπρινος"
+   ]
+  },
+  {
+   "id": "admin:κυπρινου",
+   "canonical": "ΚΥΠΡΙΝΟΥ",
+   "klass": "place_admin_unit",
+   "cut": "entities",
+   "source": "elstat2021:ΔΗΜΟΣ ΟΡΕΣΤΙΑΔΑΣ/municipal_unit",
+   "covers": [
+    "ΔΗΜΟΤΙΚΗ ΕΝΟΤΗΤΑ ΚΥΠΡΙΝΟΥ"
+   ],
+   "aliases": [
+    "δημοτικη ενοτητα κυπρινου"
+   ]
+  },
+  {
+   "id": "admin:μαρασιων",
+   "canonical": "Μαρασίων",
+   "klass": "place_admin_unit",
+   "cut": "entities",
+   "source": "elstat2021:ΔΗΜΟΣ ΟΡΕΣΤΙΑΔΑΣ/community",
+   "covers": [
+    "osm:Μαράσια",
+    "Δημοτική Κοινότητα Μαρασίων"
+   ],
+   "aliases": [
+    "δημοτικη κοινοτητα μαρασιων",
+    "μαρασια",
+    "μαρασιων"
+   ]
+  },
+  {
+   "id": "admin:μεγαλης_δοξιπαρας",
+   "canonical": "Μεγάλης Δοξιπάρας",
+   "klass": "place_admin_unit",
+   "cut": "entities",
+   "source": "elstat2021:ΔΗΜΟΣ ΟΡΕΣΤΙΑΔΑΣ/community",
+   "covers": [
+    "osm:Μεγάλη Δοξιπάρα",
+    "Δημοτική Κοινότητα Μεγάλης Δοξιπάρας"
+   ],
+   "aliases": [
+    "δημοτικη κοινοτητα μεγαλης δοξιπαρας",
+    "μεγαλη δοξιπαρα",
+    "μεγαλης δοξιπαρας"
+   ]
+  },
+  {
+   "id": "admin:μηλεα",
+   "canonical": "Μηλέα",
+   "klass": "place_admin_unit",
+   "cut": "entities",
+   "source": "elstat2021:ΔΗΜΟΣ ΟΡΕΣΤΙΑΔΑΣ/community",
+   "covers": [
+    "Δημοτική Κοινότητα Μηλέα"
+   ],
+   "aliases": [
+    "δημοτικη κοινοτητα μηλεα"
+   ]
+  },
+  {
+   "id": "admin:νεας_βυσσης",
+   "canonical": "Νέας Βύσσης",
+   "klass": "place_admin_unit",
+   "cut": "entities",
+   "source": "elstat2021:ΔΗΜΟΣ ΟΡΕΣΤΙΑΔΑΣ/community",
+   "covers": [
+    "Δημοτική Κοινότητα Νέας Βύσσης"
+   ],
+   "aliases": [
+    "δημοτικη κοινοτητα νεας βυσσης",
+    "νεας βυσσης"
+   ]
+  },
+  {
+   "id": "admin:νεου_χειμωνιου",
+   "canonical": "Νέου Χειμωνίου",
+   "klass": "place_admin_unit",
+   "cut": "entities",
+   "source": "elstat2021:ΔΗΜΟΣ ΟΡΕΣΤΙΑΔΑΣ/community",
+   "covers": [
+    "Δημοτική Κοινότητα Νέου Χειμωνίου"
+   ],
+   "aliases": [
+    "δημοτικη κοινοτητα νεου χειμωνιου",
+    "νεου χειμωνιου"
+   ]
+  },
+  {
+   "id": "admin:νεοχωριου",
+   "canonical": "Νεοχωρίου",
+   "klass": "place_admin_unit",
+   "cut": "entities",
+   "source": "elstat2021:ΔΗΜΟΣ ΟΡΕΣΤΙΑΔΑΣ/community",
+   "covers": [
+    "osm:Νεοχώρι",
+    "Δημοτική Κοινότητα Νεοχωρίου"
+   ],
+   "aliases": [
+    "δημοτικη κοινοτητα νεοχωριου",
+    "νεοχωρι",
+    "νεοχωριου"
+   ]
+  },
+  {
+   "id": "admin:ορμενιου",
+   "canonical": "Ορμενίου",
+   "klass": "place_admin_unit",
+   "cut": "entities",
+   "source": "elstat2021:ΔΗΜΟΣ ΟΡΕΣΤΙΑΔΑΣ/community",
+   "covers": [
+    "osm:Ορμένιο",
+    "Δημοτική Κοινότητα Ορμενίου"
+   ],
+   "aliases": [
+    "δημοτικη κοινοτητα ορμενιου",
+    "ορμενιο",
+    "ορμενιου"
+   ]
+  },
+  {
+   "id": "admin:πενταλοφου",
+   "canonical": "Πενταλόφου",
+   "klass": "place_admin_unit",
+   "cut": "entities",
+   "source": "elstat2021:ΔΗΜΟΣ ΟΡΕΣΤΙΑΔΑΣ/community",
+   "covers": [
+    "osm:Πεντάλοφος",
+    "Δημοτική Κοινότητα Πενταλόφου"
+   ],
+   "aliases": [
+    "δημοτικη κοινοτητα πενταλοφου",
+    "πενταλοφος",
+    "πενταλοφου"
+   ]
+  },
+  {
+   "id": "admin:πετρωτων",
+   "canonical": "Πετρωτών",
+   "klass": "place_admin_unit",
+   "cut": "entities",
+   "source": "elstat2021:ΔΗΜΟΣ ΟΡΕΣΤΙΑΔΑΣ/community",
+   "covers": [
+    "osm:Πετρωτά",
+    "Δημοτική Κοινότητα Πετρωτών"
+   ],
+   "aliases": [
+    "δημοτικη κοινοτητα πετρωτων"
+   ]
+  },
+  {
+   "id": "admin:πλατης",
+   "canonical": "Πλάτης",
+   "klass": "place_admin_unit",
+   "cut": "entities",
+   "source": "elstat2021:ΔΗΜΟΣ ΟΡΕΣΤΙΑΔΑΣ/community",
+   "covers": [
+    "osm:Πλάτη",
+    "Δημοτική Κοινότητα Πλάτης"
+   ],
+   "aliases": [
+    "δημοτικη κοινοτητα πλατης"
+   ]
+  },
+  {
+   "id": "admin:πτελεας",
+   "canonical": "Πτελέας",
+   "klass": "place_admin_unit",
+   "cut": "entities",
+   "source": "elstat2021:ΔΗΜΟΣ ΟΡΕΣΤΙΑΔΑΣ/community",
+   "covers": [
+    "osm:Πτελέα",
+    "Δημοτική Κοινότητα Πτελέας"
+   ],
+   "aliases": [
+    "δημοτικη κοινοτητα πτελεας"
+   ]
+  },
+  {
+   "id": "admin:ριζιων",
+   "canonical": "Ριζίων",
+   "klass": "place_admin_unit",
+   "cut": "entities",
+   "source": "elstat2021:ΔΗΜΟΣ ΟΡΕΣΤΙΑΔΑΣ/community",
+   "covers": [
+    "Δημοτική Κοινότητα Ριζίων"
+   ],
+   "aliases": [
+    "δημοτικη κοινοτητα ριζιων",
+    "ριζιων"
+   ]
+  },
+  {
+   "id": "admin:σπηλαιου",
+   "canonical": "Σπηλαίου",
+   "klass": "place_admin_unit",
+   "cut": "entities",
+   "source": "elstat2021:ΔΗΜΟΣ ΟΡΕΣΤΙΑΔΑΣ/community",
+   "covers": [
+    "osm:Σπήλαιο",
+    "Δημοτική Κοινότητα Σπηλαίου"
+   ],
+   "aliases": [
+    "δημοτικη κοινοτητα σπηλαιου"
+   ]
+  },
+  {
+   "id": "admin:στερνας",
+   "canonical": "Στέρνας",
+   "klass": "place_admin_unit",
+   "cut": "entities",
+   "source": "elstat2021:ΔΗΜΟΣ ΟΡΕΣΤΙΑΔΑΣ/community",
+   "covers": [
+    "osm:Στέρνα",
+    "Δημοτική Κοινότητα Στέρνας"
+   ],
+   "aliases": [
+    "δημοτικη κοινοτητα στερνας"
+   ]
+  },
+  {
+   "id": "admin:τριγωνου",
+   "canonical": "ΤΡΙΓΩΝΟΥ",
+   "klass": "place_admin_unit",
+   "cut": "entities",
+   "source": "elstat2021:ΔΗΜΟΣ ΟΡΕΣΤΙΑΔΑΣ/municipal_unit",
+   "covers": [
+    "ΔΗΜΟΤΙΚΗ ΕΝΟΤΗΤΑ ΤΡΙΓΩΝΟΥ"
+   ],
+   "aliases": [
+    "δημοτικη ενοτητα τριγωνου"
+   ]
+  },
+  {
+   "id": "admin:φυλακιου",
+   "canonical": "Φυλακίου",
+   "klass": "place_admin_unit",
+   "cut": "entities",
+   "source": "elstat2021:ΔΗΜΟΣ ΟΡΕΣΤΙΑΔΑΣ/community",
+   "covers": [
+    "osm:Φυλάκιο",
+    "Δημοτική Κοινότητα Φυλακίου"
+   ],
+   "aliases": [
+    "δημοτικη κοινοτητα φυλακιου"
+   ]
+  },
+  {
+   "id": "admin:χανδρα",
+   "canonical": "Χανδρά",
+   "klass": "place_admin_unit",
+   "cut": "entities",
+   "source": "elstat2021:ΔΗΜΟΣ ΟΡΕΣΤΙΑΔΑΣ/community",
+   "covers": [
+    "osm:Χανδράς",
+    "Δημοτική Κοινότητα Χανδρά"
+   ],
+   "aliases": [
+    "δημοτικη κοινοτητα χανδρα"
+   ]
+  },
+  {
+   "id": "body:δημοτικη_επιτροπη",
+   "canonical": "Δημοτική Επιτροπή",
+   "klass": "org_body_generic",
+   "cut": "procedure",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#roles[].administrativeBody.name + modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "Δημοτική Επιτροπή",
+    "δημοτική επιτροπή"
+   ],
+   "aliases": [
+    "δημοτικη επιτροπη"
+   ]
+  },
+  {
+   "id": "body:δημοτικο_συμβουλιο",
+   "canonical": "Δημοτικό Συμβούλιο",
+   "klass": "org_body_generic",
+   "cut": "procedure",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#roles[].administrativeBody.name + modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "Δημοτικό Συμβούλιο",
+    "δημοτικό συμβούλιο"
+   ],
+   "aliases": [
+    "δημοτικο συμβουλιο"
+   ]
+  },
+  {
+   "id": "full:αγγελακουδης_ηλιας",
+   "canonical": "Αγγελακούδης Ηλίας",
+   "klass": "person_full_name",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name (given x surname, fixed suffix rules)",
+   "covers": [
+    "Αγγελακούδης Ηλίας"
+   ],
+   "aliases": [
+    "αγγελακουδη ηλια",
+    "αγγελακουδη ηλιας",
+    "αγγελακουδης ηλια",
+    "αγγελακουδης ηλιας",
+    "ηλια αγγελακουδη",
+    "ηλια αγγελακουδης",
+    "ηλιας αγγελακουδη",
+    "ηλιας αγγελακουδης"
+   ]
+  },
+  {
+   "id": "full:αθανασιος_δομπας",
+   "canonical": "Αθανάσιος Δόμπας",
+   "klass": "person_full_name",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name (given x surname, fixed suffix rules)",
+   "covers": [
+    "Αθανάσιος Δόμπας"
+   ],
+   "aliases": [
+    "αθανασιε δομπα",
+    "αθανασιε δομπας",
+    "αθανασιο δομπα",
+    "αθανασιο δομπας",
+    "αθανασιος δομπα",
+    "αθανασιος δομπας",
+    "αθανασιου δομπα",
+    "αθανασιου δομπας",
+    "δομπα αθανασιε",
+    "δομπα αθανασιο",
+    "δομπα αθανασιος",
+    "δομπα αθανασιου",
+    "δομπας αθανασιε",
+    "δομπας αθανασιο",
+    "δομπας αθανασιος",
+    "δομπας αθανασιου"
+   ]
+  },
+  {
+   "id": "full:αθανασιος_κυργιαννης",
+   "canonical": "Αθανάσιος Κυργιάννης",
+   "klass": "person_full_name",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name (given x surname, fixed suffix rules)",
+   "covers": [
+    "Αθανάσιος Κυργιάννης"
+   ],
+   "aliases": [
+    "αθανασιε κυργιαννη",
+    "αθανασιε κυργιαννης",
+    "αθανασιο κυργιαννη",
+    "αθανασιο κυργιαννης",
+    "αθανασιος κυργιαννη",
+    "αθανασιος κυργιαννης",
+    "αθανασιου κυργιαννη",
+    "αθανασιου κυργιαννης",
+    "κυργιαννη αθανασιε",
+    "κυργιαννη αθανασιο",
+    "κυργιαννη αθανασιος",
+    "κυργιαννη αθανασιου",
+    "κυργιαννης αθανασιε",
+    "κυργιαννης αθανασιο",
+    "κυργιαννης αθανασιος",
+    "κυργιαννης αθανασιου"
+   ]
+  },
+  {
+   "id": "full:αθηνοδωρος_χατζηπαναγιωτου",
+   "canonical": "Αθηνόδωρος Χατζηπαναγιώτου",
+   "klass": "person_full_name",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name (given x surname, fixed suffix rules)",
+   "covers": [
+    "Αθηνόδωρος Χατζηπαναγιώτου"
+   ],
+   "aliases": [
+    "αθηνοδωρε χατζηπαναγιωτου",
+    "αθηνοδωρο χατζηπαναγιωτου",
+    "αθηνοδωρος χατζηπαναγιωτου",
+    "αθηνοδωρου χατζηπαναγιωτου",
+    "χατζηπαναγιωτου αθηνοδωρε",
+    "χατζηπαναγιωτου αθηνοδωρο",
+    "χατζηπαναγιωτου αθηνοδωρος",
+    "χατζηπαναγιωτου αθηνοδωρου"
+   ]
+  },
+  {
+   "id": "full:αντωνης_τσομπανιδης",
+   "canonical": "Αντώνης Τσομπανίδης",
+   "klass": "person_full_name",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name (given x surname, fixed suffix rules)",
+   "covers": [
+    "Αντώνης Τσομπανίδης"
+   ],
+   "aliases": [
+    "αντωνη τσομπανιδη",
+    "αντωνη τσομπανιδης",
+    "αντωνης τσομπανιδη",
+    "αντωνης τσομπανιδης",
+    "τσομπανιδη αντωνη",
+    "τσομπανιδη αντωνης",
+    "τσομπανιδης αντωνη",
+    "τσομπανιδης αντωνης"
+   ]
+  },
+  {
+   "id": "full:αποστολος_σταυριδης",
+   "canonical": "Απόστολος Σταυρίδης",
+   "klass": "person_full_name",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name (given x surname, fixed suffix rules)",
+   "covers": [
+    "Απόστολος Σταυρίδης"
+   ],
+   "aliases": [
+    "αποστολε σταυριδη",
+    "αποστολε σταυριδης",
+    "αποστολο σταυριδη",
+    "αποστολο σταυριδης",
+    "αποστολος σταυριδη",
+    "αποστολος σταυριδης",
+    "αποστολου σταυριδη",
+    "αποστολου σταυριδης",
+    "σταυριδη αποστολε",
+    "σταυριδη αποστολο",
+    "σταυριδη αποστολος",
+    "σταυριδη αποστολου",
+    "σταυριδης αποστολε",
+    "σταυριδης αποστολο",
+    "σταυριδης αποστολος",
+    "σταυριδης αποστολου"
+   ]
+  },
+  {
+   "id": "full:αρχοντης_αρχοντιδης",
+   "canonical": "Αρχοντής Αρχοντίδης",
+   "klass": "person_full_name",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name (given x surname, fixed suffix rules)",
+   "covers": [
+    "Αρχοντής Αρχοντίδης"
+   ],
+   "aliases": [
+    "αρχοντη αρχοντιδη",
+    "αρχοντη αρχοντιδης",
+    "αρχοντης αρχοντιδη",
+    "αρχοντης αρχοντιδης",
+    "αρχοντιδη αρχοντη",
+    "αρχοντιδη αρχοντης",
+    "αρχοντιδης αρχοντη",
+    "αρχοντιδης αρχοντης"
+   ]
+  },
+  {
+   "id": "full:βασιλης_μαυριδης",
+   "canonical": "Βασίλης Μαυρίδης",
+   "klass": "person_full_name",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name (given x surname, fixed suffix rules)",
+   "covers": [
+    "Βασίλης Μαυρίδης"
+   ],
+   "aliases": [
+    "βασιλη μαυριδη",
+    "βασιλη μαυριδης",
+    "βασιλης μαυριδη",
+    "βασιλης μαυριδης",
+    "μαυριδη βασιλη",
+    "μαυριδη βασιλης",
+    "μαυριδης βασιλη",
+    "μαυριδης βασιλης"
+   ]
+  },
+  {
+   "id": "full:βασιλης_ναστουλης",
+   "canonical": "Βασίλης Ναστούλης",
+   "klass": "person_full_name",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name (given x surname, fixed suffix rules)",
+   "covers": [
+    "Βασίλης Ναστούλης"
+   ],
+   "aliases": [
+    "βασιλη ναστουλη",
+    "βασιλη ναστουλης",
+    "βασιλης ναστουλη",
+    "βασιλης ναστουλης",
+    "ναστουλη βασιλη",
+    "ναστουλη βασιλης",
+    "ναστουλης βασιλη",
+    "ναστουλης βασιλης"
+   ]
+  },
+  {
+   "id": "full:γιαννης_περιστερακης",
+   "canonical": "Γιάννης Περιστεράκης",
+   "klass": "person_full_name",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name (given x surname, fixed suffix rules)",
+   "covers": [
+    "Γιάννης Περιστεράκης"
+   ],
+   "aliases": [
+    "γιαννη περιστερακη",
+    "γιαννη περιστερακης",
+    "γιαννης περιστερακη",
+    "γιαννης περιστερακης",
+    "περιστερακη γιαννη",
+    "περιστερακη γιαννης",
+    "περιστερακης γιαννη",
+    "περιστερακης γιαννης"
+   ]
+  },
+  {
+   "id": "full:γιωργος_καδογλου",
+   "canonical": "Γιώργος Καδόγλου",
+   "klass": "person_full_name",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name (given x surname, fixed suffix rules)",
+   "covers": [
+    "Γιώργος Καδόγλου"
+   ],
+   "aliases": [
+    "γιωργε καδογλου",
+    "γιωργο καδογλου",
+    "γιωργος καδογλου",
+    "γιωργου καδογλου",
+    "καδογλου γιωργε",
+    "καδογλου γιωργο",
+    "καδογλου γιωργος",
+    "καδογλου γιωργου"
+   ]
+  },
+  {
+   "id": "full:γιωργος_καραγιαννης",
+   "canonical": "Γιώργος Καραγιάννης",
+   "klass": "person_full_name",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name (given x surname, fixed suffix rules)",
+   "covers": [
+    "Γιώργος Καραγιάννης"
+   ],
+   "aliases": [
+    "γιωργε καραγιαννη",
+    "γιωργε καραγιαννης",
+    "γιωργο καραγιαννη",
+    "γιωργο καραγιαννης",
+    "γιωργος καραγιαννη",
+    "γιωργος καραγιαννης",
+    "γιωργου καραγιαννη",
+    "γιωργου καραγιαννης",
+    "καραγιαννη γιωργε",
+    "καραγιαννη γιωργο",
+    "καραγιαννη γιωργος",
+    "καραγιαννη γιωργου",
+    "καραγιαννης γιωργε",
+    "καραγιαννης γιωργο",
+    "καραγιαννης γιωργος",
+    "καραγιαννης γιωργου"
+   ]
+  },
+  {
+   "id": "full:γιωργος_σουκουλδανος",
+   "canonical": "Γιώργος Σουκουλδάνος",
+   "klass": "person_full_name",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name (given x surname, fixed suffix rules)",
+   "covers": [
+    "Γιώργος Σουκουλδάνος"
+   ],
+   "aliases": [
+    "γιωργε σουκουλδανε",
+    "γιωργε σουκουλδανο",
+    "γιωργε σουκουλδανος",
+    "γιωργε σουκουλδανου",
+    "γιωργο σουκουλδανε",
+    "γιωργο σουκουλδανο",
+    "γιωργο σουκουλδανος",
+    "γιωργο σουκουλδανου",
+    "γιωργος σουκουλδανε",
+    "γιωργος σουκουλδανο",
+    "γιωργος σουκουλδανος",
+    "γιωργος σουκουλδανου",
+    "γιωργου σουκουλδανε",
+    "γιωργου σουκουλδανο",
+    "γιωργου σουκουλδανος",
+    "γιωργου σουκουλδανου",
+    "σουκουλδανε γιωργε",
+    "σουκουλδανε γιωργο",
+    "σουκουλδανε γιωργος",
+    "σουκουλδανε γιωργου",
+    "σουκουλδανο γιωργε",
+    "σουκουλδανο γιωργο",
+    "σουκουλδανο γιωργος",
+    "σουκουλδανο γιωργου",
+    "σουκουλδανος γιωργε",
+    "σουκουλδανος γιωργο",
+    "σουκουλδανος γιωργος",
+    "σουκουλδανος γιωργου",
+    "σουκουλδανου γιωργε",
+    "σουκουλδανου γιωργο",
+    "σουκουλδανου γιωργος",
+    "σουκουλδανου γιωργου"
+   ]
+  },
+  {
+   "id": "full:δημητρης_σταματιου",
+   "canonical": "Δημήτρης Σταματίου",
+   "klass": "person_full_name",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name (given x surname, fixed suffix rules)",
+   "covers": [
+    "Δημήτρης Σταματίου"
+   ],
+   "aliases": [
+    "δημητρη σταματιου",
+    "δημητρης σταματιου",
+    "σταματιου δημητρη",
+    "σταματιου δημητρης"
+   ]
+  },
+  {
+   "id": "full:δημητρης_τσελεμπης",
+   "canonical": "Δημήτρης Τσελεμπής",
+   "klass": "person_full_name",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name (given x surname, fixed suffix rules)",
+   "covers": [
+    "Δημήτρης Τσελεμπής"
+   ],
+   "aliases": [
+    "δημητρη τσελεμπη",
+    "δημητρη τσελεμπης",
+    "δημητρης τσελεμπη",
+    "δημητρης τσελεμπης",
+    "τσελεμπη δημητρη",
+    "τσελεμπη δημητρης",
+    "τσελεμπης δημητρη",
+    "τσελεμπης δημητρης"
+   ]
+  },
+  {
+   "id": "full:διαμαντης_παπαδοπουλος",
+   "canonical": "Διαμαντής Παπαδόπουλος",
+   "klass": "person_full_name",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name (given x surname, fixed suffix rules)",
+   "covers": [
+    "Διαμαντής Παπαδόπουλος"
+   ],
+   "aliases": [
+    "διαμαντη παπαδοπουλε",
+    "διαμαντη παπαδοπουλο",
+    "διαμαντη παπαδοπουλος",
+    "διαμαντη παπαδοπουλου",
+    "διαμαντης παπαδοπουλε",
+    "διαμαντης παπαδοπουλο",
+    "διαμαντης παπαδοπουλος",
+    "διαμαντης παπαδοπουλου",
+    "παπαδοπουλε διαμαντη",
+    "παπαδοπουλε διαμαντης",
+    "παπαδοπουλο διαμαντη",
+    "παπαδοπουλο διαμαντης",
+    "παπαδοπουλος διαμαντη",
+    "παπαδοπουλος διαμαντης",
+    "παπαδοπουλου διαμαντη",
+    "παπαδοπουλου διαμαντης"
+   ]
+  },
+  {
+   "id": "full:ευαγγελια_μπραικουδη",
+   "canonical": "Ευαγγελία Μπραϊκούδη",
+   "klass": "person_full_name",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name (given x surname, fixed suffix rules)",
+   "covers": [
+    "Ευαγγελία Μπραϊκούδη"
+   ],
+   "aliases": [
+    "ευαγγελια μπραικουδη",
+    "μπραικουδη ευαγγελια"
+   ]
+  },
+  {
+   "id": "full:ζησης_παπαλαμπιδης",
+   "canonical": "Ζήσης Παπαλαμπίδης",
+   "klass": "person_full_name",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name (given x surname, fixed suffix rules)",
+   "covers": [
+    "Ζήσης Παπαλαμπίδης"
+   ],
+   "aliases": [
+    "ζηση παπαλαμπιδη",
+    "ζηση παπαλαμπιδης",
+    "ζησης παπαλαμπιδη",
+    "ζησης παπαλαμπιδης",
+    "παπαλαμπιδη ζηση",
+    "παπαλαμπιδη ζησης",
+    "παπαλαμπιδης ζηση",
+    "παπαλαμπιδης ζησης"
+   ]
+  },
+  {
+   "id": "full:θεοδωρα_σεμεν",
+   "canonical": "Θεοδώρα Σέμεν",
+   "klass": "person_full_name",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name (given x surname, fixed suffix rules)",
+   "covers": [
+    "Θεοδώρα Σέμεν"
+   ],
+   "aliases": [
+    "θεοδωρα σεμεν",
+    "σεμεν θεοδωρα"
+   ]
+  },
+  {
+   "id": "full:καπουλα_πασχαλινα",
+   "canonical": "Καπούλα Πασχαλίνα",
+   "klass": "person_full_name",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name (given x surname, fixed suffix rules)",
+   "covers": [
+    "Καπούλα Πασχαλίνα"
+   ],
+   "aliases": [
+    "καπουλα πασχαλινα",
+    "πασχαλινα καπουλα"
+   ]
+  },
+  {
+   "id": "full:κωνσταντινος_μιχαηλιδης",
+   "canonical": "Κωνσταντίνος Μιχαηλίδης",
+   "klass": "person_full_name",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name (given x surname, fixed suffix rules)",
+   "covers": [
+    "Κωνσταντίνος Μιχαηλίδης"
+   ],
+   "aliases": [
+    "κωνσταντινε μιχαηλιδη",
+    "κωνσταντινε μιχαηλιδης",
+    "κωνσταντινο μιχαηλιδη",
+    "κωνσταντινο μιχαηλιδης",
+    "κωνσταντινος μιχαηλιδη",
+    "κωνσταντινος μιχαηλιδης",
+    "κωνσταντινου μιχαηλιδη",
+    "κωνσταντινου μιχαηλιδης",
+    "μιχαηλιδη κωνσταντινε",
+    "μιχαηλιδη κωνσταντινο",
+    "μιχαηλιδη κωνσταντινος",
+    "μιχαηλιδη κωνσταντινου",
+    "μιχαηλιδης κωνσταντινε",
+    "μιχαηλιδης κωνσταντινο",
+    "μιχαηλιδης κωνσταντινος",
+    "μιχαηλιδης κωνσταντινου"
+   ]
+  },
+  {
+   "id": "full:μανωλης_χατζηπαναγιωτου",
+   "canonical": "Μανώλης Χατζηπαναγιώτου",
+   "klass": "person_full_name",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name (given x surname, fixed suffix rules)",
+   "covers": [
+    "Μανώλης Χατζηπαναγιώτου"
+   ],
+   "aliases": [
+    "μανωλη χατζηπαναγιωτου",
+    "μανωλης χατζηπαναγιωτου",
+    "χατζηπαναγιωτου μανωλη",
+    "χατζηπαναγιωτου μανωλης"
+   ]
+  },
+  {
+   "id": "full:μαργαριτης_αστεριαδης",
+   "canonical": "Μαργαρίτης Αστεριάδης",
+   "klass": "person_full_name",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name (given x surname, fixed suffix rules)",
+   "covers": [
+    "Μαργαρίτης Αστεριάδης"
+   ],
+   "aliases": [
+    "αστεριαδη μαργαριτη",
+    "αστεριαδη μαργαριτης",
+    "αστεριαδης μαργαριτη",
+    "αστεριαδης μαργαριτης",
+    "μαργαριτη αστεριαδη",
+    "μαργαριτη αστεριαδης",
+    "μαργαριτης αστεριαδη",
+    "μαργαριτης αστεριαδης"
+   ]
+  },
+  {
+   "id": "full:μαρια_μαναβη",
+   "canonical": "Μαρία Μανάβη",
+   "klass": "person_full_name",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name (given x surname, fixed suffix rules)",
+   "covers": [
+    "Μαρία Μανάβη"
+   ],
+   "aliases": [
+    "μαναβη μαρια",
+    "μαρια μαναβη"
+   ]
+  },
+  {
+   "id": "full:μιχαλης_στραντζαλης",
+   "canonical": "Μιχάλης Στράντζαλης",
+   "klass": "person_full_name",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name (given x surname, fixed suffix rules)",
+   "covers": [
+    "Μιχάλης Στράντζαλης"
+   ],
+   "aliases": [
+    "μιχαλη στραντζαλη",
+    "μιχαλη στραντζαλης",
+    "μιχαλης στραντζαλη",
+    "μιχαλης στραντζαλης",
+    "στραντζαλη μιχαλη",
+    "στραντζαλη μιχαλης",
+    "στραντζαλης μιχαλη",
+    "στραντζαλης μιχαλης"
+   ]
+  },
+  {
+   "id": "full:παναγιωτης_χατζηχαραλαμπους",
+   "canonical": "Παναγιώτης Χατζηχαραλάμπους",
+   "klass": "person_full_name",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name (given x surname, fixed suffix rules)",
+   "covers": [
+    "Παναγιώτης Χατζηχαραλάμπους"
+   ],
+   "aliases": [
+    "παναγιωτη χατζηχαραλαμπου",
+    "παναγιωτη χατζηχαραλαμπους",
+    "παναγιωτης χατζηχαραλαμπου",
+    "παναγιωτης χατζηχαραλαμπους",
+    "χατζηχαραλαμπου παναγιωτη",
+    "χατζηχαραλαμπου παναγιωτης",
+    "χατζηχαραλαμπους παναγιωτη",
+    "χατζηχαραλαμπους παναγιωτης"
+   ]
+  },
+  {
+   "id": "full:παντελης_δημουτσης",
+   "canonical": "Παντελής Δημούτσης",
+   "klass": "person_full_name",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name (given x surname, fixed suffix rules)",
+   "covers": [
+    "Παντελής Δημούτσης"
+   ],
+   "aliases": [
+    "δημουτση παντελη",
+    "δημουτση παντελης",
+    "δημουτσης παντελη",
+    "δημουτσης παντελης",
+    "παντελη δημουτση",
+    "παντελη δημουτσης",
+    "παντελης δημουτση",
+    "παντελης δημουτσης"
+   ]
+  },
+  {
+   "id": "full:παυλινα_κυρμανη",
+   "canonical": "Παυλίνα Κυρμάνη",
+   "klass": "person_full_name",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name (given x surname, fixed suffix rules)",
+   "covers": [
+    "Παυλίνα Κυρμάνη"
+   ],
+   "aliases": [
+    "κυρμανη παυλινα",
+    "παυλινα κυρμανη"
+   ]
+  },
+  {
+   "id": "full:πετρος_αργυριαδης",
+   "canonical": "Πέτρος Αργυριάδης",
+   "klass": "person_full_name",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name (given x surname, fixed suffix rules)",
+   "covers": [
+    "Πέτρος Αργυριάδης"
+   ],
+   "aliases": [
+    "αργυριαδη πετρε",
+    "αργυριαδη πετρο",
+    "αργυριαδη πετρος",
+    "αργυριαδη πετρου",
+    "αργυριαδης πετρε",
+    "αργυριαδης πετρο",
+    "αργυριαδης πετρος",
+    "αργυριαδης πετρου",
+    "πετρε αργυριαδη",
+    "πετρε αργυριαδης",
+    "πετρο αργυριαδη",
+    "πετρο αργυριαδης",
+    "πετρος αργυριαδη",
+    "πετρος αργυριαδης",
+    "πετρου αργυριαδη",
+    "πετρου αργυριαδης"
+   ]
+  },
+  {
+   "id": "full:χρηστος_καζαλτζης",
+   "canonical": "Χρήστος Καζαλτζής",
+   "klass": "person_full_name",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name (given x surname, fixed suffix rules)",
+   "covers": [
+    "Χρήστος Καζαλτζής"
+   ],
+   "aliases": [
+    "καζαλτζη χρηστε",
+    "καζαλτζη χρηστο",
+    "καζαλτζη χρηστος",
+    "καζαλτζη χρηστου",
+    "καζαλτζης χρηστε",
+    "καζαλτζης χρηστο",
+    "καζαλτζης χρηστος",
+    "καζαλτζης χρηστου",
+    "χρηστε καζαλτζη",
+    "χρηστε καζαλτζης",
+    "χρηστο καζαλτζη",
+    "χρηστο καζαλτζης",
+    "χρηστος καζαλτζη",
+    "χρηστος καζαλτζης",
+    "χρηστου καζαλτζη",
+    "χρηστου καζαλτζης"
+   ]
+  },
+  {
+   "id": "full:χρηστος_λεβεντης",
+   "canonical": "Χρήστος Λεβέντης",
+   "klass": "person_full_name",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name (given x surname, fixed suffix rules)",
+   "covers": [
+    "Χρήστος Λεβέντης"
+   ],
+   "aliases": [
+    "λεβεντη χρηστε",
+    "λεβεντη χρηστο",
+    "λεβεντη χρηστος",
+    "λεβεντη χρηστου",
+    "λεβεντης χρηστε",
+    "λεβεντης χρηστο",
+    "λεβεντης χρηστος",
+    "λεβεντης χρηστου",
+    "χρηστε λεβεντη",
+    "χρηστε λεβεντης",
+    "χρηστο λεβεντη",
+    "χρηστο λεβεντης",
+    "χρηστος λεβεντη",
+    "χρηστος λεβεντης",
+    "χρηστου λεβεντη",
+    "χρηστου λεβεντης"
+   ]
+  },
+  {
+   "id": "full:χρηστος_ορμανλιδης",
+   "canonical": "Χρήστος Ορμανλίδης",
+   "klass": "person_full_name",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name (given x surname, fixed suffix rules)",
+   "covers": [
+    "Χρήστος Ορμανλίδης"
+   ],
+   "aliases": [
+    "ορμανλιδη χρηστε",
+    "ορμανλιδη χρηστο",
+    "ορμανλιδη χρηστος",
+    "ορμανλιδη χρηστου",
+    "ορμανλιδης χρηστε",
+    "ορμανλιδης χρηστο",
+    "ορμανλιδης χρηστος",
+    "ορμανλιδης χρηστου",
+    "χρηστε ορμανλιδη",
+    "χρηστε ορμανλιδης",
+    "χρηστο ορμανλιδη",
+    "χρηστο ορμανλιδης",
+    "χρηστος ορμανλιδη",
+    "χρηστος ορμανλιδης",
+    "χρηστου ορμανλιδη",
+    "χρηστου ορμανλιδης"
+   ]
+  },
+  {
+   "id": "full:χριστινα_γκιλιλουδη",
+   "canonical": "Χριστίνα Γκιλιλούδη",
+   "klass": "person_full_name",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name (given x surname, fixed suffix rules)",
+   "covers": [
+    "Χριστίνα Γκιλιλούδη"
+   ],
+   "aliases": [
+    "γκιλιλουδη χριστινα",
+    "χριστινα γκιλιλουδη"
+   ]
+  },
+  {
+   "id": "osm:αμμοβουνο",
+   "canonical": "Αμμόβουνο",
+   "klass": "place_settlement_osm",
+   "cut": "entities",
+   "source": "osm:area(rel 2345114) node[place=village] id=301030303 v14",
+   "covers": [
+    "Αμμόβουνο"
+   ],
+   "aliases": [
+    "αμμοβουνο"
+   ]
+  },
+  {
+   "id": "osm:αρζος",
+   "canonical": "Άρζος",
+   "klass": "place_settlement_osm",
+   "cut": "entities",
+   "source": "osm:area(rel 2345114) node[place=village] id=1533293010 v14",
+   "covers": [
+    "Άρζος"
+   ],
+   "aliases": [
+    "αρζος"
+   ]
+  },
+  {
+   "id": "osm:βεργη",
+   "canonical": "Βέργη",
+   "klass": "place_settlement_osm",
+   "cut": "entities",
+   "source": "osm:area(rel 2345114) node[place=village] id=13621785437 v3",
+   "covers": [
+    "Βέργη"
+   ],
+   "aliases": [
+    "βεργη"
+   ]
+  },
+  {
+   "id": "osm:γυαλια_εβρου",
+   "canonical": "Γυαλιά Έβρου",
+   "klass": "place_settlement_osm",
+   "cut": "entities",
+   "source": "osm:area(rel 2345114) node[place=hamlet] id=9283675660 v3",
+   "covers": [
+    "Γυαλιά Έβρου"
+   ],
+   "aliases": [
+    "γυαλια εβρου"
+   ]
+  },
+  {
+   "id": "osm:διλοφος",
+   "canonical": "Δίλοφος",
+   "klass": "place_settlement_osm",
+   "cut": "entities",
+   "source": "osm:area(rel 2345114) node[place=hamlet] id=299264626 v20",
+   "covers": [
+    "Δίλοφος"
+   ],
+   "aliases": [
+    "διλοφος"
+   ]
+  },
+  {
+   "id": "osm:καναδας",
+   "canonical": "Καναδάς",
+   "klass": "place_settlement_osm",
+   "cut": "entities",
+   "source": "osm:area(rel 2345114) node[place=village] id=1806255085 v12",
+   "covers": [
+    "Καναδάς"
+   ],
+   "aliases": [
+    "καναδας"
+   ]
+  },
+  {
+   "id": "osm:μικρη_δοξιπαρα",
+   "canonical": "Μικρή Δοξιπάρα",
+   "klass": "place_settlement_osm",
+   "cut": "entities",
+   "source": "osm:area(rel 2345114) node[place=village] id=1806255155 v12",
+   "covers": [
+    "Μικρή Δοξιπάρα"
+   ],
+   "aliases": [
+    "μικρη δοξιπαρα"
+   ]
+  },
+  {
+   "id": "osm:νεα_βυσσα",
+   "canonical": "Νέα Βύσσα",
+   "klass": "place_settlement_osm",
+   "cut": "entities",
+   "source": "osm:area(rel 2345114) node[place=town] id=299263609 v14",
+   "covers": [
+    "Νέα Βύσσα"
+   ],
+   "aliases": [
+    "νεα βυσσα"
+   ]
+  },
+  {
+   "id": "osm:νεο_χειμωνιο",
+   "canonical": "Νέο Χειμώνιο",
+   "klass": "place_settlement_osm",
+   "cut": "entities",
+   "source": "osm:area(rel 2345114) node[place=village] id=1806255157 v12",
+   "covers": [
+    "Νέο Χειμώνιο"
+   ],
+   "aliases": [
+    "νεο χειμωνιο"
+   ]
+  },
+  {
+   "id": "osm:νεος_πυργος",
+   "canonical": "Νέος Πύργος",
+   "klass": "place_settlement_osm",
+   "cut": "entities",
+   "source": "osm:area(rel 2345114) node[place=village] id=299266545 v9",
+   "covers": [
+    "Νέος Πύργος"
+   ],
+   "aliases": [
+    "νεος πυργος"
+   ]
+  },
+  {
+   "id": "osm:παλαια_σαγηνη",
+   "canonical": "Παλαιά Σαγήνη",
+   "klass": "place_settlement_osm",
+   "cut": "entities",
+   "source": "osm:area(rel 2345114) node[place=hamlet] id=1806255202 v3",
+   "covers": [
+    "Παλαιά Σαγήνη"
+   ],
+   "aliases": [
+    "παλαια σαγηνη"
+   ]
+  },
+  {
+   "id": "osm:παλλη",
+   "canonical": "Πάλλη",
+   "klass": "place_settlement_osm",
+   "cut": "entities",
+   "source": "osm:area(rel 2345114) node[place=village] id=1806255173 v11",
+   "covers": [
+    "Πάλλη"
+   ],
+   "aliases": [
+    "παλλη"
+   ]
+  },
+  {
+   "id": "osm:παταγη",
+   "canonical": "Παταγή",
+   "klass": "place_settlement_osm",
+   "cut": "entities",
+   "source": "osm:area(rel 2345114) node[place=village] id=1806255207 v12",
+   "covers": [
+    "Παταγή"
+   ],
+   "aliases": [
+    "παταγη"
+   ]
+  },
+  {
+   "id": "osm:ριζια",
+   "canonical": "Ρίζια",
+   "klass": "place_settlement_osm",
+   "cut": "entities",
+   "source": "osm:area(rel 2345114) node[place=village] id=299265038 v20",
+   "covers": [
+    "Ρίζια"
+   ],
+   "aliases": [
+    "ριζια"
+   ]
+  },
+  {
+   "id": "osm:σ_ο_α_στρατοπεδου_σταθατου",
+   "canonical": "Σ.Ο.Α. Στρατοπέδου Σταθάτου",
+   "klass": "place_settlement_osm",
+   "cut": "entities",
+   "source": "osm:area(rel 2345114) node[place=hamlet] id=9385756189 v1",
+   "covers": [
+    "Σ.Ο.Α. Στρατοπέδου Σταθάτου"
+   ],
+   "aliases": [
+    "σ ο α στρατοπεδου σταθατου"
+   ]
+  },
+  {
+   "id": "osm:σακκος",
+   "canonical": "Σάκκος",
+   "klass": "place_settlement_osm",
+   "cut": "entities",
+   "source": "osm:area(rel 2345114) node[place=village] id=299266548 v17",
+   "covers": [
+    "Σάκκος"
+   ],
+   "aliases": [
+    "σακκος"
+   ]
+  },
+  {
+   "id": "party:αυτονομη_κινηση_πολιτων_δημου_ορεστιαδας_ειναι_στο_χερι_μας",
+   "canonical": "Αυτόνομη Κίνηση Πολιτών Δήμου Ορεστιάδας Είναι στο Χέρι Μας",
+   "klass": "org_party",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#roles[].party.name",
+   "covers": [
+    "Αυτόνομη Κίνηση Πολιτών Δήμου Ορεστιάδας Είναι στο Χέρι Μας"
+   ],
+   "aliases": [
+    "αυτονομη κινηση πολιτων",
+    "αυτονομη κινηση πολιτων δημου ορεστιαδας ειναι στο χερι μας"
+   ]
+  },
+  {
+   "id": "party:δημος_ορεστιαδας_τοπος_να_ζω",
+   "canonical": "Δήμος Ορεστιάδας Τόπος να ζω",
+   "klass": "org_party",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#roles[].party.name",
+   "covers": [
+    "Δήμος Ορεστιάδας Τόπος να ζω"
+   ],
+   "aliases": [
+    "δημος ορεστιαδας τοπος να ζω"
+   ]
+  },
+  {
+   "id": "party:δημοτικη_επαναφορα",
+   "canonical": "Δημοτική Επαναφορά",
+   "klass": "org_party",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#roles[].party.name",
+   "covers": [
+    "Δημοτική Επαναφορά"
+   ],
+   "aliases": [
+    "δημοτικη επαναφορα"
+   ]
+  },
+  {
+   "id": "party:ορεστιαδα_νεα_ξανα",
+   "canonical": "Ορεστιάδα Νέα Ξανά",
+   "klass": "org_party",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#roles[].party.name",
+   "covers": [
+    "Ορεστιάδα Νέα Ξανά"
+   ],
+   "aliases": [
+    "ορεστιαδα νεα ξανα"
+   ]
+  },
+  {
+   "id": "party:ορεστιαδα_στην_πρωτη_γραμμη",
+   "canonical": "Ορεστιάδα στην ΠΡΩΤΗ ΓΡΑΜΜΗ",
+   "klass": "org_party",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#roles[].party.name",
+   "covers": [
+    "Ορεστιάδα στην ΠΡΩΤΗ ΓΡΑΜΜΗ"
+   ],
+   "aliases": [
+    "ορεστιαδα στην πρωτη γραμμη",
+    "πρωτη γραμμη"
+   ]
+  },
+  {
+   "id": "person:αργυριαδης",
+   "canonical": "Αργυριάδης",
+   "klass": "person_surname",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name.surname",
+   "covers": [
+    "Πέτρος Αργυριάδης"
+   ],
+   "aliases": [
+    "αργυριαδη",
+    "αργυριαδης"
+   ]
+  },
+  {
+   "id": "person:αρχοντιδης",
+   "canonical": "Αρχοντίδης",
+   "klass": "person_surname",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name.surname",
+   "covers": [
+    "Αρχοντής Αρχοντίδης"
+   ],
+   "aliases": [
+    "αρχοντιδη",
+    "αρχοντιδης"
+   ]
+  },
+  {
+   "id": "person:αστεριαδης",
+   "canonical": "Αστεριάδης",
+   "klass": "person_surname",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name.surname",
+   "covers": [
+    "Μαργαρίτης Αστεριάδης"
+   ],
+   "aliases": [
+    "αστεριαδη",
+    "αστεριαδης"
+   ]
+  },
+  {
+   "id": "person:γκιλιλουδη",
+   "canonical": "Γκιλιλούδη",
+   "klass": "person_surname",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name.surname",
+   "covers": [
+    "Χριστίνα Γκιλιλούδη"
+   ],
+   "aliases": [
+    "γκιλιλουδη"
+   ]
+  },
+  {
+   "id": "person:δημουτσης",
+   "canonical": "Δημούτσης",
+   "klass": "person_surname",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name.surname",
+   "covers": [
+    "Παντελής Δημούτσης"
+   ],
+   "aliases": [
+    "δημουτση",
+    "δημουτσης"
+   ]
+  },
+  {
+   "id": "person:δομπας",
+   "canonical": "Δόμπας",
+   "klass": "person_surname",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name.surname",
+   "covers": [
+    "Αθανάσιος Δόμπας"
+   ],
+   "aliases": [
+    "δομπα",
+    "δομπας"
+   ]
+  },
+  {
+   "id": "person:ηλιας",
+   "canonical": "Ηλίας",
+   "klass": "person_surname",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name.surname",
+   "covers": [
+    "Αγγελακούδης Ηλίας"
+   ],
+   "aliases": [
+    "ηλια",
+    "ηλιας"
+   ]
+  },
+  {
+   "id": "person:καδογλου",
+   "canonical": "Καδόγλου",
+   "klass": "person_surname",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name.surname",
+   "covers": [
+    "Γιώργος Καδόγλου"
+   ],
+   "aliases": [
+    "καδογλου"
+   ]
+  },
+  {
+   "id": "person:καζαλτζης",
+   "canonical": "Καζαλτζής",
+   "klass": "person_surname",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name.surname",
+   "covers": [
+    "Χρήστος Καζαλτζής"
+   ],
+   "aliases": [
+    "καζαλτζη",
+    "καζαλτζης"
+   ]
+  },
+  {
+   "id": "person:καραγιαννης",
+   "canonical": "Καραγιάννης",
+   "klass": "person_surname",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name.surname",
+   "covers": [
+    "Γιώργος Καραγιάννης"
+   ],
+   "aliases": [
+    "καραγιαννη",
+    "καραγιαννης"
+   ]
+  },
+  {
+   "id": "person:κυργιαννης",
+   "canonical": "Κυργιάννης",
+   "klass": "person_surname",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name.surname",
+   "covers": [
+    "Αθανάσιος Κυργιάννης"
+   ],
+   "aliases": [
+    "κυργιαννη",
+    "κυργιαννης"
+   ]
+  },
+  {
+   "id": "person:κυρμανη",
+   "canonical": "Κυρμάνη",
+   "klass": "person_surname",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name.surname",
+   "covers": [
+    "Παυλίνα Κυρμάνη"
+   ],
+   "aliases": [
+    "κυρμανη"
+   ]
+  },
+  {
+   "id": "person:λεβεντης",
+   "canonical": "Λεβέντης",
+   "klass": "person_surname",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name.surname",
+   "covers": [
+    "Χρήστος Λεβέντης"
+   ],
+   "aliases": [
+    "λεβεντη",
+    "λεβεντης"
+   ]
+  },
+  {
+   "id": "person:μαναβη",
+   "canonical": "Μανάβη",
+   "klass": "person_surname",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name.surname",
+   "covers": [
+    "Μαρία Μανάβη"
+   ],
+   "aliases": [
+    "μαναβη"
+   ]
+  },
+  {
+   "id": "person:μαυριδης",
+   "canonical": "Μαυρίδης",
+   "klass": "person_surname",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name.surname",
+   "covers": [
+    "Βασίλης Μαυρίδης"
+   ],
+   "aliases": [
+    "μαυριδη",
+    "μαυριδης"
+   ]
+  },
+  {
+   "id": "person:μιχαηλιδης",
+   "canonical": "Μιχαηλίδης",
+   "klass": "person_surname",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name.surname",
+   "covers": [
+    "Κωνσταντίνος Μιχαηλίδης"
+   ],
+   "aliases": [
+    "μιχαηλιδη",
+    "μιχαηλιδης"
+   ]
+  },
+  {
+   "id": "person:μπραικουδη",
+   "canonical": "Μπραϊκούδη",
+   "klass": "person_surname",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name.surname",
+   "covers": [
+    "Ευαγγελία Μπραϊκούδη"
+   ],
+   "aliases": [
+    "μπραικουδη"
+   ]
+  },
+  {
+   "id": "person:ναστουλης",
+   "canonical": "Ναστούλης",
+   "klass": "person_surname",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name.surname",
+   "covers": [
+    "Βασίλης Ναστούλης"
+   ],
+   "aliases": [
+    "ναστουλη",
+    "ναστουλης"
+   ]
+  },
+  {
+   "id": "person:ορμανλιδης",
+   "canonical": "Ορμανλίδης",
+   "klass": "person_surname",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name.surname",
+   "covers": [
+    "Χρήστος Ορμανλίδης"
+   ],
+   "aliases": [
+    "ορμανλιδη",
+    "ορμανλιδης"
+   ]
+  },
+  {
+   "id": "person:παπαδοπουλος",
+   "canonical": "Παπαδόπουλος",
+   "klass": "person_surname",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name.surname",
+   "covers": [
+    "Διαμαντής Παπαδόπουλος"
+   ],
+   "aliases": [
+    "παπαδοπουλε",
+    "παπαδοπουλο",
+    "παπαδοπουλος",
+    "παπαδοπουλου"
+   ]
+  },
+  {
+   "id": "person:παπαλαμπιδης",
+   "canonical": "Παπαλαμπίδης",
+   "klass": "person_surname",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name.surname",
+   "covers": [
+    "Ζήσης Παπαλαμπίδης"
+   ],
+   "aliases": [
+    "παπαλαμπιδη",
+    "παπαλαμπιδης"
+   ]
+  },
+  {
+   "id": "person:πασχαλινα",
+   "canonical": "Πασχαλίνα",
+   "klass": "person_surname",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name.surname",
+   "covers": [
+    "Καπούλα Πασχαλίνα"
+   ],
+   "aliases": [
+    "πασχαλινα"
+   ]
+  },
+  {
+   "id": "person:περιστερακης",
+   "canonical": "Περιστεράκης",
+   "klass": "person_surname",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name.surname",
+   "covers": [
+    "Γιάννης Περιστεράκης"
+   ],
+   "aliases": [
+    "περιστερακη",
+    "περιστερακης"
+   ]
+  },
+  {
+   "id": "person:σεμεν",
+   "canonical": "Σέμεν",
+   "klass": "person_surname",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name.surname",
+   "covers": [
+    "Θεοδώρα Σέμεν"
+   ],
+   "aliases": [
+    "σεμεν"
+   ]
+  },
+  {
+   "id": "person:σουκουλδανος",
+   "canonical": "Σουκουλδάνος",
+   "klass": "person_surname",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name.surname",
+   "covers": [
+    "Γιώργος Σουκουλδάνος"
+   ],
+   "aliases": [
+    "σουκουλδανε",
+    "σουκουλδανο",
+    "σουκουλδανος",
+    "σουκουλδανου"
+   ]
+  },
+  {
+   "id": "person:σταματιου",
+   "canonical": "Σταματίου",
+   "klass": "person_surname",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name.surname",
+   "covers": [
+    "Δημήτρης Σταματίου"
+   ],
+   "aliases": [
+    "σταματιου"
+   ]
+  },
+  {
+   "id": "person:σταυριδης",
+   "canonical": "Σταυρίδης",
+   "klass": "person_surname",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name.surname",
+   "covers": [
+    "Απόστολος Σταυρίδης"
+   ],
+   "aliases": [
+    "σταυριδη",
+    "σταυριδης"
+   ]
+  },
+  {
+   "id": "person:στραντζαλης",
+   "canonical": "Στράντζαλης",
+   "klass": "person_surname",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name.surname",
+   "covers": [
+    "Μιχάλης Στράντζαλης"
+   ],
+   "aliases": [
+    "στραντζαλη",
+    "στραντζαλης"
+   ]
+  },
+  {
+   "id": "person:τσελεμπης",
+   "canonical": "Τσελεμπής",
+   "klass": "person_surname",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name.surname",
+   "covers": [
+    "Δημήτρης Τσελεμπής"
+   ],
+   "aliases": [
+    "τσελεμπη",
+    "τσελεμπης"
+   ]
+  },
+  {
+   "id": "person:τσομπανιδης",
+   "canonical": "Τσομπανίδης",
+   "klass": "person_surname",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name.surname",
+   "covers": [
+    "Αντώνης Τσομπανίδης"
+   ],
+   "aliases": [
+    "τσομπανιδη",
+    "τσομπανιδης"
+   ]
+  },
+  {
+   "id": "person:χατζηπαναγιωτου",
+   "canonical": "Χατζηπαναγιώτου",
+   "klass": "person_surname",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name.surname",
+   "covers": [
+    "Αθηνόδωρος Χατζηπαναγιώτου",
+    "Μανώλης Χατζηπαναγιώτου"
+   ],
+   "aliases": [
+    "χατζηπαναγιωτου"
+   ]
+  },
+  {
+   "id": "person:χατζηχαραλαμπους",
+   "canonical": "Χατζηχαραλάμπους",
+   "klass": "person_surname",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada/people#name.surname",
+   "covers": [
+    "Παναγιώτης Χατζηχαραλάμπους"
+   ],
+   "aliases": [
+    "χατζηχαραλαμπου",
+    "χατζηχαραλαμπους"
+   ]
+  },
+  {
+   "id": "place:city_name",
+   "canonical": "Ορεστιάδα",
+   "klass": "place_city",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada#city_name + elstat2021:ΔΗΜΟΣ ΟΡΕΣΤΙΑΔΑΣ/municipal_unit",
+   "covers": [
+    "osm:Ορεστιάδα",
+    "ΔΗΜΟΤΙΚΗ ΕΝΟΤΗΤΑ ΟΡΕΣΤΙΑΔΟΣ",
+    "Δημοτική Κοινότητα Ορεστιάδος",
+    "Ορεστιάδα"
+   ],
+   "aliases": [
+    "δημοτικη ενοτητα ορεστιαδος",
+    "δημοτικη κοινοτητα ορεστιαδος",
+    "ορεστιαδα",
+    "ορεστιαδος"
+   ]
+  },
+  {
+   "id": "place:municipality_name",
+   "canonical": "Δήμος Ορεστιάδας",
+   "klass": "place_municipality",
+   "cut": "entities",
+   "source": "opencouncil:https://opencouncil.gr/api/cities/orestiada#municipality_name",
+   "covers": [
+    "Δήμος Ορεστιάδας"
+   ],
+   "aliases": [
+    "δημος ορεστιαδας"
+   ]
+  },
+  {
+   "id": "proc:αντιδημαρχος",
+   "canonical": "αντιδήμαρχος",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "αντιδήμαρχος"
+   ],
+   "aliases": [
+    "αντιδημαρχος"
+   ],
+   "modelreg_attestations": 6
+  },
+  {
+   "id": "proc:αντιπροεδρος",
+   "canonical": "αντιπρόεδρος",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "αντιπρόεδρος"
+   ],
+   "aliases": [
+    "αντιπροεδρος"
+   ],
+   "modelreg_attestations": 2
+  },
+  {
+   "id": "proc:απαρτια",
+   "canonical": "απαρτία",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "απαρτία"
+   ],
+   "aliases": [
+    "απαρτια"
+   ],
+   "modelreg_attestations": 12
+  },
+  {
+   "id": "proc:απαρτιας",
+   "canonical": "απαρτίας",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "απαρτίας"
+   ],
+   "aliases": [
+    "απαρτιας"
+   ],
+   "modelreg_attestations": 8
+  },
+  {
+   "id": "proc:απολογισμος",
+   "canonical": "απολογισμός",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "απολογισμός"
+   ],
+   "aliases": [
+    "απολογισμος"
+   ],
+   "modelreg_attestations": 1
+  },
+  {
+   "id": "proc:απολυτη_πλειοψηφια",
+   "canonical": "απόλυτη πλειοψηφία",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "απόλυτη πλειοψηφία"
+   ],
+   "aliases": [
+    "απολυτη πλειοψηφια"
+   ],
+   "modelreg_attestations": 12
+  },
+  {
+   "id": "proc:αποφαση",
+   "canonical": "απόφαση",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "απόφαση"
+   ],
+   "aliases": [
+    "αποφαση"
+   ],
+   "modelreg_attestations": 30
+  },
+  {
+   "id": "proc:αποχωρηση",
+   "canonical": "αποχώρηση",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "αποχώρηση"
+   ],
+   "aliases": [
+    "αποχωρηση"
+   ],
+   "modelreg_attestations": 1
+  },
+  {
+   "id": "proc:γραμματεας",
+   "canonical": "γραμματέας",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "γραμματέας"
+   ],
+   "aliases": [
+    "γραμματεας"
+   ],
+   "modelreg_attestations": 3
+  },
+  {
+   "id": "proc:δαπανη",
+   "canonical": "δαπάνη",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "δαπάνη"
+   ],
+   "aliases": [
+    "δαπανη"
+   ],
+   "modelreg_attestations": 1
+  },
+  {
+   "id": "proc:δημαρχος",
+   "canonical": "δήμαρχος",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "δήμαρχος"
+   ],
+   "aliases": [
+    "δημαρχος"
+   ],
+   "modelreg_attestations": 19
+  },
+  {
+   "id": "proc:δημοτες",
+   "canonical": "δημότες",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "δημότες"
+   ],
+   "aliases": [
+    "δημοτες"
+   ],
+   "modelreg_attestations": 4
+  },
+  {
+   "id": "proc:δημοτικη_αρχη",
+   "canonical": "δημοτική αρχή",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "δημοτική αρχή"
+   ],
+   "aliases": [
+    "δημοτικη αρχη"
+   ],
+   "modelreg_attestations": 2
+  },
+  {
+   "id": "proc:δημοτικη_παραταξη",
+   "canonical": "δημοτική παράταξη",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "δημοτική παράταξη"
+   ],
+   "aliases": [
+    "δημοτικη παραταξη"
+   ],
+   "modelreg_attestations": 4
+  },
+  {
+   "id": "proc:δημοτικος_συμβουλος",
+   "canonical": "δημοτικός σύμβουλος",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "δημοτικός σύμβουλος"
+   ],
+   "aliases": [
+    "δημοτικος συμβουλος"
+   ],
+   "modelreg_attestations": 7
+  },
+  {
+   "id": "proc:δια_περιφορας",
+   "canonical": "δια περιφοράς",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "δια περιφοράς"
+   ],
+   "aliases": [
+    "δια περιφορας"
+   ],
+   "modelreg_attestations": 4
+  },
+  {
+   "id": "proc:διαταξη",
+   "canonical": "διάταξη",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "διάταξη"
+   ],
+   "aliases": [
+    "διαταξη"
+   ],
+   "modelreg_attestations": 17
+  },
+  {
+   "id": "proc:διαυγεια",
+   "canonical": "διαύγεια",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "διαύγεια"
+   ],
+   "aliases": [
+    "διαυγεια"
+   ],
+   "modelreg_attestations": 3
+  },
+  {
+   "id": "proc:ειδικη_συνεδριαση",
+   "canonical": "ειδική συνεδρίαση",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "ειδική συνεδρίαση"
+   ],
+   "aliases": [
+    "ειδικη συνεδριαση"
+   ],
+   "modelreg_attestations": 9
+  },
+  {
+   "id": "proc:εισηγηση",
+   "canonical": "εισήγηση",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "εισήγηση"
+   ],
+   "aliases": [
+    "εισηγηση"
+   ],
+   "modelreg_attestations": 8
+  },
+  {
+   "id": "proc:εκτος_ημερησιας_διαταξης",
+   "canonical": "εκτός ημερήσιας διάταξης",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "εκτός ημερήσιας διάταξης"
+   ],
+   "aliases": [
+    "εκτος ημερησιας διαταξης"
+   ],
+   "modelreg_attestations": 1
+  },
+  {
+   "id": "proc:επικεφαλης",
+   "canonical": "επικεφαλής",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "επικεφαλής"
+   ],
+   "aliases": [
+    "επικεφαλης"
+   ],
+   "modelreg_attestations": 7
+  },
+  {
+   "id": "proc:ημερησια_διαταξη",
+   "canonical": "ημερήσια διάταξη",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "ημερήσια διάταξη"
+   ],
+   "aliases": [
+    "ημερησια διαταξη"
+   ],
+   "modelreg_attestations": 15
+  },
+  {
+   "id": "proc:ημερησιας_διαταξης",
+   "canonical": "ημερήσιας διάταξης",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "ημερήσιας διάταξης"
+   ],
+   "aliases": [
+    "ημερησιας διαταξης"
+   ],
+   "modelreg_attestations": 14
+  },
+  {
+   "id": "proc:θεμα",
+   "canonical": "θέμα",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "θέμα"
+   ],
+   "aliases": [
+    "θεμα"
+   ],
+   "modelreg_attestations": 27
+  },
+  {
+   "id": "proc:κανονισμος_λειτουργιας",
+   "canonical": "κανονισμός λειτουργίας",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "κανονισμός λειτουργίας"
+   ],
+   "aliases": [
+    "κανονισμος λειτουργιας"
+   ],
+   "modelreg_attestations": 3
+  },
+  {
+   "id": "proc:κατεπειγον",
+   "canonical": "κατεπείγον",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "κατεπείγον"
+   ],
+   "aliases": [
+    "κατεπειγον"
+   ],
+   "modelreg_attestations": 5
+  },
+  {
+   "id": "proc:κοινοτητα",
+   "canonical": "κοινότητα",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "κοινότητα"
+   ],
+   "aliases": [
+    "κοινοτητα"
+   ],
+   "modelreg_attestations": 7
+  },
+  {
+   "id": "proc:μελη",
+   "canonical": "μέλη",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "μέλη"
+   ],
+   "aliases": [
+    "μελη"
+   ],
+   "modelreg_attestations": 19
+  },
+  {
+   "id": "proc:μυστικη_ψηφοφορια",
+   "canonical": "μυστική ψηφοφορία",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "μυστική ψηφοφορία"
+   ],
+   "aliases": [
+    "μυστικη ψηφοφορια"
+   ],
+   "modelreg_attestations": 2
+  },
+  {
+   "id": "proc:νομοθεσια",
+   "canonical": "νομοθεσία",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "νομοθεσία"
+   ],
+   "aliases": [
+    "νομοθεσια"
+   ],
+   "modelreg_attestations": 1
+  },
+  {
+   "id": "proc:παραταξη",
+   "canonical": "παράταξη",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "παράταξη"
+   ],
+   "aliases": [
+    "παραταξη"
+   ],
+   "modelreg_attestations": 11
+  },
+  {
+   "id": "proc:παραταση",
+   "canonical": "παράταση",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "παράταση"
+   ],
+   "aliases": [
+    "παραταση"
+   ],
+   "modelreg_attestations": 4
+  },
+  {
+   "id": "proc:παρων",
+   "canonical": "παρών",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "παρών"
+   ],
+   "aliases": [
+    "παρων"
+   ],
+   "modelreg_attestations": 1
+  },
+  {
+   "id": "proc:περιφερεια",
+   "canonical": "περιφέρεια",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "περιφέρεια"
+   ],
+   "aliases": [
+    "περιφερεια"
+   ],
+   "modelreg_attestations": 1
+  },
+  {
+   "id": "proc:πλειοψηφια",
+   "canonical": "πλειοψηφία",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "πλειοψηφία"
+   ],
+   "aliases": [
+    "πλειοψηφια"
+   ],
+   "modelreg_attestations": 19
+  },
+  {
+   "id": "proc:πρακτικα",
+   "canonical": "πρακτικά",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "πρακτικά"
+   ],
+   "aliases": [
+    "πρακτικα"
+   ],
+   "modelreg_attestations": 12
+  },
+  {
+   "id": "proc:προεδρειο",
+   "canonical": "προεδρείο",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "προεδρείο"
+   ],
+   "aliases": [
+    "προεδρειο"
+   ],
+   "modelreg_attestations": 3
+  },
+  {
+   "id": "proc:προεδρος",
+   "canonical": "πρόεδρος",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "πρόεδρος"
+   ],
+   "aliases": [
+    "προεδρος"
+   ],
+   "modelreg_attestations": 54
+  },
+  {
+   "id": "proc:προσελευση",
+   "canonical": "προσέλευση",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "προσέλευση"
+   ],
+   "aliases": [
+    "προσελευση"
+   ],
+   "modelreg_attestations": 1
+  },
+  {
+   "id": "proc:προσκληση",
+   "canonical": "πρόσκληση",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "πρόσκληση"
+   ],
+   "aliases": [
+    "προσκληση"
+   ],
+   "modelreg_attestations": 20
+  },
+  {
+   "id": "proc:προταση",
+   "canonical": "πρόταση",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "πρόταση"
+   ],
+   "aliases": [
+    "προταση"
+   ],
+   "modelreg_attestations": 9
+  },
+  {
+   "id": "proc:συμβουλιο",
+   "canonical": "συμβούλιο",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "συμβούλιο"
+   ],
+   "aliases": [
+    "συμβουλιο"
+   ],
+   "modelreg_attestations": 47
+  },
+  {
+   "id": "proc:συνεδριαση",
+   "canonical": "συνεδρίαση",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "συνεδρίαση"
+   ],
+   "aliases": [
+    "συνεδριαση"
+   ],
+   "modelreg_attestations": 61
+  },
+  {
+   "id": "proc:συνεδριασης",
+   "canonical": "συνεδρίασης",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "συνεδρίασης"
+   ],
+   "aliases": [
+    "συνεδριασης"
+   ],
+   "modelreg_attestations": 37
+  },
+  {
+   "id": "proc:τακτικη_συνεδριαση",
+   "canonical": "τακτική συνεδρίαση",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "τακτική συνεδρίαση"
+   ],
+   "aliases": [
+    "τακτικη συνεδριαση"
+   ],
+   "modelreg_attestations": 2
+  },
+  {
+   "id": "proc:τηλεδιασκεψη",
+   "canonical": "τηλεδιάσκεψη",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "τηλεδιάσκεψη"
+   ],
+   "aliases": [
+    "τηλεδιασκεψη"
+   ],
+   "modelreg_attestations": 3
+  },
+  {
+   "id": "proc:υπηρεσια",
+   "canonical": "υπηρεσία",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "υπηρεσία"
+   ],
+   "aliases": [
+    "υπηρεσια"
+   ],
+   "modelreg_attestations": 4
+  },
+  {
+   "id": "proc:φανερη_ψηφοφορια",
+   "canonical": "φανερή ψηφοφορία",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "φανερή ψηφοφορία"
+   ],
+   "aliases": [
+    "φανερη ψηφοφορια"
+   ],
+   "modelreg_attestations": 1
+  },
+  {
+   "id": "proc:ψηφοφορια",
+   "canonical": "ψηφοφορία",
+   "klass": "procedural",
+   "cut": "procedure",
+   "source": "modelreg:ΦΕΚ Β' 109/2025 Πρότυπος Κανονισμός Λειτουργίας Δημοτικού Συμβουλίου",
+   "covers": [
+    "ψηφοφορία"
+   ],
+   "aliases": [
+    "ψηφοφορια"
+   ],
+   "modelreg_attestations": 6
+  }
+ ],
+ "dropped_aliases": [
+  {
+   "alias": "Αμπελάκια",
+   "reason": "common_noun_in_el_GR_dict",
+   "seen_city_count": 0,
+   "term": "admin:αμπελακιων"
+  },
+  {
+   "alias": "Βάλτος",
+   "reason": "common_noun_in_el_GR_dict",
+   "seen_city_count": 0,
+   "term": "admin:βαλτου"
+  },
+  {
+   "alias": "Βάλτου",
+   "reason": "common_noun_in_el_GR_dict",
+   "seen_city_count": 0,
+   "term": "admin:βαλτου"
+  },
+  {
+   "alias": "Γαλήνη",
+   "reason": "common_noun_in_el_GR_dict",
+   "seen_city_count": 0,
+   "term": "admin:γαληνης"
+  },
+  {
+   "alias": "Γαλήνης",
+   "reason": "common_noun_in_el_GR_dict",
+   "seen_city_count": 0,
+   "term": "admin:γαληνης"
+  },
+  {
+   "alias": "Δίκαια",
+   "reason": "common_noun_in_el_GR_dict",
+   "seen_city_count": 0,
+   "term": "admin:δικαιων"
+  },
+  {
+   "alias": "Δικαίων",
+   "reason": "common_noun_in_el_GR_dict",
+   "seen_city_count": 0,
+   "term": "admin:δικαιων"
+  },
+  {
+   "alias": "Ελαίας",
+   "reason": "common_noun_in_el_GR_dict",
+   "seen_city_count": 0,
+   "term": "admin:ελαιας"
+  },
+  {
+   "alias": "Ζώνης",
+   "reason": "common_noun_in_el_GR_dict",
+   "seen_city_count": 2,
+   "term": "admin:ζωνης"
+  },
+  {
+   "alias": "Θουρίου",
+   "reason": "common_noun_in_el_GR_dict",
+   "seen_city_count": 0,
+   "term": "admin:θουριου"
+  },
+  {
+   "alias": "Θούριο",
+   "reason": "common_noun_in_el_GR_dict",
+   "seen_city_count": 0,
+   "term": "admin:θουριου"
+  },
+  {
+   "alias": "Καστανιές",
+   "reason": "common_noun_in_el_GR_dict",
+   "seen_city_count": 0,
+   "term": "admin:καστανεων"
+  },
+  {
+   "alias": "Κυπρίνος",
+   "reason": "common_noun_in_el_GR_dict",
+   "seen_city_count": 0,
+   "term": "admin:κυπρινος"
+  },
+  {
+   "alias": "ΚΥΠΡΙΝΟΥ",
+   "reason": "common_noun_in_el_GR_dict",
+   "seen_city_count": 0,
+   "term": "admin:κυπρινου"
+  },
+  {
+   "alias": "Μηλέα",
+   "reason": "common_noun_in_el_GR_dict",
+   "seen_city_count": 0,
+   "term": "admin:μηλεα"
+  },
+  {
+   "alias": "Πετρωτά",
+   "reason": "common_noun_in_el_GR_dict",
+   "seen_city_count": 0,
+   "term": "admin:πετρωτων"
+  },
+  {
+   "alias": "Πετρωτών",
+   "reason": "common_noun_in_el_GR_dict",
+   "seen_city_count": 0,
+   "term": "admin:πετρωτων"
+  },
+  {
+   "alias": "Πλάτη",
+   "reason": "common_noun_in_el_GR_dict",
+   "seen_city_count": 0,
+   "term": "admin:πλατης"
+  },
+  {
+   "alias": "Πλάτης",
+   "reason": "common_noun_in_el_GR_dict",
+   "seen_city_count": 0,
+   "term": "admin:πλατης"
+  },
+  {
+   "alias": "Πτελέα",
+   "reason": "common_noun_in_el_GR_dict",
+   "seen_city_count": 0,
+   "term": "admin:πτελεας"
+  },
+  {
+   "alias": "Πτελέας",
+   "reason": "common_noun_in_el_GR_dict",
+   "seen_city_count": 0,
+   "term": "admin:πτελεας"
+  },
+  {
+   "alias": "Σπήλαιο",
+   "reason": "common_noun_in_el_GR_dict",
+   "seen_city_count": 1,
+   "term": "admin:σπηλαιου"
+  },
+  {
+   "alias": "Σπηλαίου",
+   "reason": "common_noun_in_el_GR_dict",
+   "seen_city_count": 0,
+   "term": "admin:σπηλαιου"
+  },
+  {
+   "alias": "Στέρνα",
+   "reason": "common_noun_in_el_GR_dict",
+   "seen_city_count": 0,
+   "term": "admin:στερνας"
+  },
+  {
+   "alias": "Στέρνας",
+   "reason": "common_noun_in_el_GR_dict",
+   "seen_city_count": 0,
+   "term": "admin:στερνας"
+  },
+  {
+   "alias": "ΤΡΙΓΩΝΟΥ",
+   "reason": "common_noun_in_el_GR_dict",
+   "seen_city_count": 0,
+   "term": "admin:τριγωνου"
+  },
+  {
+   "alias": "Φυλάκιο",
+   "reason": "common_noun_in_el_GR_dict",
+   "seen_city_count": 0,
+   "term": "admin:φυλακιου"
+  },
+  {
+   "alias": "Φυλακίου",
+   "reason": "common_noun_in_el_GR_dict",
+   "seen_city_count": 0,
+   "term": "admin:φυλακιου"
+  },
+  {
+   "alias": "Χανδρά",
+   "reason": "common_noun_in_el_GR_dict",
+   "seen_city_count": 0,
+   "term": "admin:χανδρα"
+  },
+  {
+   "alias": "Χανδράς",
+   "reason": "common_noun_in_el_GR_dict",
+   "seen_city_count": 0,
+   "term": "admin:χανδρα"
+  },
+  {
+   "alias": "Ελιά",
+   "reason": "common_noun_in_el_GR_dict",
+   "seen_city_count": 1,
+   "term": "osm:ελια"
+  },
+  {
+   "alias": "Ζώνη",
+   "reason": "common_noun_in_el_GR_dict",
+   "seen_city_count": 2,
+   "term": "osm:ζωνη"
+  },
+  {
+   "alias": "Κέραμος",
+   "reason": "common_noun_in_el_GR_dict",
+   "seen_city_count": 0,
+   "term": "osm:κεραμος"
+  },
+  {
+   "alias": "Κριός",
+   "reason": "common_noun_in_el_GR_dict",
+   "seen_city_count": 0,
+   "term": "osm:κριος"
+  },
+  {
+   "alias": "Λεπτή",
+   "reason": "common_noun_in_el_GR_dict",
+   "seen_city_count": 0,
+   "term": "osm:λεπτη"
+  },
+  {
+   "alias": "Μηλιά",
+   "reason": "common_noun_in_el_GR_dict",
+   "seen_city_count": 0,
+   "term": "osm:μηλια"
+  },
+  {
+   "alias": "Νεφέλη",
+   "reason": "common_noun_in_el_GR_dict",
+   "seen_city_count": 0,
+   "term": "osm:νεφελη"
+  },
+  {
+   "alias": "Χελιδόνα",
+   "reason": "common_noun_in_el_GR_dict",
+   "seen_city_count": 0,
+   "term": "osm:χελιδονα"
+  },
+  {
+   "alias": "Ελιά",
+   "reason": "no_usable_alias",
+   "term": "osm:ελια"
+  },
+  {
+   "alias": "Ζώνη",
+   "reason": "no_usable_alias",
+   "term": "osm:ζωνη"
+  },
+  {
+   "alias": "Κέραμος",
+   "reason": "no_usable_alias",
+   "term": "osm:κεραμος"
+  },
+  {
+   "alias": "Κριός",
+   "reason": "no_usable_alias",
+   "term": "osm:κριος"
+  },
+  {
+   "alias": "Λεπτή",
+   "reason": "no_usable_alias",
+   "term": "osm:λεπτη"
+  },
+  {
+   "alias": "Μηλιά",
+   "reason": "no_usable_alias",
+   "term": "osm:μηλια"
+  },
+  {
+   "alias": "Νεφέλη",
+   "reason": "no_usable_alias",
+   "term": "osm:νεφελη"
+  },
+  {
+   "alias": "Χελιδόνα",
+   "reason": "no_usable_alias",
+   "term": "osm:χελιδονα"
+  }
+ ]
+}
