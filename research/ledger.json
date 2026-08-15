@@ -704,13 +704,13 @@
     "cap-runpod-gpu-pod"
    ],
    "superseded_by": null,
-   "next_action": "Prereg spec FROZEN v2 2026-08-15 (Codex-reviewed, job a23a41d8, 37 findings folded in: row-level sampling defined for both arms, paired seeds 101-103, wild cluster bootstrap over 31 meetings, one-sided noninferiority UBs on ALL gates, leave-one-MEETING-out, seed-consistency gate, numeric hallucination gate, final-step checkpoint, median-seed shipping rule, run-validity + exposure attestation). REMAINING BEFORE PODS: (1) FINAL BACKBONE AUDIT GATE - compose backbone (existing_keep + seeded headroom subset, seed 20260816), run 250-row risk-stratified Soniox audit, require >=90% pass; (2) build per-seed sample manifests + hashes; (3) launch 3-seed A/B pods per RunPod rules.",
+   "next_action": "FINAL BACKBONE AUDIT GATE: PASS 2026-08-15 (backbone-final-audit-2026-08-15.json): composed backbone 40,611 rows/42.38h (seed 20260816); 250-row risk-stratified audit passes 92.8% raw, 91.45% population-weighted (CI 87.3-95.6) vs the >=90% gate - point-estimate pass, CI lower bound below threshold, caveat recorded. Post-filter failure modes are mild substitutions/boundary trims, not wrong-content misalignment. Frozen row list ~/.cache/oc-public/backbone-audit/final_backbone.parquet. ALL DATA GATES CLEAR. REMAINING: build per-seed sample manifests + hashes (seeds 101-103, paired), then launch 3-seed A/B pods per the frozen spec and RunPod rules (watchdog before upload, record pod ID). GPU spend requires user go-ahead.",
    "caveats": [
     "Per-seed spread 2.1 WER points: single-seed results from this experiment are screens, never conclusions.",
     "Mining artifacts: gap-candidates-2026-08-12.{md,jsonl}, gap-mining-summary, backbone-headroom (all under data/reports/finetune-research/, gitignored).",
     "Auto-accepted labels (username=auto-verifier) carry ~2.6% expected contamination (audit-calibrated); exclude or down-weight them if a later gate failure implicates label quality."
    ],
-   "updated_at": "2026-08-15T18:00:00Z"
+   "updated_at": "2026-08-15T20:00:00Z"
   },
   {
    "id": "exp-2026-08-14-hparl-probe",
