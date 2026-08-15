@@ -43,6 +43,10 @@ SEED = int(os.environ.get("SEED", "13"))
 # (docs/specs/mixture-ratio-preregistration.md); unset, behaviour is unchanged.
 MAX_STEPS = int(os.environ.get("MAX_STEPS", "0"))
 TRAIN_MANIFEST = os.environ.get("TRAIN_MANIFEST", "")
+# Stage continuation (external-packs screens): path to a stage-1 LoRA adapter.
+# Set -> stage 2 CONTINUES that adapter (no merge, no re-init) with a fresh
+# optimizer/scheduler, per docs/specs/2026-08-15-external-packs-screens-prereg.md §3.
+INIT_ADAPTER = os.environ.get("INIT_ADAPTER", "")
 EVAL_STRATEGY = os.environ.get("EVAL_STRATEGY", "epoch")   # "no" to skip
 LORA_R, LORA_ALPHA, LORA_DROPOUT = 32, 64, 0.05  # sweep pick
 LR, TRAIN_BS, GRAD_ACC, EVAL_BS = 1e-4, 2, 4, 4
@@ -62,7 +66,8 @@ LABEL_SEMANTICS = "decoder_start_v2"
 FINGERPRINT_FILE = "run_fingerprint.json"
 RUN_FINGERPRINT = json.dumps({"label_semantics": LABEL_SEMANTICS, "smoke": SMOKE,
                               "model": MODEL_ID, "epochs": EPOCHS,
-                              "lora": [LORA_R, LORA_ALPHA, LORA_DROPOUT]},
+                              "lora": [LORA_R, LORA_ALPHA, LORA_DROPOUT],
+                              "init_adapter": INIT_ADAPTER},
                              sort_keys=True)
 
 
@@ -402,9 +407,19 @@ def main():
     collator = Collator(processor, model.config.decoder_start_token_id)
     model.model.encoder.requires_grad_(False)
     model.gradient_checkpointing_enable(); model.config.use_cache = False
-    model = get_peft_model(model, LoraConfig(r=LORA_R, lora_alpha=LORA_ALPHA,
-                                             lora_dropout=LORA_DROPOUT,
-                                             target_modules=["q_proj", "v_proj"]))
+    if INIT_ADAPTER:
+        # Stage 2 of a two-stage screen: continue the stage-1 adapter. The LoRA
+        # config (r/alpha/dropout/targets) comes from the saved adapter itself;
+        # optimizer and scheduler are re-initialized by the fresh Trainer below,
+        # which is exactly the preregistered stage boundary.
+        from peft import PeftModel
+        model = PeftModel.from_pretrained(model, INIT_ADAPTER, is_trainable=True)
+        log(f"stage continuation: LoRA initialized from {INIT_ADAPTER} "
+            f"(same adapter weights, fresh optimizer/scheduler)")
+    else:
+        model = get_peft_model(model, LoraConfig(r=LORA_R, lora_alpha=LORA_ALPHA,
+                                                 lora_dropout=LORA_DROPOUT,
+                                                 target_modules=["q_proj", "v_proj"]))
     model.print_trainable_parameters()
     # NB: freezing the encoder above does NOT keep LoRA out of it — PEFT injects
     # fresh trainable adapters into every module matching q_proj/v_proj, encoder
