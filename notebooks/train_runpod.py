@@ -327,6 +327,11 @@ def main():
 
         def prep(b):
             arr, sr = sf.read(b["audio"], dtype="float32")
+            if arr.ndim > 1:
+                arr = arr.mean(axis=1)
+            if sr != SR:  # pack audio (e.g. CV mp3s) can be 44.1/48 kHz
+                arr = librosa.resample(arr, orig_sr=sr, target_sr=SR)
+                sr = SR
             b["input_features"] = processor.feature_extractor(
                 arr, sampling_rate=sr).input_features[0]
             b["labels"] = processor.tokenizer(b["text"]).input_ids
