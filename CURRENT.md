@@ -14,6 +14,13 @@ lexicon), one gap (fidelity-to-audio).
 Canonical research state: [`research/ledger.json`](research/ledger.json).
 Agent protocol: [`CLAUDE.md`](CLAUDE.md).
 
+**Η σειρά εκτέλεσης μέχρι τις 23/8 ζει πλέον στον χάρτη**
+[«Το καλύτερο δυνατό μοντέλο + serving harness μέχρι 23/8»](https://github.com/eellak/gsoc2026-opencouncil-stt/issues/3)
+(GitHub Issues, label `wayfinder:map`). Το queue παρακάτω μένει ως περιγραφή
+κατάστασης· ο χάρτης είναι αυτός που λέει τι πιάνεται μετά και με ποια σειρά.
+Το `exp-2026-08-14-hparl-probe` βγήκε **εκτός scope** για αυτόν τον κύκλο (ανοιχτό
+νομικό ζήτημα CLARIN 1602)· το record μένει OPEN στο ledger για μετά το GSoC.
+
 The long narrative that used to live here is at
 [`archive/current/2026-08-10-CURRENT.md`](archive/current/2026-08-10-CURRENT.md).
 It is history, not state.
