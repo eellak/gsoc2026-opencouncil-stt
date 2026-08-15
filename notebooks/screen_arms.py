@@ -28,12 +28,20 @@ import json
 import math
 from pathlib import Path
 
-EFFECTIVE_BATCH = 8          # TRAIN_BS 2 x GRAD_ACC 4, train_runpod.py
+TRAIN_BS, GRAD_ACC = 2, 4    # train_runpod.py constants (per-device batch, accum)
 SHARE_TOL = 0.02             # prereg exposure tolerance, absolute
 
 
 def log(*a):
     print(*a, flush=True)
+
+
+def optimizer_updates(n_examples: int) -> int:
+    """Optimizer updates for ONE epoch, matching the trainer's real dataloader:
+    HF Trainer defaults to drop_last=False, so micro-steps = ceil(N/TRAIN_BS),
+    and a partial accumulation window at epoch end still flushes as an update:
+    updates = ceil(micro_steps / GRAD_ACC). Not the same as ceil(N/8) in general."""
+    return math.ceil(math.ceil(n_examples / TRAIN_BS) / GRAD_ACC)
 
 
 def read_jsonl(p: Path) -> list[dict]:
@@ -91,8 +99,23 @@ def emit(a) -> None:
             raise SystemExit(f"bucket {b} share drifted {drift:.3f} > {SHARE_TOL} "
                              f"after clip attrition — rebuild, do not train")
     Path(a.out).write_text(json.dumps({"train": arm}, ensure_ascii=False))
-    steps1 = math.ceil(len(arm) / EFFECTIVE_BATCH)
-    log(f"-> {a.out}; MAX_STEPS: 1 epoch = {steps1}, 2 epochs = {2 * steps1}")
+    steps1 = optimizer_updates(len(arm))
+    att = {
+        "presentations_in": len(pres), "emitted": len(arm),
+        "dropped_by_bucket": dict(dropped),
+        "realized_presentations_by_bucket": dict(got),
+        "realized_shares": {b: round(got[b] / len(arm), 4) for b in got},
+        "target_shares": {b: round(want[b] / len(pres), 4) for b in want},
+        "share_tolerance": SHARE_TOL,
+        "max_steps": {"1_epoch": steps1, "2_epochs": 2 * steps1,
+                      "formula": "ceil(ceil(N/2)/4) per epoch (drop_last=False, "
+                                 "partial accumulation flushes)"},
+    }
+    Path(str(a.out) + ".attestation.json").write_text(
+        json.dumps(att, ensure_ascii=False, indent=2))
+    log(f"realized shares: {att['realized_shares']}")
+    log(f"-> {a.out} (+ .attestation.json); "
+        f"MAX_STEPS: 1 epoch = {steps1}, 2 epochs = {2 * steps1}")
 
 
 def emit_pack(a) -> None:
@@ -100,6 +123,7 @@ def emit_pack(a) -> None:
     pres = read_jsonl(Path(a.presentations))
     out = Path(a.out)
     n = 0
+    per_source = collections.Counter()
     with out.open("w") as f:
         for p in pres:
             r = rows[p["id"]]
@@ -113,9 +137,18 @@ def emit_pack(a) -> None:
                 "text_p": "", "text_pn": r["text_pn"] or r["text"],
                 "dur_sec": float(r.get("dur") or 0.0), "n_utt": 1,
             }, ensure_ascii=False) + "\n")
+            per_source[p["bucket"]] += 1
             n += 1
-    steps1 = math.ceil(n / EFFECTIVE_BATCH)
-    log(f"-> {out} ({n} presentations); PACK_ARM=pn; "
+    steps1 = optimizer_updates(n)
+    att = {"presentations": n,
+           "realized_presentations_by_source": dict(per_source),
+           "max_steps": {"one_balanced_pass": steps1,
+                         "formula": "ceil(ceil(N/2)/4) (drop_last=False, "
+                                    "partial accumulation flushes)"}}
+    Path(str(out) + ".attestation.json").write_text(
+        json.dumps(att, ensure_ascii=False, indent=2))
+    log(f"per-source presentations: {dict(per_source)}")
+    log(f"-> {out} (+ .attestation.json) ({n} presentations); PACK_ARM=pn; "
         f"MAX_STEPS (one balanced pass) = {steps1}")
 
 

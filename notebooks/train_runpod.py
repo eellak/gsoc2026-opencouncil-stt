@@ -408,14 +408,52 @@ def main():
     model.model.encoder.requires_grad_(False)
     model.gradient_checkpointing_enable(); model.config.use_cache = False
     if INIT_ADAPTER:
-        # Stage 2 of a two-stage screen: continue the stage-1 adapter. The LoRA
-        # config (r/alpha/dropout/targets) comes from the saved adapter itself;
-        # optimizer and scheduler are re-initialized by the fresh Trainer below,
-        # which is exactly the preregistered stage boundary.
-        from peft import PeftModel
+        # Stage 2 of a two-stage screen: continue the stage-1 adapter. Optimizer
+        # and scheduler are re-initialized by the fresh Trainer below (scheduler
+        # spans THIS run's MAX_STEPS, same LR/warmup_ratio constants as stage 1),
+        # which is exactly the preregistered stage boundary. Hardened per Codex
+        # review (job c12eb5b8): fresh base only, config equality, coverage
+        # equality with fresh LoRA, and a not-still-at-init check.
+        import re as _re
+
+        from peft import PeftConfig, PeftModel
+        if isinstance(model, PeftModel):
+            sys.exit("[train FATAL] INIT_ADAPTER must wrap a fresh base model, "
+                     "not an existing PeftModel")
+        cfg = PeftConfig.from_pretrained(INIT_ADAPTER)
+        want = {"r": LORA_R, "lora_alpha": LORA_ALPHA, "lora_dropout": LORA_DROPOUT}
+        for k, v in want.items():
+            if getattr(cfg, k, None) != v:
+                sys.exit(f"[train FATAL] stage-1 adapter {k}={getattr(cfg, k, None)} "
+                         f"!= this recipe's {v}")
+        if sorted(cfg.target_modules) != ["q_proj", "v_proj"]:
+            sys.exit(f"[train FATAL] stage-1 adapter targets {sorted(cfg.target_modules)}")
+        if getattr(cfg, "bias", "none") != "none" or getattr(cfg, "modules_to_save", None):
+            sys.exit("[train FATAL] stage-1 adapter carries bias/modules_to_save "
+                     "params this recipe never trains — refusing a partial reload")
         model = PeftModel.from_pretrained(model, INIT_ADAPTER, is_trainable=True)
+        tnames = [n for n, p in model.named_parameters() if p.requires_grad]
+        bad = [n for n in tnames if not _re.search(r"\.(q_proj|v_proj)\.lora_[AB]\.", n)]
+        if bad:
+            sys.exit(f"[train FATAL] unexpected trainable params after adapter "
+                     f"load, e.g. {bad[:3]}")
+        lora_mods = {_re.sub(r"\.lora_[AB]\..*$", "", n) for n in tnames}
+        all_qv = {n for n, _ in model.named_modules()
+                  if n.endswith(("q_proj", "v_proj"))}
+        if lora_mods != all_qv or len(tnames) != 2 * len(lora_mods):
+            sys.exit(f"[train FATAL] LoRA coverage mismatch: {len(lora_mods)} "
+                     f"modules with adapters vs {len(all_qv)} q/v modules, "
+                     f"{len(tnames)} trainable tensors (fresh init would be "
+                     f"{2 * len(all_qv)})")
+        n_nonzero_b = sum(1 for n, p in model.named_parameters()
+                          if ".lora_B." in n and p.detach().abs().max().item() > 0)
+        if n_nonzero_b == 0:
+            sys.exit("[train FATAL] every lora_B tensor is zero — that is fresh "
+                     "init, not a trained stage-1 adapter. Wrong path?")
         log(f"stage continuation: LoRA initialized from {INIT_ADAPTER} "
-            f"(same adapter weights, fresh optimizer/scheduler)")
+            f"({len(lora_mods)} modules, {len(tnames)} tensors, "
+            f"{n_nonzero_b} nonzero lora_B; fresh optimizer/scheduler over "
+            f"max_steps={MAX_STEPS or 'epochs'})")
     else:
         model = get_peft_model(model, LoraConfig(r=LORA_R, lora_alpha=LORA_ALPHA,
                                                  lora_dropout=LORA_DROPOUT,
