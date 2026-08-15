@@ -1,6 +1,6 @@
 {
  "schema_version": 1,
- "updated_at": "2026-08-15T07:40:00Z",
+ "updated_at": "2026-08-15T10:30:00Z",
  "note": "Authoritative state. Reports under docs/reports/ are immutable evidence; this file says whether their conclusions still stand. When a doc disagrees with this file, this file wins and the doc gets fixed in the same change.",
  "experiments": [
   {
@@ -702,13 +702,13 @@
     "cap-runpod-gpu-pod"
    ],
    "superseded_by": null,
-   "next_action": "VERIFICATION WAVE COMPLETE 2026-08-15 (gap-verify-final-summary-2026-08-15.json): 12,946 deletion-shaped rows audio-verified via Soniox; tiers VERIFIED 4,894 / BOUNDARY 4,043 / MIDDLE 985 / REJECT 3,015; 2,643 rule passers auto-accepted (username=auto-verifier) under the two calibrated rules recorded above; with user manual includes the deletion-hard supply is ~2,950 examples. Pending: user spot-check of 40 random auto-accepted items (queue gap5); optional BOUNDARY recovery pass (4,043 recoverable via adjusted_start/end). THEN: write the preregistration spec (55/25/10/10 recipe frozen below), expand backbone (+78h with per-city caps, 200-300-row pseudo-clean audit), launch 3-seed A/B pods per RunPod rules (watchdog before upload, record pod ID).",
+   "next_action": "VERIFICATION WAVE COMPLETE 2026-08-15 (gap-verify-final-summary-2026-08-15.json): 12,946 deletion-shaped rows audio-verified via Soniox; tiers VERIFIED 4,894 / BOUNDARY 4,043 / MIDDLE 985 / REJECT 3,015; 2,643 rule passers auto-accepted (username=auto-verifier) under the two calibrated rules recorded above; with user manual includes the deletion-hard supply is ~2,950 examples. Spot-check PASSED 2026-08-15: 39/40 include (97.5%), one exclude applied; deletion-hard supply CLOSED at ~2,950 examples. PSEUDO-CLEAN AUDIT DONE 2026-08-15 (backbone-pseudoclean-audit-2026-08-15.json): 300 stratified headroom rows Soniox-scored, overall pass 80.7% (hard stratum 74.0% - a lower bound due to no padded fallback on the transcript side; uniform 87.3%); dominant failure modes are timestamp misalignment and spans longer than their text (extra-speech). Proposed admission rule for new backbone: duration>=2s AND not speaker-change-adjacent (audit pass ~88%), per-city caps ~+5h/city. Pending: optional BOUNDARY recovery pass (4,043 recoverable via adjusted_start/end). THEN: write the preregistration spec (55/25/10/10 recipe frozen below), expand backbone (+78h with per-city caps, 200-300-row pseudo-clean audit), launch 3-seed A/B pods per RunPod rules (watchdog before upload, record pod ID).",
    "caveats": [
     "Per-seed spread 2.1 WER points: single-seed results from this experiment are screens, never conclusions.",
     "Mining artifacts: gap-candidates-2026-08-12.{md,jsonl}, gap-mining-summary, backbone-headroom (all under data/reports/finetune-research/, gitignored).",
     "Auto-accepted labels (username=auto-verifier) carry ~2.6% expected contamination (audit-calibrated); exclude or down-weight them if a later gate failure implicates label quality."
    ],
-   "updated_at": "2026-08-15T08:00:00Z"
+   "updated_at": "2026-08-15T14:00:00Z"
   },
   {
    "id": "exp-2026-08-14-hparl-probe",
@@ -764,6 +764,7 @@
    "artifact_ids": [
     "artifact-pack-cv-v2",
     "artifact-pack-stoma-v2",
+    "artifact-pack-eurospeech-v2",
     "artifact-pack-cv-v1",
     "artifact-pack-stoma-v1"
    ],
@@ -771,7 +772,7 @@
     "cap-runpod-gpu-pod"
    ],
    "superseded_by": null,
-   "next_action": "FULL PASSES RUNNING since 2026-08-14 ~17:50: stoma all 14,552 rows; cv all ~13.9k validated-minus-dev/test rows (official train split is only 2,037; dev/test held out as potential third-party benchmarks; original MP3 bytes kept, no second lossy transcode); eurospeech 59 spread train shards with --preselect-ds-wer 0.15 --explore-frac 0.18 (~19k Soniox calls, target ~30h admitted). Pilot results (150 rows each, rescored after the Latin-homoglyph fix): stoma keep 72% (edge 9%), cv keep 65%, eurospeech keep 23% overall / 35% on clean-edge rows (33% of rows are boundary-clipped, mostly at the END; clean-edge deletion rate 0.019 matches HParl). ds_wer calibration is monotone (<=0.15 -> ~40-50%% keep, >0.20 -> 13%%). WHEN PASSES LAND: build packs stoma-v1/cv-v1/eurospeech-v1, register artifacts with sha256, run the eurospeech<->hparl2 normalized-text overlap check, then execute the frozen screen design in docs/specs/2026-08-15-external-packs-screens-prereg.md (5 arms, one shared seed, dose-equalized stage 1, promotion rule preregistered, 3-seed confirmation only for survivors). No pod before the spec's section-6 items close.",
+   "next_action": "ALL THREE PACKS BUILT under the harmonized gate: stoma-v2 24.19h / cv-v2 15.11h / eurospeech-v2 58.57h = 97.9h external stage-1 material. Design simplified BY USER 2026-08-15 to TWO trainings (recorded in the spec): arm A = stage-2 on in-domain corrections INCLUDING the newly verified gap rows; arm B = stage-1 on combined balanced externals -> identical stage-2. BLOCKED ON: (1) applying the auto-accept PATCHes for 3,490 wave-2 rows (user decision pending: other session's tool vs reimplement via review API + user spot-check); (2) pod cost ceiling written here + user go-ahead. Trainer gap: the weight field on edge-flagged rows is not consumed by train_runpod.py yet - either implement or state edge rows enter at full weight.",
    "caveats": [
     "EuroSpeech licence UNRESOLVED: HF card 'other', per-country pointer to Greek copyright law (n.2121/1993) for parliament proceedings - same legal call as HParl before any commercial shipping.",
     "EuroSpeech overlaps hparl2 in domain and possibly in sessions (both Hellenic Parliament): never use both packs without cross-pack dedupe. EuroSpeech solves both HParl defects (fragments at ~3s boundaries, no punctuation), so it likely supersedes hparl2 as the parliament source if its keep rate holds.",
@@ -780,7 +781,7 @@
     "Filter caches under ~/.cache/oc-public/{stoma,eurospeech-el}/ - never in git.",
     "Infra note recorded per the fails-twice rule: both long HF-parquet passes (stoma ~2.2h, eurospeech ~6.7h) died with 'httpx client has been closed' from the fsspec-cached HfFileSystem singleton. Fix in eval/ext_filter.py: HfFileSystem(skip_instance_cache=True) per shard. Resumes are lossless via --append."
    ],
-   "updated_at": "2026-08-15T07:40:00Z"
+   "updated_at": "2026-08-15T10:30:00Z"
   }
  ],
  "artifacts": [
@@ -1199,6 +1200,34 @@
    ],
    "replaced_by": null,
    "verified_at": "2026-08-15T07:40:00Z"
+  },
+  {
+   "id": "artifact-pack-eurospeech-v2",
+   "kind": "training_pack",
+   "description": "EuroSpeech Greek Parliament pack (disco-eth/EuroSpeech greece, train split, 59 spread shards, ds_wer<=0.15 preselect + 18% exploration lane, every row Soniox-verified): 14,136 rows / 58.57 h under the harmonized gate (align>=0.5, dur>=1.5s, edge-flagged rows kept at weight 0.5). Labels = official minutes spans, accented+punctuated, verbatim.",
+   "status": "ACTIVE",
+   "locations": [
+    {
+     "host": "minipc",
+     "path": "/home/harold/.cache/oc-public/training-sets/eurospeech-v2"
+    }
+   ],
+   "hash": {
+    "algorithm": "sha256-file-v1",
+    "file": "train.jsonl",
+    "value": "931a8958096174f9"
+   },
+   "caveats": [
+    "Regional quality cliff: shards 000-399 pass the harmonized gate at 97-99%, shards 400+ at 24%. Cause unresolved (source audio or their alignment); admission is per-row so the pack is safe, but its hours come mostly from the <400 region - session diversity is narrower than the shard list suggests.",
+    "Preselect used the corpus's own Whisper-Turbo ds_wer (<=0.15) plus an exploration lane; the pack skews toward Whisper-easy audio by construction. Recorded, not fixable at this size.",
+    "17% of kept rows are edge-flagged (clipped start/end) and carry weight 0.5; the trainer currently IGNORES the weight field - do not claim edge down-weighting until the trainer consumes it.",
+    "Licence basis: n.2121/1993 art. 2(5) statutory exception per the HF card; narrower legal questions (audio coverage, compilation's own terms) still open for commercial shipping.",
+    "Overlap with hparl2: 7/1000 sampled hparl2 kept segments appear verbatim inside eurospeech-v2 texts (~0.7%) - negligible, but do not use both packs in one arm without dedupe.",
+    "Official minutes are lightly edited (non-verbatim); the per-row gate limits but does not eliminate editorial drift.",
+    "No word-level timestamps: PACK_ARM=p unavailable, use pn."
+   ],
+   "replaced_by": null,
+   "verified_at": "2026-08-15T10:30:00Z"
   }
  ],
  "capabilities": [
