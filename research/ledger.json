@@ -1007,7 +1007,7 @@
     "One model (gpt-5.6-luna, reasoning_effort=low), one prompt, one run. Model stochasticity and prompt/batch choices enter no confidence interval.",
     "Agreement-with-OpenCouncil, not fidelity-to-audio.",
     "Two Codex passes shaped this: job ada1cc4a fixed the tier choice, the prompt and the enforcement BEFORE any number was seen (it produced the two-list design for ambiguous terms, the anti-length-bias instruction, the V+Lsel ablation and the 10%-of-gap threshold); job ee20cd08 cut back the interpretation afterwards and demanded the leave-one-city-out, transition-table and length checks that are now in the script.",
-    "CodeRabbit ran clean (0 findings) but reviewed only the HEAD~1 diff, i.e. CURRENT.md, research/ledger.json, eval/controlled_eval/roster_lexicon.py and an unrelated file. exp_roster_selection.py, the report and the prereg were NOT in its diff, so the post-change review does not cover the experiment script."
+    "CodeRabbit is INCOMPLETE for this change. The pre-commit run returned 0 findings but its diff base was HEAD~1, so it saw only CURRENT.md, research/ledger.json, roster_lexicon.py and an unrelated file; exp_roster_selection.py, the report and the prereg were never in its diff. The post-commit run that would have covered them hit the free-tier rate limit (3 reviews used) and was NOT retried, per the repo's stop-after-failure rule."
    ]
   }
  ],
