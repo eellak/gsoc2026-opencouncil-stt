@@ -453,10 +453,10 @@ def main() -> None:
         pool = w["placebo_pool"]
         placebo_cells = []
         acc = []
+        take = min(k, len(pool))
+        if take < k:
+            a2["placebo_short"] += 1          # per window, not per draw
         for _ in range(N_PLACEBO):
-            take = min(k, len(pool))
-            if take < k:
-                a2["placebo_short"] += 1
             pc = sorted(float(x) for x in
                         rng.choice(pool, size=take, replace=False)) if take else []
             placebo_cells.append(pc)
@@ -668,7 +668,10 @@ def main() -> None:
                                / max(sum(r[1] for r in ov_rows["placebo"]), 1)),
         "note": "common support: the speaker-partition cells containing detected "
                 "overlap. All arms scored on the same cells; only the selection "
-                "differs. Cell-local edit distance, not window-level WER.",
+                "differs. Cell-local edit distance, not window-level WER. The "
+                "placebo arm attributes each overlap cell to the winner of the "
+                "placebo cell containing that cell's MIDPOINT - an approximation "
+                "when a placebo cut falls inside the overlap cell.",
     }
 
     dd_turn = res["contrasts"]["turn vs window"]["wer"]["delta"]
@@ -729,6 +732,10 @@ def strata_ci(a_counts, b_counts, clusters):
         diffs[i] = (a[idx, 0].sum() / da if da else np.nan) - \
                    (b[idx, 0].sum() / db if db else np.nan)
     undefined = int(np.isnan(diffs).sum())
+    if undefined == N_BOOT:
+        return {"delta": None, "ci95": None, "excludes_zero": False,
+                "n_clusters": len(keys), "undefined_replicates": undefined,
+                "note": "every replicate had an empty stratum; not estimable"}
     da, db = a[:, 1].sum(), b[:, 1].sum()
     if da == 0 or db == 0:
         return {"delta": None, "ci95": None, "excludes_zero": False,
