@@ -164,17 +164,14 @@ function wireWave() {
 /* ---------- pass A ---------------------------------------------------- */
 function renderA() {
   const c = cur(), a = ans();
-  const heardAll = heardEnd >= c.dur - 1.2;
+  // A cell that was already answered carries its own proof of listening, so a redo of
+  // pass 1 must not demand the whole clip again.
+  const heardAll = Math.max(heardEnd, (a.a && a.a.heard_sec) || 0) >= c.dur - 1.2;
   $("#a-heard").textContent = heardAll ? "ακούστηκε ολόκληρο" : `ακούστηκε ${heardEnd.toFixed(0)}/${c.dur.toFixed(0)}s`;
   $("#a-heard").className = "pill " + (heardAll ? "ok" : "warn");
-  // Restore ONLY from a submitted answer. Before submit the DOM is the source of
-  // truth: renderA also runs on the selects' own onchange and on audio 'ended', so
-  // writing here unconditionally wiped the pick the instant it was made and left
-  // the submit button disabled forever. go() clears the selects on cell change.
-  if (a.a) {
-    $("#a-ov").value = a.a.overlap || "";
-    $("#a-voices").value = a.a.max_voices || "";
-  }
+  // renderA NEVER writes the selects. It runs on their own onchange and on audio
+  // 'ended', so any write here erases the pick the instant it is made. Loading a
+  // stored answer belongs to loadA(), called when a cell or phase is entered.
   const missing = !$("#a-ov").value || !$("#a-voices").value;
   $("#a-submit").disabled = !(heardAll && !missing);
   // Say WHY it is disabled. A dead-looking button with no reason reads as a broken page.
@@ -184,16 +181,34 @@ function renderA() {
     $("#a-heard").textContent = "συμπλήρωσε τις δύο ερωτήσεις";
     $("#a-heard").className = "pill warn";
   }
+  $("#a-redo").style.display = (a.a && phaseNow !== "a") ? "" : "none";
   $("#pa").classList.toggle("on", phaseNow === "a");
+  // The redo button must stay clickable while pass 1 is otherwise inert.
+  $("#a-redo").style.pointerEvents = "auto";
 }
 function submitA() {
   const a = ans();
+  const redo = !!a.a;                       // revisiting an answer, not making the first one
   a.a = { overlap: $("#a-ov").value, max_voices: +$("#a-voices").value, done_at: now(),
-          heard_sec: +heardEnd.toFixed(2) };
-  a.status = "a_done";
-  phaseNow = cur().calib && !a.blank ? "blank" : "b";
+          heard_sec: +heardEnd.toFixed(2), revised: redo || undefined };
+  // A redo must not drag a finished cell back to a_done and lose its later passes.
+  if (!redo) a.status = "a_done";
+  phaseNow = a.status === "complete" || a.status === "b_done" ? "c"
+    : cur().calib && !a.blank ? "blank" : "b";
   if (phaseNow === "b" && !a.b) initB();
+  if (phaseNow === "c" && !a.c) initC();
   touch(); render();
+}
+function loadA() {
+  // Put the stored pass-1 answer into the selects. Called only when a cell or the
+  // phase is entered, never from renderA.
+  const a = ans();
+  $("#a-ov").value = (a.a && a.a.overlap) || "";
+  $("#a-voices").value = (a.a && a.a.max_voices) || "";
+}
+function redoA() {
+  // Reopen pass 1 without touching anything already recorded in passes 2 and 3.
+  phaseNow = "a"; lastPhase = null; loadA(); render();
 }
 
 /* ---------- blank calibration ---------------------------------------- */
@@ -356,7 +371,7 @@ function go(i) {
     : a.status === "b_done" ? "c" : "c";
   if (phaseNow === "b" && !a.b) initB();
   if (phaseNow === "c" && !a.c) initC();
-  if (!a.a) { $("#a-ov").value = ""; $("#a-voices").value = ""; }  // fresh cell starts empty
+  loadA();
   loadAudio(cur()); render(); location.hash = cur().id;
 }
 function next() { const n = CELLS.findIndex((c, i) => i > idx && !["complete", "excluded"].includes((A[c.id] || {}).status)); go(n < 0 ? Math.min(idx + 1, CELLS.length - 1) : n); }
@@ -415,6 +430,7 @@ fetch("cells.json").then(r => r.json()).then(d => {
     wireWave();
     $("#a-ov").onchange = renderA; $("#a-voices").onchange = renderA;
     $("#a-submit").onclick = submitA;
+    $("#a-redo").onclick = redoA;
     $("#blank-submit").onclick = submitBlank;
     $("#b-submit").onclick = submitB; $("#b-add").onclick = addSpeaker;
     $("#b-undo").onclick = undo; $("#b-exclude").onclick = excludeCell;
