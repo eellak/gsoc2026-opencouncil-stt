@@ -1,0 +1,22 @@
+{
+ "note": "External, non-transcript attestation for individual glossary candidates. Codex review 316755b6 (issue #20) required that an acronym's expansion come from a source outside the transcripts; these are the ones checked by hand in this cycle. Term strings only, no transcript text.",
+ "retrieved": "2026-08-16",
+ "terms": [
+  {
+   "term": "ΜΑΞΙΑΔΗΖ",
+   "city": "zografou",
+   "category": "org",
+   "expansion": "Μονομετοχική Ανώνυμη Ξενοδοχειακή Ιαματική Αξιοποίησης Δημοτικής Ήσσονος Ζωγράφου (municipally owned property-utilisation company of the Municipality of Zografou)",
+   "source": "https://www.zografou.gov.gr/nomiko/maksiadhz/",
+   "resolves": "issue #19 open item: the shape looked malformed; it is an official distinctive title, not a garbled surname"
+  },
+  {
+   "term": "Φωκίωνος Νέγρη",
+   "city": "athens",
+   "category": "toponym",
+   "expansion": "pedestrian avenue in Kypseli, Athens",
+   "source": "https://www.cityofathens.gr/cooling-havens-3/",
+   "resolves": "issue #19 open item ΝΕΓΡΗ: it is the second component of this odonym, not a freestanding term"
+  }
+ ]
+}
