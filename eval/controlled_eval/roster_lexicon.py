@@ -17,13 +17,24 @@ The tier choice in (3) is FROZEN in `docs/specs/2026-08-16-roster-selection-prer
 before any WER number was computed, and is deliberately narrow:
 
   IN  - all 33 `person` candidates (user instruction: the names go in);
-      - the 31 candidates carrying `review_priority` 1 or 2, i.e. the first human
-        review sitting of #20.
-  OUT - the 52 unreviewed `review` candidates and the 55 `review-backlog`
+      - the 31 candidates carrying `review_priority` 1 or 2, i.e. the first review
+        sitting of #20. NOTE, per Codex job ada1cc4a: no per-term accept/reject
+        verdict was ever recorded, so these are PRIORITISED AND INSPECTED, not
+        "human-approved". Nothing may be attributed to human curation.
+  OUT - the 52 unprioritised `review` candidates and the 55 `review-backlog`
         singletons (one human correction, no independent witness);
-      - anything with a non-empty `ambiguous_wrong_forms`, because at least one of
-        its observed wrong forms is itself a legitimate Greek word or acronym.
       - the `injection` tier is empty by construction upstream; nothing to take.
+
+Two lists, not one (Codex job ada1cc4a): a candidate with a non-empty
+`ambiguous_wrong_forms` — at least one observed wrong form is itself a legitimate
+Greek word or acronym — stays VISIBLE to the LLM selector but is barred from being
+a replacement target. Excluding it entirely would have removed some of the
+highest-benefit terms and made a weak result unreadable.
+
+Declared contradiction: one of the 33 person names sits in the upstream
+`metric-only` tier, whose stated meaning is "measure, never normalise". Admitting
+it as a replacement target overrides that tier. This is a user instruction, it is
+recorded here, and no result may be read as evidence that the tier was wrong.
 
 Nothing here writes to `research/ds_wer/terms/`. The admitted slice is assembled at
 runtime, so the frozen files stay frozen.
@@ -80,10 +91,9 @@ def admitted_mined() -> tuple[dict[str, list[dict]], dict]:
         if not (person or reviewed):
             stats["out_tier_not_chosen"] += 1
             continue
-        if c.get("ambiguous_wrong_forms"):
-            stats["out_ambiguous_wrong_forms"] += 1
-            stats[f"out_ambiguous_{c['category']}"] += 1
-            continue
+        replaceable = not c.get("ambiguous_wrong_forms")
+        if not replaceable:
+            stats["visible_only_ambiguous"] += 1
         aliases = sorted({rnorm(a) for a in c["display_aliases"]} | {c["key"]})
         term = {
             "id": f"mined:{c['key']}",
@@ -92,6 +102,7 @@ def admitted_mined() -> tuple[dict[str, list[dict]], dict]:
             "covers": [c["term"]],
             "aliases": aliases,
             "_surface": c["display_aliases"][0],
+            "_replaceable": replaceable,
         }
         cities = [x for x in c["eligible_cities"] if x in per_city]
         if not cities:
@@ -101,9 +112,12 @@ def admitted_mined() -> tuple[dict[str, list[dict]], dict]:
             per_city[city].append(term)
         stats["in"] += 1
         stats[f"in_{c['category']}"] += 1
+        if replaceable:
+            stats["in_replaceable"] += 1
         admitted.append({"term": c["term"], "category": c["category"],
                          "tier": c["tier"], "review_priority": c["review_priority"],
-                         "cities": cities, "n_corrections": c["n_corrections"]})
+                         "cities": cities, "n_corrections": c["n_corrections"],
+                         "replaceable": replaceable})
     return per_city, {"counts": dict(stats), "admitted": admitted,
                       "n_candidates": len(cands),
                       "sha256_candidates": sha256(MINED)}
@@ -123,12 +137,16 @@ def build_meeting_context(city: str, meeting_id: str, city_terms: list[dict],
     exactly what the rule's `n_persons == 1` clause asks for.
     """
     ctx = RosterContext(seen_freq=seen_freq)
+    visible_only: list[str] = []
     persons = [t for t in city_terms if t["klass"] == "person_surname"]
     roster_entries = rosters.get(f"{city}/{meeting_id}", [])
     if roster_entries:
         ctx.present.update(meeting_roster_terms(persons, roster_entries))
     non_person = [t for t in city_terms if t["klass"] != "person_surname"]
     for t in non_person + mined_terms:
+        if not t.get("_replaceable", True):
+            visible_only.append(t["canonical"])
+            continue
         if t["klass"].startswith("mined_person"):
             # a mined person name is admitted only if the roster puts them in the
             # room, on the same principle as (1)
@@ -147,4 +165,5 @@ def build_meeting_context(city: str, meeting_id: str, city_terms: list[dict],
             an = rnorm(alias)
             ctx.valid_aliases.add(an)
             ctx.alias_surface[(tid, an)] = info["term"].get("_surface", alias)
-    return ctx, {"n_terms": len(ctx.present), "has_roster": bool(roster_entries)}
+    return ctx, {"n_terms": len(ctx.present), "has_roster": bool(roster_entries),
+                 "visible_only": sorted(set(visible_only))}

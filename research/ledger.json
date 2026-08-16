@@ -1,6 +1,6 @@
 {
  "schema_version": 1,
- "updated_at": "2026-08-16",
+ "updated_at": "2026-08-16T18:00:00Z",
  "note": "Authoritative state. Reports under docs/reports/ are immutable evidence; this file says whether their conclusions still stand. When a doc disagrees with this file, this file wins and the doc gets fixed in the same change.",
  "experiments": [
   {
@@ -972,6 +972,42 @@
     "Zero GPU. pyannoteAI cost: EUR 0.77 whole-meeting diarization + ~EUR 0.13 clip transcription. Running total on the key is about USD 6.2 against the USD 20 cap of eval/controlled_eval/exclusive_cost_check.py.",
     "Three Codex reviews (high effort) ran before any audio was chosen and before any code was written: on the stratification and its selection bias, on the UI/schema and the overlap representation, and on anchoring mitigation. What was accepted and what was rejected is recorded in the spec.",
     "Audio and transcript text live in ~/.cache/oc-public/gold-set/ and ~/oc-gold-set/. Git holds only manifests, hashes, aggregates and code."
+   ]
+  },
+  {
+   "id": "exp-2026-08-16-roster-grounded-selection",
+   "title": "A term list inside the fusion selector: free phonetic repair against an LLM selector",
+   "question": "Does the distance to the oracle close if the fusion selector sees a closed term list (per-meeting roster + per-city frozen terms + error-mined candidates) and may only correct towards a list term, only where the systems disagree?",
+   "status": "CLOSED",
+   "conclusion": "The free control wins and the LLM selector is actively harmful. V+E (frozen phonetic closed-list repair on the vote's chosen text, no LLM) gives WER 0.1201 -> 0.1193, -0.00083 [-0.00119,-0.00049], CI excludes zero, LOO over windows sign-stable, 36 windows better / 205 tied / 6 worse. Both preregistered rate gates pass IDENTICALLY, not marginally: del_rate 0.0247 -> 0.0247 and ins_rate 0.0443 -> 0.0443 are unchanged to the digit, because the repair only ever moves substitutions (0.0512 -> 0.0503). It recovers 6.0% of the V-to-trio-oracle gap and 4.0% of the gap to the 9-system oracle. The LLM selector FAILS its deletion gate on every variant: del_rate 0.0247 -> 0.0349 (+41% relative) and WER 0.1201 -> 0.1307 (V+L+E), i.e. it loses a full point. Against the free control, V+E beats V+L+E by -0.01144 [-0.01534,-0.00753]. The preregistered justification threshold for the LLM (>=10% of the 0.0129 oracle gap V+E still leaves, i.e. >=0.00129) was missed by sign, not by size: the 'improvement' is -0.01144. WHAT THE LLM DOES: the vote picks Soniox 115 / Scribe 108 / ours 24; the LLM picks Scribe 215 / Soniox 28 / ours 1, deviating on 129 of 247 windows. All damage is on those 129 (WER 0.1072 -> 0.1290, del 0.0174 -> 0.0370). The dominant transition is Soniox -> Scribe on 95 windows: +790 deletions, -514 insertions, -1304 words. In 103 of 129 deviations the LLM chose the SHORTER text, and its choices match the oracle-best hypothesis in only 97/247 windows against the vote's 145/247. No single window (6.7% of the damage), meeting (6.8%) or city carries it; leave-one-out over windows, meetings and cities produces zero sign flips. Separately, the LLM's mechanically enforced replacements are slightly positive - V+L vs V+Lsel is -0.00021 [-0.00036,-0.00008] - but that recovers 0.021 points inside a pipeline losing 1.14, and it is the effect of the whole enforcement procedure, not of free LLM editing. Of 91 proposed replacements only 28 survived (29 over the arm-E distance budget, 11 ambiguous source, 10 on tokens all three systems agreed on, 4 not single tokens, 3 absent, 3 off-list, 3 no-ops).",
+   "decision": "V+E ships as the cheap step after the vote, inside the exp-2026-08-11-name-repair ladder. The LLM selector is CLOSED: a reader that cannot hear the audio prefers the transcript that reads well, which is the one that swallowed the hard passages, and the deletion gate catches it. This is the same shape as exp-2026-08-02-asr-fusion, where the free vote took 1.1 of the 1.45 points and the LLM added nothing. Do not re-open a text-only selector without an audio-grounded signal.",
+   "artifact_ids": [],
+   "capability_ids": [],
+   "reports": [
+    "docs/reports/2026-08-16-roster-grounded-selection.md"
+   ],
+   "specs": [
+    "docs/specs/2026-08-16-roster-selection-prereg.md"
+   ],
+   "superseded_by": null,
+   "next_action": null,
+   "updated_at": "2026-08-16T18:00:00Z",
+   "caveats": [
+    "The ticket's substrate line said 253 windows. It was wrong: 6 of the 7 SEALED temporal holdout windows of eval-freeze-2026-08 sit inside them. Corrected to 247 windows / 144 meetings, and the ticket's baselines were corrected with it (V 0.1193 -> 0.1201, oracle trio 0.1058 -> 0.1064, oracle 9 0.0989 -> 0.0995). The seal was never scored.",
+    "The trio was NOT re-selected here; inherited from exp-2026-08-02-asr-fusion where it was chosen against these same references. The split-half there shows the PROCEDURE generalises, not the specific trio, and it has never been confirmed on untouched audio.",
+    "Every arm using the error-mined lexicon is EXPLORATORY, not confirmatory (exp-2026-08-16-glossary-distillation): the mining fold overlaps the benchmark. The 34 windows disjoint from both the mining fold and the training manifest point the same way (V 0.1236, V+E 0.1232, V+Lsel 0.1521) but are too few, and are reported without clustered CIs.",
+    "The 31 admitted 'P1/P2' terms are NOT human-approved. exp-2026-08-16-error-mined-terms recorded no per-term accept/reject verdict, only a priority. Nothing here is evidence about human curation.",
+    "One of the 33 admitted person names sits in the upstream `metric-only` tier, whose stated meaning is 'measure, never normalise'. It was admitted as a replacement target on explicit user instruction. No result here says that tier was wrong.",
+    "The common-word table the rule needs is built leave-one-city-out over the benchmark's OWN references. That is benchmark-internal cross-fitting, not an external resource; the bootstrap CIs are conditional on it.",
+    "V+E is not a verdict on lexicon repair in general. One lexicon, one rule, one firing restriction were tested. 94% of the oracle gap surviving means THIS repair does not reach it.",
+    "The oracle measures hindsight potential. Nothing here shows a usable selector can reach it; this experiment shows one that cannot.",
+    "The mechanism (the LLM prefers Scribe BECAUSE fluent text that dropped hard passages reads better) is a testable explanation, not a measured cause. What is measured is the concentration on Scribe, the shorter selections, the deletion import and the worse oracle agreement. Codex job ee20cd08 required this distinction.",
+    "Rule 2 of the ticket ('acts only where the systems disagree') was applied to arm E as well, which is STRICTER than arm E ran in the serving-stack ladder: 103 firings restricted against 161 unrestricted. The unrestricted count is a declared sensitivity, not an arm.",
+    "'Agreement' is defined as the set of normalised tokens common to all three hypotheses, not aligned occurrences. Codex asked for alignment; the set rule errs safe by protecting more tokens.",
+    "One model (gpt-5.6-luna, reasoning_effort=low), one prompt, one run. Model stochasticity and prompt/batch choices enter no confidence interval.",
+    "Agreement-with-OpenCouncil, not fidelity-to-audio.",
+    "Two Codex passes shaped this: job ada1cc4a fixed the tier choice, the prompt and the enforcement BEFORE any number was seen (it produced the two-list design for ambiguous terms, the anti-length-bias instruction, the V+Lsel ablation and the 10%-of-gap threshold); job ee20cd08 cut back the interpretation afterwards and demanded the leave-one-city-out, transition-table and length checks that are now in the script.",
+    "CodeRabbit ran clean (0 findings) but reviewed only the HEAD~1 diff, i.e. CURRENT.md, research/ledger.json, eval/controlled_eval/roster_lexicon.py and an unrelated file. exp_roster_selection.py, the report and the prereg were NOT in its diff, so the post-change review does not cover the experiment script."
    ]
   }
  ],

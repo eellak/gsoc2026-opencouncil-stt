@@ -1,0 +1,2318 @@
+{
+ "run_id": "2026-08-10-corrected-adapter-label-prefix-fix-vs-ju",
+ "n_items": 247,
+ "n_meetings": 144,
+ "trio": [
+  "scribe-v2-clean",
+  "soniox",
+  "oc-runpod-fixed-2026-08-10"
+ ],
+ "n_boot": 10000,
+ "scorer": "eval/controlled_eval/scoring.py (not the benchmark app's)",
+ "lexicon": {
+  "terms_dir_sha256": {
+   "argos": "28a6edd098dc96f6d3e879a3c56ea3405d0ed85459791a9b4230b9034592a264",
+   "athens": "9a9fabc84df577919634fc4c52051a24721d3c502733829f756a795265102537",
+   "chalandri": "f212525a5057ce51c2d8073e41ac647e659440e66fe63571332e2697789f999c",
+   "chania": "b6839b4028a18841bfa7e42bfafb02ba4badf8665d797021d1eeef73f6f489bb",
+   "orestiada": "6f0a4a8644cf227a06534d7dbb5679377bf58c2d687d24e958c7375ff54ccb1d",
+   "samothraki": "37ae024eb752c07622f4eea43e5c5b5d0356c5d60b8a9a68cd88321daaa662e5",
+   "sparta": "f1bc97e2cec79bee778e5ee3471329824aa1c84ecd4032e62531dc8a9f19058b",
+   "vrilissia": "b7b5ab113637dce00df70925f79297ccc481de2f1ad7e8c8e02e147c6e60d518",
+   "xylokastro": "044d4ad15798b63efde1606d4389f6e7d596ceb03edc31988f9e547d8acc2ee3",
+   "zografou": "2eef3a6a3707e185b0c3efb4420f34f0460b87d9d95c9888e11b0d36e3f3fc85"
+  },
+  "rosters_windows": 232,
+  "mined": {
+   "counts": {
+    "out_tier_not_chosen": 85,
+    "in": 62,
+    "in_person": 33,
+    "in_replaceable": 50,
+    "in_toponym": 24,
+    "in_acronym": 5,
+    "visible_only_ambiguous": 12
+   },
+   "admitted": [
+    {
+     "term": "Αρσένη",
+     "category": "person",
+     "tier": "metric-only",
+     "review_priority": null,
+     "cities": [
+      "vrilissia"
+     ],
+     "n_corrections": 3,
+     "replaceable": true
+    },
+    {
+     "term": "Μαριέττα",
+     "category": "person",
+     "tier": "review",
+     "review_priority": 1,
+     "cities": [
+      "zografou",
+      "sparta"
+     ],
+     "n_corrections": 2,
+     "replaceable": true
+    },
+    {
+     "term": "Αγγελακούδη",
+     "category": "person",
+     "tier": "review",
+     "review_priority": 1,
+     "cities": [
+      "orestiada"
+     ],
+     "n_corrections": 2,
+     "replaceable": true
+    },
+    {
+     "term": "Γκράβα",
+     "category": "toponym",
+     "tier": "review",
+     "review_priority": 1,
+     "cities": [
+      "athens"
+     ],
+     "n_corrections": 2,
+     "replaceable": true
+    },
+    {
+     "term": "ΔΟΥ",
+     "category": "acronym",
+     "tier": "review",
+     "review_priority": 1,
+     "cities": [
+      "chania"
+     ],
+     "n_corrections": 2,
+     "replaceable": true
+    },
+    {
+     "term": "ΕΛΚΕΘΕ",
+     "category": "acronym",
+     "tier": "review",
+     "review_priority": 1,
+     "cities": [
+      "xylokastro"
+     ],
+     "n_corrections": 2,
+     "replaceable": false
+    },
+    {
+     "term": "ΙΚΕ",
+     "category": "acronym",
+     "tier": "review",
+     "review_priority": 1,
+     "cities": [
+      "vrilissia"
+     ],
+     "n_corrections": 2,
+     "replaceable": false
+    },
+    {
+     "term": "ΚΕΘΕΑ",
+     "category": "acronym",
+     "tier": "review",
+     "review_priority": 1,
+     "cities": [
+      "chania"
+     ],
+     "n_corrections": 2,
+     "replaceable": false
+    },
+    {
+     "term": "ΟΤΑ",
+     "category": "acronym",
+     "tier": "review",
+     "review_priority": 1,
+     "cities": [
+      "athens"
+     ],
+     "n_corrections": 2,
+     "replaceable": true
+    },
+    {
+     "term": "Ίκαρος",
+     "category": "person",
+     "tier": "review-backlog",
+     "review_priority": null,
+     "cities": [
+      "chania"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Αγρογιάννη",
+     "category": "person",
+     "tier": "review",
+     "review_priority": 3,
+     "cities": [
+      "athens"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Αδριανού",
+     "category": "toponym",
+     "tier": "review",
+     "review_priority": 2,
+     "cities": [
+      "athens"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Ακρωτηρίου",
+     "category": "toponym",
+     "tier": "review",
+     "review_priority": 2,
+     "cities": [
+      "chania"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Αναπαύσεως",
+     "category": "toponym",
+     "tier": "review",
+     "review_priority": 2,
+     "cities": [
+      "vrilissia"
+     ],
+     "n_corrections": 1,
+     "replaceable": false
+    },
+    {
+     "term": "Αποκορώνου",
+     "category": "toponym",
+     "tier": "review",
+     "review_priority": 2,
+     "cities": [
+      "chania"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Αργυρουπόλεως",
+     "category": "toponym",
+     "tier": "review",
+     "review_priority": 2,
+     "cities": [
+      "athens"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Αρκουριδέα",
+     "category": "person",
+     "tier": "review-backlog",
+     "review_priority": null,
+     "cities": [
+      "chania"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Ασκοξυλάκη",
+     "category": "person",
+     "tier": "review-backlog",
+     "review_priority": null,
+     "cities": [
+      "athens"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Βολουδάκη",
+     "category": "person",
+     "tier": "review-backlog",
+     "review_priority": null,
+     "cities": [
+      "chania"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Βρεττάκος Στέφανος",
+     "category": "person",
+     "tier": "review",
+     "review_priority": 3,
+     "cities": [
+      "sparta"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Γερασιμούλα Μίνα",
+     "category": "person",
+     "tier": "review",
+     "review_priority": 3,
+     "cities": [
+      "athens"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Γλέζου",
+     "category": "person",
+     "tier": "review-backlog",
+     "review_priority": null,
+     "cities": [
+      "athens"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Γουδή",
+     "category": "toponym",
+     "tier": "review",
+     "review_priority": 2,
+     "cities": [
+      "zografou"
+     ],
+     "n_corrections": 1,
+     "replaceable": false
+    },
+    {
+     "term": "Δαμιανάκη",
+     "category": "person",
+     "tier": "review-backlog",
+     "review_priority": null,
+     "cities": [
+      "chania"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Δελμούζος",
+     "category": "person",
+     "tier": "review-backlog",
+     "review_priority": null,
+     "cities": [
+      "athens"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Δερβένι",
+     "category": "toponym",
+     "tier": "review",
+     "review_priority": 2,
+     "cities": [
+      "xylokastro"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Καθιανά",
+     "category": "toponym",
+     "tier": "review",
+     "review_priority": 2,
+     "cities": [
+      "chania"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Καλαϊτζή Αικατερίνη",
+     "category": "person",
+     "tier": "review",
+     "review_priority": 3,
+     "cities": [
+      "samothraki"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Καρβουνιάρη",
+     "category": "person",
+     "tier": "review-backlog",
+     "review_priority": null,
+     "cities": [
+      "sparta"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Κατζαλτζή",
+     "category": "person",
+     "tier": "review-backlog",
+     "review_priority": null,
+     "cities": [
+      "orestiada"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Κική Χατζηευαγγέλου",
+     "category": "person",
+     "tier": "review-backlog",
+     "review_priority": null,
+     "cities": [
+      "chania"
+     ],
+     "n_corrections": 1,
+     "replaceable": false
+    },
+    {
+     "term": "Κουτρουμπά",
+     "category": "person",
+     "tier": "review-backlog",
+     "review_priority": null,
+     "cities": [
+      "chania"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Κράπης",
+     "category": "toponym",
+     "tier": "review",
+     "review_priority": 2,
+     "cities": [
+      "chania"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Κυδωνίας",
+     "category": "toponym",
+     "tier": "review",
+     "review_priority": 2,
+     "cities": [
+      "chania"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Λυκαβηττός",
+     "category": "toponym",
+     "tier": "review",
+     "review_priority": 2,
+     "cities": [
+      "athens"
+     ],
+     "n_corrections": 1,
+     "replaceable": false
+    },
+    {
+     "term": "ΜΕΤΣ",
+     "category": "toponym",
+     "tier": "review",
+     "review_priority": 2,
+     "cities": [
+      "athens"
+     ],
+     "n_corrections": 1,
+     "replaceable": false
+    },
+    {
+     "term": "Μίνωος",
+     "category": "toponym",
+     "tier": "review",
+     "review_priority": 2,
+     "cities": [
+      "chania"
+     ],
+     "n_corrections": 1,
+     "replaceable": false
+    },
+    {
+     "term": "Μαυρογεώργη",
+     "category": "person",
+     "tier": "review-backlog",
+     "review_priority": null,
+     "cities": [
+      "athens"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Μιχαηλάκης Στέλιος",
+     "category": "person",
+     "tier": "review",
+     "review_priority": 3,
+     "cities": [
+      "chania"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Μονοδένδρι",
+     "category": "person",
+     "tier": "review-backlog",
+     "review_priority": null,
+     "cities": [
+      "sparta"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Μπέη",
+     "category": "person",
+     "tier": "review",
+     "review_priority": 3,
+     "cities": [
+      "athens"
+     ],
+     "n_corrections": 1,
+     "replaceable": false
+    },
+    {
+     "term": "Παλιγγενεσίας",
+     "category": "toponym",
+     "tier": "review",
+     "review_priority": 2,
+     "cities": [
+      "athens"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Παναρίτι",
+     "category": "toponym",
+     "tier": "review",
+     "review_priority": 2,
+     "cities": [
+      "xylokastro"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Πανόρμου",
+     "category": "toponym",
+     "tier": "review",
+     "review_priority": 2,
+     "cities": [
+      "athens"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Πατησίων",
+     "category": "toponym",
+     "tier": "review",
+     "review_priority": 2,
+     "cities": [
+      "athens"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Πεντέλης",
+     "category": "toponym",
+     "tier": "review",
+     "review_priority": 2,
+     "cities": [
+      "vrilissia"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Πλαταιών",
+     "category": "toponym",
+     "tier": "review",
+     "review_priority": 2,
+     "cities": [
+      "athens"
+     ],
+     "n_corrections": 1,
+     "replaceable": false
+    },
+    {
+     "term": "Ρουφ",
+     "category": "toponym",
+     "tier": "review",
+     "review_priority": 2,
+     "cities": [
+      "athens"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Σίνα",
+     "category": "toponym",
+     "tier": "review",
+     "review_priority": 2,
+     "cities": [
+      "athens"
+     ],
+     "n_corrections": 1,
+     "replaceable": false
+    },
+    {
+     "term": "Σαμοθράκης",
+     "category": "person",
+     "tier": "review",
+     "review_priority": 3,
+     "cities": [
+      "samothraki"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Σικελιανός",
+     "category": "person",
+     "tier": "review-backlog",
+     "review_priority": null,
+     "cities": [
+      "xylokastro"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Σιούτου",
+     "category": "person",
+     "tier": "review-backlog",
+     "review_priority": null,
+     "cities": [
+      "sparta"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Σολειντάκη",
+     "category": "person",
+     "tier": "review-backlog",
+     "review_priority": null,
+     "cities": [
+      "chania"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Σοφιανό",
+     "category": "person",
+     "tier": "review-backlog",
+     "review_priority": null,
+     "cities": [
+      "sparta"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Σοϊλεντάκη",
+     "category": "person",
+     "tier": "review-backlog",
+     "review_priority": null,
+     "cities": [
+      "chania"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Σπλάντζια",
+     "category": "toponym",
+     "tier": "review",
+     "review_priority": 2,
+     "cities": [
+      "chania"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Τζιβανόπουλοι",
+     "category": "person",
+     "tier": "review-backlog",
+     "review_priority": null,
+     "cities": [
+      "sparta"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Τσικνομπουρμπούλης",
+     "category": "person",
+     "tier": "review-backlog",
+     "review_priority": null,
+     "cities": [
+      "orestiada"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Φιλοπάππου",
+     "category": "toponym",
+     "tier": "review",
+     "review_priority": 2,
+     "cities": [
+      "athens"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Χουρδάκη",
+     "category": "person",
+     "tier": "review-backlog",
+     "review_priority": null,
+     "cities": [
+      "chania"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Ψαδιώτης",
+     "category": "person",
+     "tier": "review-backlog",
+     "review_priority": null,
+     "cities": [
+      "xylokastro"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    },
+    {
+     "term": "Ψυλλάκη",
+     "category": "person",
+     "tier": "review-backlog",
+     "review_priority": null,
+     "cities": [
+      "chania"
+     ],
+     "n_corrections": 1,
+     "replaceable": true
+    }
+   ],
+   "n_candidates": 147,
+   "sha256_candidates": "8e10fe241f0d5f14887e056269efba13fd0828aafead1ba3b58abd74ad8d4505"
+  },
+  "terms_per_meeting": {
+   "min": 2,
+   "median": 39,
+   "max": 160
+  }
+ },
+ "arms": {
+  "single:gladia-prod": {
+   "S": 6208,
+   "D": 2665,
+   "I": 1908,
+   "ref_tokens": 74917,
+   "wer": 0.1439059225542934,
+   "del_rate": 0.035572700455170386,
+   "ins_rate": 0.025468184791168892,
+   "sub_rate": 0.08286503730795414
+  },
+  "single:gpt-4o-transcribe": {
+   "S": 6176,
+   "D": 3688,
+   "I": 2843,
+   "ref_tokens": 74917,
+   "wer": 0.16961437323971862,
+   "del_rate": 0.04922781211207069,
+   "ins_rate": 0.03794866318726057,
+   "sub_rate": 0.08243789794038736
+  },
+  "single:hf-openai-whisper-large-v3": {
+   "S": 6231,
+   "D": 2484,
+   "I": 2222,
+   "ref_tokens": 74917,
+   "wer": 0.14598822697118144,
+   "del_rate": 0.033156693407370826,
+   "ins_rate": 0.029659489835417864,
+   "sub_rate": 0.08317204372839275
+  },
+  "single:greek-whisper-v3-turbo": {
+   "S": 5732,
+   "D": 29300,
+   "I": 1102,
+   "ref_tokens": 74917,
+   "wer": 0.4823204346143065,
+   "del_rate": 0.39109948342832734,
+   "ins_rate": 0.014709611970580776,
+   "sub_rate": 0.07651133921539838
+  },
+  "single:scribe-v2-clean": {
+   "S": 4256,
+   "D": 2846,
+   "I": 2802,
+   "ref_tokens": 74917,
+   "wer": 0.13219963426191653,
+   "del_rate": 0.037988707502969954,
+   "ins_rate": 0.03740139087256564,
+   "sub_rate": 0.05680953588638093
+  },
+  "single:soniox": {
+   "S": 3877,
+   "D": 1061,
+   "I": 5617,
+   "ref_tokens": 74917,
+   "wer": 0.14088925077085307,
+   "del_rate": 0.014162339655885847,
+   "ins_rate": 0.07497630711320528,
+   "sub_rate": 0.05175060400176195
+  },
+  "single:oc-minipc-finetune": {
+   "S": 5674,
+   "D": 3600,
+   "I": 1858,
+   "ref_tokens": 74917,
+   "wer": 0.14859110749229146,
+   "del_rate": 0.04805317885126206,
+   "ins_rate": 0.02480077952934581,
+   "sub_rate": 0.0757371491116836
+  },
+  "single:oc-runpod-finetune": {
+   "S": 5409,
+   "D": 3824,
+   "I": 1791,
+   "ref_tokens": 74917,
+   "wer": 0.14714951212675362,
+   "del_rate": 0.05104315442422948,
+   "ins_rate": 0.023906456478502876,
+   "sub_rate": 0.07219990122402126
+  },
+  "single:oc-runpod-fixed-2026-08-10": {
+   "S": 5243,
+   "D": 3438,
+   "I": 1701,
+   "ref_tokens": 74917,
+   "wer": 0.1385800285649452,
+   "del_rate": 0.04589078580295527,
+   "ins_rate": 0.022705127007221326,
+   "sub_rate": 0.06998411575476861
+  },
+  "V": {
+   "S": 3833,
+   "D": 1849,
+   "I": 3317,
+   "ref_tokens": 74917,
+   "wer": 0.1201195990229187,
+   "del_rate": 0.024680646582217653,
+   "ins_rate": 0.044275665069343405,
+   "sub_rate": 0.051163287371357634
+  },
+  "V+E": {
+   "S": 3771,
+   "D": 1849,
+   "I": 3317,
+   "ref_tokens": 74917,
+   "wer": 0.11929201649825807,
+   "del_rate": 0.024680646582217653,
+   "ins_rate": 0.044275665069343405,
+   "sub_rate": 0.05033570484669701
+  },
+  "V+Lsel": {
+   "S": 4188,
+   "D": 2617,
+   "I": 3047,
+   "ref_tokens": 74917,
+   "wer": 0.13150553278962052,
+   "del_rate": 0.03493199140382023,
+   "ins_rate": 0.04067167665549875,
+   "sub_rate": 0.05590186473030154
+  },
+  "V+L": {
+   "S": 4172,
+   "D": 2617,
+   "I": 3047,
+   "ref_tokens": 74917,
+   "wer": 0.13129196310583713,
+   "del_rate": 0.03493199140382023,
+   "ins_rate": 0.04067167665549875,
+   "sub_rate": 0.05568829504651815
+  },
+  "V+L+E": {
+   "S": 4130,
+   "D": 2617,
+   "I": 3047,
+   "ref_tokens": 74917,
+   "wer": 0.13073134268590575,
+   "del_rate": 0.03493199140382023,
+   "ins_rate": 0.04067167665549875,
+   "sub_rate": 0.055127674626586756
+  },
+  "oracle_trio": {
+   "S": 3829,
+   "D": 1928,
+   "I": 2213,
+   "ref_tokens": 74917,
+   "wer": 0.10638439873459962,
+   "del_rate": 0.025735146895898127,
+   "ins_rate": 0.02953935688828971,
+   "sub_rate": 0.05110989495041179
+  },
+  "oracle_all": {
+   "S": 3985,
+   "D": 1748,
+   "I": 1719,
+   "ref_tokens": 74917,
+   "wer": 0.09947008022211247,
+   "del_rate": 0.023332487953335024,
+   "ins_rate": 0.022945392901477634,
+   "sub_rate": 0.05319219936729981
+  }
+ },
+ "E": {
+  "changes": 103,
+  "windows_changed": 51,
+  "changes_unrestricted": 161,
+  "detail": [
+   {
+    "window": "win_argos_aug14_2025_203808",
+    "original": "Αδραχτάς",
+    "replacement": "Αδρακτας",
+    "term": "person:αδρακτας",
+    "dist": 1
+   },
+   {
+    "window": "win_argos_aug14_2025_203808",
+    "original": "Κοτσονάρος",
+    "replacement": "Κωτσοναρος",
+    "term": "person:κωτσοναρος",
+    "dist": 1
+   },
+   {
+    "window": "win_argos_aug14_2025_203808",
+    "original": "Ξυνταροπούλου",
+    "replacement": "Ξηνταροπουλου",
+    "term": "person:ξηνταροπουλου",
+    "dist": 1
+   },
+   {
+    "window": "win_argos_aug14_2025_203808",
+    "original": "Γάτσου",
+    "replacement": "Γατσιου",
+    "term": "person:γατσιου",
+    "dist": 1
+   },
+   {
+    "window": "win_argos_dec23_2025_581922",
+    "original": "Κλεβάρης",
+    "replacement": "Φλεβαρης",
+    "term": "person:φλεβαρης",
+    "dist": 1
+   },
+   {
+    "window": "win_argos_dec23_2025_581922",
+    "original": "Ξανταροπούλου",
+    "replacement": "Ξηνταροπουλου",
+    "term": "person:ξηνταροπουλου",
+    "dist": 1
+   },
+   {
+    "window": "win_argos_dec23_2025_581922",
+    "original": "Πούλιος",
+    "replacement": "Πουλος",
+    "term": "person:πουλος",
+    "dist": 1
+   },
+   {
+    "window": "win_argos_dec23_2025_581922",
+    "original": "Ραμάλας",
+    "replacement": "Δαμαλας",
+    "term": "person:δαμαλας",
+    "dist": 1
+   },
+   {
+    "window": "win_argos_dec5_2025_996850",
+    "original": "Ανδρακτάς",
+    "replacement": "Αδρακτας",
+    "term": "person:αδρακτας",
+    "dist": 1
+   },
+   {
+    "window": "win_argos_dec5_2025_996850",
+    "original": "Κολεβέτης",
+    "replacement": "Κολεβεντης",
+    "term": "person:κολεβεντης",
+    "dist": 1
+   },
+   {
+    "window": "win_argos_dec5_2025_996850",
+    "original": "Κοτσονάρος",
+    "replacement": "Κωτσοναρος",
+    "term": "person:κωτσοναρος",
+    "dist": 1
+   },
+   {
+    "window": "win_argos_dec5_2025_996850",
+    "original": "Ξινταροπούλου",
+    "replacement": "Ξηνταροπουλου",
+    "term": "person:ξηνταροπουλου",
+    "dist": 1
+   },
+   {
+    "window": "win_argos_dec5_2025_996850",
+    "original": "Γάτσου",
+    "replacement": "Γατσιου",
+    "term": "person:γατσιου",
+    "dist": 1
+   },
+   {
+    "window": "win_argos_dec5_2025_996850",
+    "original": "Διολίτης",
+    "replacement": "Διολιτση",
+    "term": "person:διολιτσης",
+    "dist": 1
+   },
+   {
+    "window": "win_argos_dec5_2025_996850",
+    "original": "Γάτσου",
+    "replacement": "Γατσιου",
+    "term": "person:γατσιου",
+    "dist": 1
+   },
+   {
+    "window": "win_athens_feb16_2026_3604029",
+    "original": "Αδαμαπούλου",
+    "replacement": "Αδαμοπουλου",
+    "term": "person:αδαμοπουλου",
+    "dist": 1
+   },
+   {
+    "window": "win_athens_jan19_2_2026_1079",
+    "original": "Ζοντύρος",
+    "replacement": "Ζοντιρος",
+    "term": "person:ζοντιρος",
+    "dist": 1
+   },
+   {
+    "window": "win_athens_jan19_2_2026_1079",
+    "original": "Σακελαρίου",
+    "replacement": "Σακελλαριου",
+    "term": "person:σακελλαριου",
+    "dist": 1
+   },
+   {
+    "window": "win_athens_mar9_2_2026_5324843",
+    "original": "Καζαντζή",
+    "replacement": "Καζαντη",
+    "term": "person:καζαντη",
+    "dist": 1
+   },
+   {
+    "window": "win_athens_mar9_2_2026_5324843",
+    "original": "Καζαντζή",
+    "replacement": "Καζαντη",
+    "term": "person:καζαντη",
+    "dist": 1
+   },
+   {
+    "window": "win_athens_apr20_3_2026_3155310",
+    "original": "Χαρλάφτης",
+    "replacement": "Χαρλαυτης",
+    "term": "person:χαρλαυτης",
+    "dist": 1
+   },
+   {
+    "window": "win_athens_feb26_2026_2320602",
+    "original": "Κολάτος",
+    "replacement": "Κολλατος",
+    "term": "person:κολλατος",
+    "dist": 1
+   },
+   {
+    "window": "win_athens_mar23_2026_5939601",
+    "original": "Κλίτσα",
+    "replacement": "Κλειτσα",
+    "term": "person:κλειτσα",
+    "dist": 1
+   },
+   {
+    "window": "win_athens_mar23_2026_5939601",
+    "original": "Κλίτσα",
+    "replacement": "Κλειτσα",
+    "term": "person:κλειτσα",
+    "dist": 1
+   },
+   {
+    "window": "win_athens_mar23_2026_5939601",
+    "original": "Κλίτσα",
+    "replacement": "Κλειτσα",
+    "term": "person:κλειτσα",
+    "dist": 1
+   },
+   {
+    "window": "win_athens_mar9_1_2026_16934025",
+    "original": "Μπαμπογιάννης",
+    "replacement": "Μπακογιαννης",
+    "term": "person:μπακογιαννης",
+    "dist": 2
+   },
+   {
+    "window": "win_athens_mar9_1_2026_16934025",
+    "original": "Μπαμπογιάννης",
+    "replacement": "Μπακογιαννης",
+    "term": "person:μπακογιαννης",
+    "dist": 2
+   },
+   {
+    "window": "win_athens_mar9_1_2026_16934025",
+    "original": "Μπαμπογιάννης",
+    "replacement": "Μπακογιαννης",
+    "term": "person:μπακογιαννης",
+    "dist": 2
+   },
+   {
+    "window": "win_athens_mar9_1_2026_16934025",
+    "original": "Μπαμπογιάννη",
+    "replacement": "Μπακογιαννη",
+    "term": "person:μπακογιαννης",
+    "dist": 2
+   },
+   {
+    "window": "win_athens_mar9_1_2026_16934025",
+    "original": "Κλίτσα",
+    "replacement": "Κλειτσα",
+    "term": "person:κλειτσα",
+    "dist": 1
+   },
+   {
+    "window": "win_chalandri_apr29_2026_2598239",
+    "original": "Χαλάντρι",
+    "replacement": "Χαλανδρι",
+    "term": "place:city_name",
+    "dist": 1
+   },
+   {
+    "window": "win_chalandri_mar11_2026_9663639",
+    "original": "Ξυδόπουλος",
+    "replacement": "Λαδοπουλος",
+    "term": "person:λαδοπουλος",
+    "dist": 2
+   },
+   {
+    "window": "win_chalandri_sep24_2025_1650859",
+    "original": "Μαυροδή",
+    "replacement": "Μαυρουδη",
+    "term": "person:μαυρουδης",
+    "dist": 1
+   },
+   {
+    "window": "win_chania_sep1_2025_7412",
+    "original": "Δουτσέτης",
+    "replacement": "Λουτσετης",
+    "term": "person:λουτσετης",
+    "dist": 1
+   },
+   {
+    "window": "win_chania_apr28_2025_2_9524776",
+    "original": "Καλητσάκης",
+    "replacement": "Καλιτσακης",
+    "term": "person:καλιτσακης",
+    "dist": 1
+   },
+   {
+    "window": "win_chania_dec10_2025_4530811",
+    "original": "Καλογερδάκη",
+    "replacement": "Καλογριδακη",
+    "term": "person:καλογριδακης",
+    "dist": 2
+   },
+   {
+    "window": "win_chania_jul9_2025_12143763",
+    "original": "Λουτζέτη",
+    "replacement": "Λουτσετη",
+    "term": "person:λουτσετης",
+    "dist": 1
+   },
+   {
+    "window": "win_chania_jul9_2025_12143763",
+    "original": "Λόγλου",
+    "replacement": "Αλογλου",
+    "term": "person:αλογλου",
+    "dist": 1
+   },
+   {
+    "window": "win_chania_nov26_2025_8091520",
+    "original": "Καλογερδάκη",
+    "replacement": "Καλογριδακη",
+    "term": "person:καλογριδακης",
+    "dist": 2
+   },
+   {
+    "window": "win_chania_sep29_2025_2_4142394",
+    "original": "Κλονιζάκης",
+    "replacement": "Κλωνιζακης",
+    "term": "person:κλωνιζακης",
+    "dist": 1
+   },
+   {
+    "window": "win_orestiada_apr27_2026_6555813",
+    "original": "Τσοπανίδη",
+    "replacement": "Τσομπανιδη",
+    "term": "person:τσομπανιδης",
+    "dist": 1
+   },
+   {
+    "window": "win_orestiada_apr27_2026_6555813",
+    "original": "Ορεστιάδας",
+    "replacement": "Ορεστιαδα",
+    "term": "place:city_name",
+    "dist": 1
+   },
+   {
+    "window": "win_orestiada_apr27_2026_6555813",
+    "original": "Ορεστιάδας",
+    "replacement": "Ορεστιαδα",
+    "term": "place:city_name",
+    "dist": 1
+   },
+   {
+    "window": "win_orestiada_apr28_3_2026_1291909",
+    "original": "Ορεστιάδας",
+    "replacement": "Ορεστιαδα",
+    "term": "place:city_name",
+    "dist": 1
+   },
+   {
+    "window": "win_orestiada_feb27_2026_305602",
+    "original": "Ορεστιάδας",
+    "replacement": "Ορεστιαδα",
+    "term": "place:city_name",
+    "dist": 1
+   },
+   {
+    "window": "win_orestiada_feb27_2026_305602",
+    "original": "Ορεστιάδας",
+    "replacement": "Ορεστιαδα",
+    "term": "place:city_name",
+    "dist": 1
+   },
+   {
+    "window": "win_orestiada_jan21_2026_7536686",
+    "original": "Καζαντζή",
+    "replacement": "Καζαλτζη",
+    "term": "person:καζαλτζης",
+    "dist": 1
+   },
+   {
+    "window": "win_orestiada_jan21_2026_7536686",
+    "original": "Αστειριάδη",
+    "replacement": "Αστεριαδη",
+    "term": "person:αστεριαδης",
+    "dist": 1
+   },
+   {
+    "window": "win_orestiada_jan21_2026_7985300",
+    "original": "Ορεστιάδας",
+    "replacement": "Ορεστιαδα",
+    "term": "place:city_name",
+    "dist": 1
+   },
+   {
+    "window": "win_orestiada_jan21_2026_7985300",
+    "original": "Καζαντζή",
+    "replacement": "Καζαλτζη",
+    "term": "person:καζαλτζης",
+    "dist": 1
+   },
+   {
+    "window": "win_orestiada_jan21_2026_7985300",
+    "original": "Κιρμάνη",
+    "replacement": "Κυρμανη",
+    "term": "person:κυρμανη",
+    "dist": 1
+   },
+   {
+    "window": "win_orestiada_mar23_2026_6383163",
+    "original": "Σουκουρδάνο",
+    "replacement": "Σουκουλδανο",
+    "term": "person:σουκουλδανος",
+    "dist": 1
+   },
+   {
+    "window": "win_orestiada_mar23_2026_7271847",
+    "original": "Πραικούδη",
+    "replacement": "Μπραικουδη",
+    "term": "person:μπραικουδη",
+    "dist": 1
+   },
+   {
+    "window": "win_orestiada_mar23_2026_7271847",
+    "original": "Ορεστιάδας",
+    "replacement": "Ορεστιαδα",
+    "term": "place:city_name",
+    "dist": 1
+   },
+   {
+    "window": "win_orestiada_mar23_2026_7271847",
+    "original": "Ορεστιάδας",
+    "replacement": "Ορεστιαδα",
+    "term": "place:city_name",
+    "dist": 1
+   },
+   {
+    "window": "win_orestiada_mar23_2026_7271847",
+    "original": "Ορεστιάδας",
+    "replacement": "Ορεστιαδα",
+    "term": "place:city_name",
+    "dist": 1
+   },
+   {
+    "window": "win_orestiada_mar23_2026_7271847",
+    "original": "Πραικούδη",
+    "replacement": "Μπραικουδη",
+    "term": "person:μπραικουδη",
+    "dist": 1
+   },
+   {
+    "window": "win_orestiada_mar3_2026_1332463",
+    "original": "Καζαντζή",
+    "replacement": "Καζαλτζη",
+    "term": "person:καζαλτζης",
+    "dist": 1
+   },
+   {
+    "window": "win_orestiada_may18_2026_2809949",
+    "original": "Ορεστιάδος",
+    "replacement": "Ορεστιαδα",
+    "term": "place:city_name",
+    "dist": 2
+   },
+   {
+    "window": "win_orestiada_may18_2026_7271113",
+    "original": "Σουκουρδάνο",
+    "replacement": "Σουκουλδανο",
+    "term": "person:σουκουλδανος",
+    "dist": 1
+   },
+   {
+    "window": "win_orestiada_may18_2026_7271113",
+    "original": "Μπαρρικούδη",
+    "replacement": "Μπραικουδη",
+    "term": "person:μπραικουδη",
+    "dist": 2
+   },
+   {
+    "window": "win_samothraki_dec29_2025_321461",
+    "original": "Σκαλατίδης",
+    "replacement": "Σκαρλατιδης",
+    "term": "person:σκαρλατιδης",
+    "dist": 1
+   },
+   {
+    "window": "win_samothraki_dec29_2025_321461",
+    "original": "Σκαλατιδάς",
+    "replacement": "Σκαρλατιδης",
+    "term": "person:σκαρλατιδης",
+    "dist": 2
+   },
+   {
+    "window": "win_samothraki_may9_2026_600534",
+    "original": "Καλατζή",
+    "replacement": "Καλαιτζη",
+    "term": "person:καλαιτζη",
+    "dist": 1
+   },
+   {
+    "window": "win_samothraki_may9_2026_600534",
+    "original": "Καλατζή",
+    "replacement": "Καλαιτζη",
+    "term": "person:καλαιτζη",
+    "dist": 1
+   },
+   {
+    "window": "win_sparta_apr15_2026_450008",
+    "original": "Κατσίκτη",
+    "replacement": "Κατσιχτη",
+    "term": "person:κατσιχτης",
+    "dist": 1
+   },
+   {
+    "window": "win_sparta_feb17_2026_1026862",
+    "original": "Τσούχλαρης",
+    "replacement": "Τσουκλερης",
+    "term": "person:τσουκλερης",
+    "dist": 2
+   },
+   {
+    "window": "win_sparta_feb17_2026_1026862",
+    "original": "Καρμίρης",
+    "replacement": "Καρμοιρης",
+    "term": "person:καρμοιρης",
+    "dist": 1
+   },
+   {
+    "window": "win_sparta_feb17_2026_1026862",
+    "original": "Τσούχλαρης",
+    "replacement": "Τσουκλερης",
+    "term": "person:τσουκλερης",
+    "dist": 2
+   },
+   {
+    "window": "win_sparta_feb17_2026_1026862",
+    "original": "Καρμίρης",
+    "replacement": "Καρμοιρης",
+    "term": "person:καρμοιρης",
+    "dist": 1
+   },
+   {
+    "window": "win_sparta_feb17_2026_1026862",
+    "original": "Τσούχλαρης",
+    "replacement": "Τσουκλερης",
+    "term": "person:τσουκλερης",
+    "dist": 2
+   },
+   {
+    "window": "win_sparta_feb17_2026_1026862",
+    "original": "Καρμίρης",
+    "replacement": "Καρμοιρης",
+    "term": "person:καρμοιρης",
+    "dist": 1
+   },
+   {
+    "window": "win_sparta_jan20_2026_2743",
+    "original": "Καρμίρης",
+    "replacement": "Καρμοιρης",
+    "term": "person:καρμοιρης",
+    "dist": 1
+   },
+   {
+    "window": "win_sparta_jan20_2026_2743",
+    "original": "Καρμίρης",
+    "replacement": "Καρμοιρης",
+    "term": "person:καρμοιρης",
+    "dist": 1
+   },
+   {
+    "window": "win_sparta_mar10_2026_1332708",
+    "original": "Κυριακούλη",
+    "replacement": "Κυριακουλια",
+    "term": "person:κυριακουλιας",
+    "dist": 2
+   },
+   {
+    "window": "win_sparta_mar10_2026_149636",
+    "original": "Κακούρα",
+    "replacement": "Κακουρε",
+    "term": "person:κακουρος",
+    "dist": 1
+   },
+   {
+    "window": "win_sparta_mar10_2026_149636",
+    "original": "Κακούρα",
+    "replacement": "Κακουρε",
+    "term": "person:κακουρος",
+    "dist": 1
+   },
+   {
+    "window": "win_sparta_mar10_2026_149636",
+    "original": "Κακούρα",
+    "replacement": "Κακουρε",
+    "term": "person:κακουρος",
+    "dist": 1
+   },
+   {
+    "window": "win_sparta_mar12_2026_148798",
+    "original": "Κοκκόρα",
+    "replacement": "Κοκκορο",
+    "term": "person:κοκκορος",
+    "dist": 1
+   },
+   {
+    "window": "win_sparta_mar12_2026_591584",
+    "original": "Βρετάκος",
+    "replacement": "Βρεττακος",
+    "term": "person:βρεττακος",
+    "dist": 1
+   },
+   {
+    "window": "win_sparta_mar12_2026_591584",
+    "original": "Τρετάκη",
+    "replacement": "Τριτακη",
+    "term": "person:τριτακης",
+    "dist": 1
+   },
+   {
+    "window": "win_sparta_may19_2026_46",
+    "original": "Καρμίρης",
+    "replacement": "Καρμοιρης",
+    "term": "person:καρμοιρης",
+    "dist": 1
+   },
+   {
+    "window": "win_sparta_may19_2026_590470",
+    "original": "Κακούρα",
+    "replacement": "Κακουρε",
+    "term": "person:κακουρος",
+    "dist": 1
+   },
+   {
+    "window": "win_sparta_dec10_2025_10769314",
+    "original": "Βακαλόπλος",
+    "replacement": "Βακαλοπουλος",
+    "term": "person:βακαλοπουλος",
+    "dist": 2
+   },
+   {
+    "window": "win_sparta_jan19_2026_4214084",
+    "original": "Λιανοπούλου",
+    "replacement": "Γιαννοπουλου",
+    "term": "person:γιαννοπουλος",
+    "dist": 2
+   },
+   {
+    "window": "win_sparta_mar18_2026_9304905",
+    "original": "Σελήμος",
+    "replacement": "Σελιμος",
+    "term": "person:σελιμος",
+    "dist": 1
+   },
+   {
+    "window": "win_sparta_mar18_2026_9304905",
+    "original": "Σελήμος",
+    "replacement": "Σελιμος",
+    "term": "person:σελιμος",
+    "dist": 1
+   },
+   {
+    "window": "win_sparta_mar18_2026_9304905",
+    "original": "Σελήμος",
+    "replacement": "Σελιμος",
+    "term": "person:σελιμος",
+    "dist": 1
+   },
+   {
+    "window": "win_sparta_mar18_2026_9304905",
+    "original": "Σελήμος",
+    "replacement": "Σελιμος",
+    "term": "person:σελιμος",
+    "dist": 1
+   },
+   {
+    "window": "win_vrilissia_apr29_2_2026_4141095",
+    "original": "Χιμανδρίτης",
+    "replacement": "Αρχιμανδριτης",
+    "term": "person:αρχιμανδριτης",
+    "dist": 2
+   },
+   {
+    "window": "win_vrilissia_feb4_2026_7008540",
+    "original": "Μουτσαδάκη",
+    "replacement": "Βουτσαδακη",
+    "term": "person:βουτσαδακη",
+    "dist": 1
+   },
+   {
+    "window": "win_vrilissia_feb4_2026_7008540",
+    "original": "Μουτσαδάκη",
+    "replacement": "Βουτσαδακη",
+    "term": "person:βουτσαδακη",
+    "dist": 1
+   },
+   {
+    "window": "win_vrilissia_feb4_2026_7008540",
+    "original": "Μουτσαδάκη",
+    "replacement": "Βουτσαδακη",
+    "term": "person:βουτσαδακη",
+    "dist": 1
+   },
+   {
+    "window": "win_vrilissia_feb4_2026_7158628",
+    "original": "Βριλήσια",
+    "replacement": "Βριλησσια",
+    "term": "place:city_name",
+    "dist": 1
+   },
+   {
+    "window": "win_vrilissia_jan29_2026_9345479",
+    "original": "Κουτσιόρης",
+    "replacement": "Κουτσιωρης",
+    "term": "person:κουτσιωρης",
+    "dist": 1
+   },
+   {
+    "window": "win_vrilissia_jan29_2026_9345479",
+    "original": "Πηλιώτης",
+    "replacement": "Σπηλιωτης",
+    "term": "person:σπηλιωτης",
+    "dist": 1
+   },
+   {
+    "window": "win_xylokastro_mar12_2025_5534",
+    "original": "Σταματούρης",
+    "replacement": "Σταματουλης",
+    "term": "person:σταματουλης",
+    "dist": 1
+   },
+   {
+    "window": "win_xylokastro_mar12_2025_5534",
+    "original": "Αγγελική",
+    "replacement": "Αγγελιδη",
+    "term": "person:αγγελιδης",
+    "dist": 1
+   },
+   {
+    "window": "win_xylokastro_mar12_2025_5534",
+    "original": "Κατζάνης",
+    "replacement": "Καζανης",
+    "term": "person:καζανης",
+    "dist": 1
+   },
+   {
+    "window": "win_xylokastro_mar12_2025_5534",
+    "original": "Σταματούδης",
+    "replacement": "Σταματουλης",
+    "term": "person:σταματουλης",
+    "dist": 1
+   },
+   {
+    "window": "win_zografou_apr30_2026_1203213",
+    "original": "Μητρικαρίδη",
+    "replacement": "Μετικαριδη",
+    "term": "person:μετικαριδης",
+    "dist": 2
+   },
+   {
+    "window": "win_zografou_nov13_2025_10016576",
+    "original": "Πολύτη",
+    "replacement": "Πολιτη",
+    "term": "person:πολιτης",
+    "dist": 1
+   },
+   {
+    "window": "win_zografou_oct30_2_2025_3939586",
+    "original": "Μυτικαρίδη",
+    "replacement": "Μετικαριδη",
+    "term": "person:μετικαριδης",
+    "dist": 1
+   }
+  ]
+ },
+ "L": {
+  "model": "gpt-5.6-luna",
+  "reasoning_effort": "low",
+  "prompt_sha256": "3d8ac116960005c6e46dc225945430ee2cd6a72b427937037ee652f76b31c197",
+  "batch_size": 6,
+  "accounting": {
+   "pick_ok": 244,
+   "pick_differs_from_vote": 129,
+   "e_on_top_changes": 84,
+   "rep_over_budget": 29,
+   "rep_source_absent": 3,
+   "rep_applied": 28,
+   "rep_on_agreed_token": 10,
+   "rep_not_single_token": 4,
+   "rep_source_ambiguous": 11,
+   "rep_noop": 3,
+   "rep_target_off_list": 3,
+   "pick_invalid": 3
+  },
+  "applied": [
+   {
+    "window": "win_argos_dec5_2025_996850",
+    "from": "Ραμάλας",
+    "to": "δαμαλας",
+    "dist": 1
+   },
+   {
+    "window": "win_argos_dec5_2025_996850",
+    "from": "Ρημάκης",
+    "to": "δημακης",
+    "dist": 1
+   },
+   {
+    "window": "win_argos_dec5_2025_996850",
+    "from": "Γάτσιος",
+    "to": "γατσιου",
+    "dist": 1
+   },
+   {
+    "window": "win_argos_nov26_2025_2806748",
+    "from": "Μπουλούκο",
+    "to": "μπουλουκος",
+    "dist": 1
+   },
+   {
+    "window": "win_athens_jan19_2_2026_1079",
+    "from": "Ζοντύρος",
+    "to": "ζοντιρος",
+    "dist": 1
+   },
+   {
+    "window": "win_athens_feb11_2026_7486356",
+    "from": "Βαγγελίδου",
+    "to": "ευαγγελιδου",
+    "dist": 2
+   },
+   {
+    "window": "win_athens_feb26_2026_2320602",
+    "from": "Αλεβιζάκη",
+    "to": "αλεβυζακη",
+    "dist": 1
+   },
+   {
+    "window": "win_chalandri_may13_2026_8142238",
+    "from": "Μαυροδής",
+    "to": "μαυρουδης",
+    "dist": 1
+   },
+   {
+    "window": "win_chania_oct27_2025_2242779",
+    "from": "Ζαρκουδάκη",
+    "to": "ζερβουδακη",
+    "dist": 2
+   },
+   {
+    "window": "win_chania_sep1_2025_7412",
+    "from": "Δουτσέτης",
+    "to": "λουτσετης",
+    "dist": 1
+   },
+   {
+    "window": "win_chania_apr28_2025_2_9524776",
+    "from": "Δραγακάκης",
+    "to": "δρακακακης",
+    "dist": 1
+   },
+   {
+    "window": "win_chania_feb11_2026_3831080",
+    "from": "Κελαϊδή",
+    "to": "κελαιδης",
+    "dist": 1
+   },
+   {
+    "window": "win_chania_sep29_2025_2_4142394",
+    "from": "Κλονιζάκης",
+    "to": "κλωνιζακης",
+    "dist": 1
+   },
+   {
+    "window": "win_orestiada_may18_2026_2809949",
+    "from": "Κιρμάνη",
+    "to": "κυρμανη",
+    "dist": 1
+   },
+   {
+    "window": "win_samothraki_may15_2026_2277432",
+    "from": "Γαλατούμο",
+    "to": "γαλατουμος",
+    "dist": 1
+   },
+   {
+    "window": "win_samothraki_nov19_2025_9912829",
+    "from": "Γαλατούμο",
+    "to": "γαλατουμος",
+    "dist": 1
+   },
+   {
+    "window": "win_sparta_mar10_2026_1332708",
+    "from": "Κοκορός",
+    "to": "κοκκορος",
+    "dist": 1
+   },
+   {
+    "window": "win_sparta_mar24_2026_297822",
+    "from": "Καγούρος",
+    "to": "κακουρος",
+    "dist": 1
+   },
+   {
+    "window": "win_sparta_may19_2026_46",
+    "from": "Καρμίρης",
+    "to": "καρμοιρης",
+    "dist": 1
+   },
+   {
+    "window": "win_sparta_may6_2_2026_5212681",
+    "from": "Τζανατέα",
+    "to": "τζανετεα",
+    "dist": 1
+   },
+   {
+    "window": "win_vrilissia_apr29_2_2026_4141095",
+    "from": "Βαφεάδης",
+    "to": "βαφειαδης",
+    "dist": 1
+   },
+   {
+    "window": "win_vrilissia_jan29_2026_9345479",
+    "from": "Πηλιώτης",
+    "to": "σπηλιωτης",
+    "dist": 1
+   },
+   {
+    "window": "win_xylokastro_apr29_2026_3588128",
+    "from": "Μεντεβελής",
+    "to": "μετεβελης",
+    "dist": 1
+   },
+   {
+    "window": "win_xylokastro_mar12_2025_5534",
+    "from": "Καραπάς",
+    "to": "καραβας",
+    "dist": 1
+   },
+   {
+    "window": "win_xylokastro_mar12_2025_5534",
+    "from": "Κατζάνης",
+    "to": "καζανης",
+    "dist": 1
+   },
+   {
+    "window": "win_xylokastro_mar12_2025_5534",
+    "from": "Σταματούρης",
+    "to": "σταματουλης",
+    "dist": 1
+   },
+   {
+    "window": "win_zografou_apr24_2026_4298404",
+    "from": "Μπόττου",
+    "to": "μποτου",
+    "dist": 1
+   },
+   {
+    "window": "win_zografou_oct30_2_2025_3939586",
+    "from": "Μυτικαρίδη",
+    "to": "μετικαριδης",
+    "dist": 2
+   }
+  ]
+ },
+ "contrasts": {
+  "V+E vs V": {
+   "wer": {
+    "delta": -0.0008275825246606278,
+    "ci95": [
+     -0.0011921652479222674,
+     -0.000494441456731949
+    ],
+    "excludes_zero": true,
+    "n_clusters": 144
+   },
+   "sub_rate": {
+    "delta": -0.0008275825246606208,
+    "ci95": [
+     -0.0011921652479222674,
+     -0.000494441456731949
+    ],
+    "excludes_zero": true,
+    "n_clusters": 144
+   },
+   "del_rate": {
+    "delta": 0.0,
+    "ci95": [
+     0.0,
+     0.0
+    ],
+    "excludes_zero": false,
+    "n_clusters": 144
+   },
+   "ins_rate": {
+    "delta": 0.0,
+    "ci95": [
+     0.0,
+     0.0
+    ],
+    "excludes_zero": false,
+    "n_clusters": 144
+   },
+   "head2head_wer": {
+    "a_better": 36,
+    "tie": 205,
+    "b_better": 6
+   }
+  },
+  "V+Lsel vs V": {
+   "wer": {
+    "delta": 0.011385933766701814,
+    "ci95": [
+     0.007424734250493442,
+     0.015323264395340944
+    ],
+    "excludes_zero": true,
+    "n_clusters": 144
+   },
+   "sub_rate": {
+    "delta": 0.004738577358943903,
+    "ci95": [
+     0.002710759704052815,
+     0.006868646226949316
+    ],
+    "excludes_zero": true,
+    "n_clusters": 144
+   },
+   "del_rate": {
+    "delta": 0.010251344821602577,
+    "ci95": [
+     0.007446044877956617,
+     0.013108716930642096
+    ],
+    "excludes_zero": true,
+    "n_clusters": 144
+   },
+   "ins_rate": {
+    "delta": -0.0036039884138446554,
+    "ci95": [
+     -0.007084681446392717,
+     -0.00019109268889749693
+    ],
+    "excludes_zero": true,
+    "n_clusters": 144
+   },
+   "head2head_wer": {
+    "a_better": 28,
+    "tie": 123,
+    "b_better": 96
+   }
+  },
+  "V+L vs V": {
+   "wer": {
+    "delta": 0.011172364082918426,
+    "ci95": [
+     0.007252435217132038,
+     0.015091746963919439
+    ],
+    "excludes_zero": true,
+    "n_clusters": 144
+   },
+   "sub_rate": {
+    "delta": 0.004525007675160515,
+    "ci95": [
+     0.002506290169560573,
+     0.006625013684847278
+    ],
+    "excludes_zero": true,
+    "n_clusters": 144
+   },
+   "del_rate": {
+    "delta": 0.010251344821602577,
+    "ci95": [
+     0.007446044877956617,
+     0.013108716930642096
+    ],
+    "excludes_zero": true,
+    "n_clusters": 144
+   },
+   "ins_rate": {
+    "delta": -0.0036039884138446554,
+    "ci95": [
+     -0.007084681446392717,
+     -0.00019109268889749693
+    ],
+    "excludes_zero": true,
+    "n_clusters": 144
+   },
+   "head2head_wer": {
+    "a_better": 36,
+    "tie": 114,
+    "b_better": 97
+   }
+  },
+  "V+L+E vs V": {
+   "wer": {
+    "delta": 0.010611743662987047,
+    "ci95": [
+     0.006748021134075893,
+     0.014488167864205004
+    ],
+    "excludes_zero": true,
+    "n_clusters": 144
+   },
+   "sub_rate": {
+    "delta": 0.003964387255229122,
+    "ci95": [
+     0.0019501309541486646,
+     0.0060702777767102705
+    ],
+    "excludes_zero": true,
+    "n_clusters": 144
+   },
+   "del_rate": {
+    "delta": 0.010251344821602577,
+    "ci95": [
+     0.007446044877956617,
+     0.013108716930642096
+    ],
+    "excludes_zero": true,
+    "n_clusters": 144
+   },
+   "ins_rate": {
+    "delta": -0.0036039884138446554,
+    "ci95": [
+     -0.007084681446392717,
+     -0.00019109268889749693
+    ],
+    "excludes_zero": true,
+    "n_clusters": 144
+   },
+   "head2head_wer": {
+    "a_better": 49,
+    "tie": 97,
+    "b_better": 101
+   }
+  },
+  "V+E vs V+L+E": {
+   "wer": {
+    "delta": -0.011439326187647675,
+    "ci95": [
+     -0.015337359072818899,
+     -0.007529814702207245
+    ],
+    "excludes_zero": true,
+    "n_clusters": 144
+   },
+   "sub_rate": {
+    "delta": -0.004791969779889743,
+    "ci95": [
+     -0.006892367550216313,
+     -0.0027851626018650785
+    ],
+    "excludes_zero": true,
+    "n_clusters": 144
+   },
+   "del_rate": {
+    "delta": -0.010251344821602577,
+    "ci95": [
+     -0.013108716930642096,
+     -0.007446044877956617
+    ],
+    "excludes_zero": true,
+    "n_clusters": 144
+   },
+   "ins_rate": {
+    "delta": 0.0036039884138446554,
+    "ci95": [
+     0.00019109268889749565,
+     0.007084681446392716
+    ],
+    "excludes_zero": true,
+    "n_clusters": 144
+   },
+   "head2head_wer": {
+    "a_better": 99,
+    "tie": 114,
+    "b_better": 34
+   }
+  },
+  "V+L vs V+Lsel": {
+   "wer": {
+    "delta": -0.0002135696837833878,
+    "ci95": [
+     -0.00035897774228898144,
+     -8.093829435401531e-05
+    ],
+    "excludes_zero": true,
+    "n_clusters": 144
+   },
+   "sub_rate": {
+    "delta": -0.0002135696837833878,
+    "ci95": [
+     -0.00035897774228898144,
+     -8.093829435401531e-05
+    ],
+    "excludes_zero": true,
+    "n_clusters": 144
+   },
+   "del_rate": {
+    "delta": 0.0,
+    "ci95": [
+     0.0,
+     0.0
+    ],
+    "excludes_zero": false,
+    "n_clusters": 144
+   },
+   "ins_rate": {
+    "delta": 0.0,
+    "ci95": [
+     0.0,
+     0.0
+    ],
+    "excludes_zero": false,
+    "n_clusters": 144
+   },
+   "head2head_wer": {
+    "a_better": 17,
+    "tie": 226,
+    "b_better": 4
+   }
+  }
+ },
+ "loo": {
+  "V+E vs V": {
+   "delta": -0.0008275825246606244,
+   "min": -0.0008583345627187748,
+   "max": -0.0007507708808151227,
+   "sign_flips": 0,
+   "max_influence_window": "win_sparta_feb17_2026_1026862",
+   "delta_without_it": -0.0007507708808151227
+  },
+  "V+Lsel vs V": {
+   "delta": 0.011385933766701817,
+   "min": 0.010455483767191229,
+   "max": 0.012028159570901777,
+   "sign_flips": 0,
+   "max_influence_window": "win_orestiada_apr7_2026_3737815",
+   "delta_without_it": 0.010455483767191229
+  },
+  "V+L vs V": {
+   "delta": 0.01117236408291843,
+   "min": 0.010241012305300126,
+   "max": 0.011800201139792155,
+   "sign_flips": 0,
+   "max_influence_window": "win_orestiada_apr7_2026_3737815",
+   "delta_without_it": 0.010241012305300126
+  },
+  "V+L+E vs V": {
+   "delta": 0.010611743662987038,
+   "min": 0.009678024717835984,
+   "max": 0.01123700972175662,
+   "sign_flips": 0,
+   "max_influence_window": "win_orestiada_apr7_2026_3737815",
+   "delta_without_it": 0.009678024717835984
+  },
+  "V+E vs V+L+E": {
+   "delta": -0.011439326187647663,
+   "min": -0.012068387529332886,
+   "max": -0.010509101632664004,
+   "sign_flips": 0,
+   "max_influence_window": "win_orestiada_apr7_2026_3737815",
+   "delta_without_it": -0.010509101632664004
+  }
+ },
+ "gates": {
+  "V+E": {
+   "ins_rate_gate": {
+    "V": 0.044275665069343405,
+    "arm": 0.044275665069343405,
+    "pass": true
+   },
+   "del_rate_gate": {
+    "V": 0.024680646582217653,
+    "arm": 0.024680646582217653,
+    "pass": true
+   },
+   "wer_ci_excludes_zero": true,
+   "loo_sign_stable": true
+  },
+  "V+Lsel": {
+   "ins_rate_gate": {
+    "V": 0.044275665069343405,
+    "arm": 0.04067167665549875,
+    "pass": true
+   },
+   "del_rate_gate": {
+    "V": 0.024680646582217653,
+    "arm": 0.03493199140382023,
+    "pass": false
+   },
+   "wer_ci_excludes_zero": true,
+   "loo_sign_stable": true
+  },
+  "V+L": {
+   "ins_rate_gate": {
+    "V": 0.044275665069343405,
+    "arm": 0.04067167665549875,
+    "pass": true
+   },
+   "del_rate_gate": {
+    "V": 0.024680646582217653,
+    "arm": 0.03493199140382023,
+    "pass": false
+   },
+   "wer_ci_excludes_zero": true,
+   "loo_sign_stable": true
+  },
+  "V+L+E": {
+   "ins_rate_gate": {
+    "V": 0.044275665069343405,
+    "arm": 0.04067167665549875,
+    "pass": true
+   },
+   "del_rate_gate": {
+    "V": 0.024680646582217653,
+    "arm": 0.03493199140382023,
+    "pass": false
+   },
+   "wer_ci_excludes_zero": true,
+   "loo_sign_stable": true
+  }
+ },
+ "oracle_recovery": {
+  "V+E": {
+   "vs_oracle_trio": 0.06025267249757067,
+   "vs_oracle_all": 0.040077569489334344
+  },
+  "V+Lsel": {
+   "vs_oracle_trio": -0.8289601554907672,
+   "vs_oracle_all": -0.551389786683904
+  },
+  "V+L": {
+   "vs_oracle_trio": -0.8134110787172005,
+   "vs_oracle_all": -0.5410471881060113
+  },
+  "V+L+E": {
+   "vs_oracle_trio": -0.7725947521865891,
+   "vs_oracle_all": -0.5138978668390435
+  }
+ },
+ "by_mining_disjoint": {
+  "n_windows": 34,
+  "arms": {
+   "V": {
+    "S": 497,
+    "D": 323,
+    "I": 435,
+    "ref_tokens": 10150,
+    "wer": 0.12364532019704433,
+    "del_rate": 0.031822660098522165,
+    "ins_rate": 0.04285714285714286,
+    "sub_rate": 0.04896551724137931
+   },
+   "V+E": {
+    "S": 492,
+    "D": 323,
+    "I": 435,
+    "ref_tokens": 10150,
+    "wer": 0.12315270935960591,
+    "del_rate": 0.031822660098522165,
+    "ins_rate": 0.04285714285714286,
+    "sub_rate": 0.048472906403940884
+   },
+   "V+Lsel": {
+    "S": 599,
+    "D": 414,
+    "I": 531,
+    "ref_tokens": 10150,
+    "wer": 0.15211822660098523,
+    "del_rate": 0.04078817733990148,
+    "ins_rate": 0.05231527093596059,
+    "sub_rate": 0.059014778325123154
+   },
+   "V+L": {
+    "S": 599,
+    "D": 414,
+    "I": 531,
+    "ref_tokens": 10150,
+    "wer": 0.15211822660098523,
+    "del_rate": 0.04078817733990148,
+    "ins_rate": 0.05231527093596059,
+    "sub_rate": 0.059014778325123154
+   },
+   "V+L+E": {
+    "S": 595,
+    "D": 414,
+    "I": 531,
+    "ref_tokens": 10150,
+    "wer": 0.15172413793103448,
+    "del_rate": 0.04078817733990148,
+    "ins_rate": 0.05231527093596059,
+    "sub_rate": 0.05862068965517241
+   }
+  },
+  "note": "exploratory, underpowered; disjoint from BOTH the glossary mining fold and the fine-tune training manifest"
+ },
+ "llm_justification": {
+  "wer_V+E": 0.11929201649825807,
+  "wer_V+L+E": 0.13073134268590575,
+  "improvement": -0.011439326187647675,
+  "oracle_gap_left_after_E": 0.012907617763658452,
+  "threshold_10pct_of_gap": 0.0012907617763658454,
+  "meets_threshold": false,
+  "ci_excludes_zero": true,
+  "ci95": [
+   -0.015337359072818899,
+   -0.007529814702207245
+  ]
+ },
+ "mechanism": {
+  "vote_picks": {
+   "soniox": 115,
+   "scribe-v2-clean": 108,
+   "oc-runpod-fixed-2026-08-10": 24
+  },
+  "llm_picks": {
+   "scribe-v2-clean": 215,
+   "soniox": 31,
+   "oc-runpod-fixed-2026-08-10": 1
+  },
+  "n_deviations": 129,
+  "llm_picked_shorter_in": 103,
+  "transitions": {
+   "soniox -> scribe-v2-clean": {
+    "n": 95,
+    "d_err": 544,
+    "d_del": 790,
+    "d_sub": 268,
+    "d_ins": -514,
+    "d_words": -1304
+   },
+   "scribe-v2-clean -> soniox": {
+    "n": 11,
+    "d_err": 61,
+    "d_del": -103,
+    "d_sub": -16,
+    "d_ins": 180,
+    "d_words": 283
+   },
+   "oc-runpod-fixed-2026-08-10 -> scribe-v2-clean": {
+    "n": 23,
+    "d_err": 248,
+    "d_del": 81,
+    "d_sub": 103,
+    "d_ins": 64,
+    "d_words": -17
+   }
+  },
+  "vote_equals_oracle_best": 145,
+  "llm_equals_oracle_best": 97,
+  "loo_meeting": {
+   "full": 0.011385933766701817,
+   "min": 0.01067484662576687,
+   "min_group": "apr7_2026",
+   "max": 0.012152287133109936,
+   "max_group": "dec15_2025",
+   "sign_flips": 0
+  },
+  "loo_city": {
+   "full": 0.011385933766701817,
+   "min": 0.010706975279483546,
+   "min_group": "chania",
+   "max": 0.012980630239953744,
+   "max_group": "samothraki",
+   "sign_flips": 0
+  },
+  "largest_window_share_of_damage": 0.06678865507776761,
+  "largest_window": "win_orestiada_apr7_2026_3737815",
+  "llm_replacements_proposed": 91
+ }
+}

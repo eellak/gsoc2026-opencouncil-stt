@@ -58,7 +58,10 @@ trained through the label-prefix bug and cannot answer it.
 2. Name work continues as the **post-hoc roster repair** arm of
    `exp-2026-08-11-name-repair` (inside the ladder above). Decode-time hotword
    biasing is closed: it lifts name recall 51→65% but costs +0.34 WER in
-   deletions and fails its preregistered gate.
+   deletions and fails its preregistered gate. **2026-08-16:** the same repair
+   now has a number on top of the fusion vote across all 10 benchmark cities —
+   −0.083 WER points, CI excludes zero, both rate gates pass identically because
+   it only moves substitutions (`exp-2026-08-16-roster-grounded-selection`).
 3. Decide whether fidelity-to-audio changes this ranking. The benchmark measures
    agreement-with-OpenCouncil; the one time both were measured, the ranking flipped.
    **Done when** the corrected adapter has a fidelity-to-audio number on unseen
@@ -107,6 +110,13 @@ have released them.
 
 ## Recently changed
 
+- `exp-2026-08-16-roster-grounded-selection` closed: a closed term list inside the
+  fusion selector helps only through the FREE phonetic repair (−0.083 WER points,
+  CI excludes zero, both rate gates pass identically, 6% of the trio-oracle gap).
+  The LLM selector fails its deletion gate on every variant and loses a full WER
+  point: it picks Scribe on 215 of 244 windows, the shorter text in 103 of its 129
+  deviations, and imports Scribe's deletions. Text-only selection is closed,
+  2026-08-16.
 - `exp-2026-08-14-hparl-probe` closed: HParl's minutes *are* faithful to their audio
   (6.1% Soniox disagreement on placeholder-free rows), but ~55% of rows carry `[UNK]`
   over real speech and no row anywhere carries an accent or punctuation mark. Usable
