@@ -58,10 +58,16 @@ def upload(path: Path, key: str, name: str) -> str:
     return media
 
 
-def diarize(media: str, key: str, exclusive: bool = False, model: str = MODEL) -> str:
+def diarize(media: str, key: str, exclusive: bool = False, model: str = MODEL,
+            transcription: bool = False) -> str:
     body = {"url": media, "model": model}
     if exclusive:
         body["exclusive"] = True
+    if transcription:
+        # Adds wordLevelTranscription + turnLevelTranscription to the job output,
+        # from the default STT (Nvidia Parakeet-TDT-0.6b-v3). Billed separately
+        # from diarization; see wayfinder issue #17 for the cost check.
+        body["transcription"] = True
     r = curl(["-X", "POST", f"{API}/diarize",
               "-H", f"Authorization: Bearer {key}",
               "-H", "Content-Type: application/json",
@@ -94,12 +100,13 @@ def wait_job(job_id: str, key: str, timeout: float = 300) -> dict:
 
 
 def run_one(path: Path, key: str, name: str, exclusive: bool,
-            attempts: int = 2) -> dict:
+            attempts: int = 2, transcription: bool = False,
+            timeout: float = 300) -> dict:
     """Upload + diarize + wait, retrying once on a stuck/timed-out job."""
     for i in range(attempts):
         media = upload(path, key, f"{name}__try{i}.wav" if i else f"{name}.wav")
-        job = diarize(media, key, exclusive=exclusive)
-        r = wait_job(job, key)
+        job = diarize(media, key, exclusive=exclusive, transcription=transcription)
+        r = wait_job(job, key, timeout=timeout)
         if r.get("status") == "succeeded":
             return r
         log(f"    {name} excl={exclusive} attempt {i + 1}: {r.get('status')}")
