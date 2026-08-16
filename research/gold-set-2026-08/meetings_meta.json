@@ -1,0 +1,8 @@
+{
+  "seed": 21,
+  "k_cities": 6,
+  "n_eligible_meetings": 46,
+  "n_eligible_cities": 10,
+  "restriction": "900<=duration_sec<=9000, n_speaker_tags>=3, not hidden_for_review",
+  "total_hours_drawn": 6.83
+}

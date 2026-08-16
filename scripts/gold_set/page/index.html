@@ -1,0 +1,68 @@
+<!doctype html><html lang="el"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Χρυσό σύνολο — επαλήθευση</title>
+<link rel="stylesheet" href="app.css"></head><body>
+<header>
+  <b id="title">…</b><span class="pill" id="tier"></span>
+  <span class="sp"></span>
+  <span class="pill" id="clock"></span><span class="pill" id="rate"></span>
+  <span class="pill" id="rate2">1x</span><span class="pill" id="sync">—</span>
+  <button id="prev">←</button><button id="next">→</button><button id="export">Export</button>
+</header>
+<main>
+  <canvas id="wave"></canvas>
+  <p class="hint">Κλικ = παίξε από εκεί. Σύρε = διάλεξε διάστημα. <kbd>space</kbd> play/pause ·
+    <kbd>Enter</kbd> ξαναπαίξε τον πυρήνα · <kbd>←</kbd><kbd>→</kbd> ±1s (με shift ±3s) ·
+    <kbd>o</kbd> πρόσθεσε ταυτόχρονο ομιλητή · <kbd>r</kbd> ταχύτητα · <kbd>ctrl+z</kbd> αναίρεση.
+    Μόνο το κίτρινο διάστημα (πυρήνας) σκοράρεται.</p>
+
+  <div class="card phase" id="pa">
+    <h2>1 · Άκου πρώτα, χωρίς κείμενο</h2>
+    <p class="hint">Άκουσε ολόκληρο το απόσπασμα μία φορά. Το κείμενο ΔΕΝ φαίνεται ακόμη — αυτό είναι
+      σκόπιμο: αν το δεις πρώτα, δεν θα ακούσεις τι λείπει.</p>
+    <div class="row">
+      <span class="pill" id="a-heard">—</span>
+      <label>Μιλάνε δύο ταυτόχρονα μέσα στον πυρήνα;
+        <select id="a-ov"><option value="">—</option><option value="yes">ναι</option>
+        <option value="no">όχι</option><option value="unsure">δεν είμαι σίγουρος</option></select></label>
+      <label>Πόσες φωνές το πολύ ταυτόχρονα;
+        <select id="a-voices"><option value="">—</option><option>1</option><option>2</option>
+        <option>3</option><option>4</option></select></label>
+      <button class="pri" id="a-submit" disabled>Καταχώρησε και δείξε το κείμενο</button>
+    </div>
+  </div>
+
+  <div class="card phase" id="pblank" style="display:none">
+    <h2>1β · Γράψε από το μηδέν (κελί βαθμονόμησης)</h2>
+    <p class="hint">Αυτό το κελί είναι ένα από τα τρία που γράφονται τυφλά, για να μετρηθεί πόσα
+      χάνει η διόρθωση. Γράψε ό,τι ακούς μέσα στον πυρήνα. Μετά θα δεις το έτοιμο κείμενο.</p>
+    <textarea id="blank-text" style="min-height:110px"></textarea>
+    <div class="row"><button class="pri" id="blank-submit">Καταχώρησε και δείξε το έτοιμο</button></div>
+  </div>
+
+  <div class="card phase" id="pb">
+    <h2>2 · Διόρθωσε το κείμενο και τους ομιλητές</h2>
+    <p class="hint" id="b-locked">Κλειδωμένο μέχρι να τελειώσει το βήμα 1.</p>
+    <p class="hint">Το κείμενο είναι <b>προ-συμπληρωμένο</b>. Άλλαξε μόνο ό,τι είναι λάθος.
+      Για ταυτόχρονη ομιλία: διάλεξε το διάστημα πάνω στην κυματομορφή, πάτα
+      <b>＋ ταυτόχρονος ομιλητής</b>, γράψε τα λόγια του, και σύρε τα όριά του στην κυματομορφή.</p>
+    <div id="blocks"></div>
+    <div class="row">
+      <button id="b-add">＋ ταυτόχρονος ομιλητής (o)</button>
+      <button id="b-undo">↶ αναίρεση</button>
+      <button class="danger" id="b-exclude">Εξαίρεσε το κελί</button>
+      <span class="sp"></span>
+      <button class="pri" id="b-submit">Τελείωσα τη διόρθωση</button>
+    </div>
+  </div>
+
+  <div class="card phase" id="pc">
+    <h2>3 · Λείπει κάτι;</h2>
+    <p class="hint">Σημεία όπου ο ήχος έχει ομιλία αλλά το κείμενό σου δεν έχει λέξεις, ή όπου το
+      δημοσιευμένο κείμενο λέει ότι ειπώθηκε κάτι. Άκουσε και αποφάσισε. Αν χάθηκε ομιλία,
+      γύρνα στο βήμα 2 και πρόσθεσέ την.</p>
+    <div id="flags"></div>
+    <div class="row"><button class="pri" id="c-submit">Ολοκλήρωσε το κελί</button></div>
+  </div>
+</main>
+<script src="app.js"></script></body></html>

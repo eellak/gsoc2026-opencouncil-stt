@@ -1,0 +1,47 @@
+{
+  "seed": 21,
+  "allocation_required": {
+    "P": 14,
+    "I": 6,
+    "H": 6,
+    "M": 4,
+    "R": 6
+  },
+  "allocation_stretch": {
+    "P": 7,
+    "I": 3,
+    "H": 3,
+    "M": 2,
+    "R": 3
+  },
+  "frame_sizes": {
+    "I": 69,
+    "M": 956,
+    "P": 211,
+    "H": 160,
+    "R": 1396
+  },
+  "max_per_meeting_cumulative": {
+    "required": 7,
+    "stretch": 11
+  },
+  "min_gap_sec": 60.0,
+  "n_calibration": 3,
+  "calibration_cells": [
+    "gc_samothraki_jul6_2026_1285000",
+    "gc_sparta_jul1_2026_220000",
+    "gc_zografou_jun18_2026_1390000"
+  ],
+  "core27": {
+    "P": 12,
+    "I": 4,
+    "H": 4,
+    "M": 3,
+    "R": 4
+  },
+  "n_required27": 27,
+  "scored_core_min_required27": 6.75,
+  "n_required_drawn": 36,
+  "n_stretch": 18,
+  "scored_core_sec_required": 540.0
+}

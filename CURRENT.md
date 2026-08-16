@@ -1,6 +1,6 @@
 # Current Work
 
-Last updated: 2026-08-14
+Last updated: 2026-08-16
 
 **The endgame plan is finished.** All four workstreams of
 [`docs/specs/2026-08-11-endgame-handoff-plan.md`](docs/specs/2026-08-11-endgame-handoff-plan.md)
@@ -62,7 +62,12 @@ trained through the label-prefix bug and cannot answer it.
 3. Decide whether fidelity-to-audio changes this ranking. The benchmark measures
    agreement-with-OpenCouncil; the one time both were measured, the ranking flipped.
    **Done when** the corrected adapter has a fidelity-to-audio number on unseen
-   meetings.
+   meetings. **Blocked on a human decision, 2026-08-16:** `exp-2026-08-16-gold-set`
+   has a frozen design, a candidate audio manifest and a verification tool
+   ([prereg](docs/specs/2026-08-16-gold-set-prereg.md), wayfinder #21). It waits
+   for approval and then for about 2 hours of the user's listening (96–145 min
+   modelled, hard stop at 150). It also carries
+   the project's first speaker ground truth.
 
 ## Product decision: answered 2026-08-12 — transcripts are **clean**
 

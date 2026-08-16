@@ -1,0 +1,72 @@
+{
+  "note": "model, not a measured human rate; densities are measured",
+  "n_cells": 27,
+  "missing_prefill": 0,
+  "assumptions": {
+    "pass_a_sec": 47.0,
+    "sec_per_word": {
+      "P": 4.0,
+      "I": 3.6,
+      "H": 3.0,
+      "M": 2.3,
+      "R": 2.5
+    },
+    "pass_c_sec": {
+      "P": 60,
+      "I": 55,
+      "H": 45,
+      "M": 40,
+      "R": 45
+    }
+  },
+  "per_stream": {
+    "H": {
+      "n_cells": 4,
+      "median_words_in_core": 27.0,
+      "median_blocks_in_core": 3.5,
+      "sec_per_cell": 173,
+      "minutes": 11.5
+    },
+    "I": {
+      "n_cells": 4,
+      "median_words_in_core": 25.5,
+      "median_blocks_in_core": 5.0,
+      "sec_per_cell": 194,
+      "minutes": 12.9
+    },
+    "M": {
+      "n_cells": 3,
+      "median_words_in_core": 32,
+      "median_blocks_in_core": 4,
+      "sec_per_cell": 161,
+      "minutes": 8.0
+    },
+    "P": {
+      "n_cells": 12,
+      "median_words_in_core": 38.0,
+      "median_blocks_in_core": 4.5,
+      "sec_per_cell": 259,
+      "minutes": 51.8
+    },
+    "R": {
+      "n_cells": 4,
+      "median_words_in_core": 40.5,
+      "median_blocks_in_core": 5.0,
+      "sec_per_cell": 193,
+      "minutes": 12.9
+    }
+  },
+  "median_words_per_core": 32,
+  "median_blocks_per_core": 5,
+  "cells_minutes": 97.2,
+  "warmup_minutes": 10.0,
+  "blind_extra_minutes": 10.0,
+  "total_minutes": 117.2,
+  "range_minutes": [
+    96,
+    145
+  ],
+  "scored_core_minutes": 6.75,
+  "audio_played_minutes": 15.75,
+  "human_min_per_scored_audio_min": 17.4
+}
