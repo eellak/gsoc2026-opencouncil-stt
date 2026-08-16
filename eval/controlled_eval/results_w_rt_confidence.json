@@ -1886,6 +1886,11 @@
     "p95": 0.00018687347331046357,
     "min": -0.0003470507361480038,
     "max": 0.00029365831520215705
+   },
+   "A_exact": {
+    "n": 200,
+    "n_at_or_below_observed": 0,
+    "p_one_sided": 0.004975124378109453
    }
   }
  },
@@ -2067,5 +2072,48 @@
   "O": 1.01,
   "O2": 0.95,
   "M": 1.01
+ },
+ "diagnostics": {
+  "O": {
+   "eligible": 3167,
+   "oracle_wants_soniox": 547,
+   "oracle_wants_W_rt": 2620,
+   "oracle_wants_a_third_thing": 0,
+   "prevalence": 0.17271866119355858,
+   "auroc_conf_predicts_oracle_wants_soniox": 0.61825467156035,
+   "conf_mean_when_oracle_wants_soniox": 0.9425502742230348,
+   "conf_mean_when_oracle_wants_W_rt": 0.8851408396946565
+  },
+  "O2": {
+   "eligible": 811,
+   "oracle_wants_soniox": 138,
+   "oracle_wants_W_rt": 49,
+   "oracle_wants_a_third_thing": 624,
+   "prevalence": 0.7379679144385026,
+   "auroc_conf_predicts_oracle_wants_soniox": 0.6728778467908902,
+   "conf_mean_when_oracle_wants_soniox": 0.8368623188405797,
+   "conf_mean_when_oracle_wants_W_rt": 0.7435918367346939
+  },
+  "A": {
+   "eligible": 1889,
+   "oracle_wants_soniox": 405,
+   "oracle_wants_W_rt": 408,
+   "oracle_wants_a_third_thing": 1076,
+   "prevalence": 0.4981549815498155,
+   "auroc_conf_predicts_oracle_wants_soniox": 0.7028746066327766,
+   "conf_mean_when_oracle_wants_soniox": 0.8227407407407407,
+   "conf_mean_when_oracle_wants_W_rt": 0.6699215686274509
+  },
+  "M": {
+   "eligible": 1515,
+   "oracle_wants_soniox": 203,
+   "oracle_wants_W_rt": 1312,
+   "oracle_wants_a_third_thing": 0,
+   "prevalence": 0.13399339933993398,
+   "auroc_conf_predicts_oracle_wants_soniox": 0.5872901147422804,
+   "conf_mean_when_oracle_wants_soniox": 0.8605270935960592,
+   "conf_mean_when_oracle_wants_W_rt": 0.7995221036585366
+  },
+  "_note": "POST-HOC, reporting only. Written after the arms were scored, never a gate, never visible to fit or apply. The column oracle is hindsight."
  }
 }

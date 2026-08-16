@@ -44,6 +44,7 @@ from eval.controlled_eval import w_rt as R                             # noqa: E
 from eval.controlled_eval.column_classes import (column_class,         # noqa: E402
                                                  split_merge_columns)
 from eval.controlled_eval.msa import oracle_select                     # noqa: E402
+from rapidfuzz.distance import Levenshtein as _LEV                     # noqa: E402
 
 SON = R.SONIOX_IDX
 K_OTHER = 0.5                       # preregistered constant weight, see spec S4
@@ -185,9 +186,6 @@ class VoteIdea(F.Idea):
 
 
 # ----------------------------------------------------------------- fast fitting
-from rapidfuzz.distance import Levenshtein as _LEV                     # noqa: E402
-
-
 def _lev(a: list[str], b: list[str]) -> int:
     return _LEV.distance(a, b)
 
@@ -372,9 +370,6 @@ def exposure(sub: F.Substrate, preps: dict[str, Prep], arm: str, res: dict,
              fold_params: dict) -> dict:
     """Eligible / firing counts, and (reporting only) agreement with the column
     oracle. The oracle is never visible to fit or apply."""
-    d = res["detail"]
-    out_tokens = d["out_tokens"]
-    del d, out_tokens
     n_elig = sum(len(preps[w.item_id].elig[arm]) for w in sub.windows)
     fired = fired_oracle_ok = fired_oracle_bad = 0
     for w in sub.windows:
@@ -491,12 +486,10 @@ def main() -> None:
     del old, old_ident
 
     # ---- the arms
-    detail_cache = {}
     for arm in ARMS:
         idea = VoteIdea(preps) if arm == "A" else ThresholdIdea(arm, preps)
         log(f"evaluating arm {arm}")
         res = F.evaluate(idea, sub, n_boot=n_boot, return_detail=True)
-        detail_cache[arm] = res
         entry = strip_detail(res)
         entry["adjusted_ci"] = adjusted_ci(res) if arm in FAMILY else None
         entry["city_sign_test"] = city_sign_test(res)
@@ -546,5 +539,107 @@ def main() -> None:
     log(f"wrote {mp} (stays outside git: it names verbatim-speech caches)")
 
 
+
+
+# ---------------------------------------------------------------- diagnostics
+# Everything below is POST-HOC and REPORTING-ONLY. It was written after the arms
+# were scored, to explain the result; it is not a gate, it never touched a fitted
+# parameter, and no arm is promoted on it. The column oracle it reads is hindsight.
+def _auroc(scores: list[float], labels: list[int]) -> float | None:
+    pos = [s for s, y in zip(scores, labels) if y == 1]
+    neg = [s for s, y in zip(scores, labels) if y == 0]
+    if not pos or not neg:
+        return None
+    order = sorted(range(len(scores)), key=lambda i: scores[i])
+    ranks = [0.0] * len(scores)
+    i = 0
+    while i < len(order):
+        j = i
+        while j + 1 < len(order) and scores[order[j + 1]] == scores[order[i]]:
+            j += 1
+        r = (i + j) / 2.0 + 1.0
+        for t in range(i, j + 1):
+            ranks[order[t]] = r
+        i = j + 1
+    rsum = sum(r for r, y in zip(ranks, labels) if y == 1)
+    return (rsum - len(pos) * (len(pos) + 1) / 2) / (len(pos) * len(neg))
+
+
+def diagnostics(sub: F.Substrate, preps: dict[str, Prep]) -> dict:
+    """Does confidence discriminate the decision each arm has to make, on THIS
+    benchmark, against the alignment-conditional column oracle?
+
+    label 1 = the oracle wants the Soniox candidate at that column
+    label 0 = the oracle wants what W-rt already has (epsilon for O, the majority
+              token for M, W-rt's tie-break for A / O2)
+    Columns where the oracle wants a third thing are counted separately and
+    excluded from the AUROC, because they are not the decision the arm makes.
+    """
+    out = {}
+    for arm in ARMS:
+        scores, labels, other = [], [], 0
+        for w in sub.windows:
+            p = preps[w.item_id]
+            for i, tok, c in p.elig[arm]:
+                o = p.oracle[i]
+                if o == tok:
+                    scores.append(c)
+                    labels.append(1)
+                elif o == p.base[i]:
+                    scores.append(c)
+                    labels.append(0)
+                else:
+                    other += 1
+        n1 = sum(labels)
+        out[arm] = {
+            "eligible": sum(len(preps[w.item_id].elig[arm]) for w in sub.windows),
+            "oracle_wants_soniox": n1,
+            "oracle_wants_W_rt": len(labels) - n1,
+            "oracle_wants_a_third_thing": other,
+            "prevalence": n1 / len(labels) if labels else None,
+            "auroc_conf_predicts_oracle_wants_soniox": _auroc(scores, labels),
+            "conf_mean_when_oracle_wants_soniox":
+                (sum(s for s, y in zip(scores, labels) if y) / n1) if n1 else None,
+            "conf_mean_when_oracle_wants_W_rt":
+                (sum(s for s, y in zip(scores, labels) if not y) / (len(labels) - n1))
+                if len(labels) - n1 else None,
+        }
+    return out
+
+
+def perm_pvalue_A(sub: F.Substrate, preps: dict[str, Prep], observed: float,
+                  n: int = N_PERM) -> dict:
+    """Exact left-tail count of the arm-A permutation null (no fitting to redo)."""
+    rng = random.Random(PERM_SEED)
+    den = sum(len(w.ref) for w in sub.windows)
+    base_num = sum(_lev(w.ref, w.w_tokens) for w in sub.windows)
+    le = 0
+    for _ in range(n):
+        ov = permuted_conf(sub, preps, "A", rng)
+        num = sum(_lev(w.ref, apply_vote_arm(w, preps[w.item_id], K_OTHER,
+                                             ov[w.item_id])) for w in sub.windows)
+        if (num - base_num) / den <= observed:
+            le += 1
+    return {"n": n, "n_at_or_below_observed": le, "p_one_sided": (le + 1) / (n + 1)}
+
+
+def add_diagnostics() -> None:
+    sub, conf = R.load_substrate_rt(strict=True)
+    preps = prepare(sub, conf)
+    res = json.loads(OUT.read_text())
+    res["diagnostics"] = diagnostics(sub, preps)
+    res["diagnostics"]["_note"] = (
+        "POST-HOC, reporting only. Written after the arms were scored, never a gate, "
+        "never visible to fit or apply. The column oracle is hindsight.")
+    res["controls"]["permutation"]["A_exact"] = perm_pvalue_A(
+        sub, preps, res["arms"]["A"]["vs_W"]["wer"]["delta"])
+    OUT.write_text(json.dumps(res, ensure_ascii=False, indent=1))
+    log(json.dumps(res["diagnostics"], indent=1, ensure_ascii=False))
+    log(json.dumps(res["controls"]["permutation"]["A_exact"]))
+
+
 if __name__ == "__main__":
-    main()
+    if "--diagnostics" in sys.argv:
+        add_diagnostics()
+    else:
+        main()

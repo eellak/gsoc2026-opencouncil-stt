@@ -1,6 +1,6 @@
 {
  "schema_version": 1,
- "updated_at": "2026-08-16",
+ "updated_at": "2026-08-16T17:30:00Z",
  "note": "Authoritative state. Reports under docs/reports/ are immutable evidence; this file says whether their conclusions still stand. When a doc disagrees with this file, this file wins and the doc gets fixed in the same change.",
  "experiments": [
   {
@@ -17,8 +17,8 @@
    ],
    "specs": [],
    "superseded_by": null,
-   "next_action": "Run stt-async-v5 with per-token confidence over the 247 benchmark windows (~$0.82) as a separate, preregistered experiment; freeze its analysis before results. Blocked on nothing but a paid Soniox key (SONIOX_API_KEY is empty in soniox-tools/.env; the free Perplexity temp key only unlocks the realtime path).",
-   "updated_at": "2026-08-16T00:00:00Z",
+   "next_action": "Superseded as a plan by exp-2026-08-16-w-rt-confidence, which ran the FREE stt-rt-v4 path over all 247 windows instead and found no confidence arm meeting its criteria. The ~$0.82 stt-async-v5 run is NOT justified by the fusion-arm hypothesis any more; it would need a different question.",
+   "updated_at": "2026-08-16T17:30:00Z",
    "caveats": [
     "30 cells, 27 scored, 6 meetings, 6 cities, ONE MEETING PER CITY so meeting and city are fully confounded. The cell is the independent unit and clustering is by meeting. This CANNOT support a population claim or any promotion gate; a 6-cluster interval excluding a null is not significance.",
     "stt-rt-v4 IS NOT stt-async-v5. Everything here is indirect evidence motivating an experiment, never evidence about the paid model's confidence.",
@@ -32,7 +32,8 @@
     "soniox-tools at /home/harold/projects/soniox-tools is NOT a git repository, so the tooling change has no commit or revision to cite.",
     "Every gold-set caveat still applies: one listener, one pass, no inter-annotator number, 19% of core tokens excluded as text-uncertain with their time masked out, and a reference that knowingly under-covers.",
     "Two Codex reviews at high effort, each before the thing it governed. Job 4759402624f643efacc4fb2e9cd63beb ran BEFORE any scoring code and replaced a pooled AUROC with the within-meeting mean, corrected the null from 0 to 0.5, forced the deletion ceiling up front, required a within-meeting rather than global permutation null, and required the alignment envelope and length control. Job 69c1a01b05a54aa08deb776df756af8a ran on the findings BEFORE any claim was written and killed three sentences: 'nothing here is evidence about async-v5', 'robust across all six meetings', and 93.2% framed as a reproduction ceiling.",
-    "ZERO GPU, ZERO PAID API. Free Perplexity temp key on the realtime path, local CPU. The ~$0.82 is the proposed next step, not spend incurred."
+    "ZERO GPU, ZERO PAID API. Free Perplexity temp key on the realtime path, local CPU. The ~$0.82 is the proposed next step, not spend incurred.",
+    "2026-08-16, same day: the paid run this record recommended was NOT bought. exp-2026-08-16-w-rt-confidence instead rebuilt the whole substrate on the free stt-rt-v4 path (W-rt) and measured the fusion arms there. All three confirmatory arms failed, and the post-hoc diagnostic put confidence's AUROC at 0.587-0.703 on the decisions a fusion arm actually makes, against the 0.8167 in this record. Read that report before quoting 0.8167 as if it were available to a fusion arm."
    ]
   },
   {
@@ -722,9 +723,9 @@
    "id": "exp-2026-08-13-targeted-deletion-training",
    "title": "Targeted retraining against within-span deletions",
    "question": "Does a deletion-targeted training mix (55% expanded clean backbone / 25% verified deletion-coverage hard examples / 10% names / 10% other), 3 seeds per arm vs an expanded-pool neutral control, lower the deletion rate without raising insertions or WER?",
-   "status": "OPEN",
+   "status": "CLOSED",
    "conclusion": "SCREEN RESULT 2026-08-16 (single seed 101; measured per-seed spread is 2.1 WER points, so this decides nothing alone). Both screens were merged, converted to CT2 int8 and decoded on the LOCAL minipc stack only (CPU, 16 threads, frozen control decode config, common random numbers, same normalizer); four distinct model.bin sha256 (control 8a1a3b25, RUN1 d808868a, RUN2-stage1 96088a40, RUN2-stage2 444de4e9). 39 frozen windows / 31 meetings / 11,911 ref tokens; paired bootstrap over meetings, 4000 replicates. control WER 0.1589 del 0.0600 ins 0.0201 sub 0.0788 | RUN1 WER 0.1641 del 0.0788 ins 0.0174 sub 0.0680 | RUN2-stage2 WER 0.1591 del 0.0756 ins 0.0163 sub 0.0672. vs control both arms: WER delta includes zero (+0.0052 / +0.0002), del_rate RISES with CI excluding zero (+0.0187 [+0.0012,+0.0414] / +0.0155 [+0.0016,+0.0341]), sub_rate FALLS with CI excluding zero (-0.0107 / -0.0115), ins_rate falls but includes zero. Leave-one-window-out does not reverse any del/sub/ins sign; the RUN2 WER delta's sign flips on 13 of 39 windows and is read as flat, never as better. DS-WER v2 entities (primary, 274 occurrences, never decides alone): control 0.5365, RUN1 0.6058, RUN2 0.5657; the same S->D swap appears there (entities S/D 114/26 -> 70/93 -> 90/58). v1: 0.512 / 0.596 / 0.536. READING: both stage-2-containing screens traded substitutions for deletions - the mix built to REDUCE deletions is followed by MORE deletions in both arms, with WER flat, which a pooled-WER-only look would have missed entirely. Neither arm meets the frozen primary criterion (deletion drop without insertion/WER regression), so the control artifact-adapter-fixed keeps the candidate slot. Pipeline-bug check done first and clean: distinct fingerprints, stage2.log records LoRA initialized from trained stage-1 weights (192 nonzero lora_B), identical stage-2 substrate (n_train 42,204 / max_steps 10,552 in both runs), S+D+I reproduce the WERs, no arm near the +2-point bug threshold. FOR THIS RECORD: RUN1 IS this mix's screen, and the mixture it actually trained on is NOT the 55/25/10/10 of the question above: the realized exposure over 42,204 presentations was 68.9/18.6/2.6/10.0 (backbone/deletion-hard/names/other). 55/25/10/10 is the PLANNED mix; every result below belongs to the executed 68.9/18.6/2.6/10.0 one, and the gap (a smaller deletion-hard and a much smaller names share than designed) is itself a candidate explanation for the outcome. It did not lower the deletion rate; it raised it (+0.0187 per ref token, CI excludes zero, 715 -> 938 deletions) while lowering substitutions (938 -> 810) and leaving WER statistically flat. The stated goal of the mix is therefore not achieved on one seed, in the direction opposite to the hypothesis. Association, not proof of cause: one seed per arm, no ablation separating data composition from anything else in the run, and aggregate counts do not show that particular substitutions became deletions.",
-   "decision": null,
+   "decision": "Close this training question for the current cycle. Neither single-seed screen lowered deletions; both raised them with intervals excluding zero, and the follow-up deletion-hard coverage audit established neither frozen reopening gate. Keep artifact-adapter-fixed in the candidate slot. Do not spend GPU or run a blind confirmation without a new reason and the preregistered three-seed matched-GPU design.",
    "reports": [
     "docs/reports/2026-08-16-screens-eval.md",
     "docs/reports/2026-08-16-deletion-hard-coverage-audit.md"
@@ -739,7 +740,7 @@
     "cap-runpod-gpu-pod"
    ],
    "superseded_by": null,
-   "next_action": "DONE 2026-08-16: the error analysis of the deletion-hard supply ran as exp-2026-08-16-deletion-hard-coverage and NEITHER frozen gate was established, so the user's training freeze holds for this cycle. The 25% deletion-hard share is not shown to be the problem and the rows are not shown to be truncated; the largest recorded anomaly is the realized mixture itself (names 2.6% against a designed 10%, and names 6.8x/4.4x enriched in the new deletions). The prereg v2 3-seed gates stay frozen and unused. No GPU spend authorised. Reopening needs a new reason, not this one.",
+   "next_action": null,
    "caveats": [
     "Per-seed spread 2.1 WER points: single-seed results from this experiment are screens, never conclusions.",
     "Mining artifacts: gap-candidates-2026-08-12.{md,jsonl}, gap-mining-summary, backbone-headroom (all under data/reports/finetune-research/, gitignored).",
@@ -791,9 +792,9 @@
    "id": "exp-2026-08-14-external-packs",
    "title": "External Greek corpora as stage-1 packs: STOMA, EuroSpeech-el, Common Voice Scripted 26.0",
    "question": "Do additional external Greek speech corpora, admitted through the pack pipeline and used as stage-1 adaptation before the frozen in-domain stage-2 recipe, lower agreement-WER on the 39 frozen validation windows without a deletion-rate regression?",
-   "status": "OPEN",
+   "status": "CLOSED",
    "conclusion": "SCREEN RESULT 2026-08-16 (single seed 101; measured per-seed spread is 2.1 WER points, so this decides nothing alone). Both screens were merged, converted to CT2 int8 and decoded on the LOCAL minipc stack only (CPU, 16 threads, frozen control decode config, common random numbers, same normalizer); four distinct model.bin sha256 (control 8a1a3b25, RUN1 d808868a, RUN2-stage1 96088a40, RUN2-stage2 444de4e9). 39 frozen windows / 31 meetings / 11,911 ref tokens; paired bootstrap over meetings, 4000 replicates. control WER 0.1589 del 0.0600 ins 0.0201 sub 0.0788 | RUN1 WER 0.1641 del 0.0788 ins 0.0174 sub 0.0680 | RUN2-stage2 WER 0.1591 del 0.0756 ins 0.0163 sub 0.0672. vs control both arms: WER delta includes zero (+0.0052 / +0.0002), del_rate RISES with CI excluding zero (+0.0187 [+0.0012,+0.0414] / +0.0155 [+0.0016,+0.0341]), sub_rate FALLS with CI excluding zero (-0.0107 / -0.0115), ins_rate falls but includes zero. Leave-one-window-out does not reverse any del/sub/ins sign; the RUN2 WER delta's sign flips on 13 of 39 windows and is read as flat, never as better. DS-WER v2 entities (primary, 274 occurrences, never decides alone): control 0.5365, RUN1 0.6058, RUN2 0.5657; the same S->D swap appears there (entities S/D 114/26 -> 70/93 -> 90/58). v1: 0.512 / 0.596 / 0.536. READING: both stage-2-containing screens traded substitutions for deletions - the mix built to REDUCE deletions is followed by MORE deletions in both arms, with WER flat, which a pooled-WER-only look would have missed entirely. Neither arm meets the frozen primary criterion (deletion drop without insertion/WER regression), so the control artifact-adapter-fixed keeps the candidate slot. Pipeline-bug check done first and clean: distinct fingerprints, stage2.log records LoRA initialized from trained stage-1 weights (192 nonzero lora_B), identical stage-2 substrate (n_train 42,204 / max_steps 10,552 in both runs), S+D+I reproduce the WERs, no arm near the +2-point bug threshold. EXTERNAL-PACK VERDICT: RUN2 vs RUN1 paired on the same windows shows NO detected difference - every CI includes zero (WER -0.0050 [-0.0195,+0.0090], del -0.0032 [-0.0193,+0.0121], ins -0.0011, sub -0.0008; head2head 19/4/16; the del sign flips on one window). Per the frozen tree BOTH arms advance. 'Not detected' is not 'no effect': RUN2 bundles external stage-1 data + 5,190 extra optimizer updates + a different training GPU (A5000 vs A40), and this design cannot attribute anything among them; the CIs cover meeting-sampling uncertainty for fixed checkpoints, not training-seed uncertainty, which is larger than every delta here. The earlier prereg's point-estimate promotion rule (WER delta < 0 AND del delta <= 0 vs the baseline arm) is technically satisfied by RUN2 vs RUN1, which governs promotion relative to RUN1 only and says nothing about replacing the control. COST: RUN1 ~$6.20 (A40 t6ugwl9f4efu23) + RUN2 $6.74 (24.96h x $0.27, A5000 hwydnokhc60y2f) = ~$12.94 against the $22 ceiling; evaluation cost $0 on local CPU; zero pods alive.",
-   "decision": null,
+   "decision": "Close the external-pack screen for this cycle. The executed RUN2 recipe did not show a detectable improvement over RUN1, and both stage-2-containing arms raised deletions against the control. No confirmation round is authorised while the shared training freeze holds; any future confirmation needs three seeds and matched GPUs.",
    "reports": [
     "docs/reports/2026-08-15-external-sources-probe.md",
     "docs/reports/2026-08-16-screens-eval.md",
@@ -814,7 +815,7 @@
     "cap-runpod-gpu-pod"
    ],
    "superseded_by": null,
-   "next_action": "The zero-GPU look at the deletion-hard supply is DONE 2026-08-16 (exp-2026-08-16-deletion-hard-coverage): neither frozen gate established, training stays closed for this cycle. No further external-pack screen is authorised - the pack question cannot be advanced while the shared stage-2 is regressing deletions, and the stage-2 is not being rebuilt. Any confirmation round after that needs 3 seeds and MATCHED GPUs per the frozen gates in docs/specs/2026-08-15-targeted-deletion-training-prereg.md.",
+   "next_action": null,
    "caveats": [
     "EuroSpeech licence UNRESOLVED: HF card 'other', per-country pointer to Greek copyright law (n.2121/1993) for parliament proceedings - same legal call as HParl before any commercial shipping.",
     "EuroSpeech overlaps hparl2 in domain and possibly in sessions (both Hellenic Parliament): never use both packs without cross-pack dedupe. EuroSpeech solves both HParl defects (fragments at ~3s boundaries, no punctuation), so it likely supersedes hparl2 as the parliament source if its keep rate holds.",
@@ -1250,7 +1251,98 @@
    "next_action": "Finish the two local 247-window decode passes and complete the gate section of the report.",
    "updated_at": "2026-08-16T00:00:00Z",
    "caveats": []
-  }
+  },
+  {
+   "id": "exp-2026-08-16-w-rt-confidence",
+   "title": "Does Soniox per-word confidence beat the plain per-column vote, inside a confidence-carrying substrate?",
+   "question": "Soniox per-word confidence exists only on the free realtime model stt-rt-v4, whose text differs from the cached paid stt-async-v5 text that W is built on. Rebuilding the fusion substrate with the realtime Soniox arm (W-rt), do confidence-informed composition arms beat the plain per-column vote under the frozen gates?",
+   "status": "CLOSED",
+   "conclusion": "NO ARM MET THE PREREGISTERED SUCCESS CRITERIA, and the two arms with the most theoretical room never fired. This was a DEVELOPMENT run by design (sixth pass over the same 247 windows), so no arm could ship on it whatever it scored. | SUBSTRATE: the free path forced a whole parallel substrate. 247/247 windows re-transcribed on stt-rt-v4 with per-token confidence, 0 failures, 0 retries, 2041 s at 18 concurrent free realtime sessions, ZERO COST. 78,425 words -> 79,007 normalized units with ZERO missing timestamps, ZERO missing confidences and ZERO invalid confidences. scribe-v2-clean and oc-runpod-fixed-2026-08-10 byte-identical from cache; W-rt recomposed by the unmodified hierarchical vote. | ARMS (leave-one-city-out, paired meeting-clustered bootstrap 10k, Bonferroni-adjusted 98.333% interval for the family {O,A,M}): W-rt baseline WER 0.09931 (del 0.02050 ins 0.03557 sub 0.04323). Arm O (restore a Soniox-only singleton iff conf >= tau, 3,167 eligible) fitted tau = 1.01 = NEVER FIRE IN ALL TEN FOLDS, 0 firings, dWER exactly 0. Arm M (override a 2-of-3 majority with the Soniox minority, 1,515 eligible) likewise NEVER FIRED in all ten folds. Arm A (asymmetric weighted identity vote on the 1,889-column tie set, Soniox weight = conf, other two systems constant k = 0.5 preregistered) fired 750 times, dWER -0.00035, CI95 [-0.00105,+0.00027] and adjusted CI [-0.00124,+0.00039] BOTH INCLUDE ZERO, and BOTH RATE GATES FAIL narrowly; 5 cities better 5 worse, city sign test p = 1.0; 169 firings match the column oracle against 301 that go against it. | CONTROLS: O-all (fire on everything) cuts the deletion rate ~37% (0.02050 -> 0.01285) but nearly doubles insertions (0.03557 -> 0.07020) for dWER +0.02694 and 210 of 247 windows worse - about 573 fewer deletion errors bought with about 2,594 more insertion errors. M-all gives dWER +0.01281 with substitutions 0.04323 -> 0.05608. | ATTRIBUTION: A met the preregistered permutation criterion, its observed dWER at least as favourable as ALL 200 within-meeting confidence permutations (one-sided Monte Carlo p = 0.00498) - confidence is doing something a shuffle does not, but that is attribution against a shuffle and NOT an established WER benefit. For O and M the permutation null is DEGENERATE (every replicate exactly 0.0, because the procedure declines to fire under any reassignment), so it is uninformative there. The declared k envelope for A CHANGES SIGN (+0.000013 at k=0.3 to -0.00068 at k=0.7, whose CI excludes zero), so the preregistered instability clause fired. | THE VARIANT THAT CAME CLOSEST CANNOT BE USED: O2 (take the Soniox token in unresolved_two columns iff conf >= tau) fitted tau = 0.95 in all ten folds, fired 289 of 811, and is the only arm with a reported interval entirely below zero (exploratory 95% [-0.00051,-0.00006]), with 74 of its firings matching the oracle against 8 opposing. It was placed OUTSIDE the confirmatory family by the preregistration, its interval is 95% exploratory rather than the family's adjusted 98.333%, and both rate gates fail by two tokens each. Not promotable, for reasons written down before it ran. | WHY (POST-HOC DIAGNOSTIC, reporting only, hindsight oracle): for the decision each arm actually makes, confidence's AUROC is 0.587 for M, 0.618 for O, 0.673 for O2 and 0.703 for A, against 0.8167 for the gold-set task of predicting that an EMITTED word is an error. These are NOT directly comparable estimates of degradation - different task, population, labels and exclusions - but the two decisions with the most room (occupancy 3,167 columns, majority override 1,515) are the two where confidence discriminates least, and at 0.618 discrimination with 17.3% prevalence no threshold on the grid pays, which is exactly what ten independent folds concluded unaided. | DESCRIPTIVE, MODEL SWAP ONLY, NOT AN EXPERIMENTAL RESULT: W-rt 0.09931 vs old W 0.10046 on these 247 windows, 0.00115 lower, almost entirely through insertions (0.03743 -> 0.03557). This does NOT establish that stt-rt-v4 is generally non-inferior to stt-async-v5 as a fusion voter, and it points the other way twice: the whole-window vote is 0.12466 vs 0.12012 (worse) and the column oracle 0.04799 vs 0.04748 (the ceiling moved up). The prediction written before the run - that W-rt would be worse - was wrong.",
+   "decision": "No confidence arm ships, and none may be revived without the preregistration's confirmation obligation: a second independently collected W-rt draw under the identical frozen protocol with the frozen rules applied without retuning, plus a sealed evaluation on cities and meetings that contributed to nothing here. The 6 sealed temporal-holdout windows are NOT spent on this and stay sealed. | DO NOT spend the ~$0.82 stt-async-v5 confidence run proposed by exp-2026-08-16-soniox-confidence on the strength of a fusion-arm hypothesis: on the free path the fusion arms failed, and the diagnostic says why (0.59-0.70 AUROC on the decisions that matter, worst where the mass is). That run may still be justified for a different question, but not for this one. | DO NOT quote 0.8167 as if it were the discrimination available to a fusion arm. | The occupancy material IS real (O-all cuts deletions 37%) and remains unreachable by any confidence threshold on this grid - the next lever on deletions is not a per-column confidence gate. | Overriding 2-of-3 majorities has now failed a FOURTH time on this substrate, with a signal the previous three did not have.",
+   "artifact_ids": [
+    "artifact-adapter-fixed",
+    "artifact-soniox-rt-tokens-2026-08-16"
+   ],
+   "capability_ids": [],
+   "reports": [
+    "docs/reports/2026-08-16-w-rt-confidence.md"
+   ],
+   "specs": [
+    "docs/specs/2026-08-16-w-rt-confidence-prereg.md"
+   ],
+   "superseded_by": null,
+   "next_action": null,
+   "updated_at": "2026-08-16T17:30:00Z",
+   "caveats": [
+    "DEVELOPMENT RUN, NOT CONFIRMATORY, by Codex's first correction and stated in the preregistration before anything was built. The arm classes and eligibility rules were chosen by a human who had already seen five reference-informed passes over these same 247 windows. This is the SIXTH pass. Leave-one-city-out prices PARAMETER overfitting only.",
+    "The bootstrap is CONDITIONAL ON THE TEN FITTED THRESHOLDS, with no refitting inside replicates. It is not an interval for a deployable trained arm and does not include threshold-selection variability. O2's threshold coming out identically (0.95) in all ten folds is descriptively reassuring and does not turn its interval into full-pipeline uncertainty. Nested refitting was declined in the prereg with a stated reason.",
+    "The estimand is the finite frozen benchmark plus, weakly, future meetings inside these ten cities. Ten cities are too few for a city-level bootstrap; per-city deltas and an exact paired city sign test are reported instead, both low-powered.",
+    "The deletion and insertion gates are POINT-ESTIMATE OPERATIONAL CONSTRAINTS, not evidence that the population rates are non-inferior.",
+    "W-rt is ONE DRAW of a non-deterministic realtime model (97.8% run-to-run word agreement measured by the probe). The preregistered second-draw confirmation was NOT triggered because no arm passed the gates; it is owed before any arm here is revived.",
+    "stt-rt-v4 confidence is NOT stt-async-v5 confidence and W-rt is NOT W. Nothing here transports to the shipped fusion stack without a paid re-run.",
+    "The AUROC diagnostic is POST-HOC, written after the arms were scored, never a gate, never visible to fit or apply, and read against a HINDSIGHT column oracle. Its four AUROCs are not directly comparable to the gold-set probe's 0.8167.",
+    "Agreement-with-OpenCouncil, not fidelity-to-audio, scored with eval/controlled_eval/scoring.py. Comparable to exp-2026-08-16-composition-over-selection, NOT to the published leaderboard.",
+    "The 6 sealed temporal-holdout windows of eval-freeze-2026-08 were removed by the same explicit filter before anything was computed and were never transcribed, aligned or scored.",
+    "One disclosed acquisition deviation: concurrency was ramped 12 -> 18 after a 12-window pilot returned 12/12 clean. Those 12 windows are kept under the first-protocol-valid-success retention rule.",
+    "soniox-tools at /home/harold/projects/soniox-tools is NOT a git repository, so the on_token / --json tooling this depends on has no commit or revision to cite.",
+    "Two Codex passes at high effort, each before the thing it governed. Job b71f2dca0cad451db62cfb8f65e9d08e on the PREREGISTRATION reclassified the run as development, required the ungated O-all/M-all controls and the permutation attribution criterion (without which a tau=0 win would have been mislabelled a confidence result), forced the estimand statement and city sign test, replaced the intersection stop rule with all-or-nothing, banned transferring old-W census facts to W-rt, disambiguated O2, KILLED THE FALSE ARGUMENT that an added wrong token is an insertion by construction, and supplied the acceptance-test list. Job 3b441ec3b47b48dbbaf49caa0ce1ed84 on the FINDINGS rejected six of seven candidate sentences and caught a factual error (M at 0.587, not O at 0.618, is the weakest AUROC).",
+    "ZERO GPU, ZERO PAID API. 34 minutes of wall clock for 9.6 audio hours on a free Perplexity temp key."
+   ]
+  },
+  {
+    "id": "exp-2026-08-16-tse-overlap",
+   "title": "Target-speaker extraction over simultaneous speech",
+   "question": "Can target-speaker extraction improve the corrected adapter's transcription of real overlap, or at least produce useful isolated tracks for human review, under a preregistered CPU-only screen?",
+    "status": "CLOSED",
+    "conclusion": "The WeSep BSRNN/ECAPA checkpoint passed all four preregistered Stage 1 gates on the frozen additive-mixture screen: TSE WER 0.2934 (142/484 errors) versus MIX_NORM 0.6384 (309/484), with positive leave-one-meeting-out gains, G2 targeting contrast -0.4762, clean safety cost +0.0124, deletion harm -0.0868, and top-item share 0.0838. The required Stage 2 audit then found only 1/6 participating speakers enrollable across three real-overlap cases; the sole TSE.B track tied MIX_NORM at 2/22 errors and recovered zero missing reference words. The experiment is closed as a positive synthetic mechanism screen but an inconclusive, non-deployable real-overlap result.",
+    "decision": "Do not promote TSE to serving or spend GPU/API budget. Keep artifact-wesep-bsrnn-ecapa-vox1 as historical evidence only. A future natural-overlap study would need preregistered enrollment coverage and reverberant Greek data; do not rerun this screen or add a second architecture under this record.",
+    "artifact_ids": [
+      "artifact-adapter-fixed",
+      "artifact-ct2-fixed",
+      "artifact-wesep-bsrnn-ecapa-vox1",
+      "artifact-tse-overlap-stage1-results-2026-08-16",
+      "artifact-tse-overlap-stage2-results-2026-08-16"
+    ],
+   "capability_ids": [],
+    "reports": [
+      "docs/reports/2026-08-16-tse-overlap.md"
+    ],
+   "specs": [
+    "docs/specs/2026-08-16-tse-overlap-prereg.md"
+   ],
+   "superseded_by": null,
+    "next_action": null,
+    "updated_at": "2026-08-16T19:56:51Z",
+   "caveats": [
+    "The gold overlap substrate has approximately 23 certain reference tokens after mandatory uncertainty masking, so Stage 2 is a case-level failure-mode audit and cannot support an aggregate WER, delta or bootstrap interval.",
+    "Stage 1 uses favourable additive mixtures of council clips and oracle-clean enrollment; a pass does not establish transfer to natural reverberant overlap.",
+      "The WeSep checkpoint is a single English, anechoic, noise-free VoxCeleb model; Stage 1 transfer to additive Greek council mixtures passed, but natural reverberant overlap transfer remains unverified.",
+      "Stage 2 had 1/6 participating speakers with >=3 seconds of same-cell certain non-overlap enrollment, so it cannot establish a real-overlap aggregate effect.",
+    "All audio, extracted tracks and transcript text stay under ~/.cache/oc-public/tse-2026-08/ and never enter git."
+   ]
+  },
+ {
+  "id": "exp-2026-08-16-open-task-resources",
+  "title": "External resources for the open ASR tasks",
+  "question": "Which current primary sources, official documentation, and reproducible open-source implementations can change decisions on name-repair deployment, confidence, overlap handling, and leakage-safe fidelity evaluation?",
+  "status": "OPEN",
+  "conclusion": "A resource index was assembled from primary papers, official source repositories, and documentation for map tickets #6, #7, #13, and #25. The MacBook wayfinder and grok-research skills were copied into ~/.codex/skills. The MacBook Grok browser passed doctor but four research calls plus one tighter retry timed out at the composer; no Grok answer was used as evidence. The fallback primary-source index is available in docs/reference/external-resources/2026-08-16-open-task-resources.md.",
+  "decision": null,
+  "artifact_ids": [],
+  "capability_ids": [],
+  "reports": [
+   "docs/reference/external-resources/2026-08-16-open-task-resources.md"
+  ],
+  "specs": [],
+  "superseded_by": null,
+  "next_action": "Keep GitHub issue #26 open. When the MacBook Grok composer is healthy, rerun the grok-research loop, reconcile its citations against the primary-source index, and then graduate only the resulting concrete decisions into new Wayfinder tickets.",
+  "updated_at": "2026-08-16T20:15:01Z",
+  "caveats": [
+   "The index is a research aid, not a project conclusion; local ledger records and preregistered reports remain authoritative.",
+   "External claims about English, LibriCSS, or generic Whisper behavior do not transfer to Greek far-field council audio without same-stack evidence.",
+   "No sealed benchmark windows, audio/transcript text, GPU spend, or paid API calls were used for this resource pass."
+  ]
+ }
  ],
  "artifacts": [
   {
@@ -1707,6 +1799,103 @@
    ],
    "replaced_by": null,
    "verified_at": "2026-08-15T10:30:00Z"
+  },
+  {
+    "id": "artifact-wesep-bsrnn-ecapa-vox1",
+    "kind": "speech_separator_checkpoint",
+    "description": "WeSep BSRNN/ECAPA target-speaker extraction checkpoint used by exp-2026-08-16-tse-overlap.",
+    "status": "HISTORICAL",
+    "locations": [
+      {
+        "host": "minipc",
+        "path": "/home/harold/.wesep/english/avg_model.pt"
+      }
+    ],
+    "hash": {
+      "algorithm": "sha256-file-v1",
+      "file": "avg_model.pt",
+      "value": "3d050217e1ab31b7cf25835f35d1969b415bb95f2ac52e2c5e2a743ebd8f90e5"
+    },
+    "produced_by": null,
+    "replaced_by": null,
+    "verified_at": "2026-08-16T19:56:51Z",
+    "caveats": [
+      "Single released English VoxCeleb checkpoint from WeSep source commit 99eca54b; its training configuration has reverb_prob=0 and noise_prob=0.",
+      "The source archive bsrnn_ecapa_vox1.tar.gz has SHA-256 a129b8247e47a2a2fe7407768c69a55c0f97433ba1016c943e9afa1ad2414ffb.",
+      "Used CPU-only in the preregistered synthetic mechanism screen and three-case real-overlap audit; not validated for production serving."
+    ]
+  },
+  {
+    "id": "artifact-tse-overlap-stage1-results-2026-08-16",
+    "kind": "evaluation_result",
+    "description": "Frozen Stage 1 result for exp-2026-08-16-tse-overlap: 37 additive-mixture items, 0 dB primary gates, and +5 dB descriptive arm.",
+    "status": "HISTORICAL",
+    "locations": [
+      {
+        "host": "repo",
+        "path": "/home/harold/opencouncil-fine-tuning/eval/results_tse_overlap.json"
+      }
+    ],
+    "hash": {
+      "algorithm": "sha256-file-v1",
+      "file": "results_tse_overlap.json",
+      "value": "93ce7ea391fd666af25fd88b7de89daa8bfa650f80207e8846b2c5a7732bb6ca"
+    },
+    "produced_by": "exp-2026-08-16-tse-overlap",
+    "replaced_by": null,
+    "verified_at": "2026-08-16T19:56:51Z",
+    "caveats": [
+      "Fidelity-to-audio on a favourable additive-mixture mechanism screen; not a natural-overlap or benchmark result.",
+      "No transcript text or audio is stored in this result file."
+    ]
+  },
+  {
+    "id": "artifact-tse-overlap-stage2-results-2026-08-16",
+    "kind": "evaluation_result",
+    "description": "Frozen Stage 2 case-level result for exp-2026-08-16-tse-overlap: three real-overlap cases with no aggregate metric.",
+    "status": "HISTORICAL",
+    "locations": [
+      {
+        "host": "repo",
+        "path": "/home/harold/opencouncil-fine-tuning/eval/results_tse_overlap_stage2.json"
+      }
+    ],
+    "hash": {
+      "algorithm": "sha256-file-v1",
+      "file": "results_tse_overlap_stage2.json",
+      "value": "2c529c2c4551b032330156f02c38bac89405d3095cf1384d18820c4147cc1be6"
+    },
+    "produced_by": "exp-2026-08-16-tse-overlap",
+    "replaced_by": null,
+    "verified_at": "2026-08-16T19:56:51Z",
+    "caveats": [
+      "Case-level failure-mode audit only: 24 duration-weighted reference-token estimate and 1/6 speaker enrollment coverage; no aggregate WER, delta, or bootstrap.",
+      "No transcript text or audio is stored in this result file."
+    ]
+  },
+  {
+    "id": "artifact-soniox-rt-tokens-2026-08-16",
+   "kind": "asr_output_cache",
+   "description": "Per-token Soniox output (text, confidence, start_ms, end_ms, is_final) for all 247 scored benchmark windows of run 2026-08-10-corrected-adapter-label-prefix-fix-vs-ju, produced on the FREE realtime model stt-rt-v4. This is NOT the cached stt-async-v5 text that W is built on: different model, different text. It is the Soniox arm of the parallel W-rt substrate.",
+   "status": "ACTIVE",
+   "locations": [
+    {
+     "host": "minipc",
+     "path": "/home/harold/.cache/oc-public/composition-rt-2026-08/soniox-tokens"
+    }
+   ],
+   "hash": {
+    "algorithm": "sha256-of-per-file-sha256-manifest",
+    "value": "8bd5debdb04e1cb95a9d75f574278752c10b278cc21c3541ee6249a7c7fd1964"
+   },
+   "caveats": [
+    "Never in git: verbatim council speech, same PII category as the 2026-07-21 purge.",
+    "stt-rt-v4, NOT stt-async-v5. Its text is not interchangeable with the cached soniox provider text of the benchmark report, and confidences from it must never be grafted onto that text.",
+    "Realtime Soniox is not deterministic (97.8% run-to-run word agreement measured by exp-2026-08-16-soniox-confidence). This cache is ONE DRAW and is not exactly reproducible.",
+    "Acquisition protocol frozen in scripts/run_soniox_rt_bench.py: 24 kHz pcm_s16le, 100 ms frames at ~1x, endpoint_detection off, lang el, silence trimming OFF, first protocol-valid success retained. 247/247 windows, 0 failures, 0 retries, 2041 s at 18 concurrent sessions; the first 12 windows ran at concurrency 12 as a pilot.",
+    "Zero cost: free Perplexity temp key on the realtime WebSocket path."
+   ],
+   "verified_at": "2026-08-16T17:00:00Z"
   }
  ],
  "capabilities": [

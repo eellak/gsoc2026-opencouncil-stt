@@ -1,0 +1,127 @@
+{
+ "protocol": "tse-overlap-2026-08-16",
+ "stage": 2,
+ "n_cases": 3,
+ "n_meetings": 2,
+ "ref_tokens": 24,
+ "enrollment_coverage": [
+  1,
+  6
+ ],
+ "note": "case-level failure-mode audit; no aggregate WER, delta or bootstrap is computed from this substrate, by preregistration",
+ "extraction_failures": [],
+ "cases": [
+  {
+   "case": "gc_samothraki_jul6_2026_715000__g0",
+   "meeting": "jul6_2026",
+   "n_ref": 37,
+   "enrollment": {
+    "B": 0.0,
+    "C": 0.0
+   },
+   "unenrollable": [
+    "B",
+    "C"
+   ],
+   "arms": {
+    "BASELINE": {
+     "S": 12,
+     "D": 5,
+     "I": 0,
+     "M": 20,
+     "N": 37,
+     "err": 17,
+     "n_hyp": 32
+    },
+    "MIX_NORM": {
+     "S": 7,
+     "D": 7,
+     "I": 2,
+     "M": 23,
+     "N": 37,
+     "err": 16,
+     "n_hyp": 32
+    }
+   },
+   "failures": []
+  },
+  {
+   "case": "gc_xylokastro_jun29_2026_3250000__g0",
+   "meeting": "jun29_2026",
+   "n_ref": 22,
+   "enrollment": {
+    "A": 0.0,
+    "B": 8.66
+   },
+   "unenrollable": [
+    "A"
+   ],
+   "arms": {
+    "BASELINE": {
+     "S": 1,
+     "D": 0,
+     "I": 2,
+     "M": 21,
+     "N": 22,
+     "err": 3,
+     "n_hyp": 24
+    },
+    "MIX_NORM": {
+     "S": 1,
+     "D": 0,
+     "I": 1,
+     "M": 21,
+     "N": 22,
+     "err": 2,
+     "n_hyp": 23
+    },
+    "TSE.B": {
+     "S": 1,
+     "D": 0,
+     "I": 1,
+     "M": 21,
+     "N": 22,
+     "err": 2,
+     "n_hyp": 23,
+     "new_words": 1,
+     "new_words_in_reference": 0
+    }
+   },
+   "failures": []
+  },
+  {
+   "case": "gc_xylokastro_jun29_2026_4210000__g0",
+   "meeting": "jun29_2026",
+   "n_ref": 15,
+   "enrollment": {
+    "A": 0.0,
+    "B": 0.0
+   },
+   "unenrollable": [
+    "A",
+    "B"
+   ],
+   "arms": {
+    "BASELINE": {
+     "S": 1,
+     "D": 4,
+     "I": 0,
+     "M": 10,
+     "N": 15,
+     "err": 5,
+     "n_hyp": 11
+    },
+    "MIX_NORM": {
+     "S": 0,
+     "D": 4,
+     "I": 0,
+     "M": 11,
+     "N": 15,
+     "err": 4,
+     "n_hyp": 11
+    }
+   },
+   "failures": []
+  }
+ ]
+}

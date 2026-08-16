@@ -8,8 +8,9 @@ are closed, 2026-08-12. Read
 [`docs/reports/2026-08-20-final-report.md`](docs/reports/2026-08-20-final-report.md)
 first — it is the answer to the project's question, with its limits.
 
-What is left is the queue below: one experiment (name lexicon) and one gap
-(fidelity-to-audio). The publish decision was carried out on 2026-08-16.
+What is left is the queue below: the name-lexicon deployment, one unresolved
+fidelity gap, the unfinished local adapter-confidence screen, and the external
+resource research ticket. The publish decision was carried out on 2026-08-16.
 
 Canonical research state: [`research/ledger.json`](research/ledger.json).
 Agent protocol: [`CLAUDE.md`](CLAUDE.md).
@@ -46,8 +47,8 @@ trained through the label-prefix bug and cannot answer it.
 1. Publish `artifact-adapter-fixed` to HuggingFace — **done 2026-08-16**, commit
    `e214de71` at `opencouncil/whisper-large-v3-el-council-lora`. The hub weights are
    the corrected ones.
-1b. `exp-2026-08-13-targeted-deletion-training` — OPEN, **its first screen came
-   back negative, 2026-08-16**: the deletion-targeted mix *raised* the deletion
+1b. `exp-2026-08-13-targeted-deletion-training` — **CLOSED 2026-08-16** after
+   its first screen came back negative: the deletion-targeted mix *raised* the deletion
    rate (0.0600 → 0.0788 per reference token, CI excludes zero) while lowering
    substitutions, with WER flat, and the external-pack stage-1 of
    `exp-2026-08-14-external-packs` (RUN 2) changed nothing detectable on top of
@@ -106,6 +107,19 @@ trained through the label-prefix bug and cannot answer it.
    credential in this environment — so the question the gold set was built for
    ("are the words the fusion recovers real?") is answered only for the candidate
    pool, not for W. Getting a Scribe v2 key is the unblocking step.
+4. `exp-2026-08-16-tse-overlap` — **CLOSED 2026-08-16**. All four synthetic
+   mechanism gates passed, but the real-overlap audit had only 1/6 enrollable
+   speakers and showed no recovered reference word. TSE is not a serving candidate.
+   [`docs/reports/2026-08-16-tse-overlap.md`](docs/reports/2026-08-16-tse-overlap.md).
+5. `exp-2026-08-16-adapter-confidence` — **OPEN, local decode unfinished**. The
+   two 247-window passes with and without word timestamps are still running under
+   the Claude watchdog; do not quote a gate result until both finish and the report
+   is completed. [`docs/reports/2026-08-16-adapter-confidence.md`](docs/reports/2026-08-16-adapter-confidence.md).
+6. `exp-2026-08-16-open-task-resources` — **OPEN, research index started**. The
+   primary-source resource index is at
+   [`docs/reference/external-resources/2026-08-16-open-task-resources.md`](docs/reference/external-resources/2026-08-16-open-task-resources.md).
+   Re-run the MacBook Grok loop when its composer is healthy, reconcile citations,
+   then graduate only concrete decisions into Wayfinder tickets.
 
 ## Product decision: answered 2026-08-12 — transcripts are **clean**
 
@@ -144,6 +158,22 @@ have released them.
 
 ## Recently changed
 
+- `exp-2026-08-16-w-rt-confidence` closed: **no confidence arm met its criteria, and
+  the two with the most room never fired.** The free realtime path re-transcribed all
+  247 windows with per-token confidence in 34 minutes at zero cost, which forced a
+  parallel substrate (**W-rt**, `stt-rt-v4` in place of the cached paid `stt-async-v5`)
+  because Soniox is one of W's three voters. Inside it, the occupancy arm and the
+  majority-override arm both fitted "never fire" in **all ten** leave-one-city-out
+  folds; the asymmetric weighted vote moved WER by −0.00035 with both intervals
+  including zero and both rate gates failing. The ungated control says the occupancy
+  material is real and unreachable: firing on everything cuts deletions 37% and nearly
+  doubles insertions. Post-hoc, confidence's AUROC on the decisions a fusion arm
+  actually makes is **0.587–0.703**, against 0.8167 on the gold-set error-detection
+  task — weakest where the mass is. Descriptive only: W-rt scores 0.09931 against old
+  W's 0.10046 on these windows, which is a **model swap, not a result**. Consequence:
+  the ~$0.82 `stt-async-v5` run proposed the same morning is **not** justified by the
+  fusion-arm hypothesis.
+  [`docs/reports/2026-08-16-w-rt-confidence.md`](docs/reports/2026-08-16-w-rt-confidence.md).
 - `exp-2026-08-16-overlap-speaker-arms` closed: **one negative that must not be
   overstated, and one positive.** The inside-overlap speaker advantage of
   `exp-2026-08-16-pyannote-transcription` (−0.00558 on top of whole-window selection)
