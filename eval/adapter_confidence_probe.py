@@ -561,13 +561,32 @@ def gate_and_247():
             return cached_local.get(wid, {}).get("text")
         return have[src]["windows"].get(wid, {}).get("text")
 
-    def contrast(a, b, ids):
+    def toks_of(src, wid, segment_aware):
+        """Token sequence for one window.
+
+        The stored `text` is `"".join(segment.text)`, and faster-whisper does NOT always
+        put a leading space on a segment: 505 of 1,677 segment boundaries here do not
+        have one, so the joined string FUSES the last word of a segment with the first
+        word of the next. `word_timestamps` moves segment boundaries, so scoring the
+        joined string charges the gate for fusions that are an artifact of the join.
+        Where segments are available the tokens are built per segment instead. The two
+        cached sources (the GPU benchmark text and the arm-A local control) store only
+        the joined string, so contrasts against them stay on it, and say so.
+        """
+        if segment_aware and src in have:
+            w = have[src]["windows"].get(wid)
+            return None if w is None else [t for s in w["segments"]
+                                           for t in wtoks(s["text"])]
+        t = text_of(src, wid)
+        return None if t is None else wtoks(t)
+
+    def contrast(a, b, ids, segment_aware=True):
         rows = []
         for wid in ids:
-            ta, tb = text_of(a, wid), text_of(b, wid)
-            if ta is None or tb is None:
+            na, nb = toks_of(a, wid, segment_aware), toks_of(b, wid, segment_aware)
+            if na is None or nb is None:
                 continue
-            na, nb = wtoks(ta), wtoks(tb)
+            ta, tb = text_of(a, wid), text_of(b, wid)
             rows.append({"wid": wid, "raw_exact": ta == tb, "norm_exact": na == nb,
                          "n_a": len(na), "n_b": len(nb), "e": edist(na, nb)})
         if not rows:
@@ -599,14 +618,54 @@ def gate_and_247():
         "construction": ("substrate-order head decoded before the amendment "
                          "(city-clustered) + seeded random sample of the remainder"),
     }
+    # The 23:45 stop was not enforced (the watchdog died with the session) and the
+    # realized set overran it. What CANNOT have been affected: the 9 windows already
+    # decoded in both passes before the 20:05 amendment. They are in the deadline set
+    # by construction, whatever the deadline was. If they already fail the conjunction,
+    # the overrun cannot have created the gate failure.
+    pre = [it["item_id"] for it in substrate()][:9]
+    if all(w in ids for w in pre):
+        pre_same = [w for w in pre
+                    if toks_of("wt_false", w, True) == toks_of("wt_true", w, True)]
+        out["analysis_set"]["pre_amendment_head"] = {
+            "n": len(pre), "cities": sorted({items[w]["city_id"] for w in pre}),
+            "n_normalized_identical": len(pre_same),
+            "note": ("decoded in substrate order before the 20:05 amendment, so inside "
+                     "the 23:45 deadline set regardless of when decoding stopped"),
+        }
     overlap = [w for w in ids if w in cached_local]
+    # Same config, different run: how much of the gate difference could be run-to-run
+    # nondeterminism rather than `word_timestamps`? Only comparable on the SAME windows.
+    out["rerun_noise_vs_gate_same_windows"] = {
+        "n": len(overlap),
+        "rerun_same_config": contrast("local_cpu_wt_false_armA", "wt_false", overlap,
+                                      segment_aware=False),
+        "gate_wtF_vs_wtT": contrast("wt_false", "wt_true", overlap,
+                                    segment_aware=False),
+        "note": ("the cached arm-A local control and this pass share every decode "
+                 "argument and the per-window seed; any difference is run-to-run "
+                 "nondeterminism (thread count was not recorded for arm A). arm A "
+                 "stores only the joined string, so BOTH rows here are scored on the "
+                 "joined string - matched, and comparable only to each other."),
+    }
+    # The two cached-GPU contrasts are TOKENIZED FROM DIFFERENT SOURCES: the local side
+    # per segment (correct), the benchmark side from its stored string (the only form
+    # it exists in, and the form every other experiment scores it in). Both variants are
+    # reported rather than one being chosen, because neither is unambiguously right.
     out["contrasts"] = {
         "stack__cachedGPU_wtF_vs_localCPU_wtF": contrast("cached_gpu", "wt_false", ids),
+        "stack__both_sides_on_the_stored_string": contrast("cached_gpu", "wt_false",
+                                                           ids, segment_aware=False),
         "gate__localCPU_wtF_vs_localCPU_wtT": contrast("wt_false", "wt_true", ids),
         "endtoend__cachedGPU_wtF_vs_localCPU_wtT": contrast("cached_gpu", "wt_true",
                                                             ids),
+        "endtoend__both_sides_on_the_stored_string": contrast("cached_gpu", "wt_true",
+                                                              ids, segment_aware=False),
+        "gate_on_the_joined_string__superseded_by_the_segment_aware_row": contrast(
+            "wt_false", "wt_true", ids, segment_aware=False),
         "reproducibility__localCPU_wtF_vs_armA": (
-            contrast("local_cpu_wt_false_armA", "wt_false", overlap)),
+            contrast("local_cpu_wt_false_armA", "wt_false", overlap,
+                     segment_aware=False)),
         "n_overlap_windows_with_cached_local_control": len(overlap),
     }
     g = out["contrasts"]["gate__localCPU_wtF_vs_localCPU_wtT"]
@@ -619,6 +678,9 @@ def gate_and_247():
         "note": ("if this is false, the confidences belong to THIS re-run and cannot "
                  "be attached to the frozen fusion input W"),
     }
+
+    if ids and "wt_true" in have and "wt_false" in have:
+        out["gate_anatomy"] = gate_anatomy(have, items, ids)
 
     # descriptive arm: agreement-with-OpenCouncil, never merged with the gold set.
     # Runs on the same analysis set as the gate, so the two are comparable.
@@ -662,6 +724,181 @@ def gate_and_247():
         # ftoks (filler-stripped) is the benchmark's own normalizer; note the deviation
         out["descriptive_247"]["normalizer"] = "eval_freeze.ftoks (filler-stripped)"
     return out
+
+
+def gate_anatomy(have, items, ids):
+    """What the `word_timestamps` difference IS, once the gate has already failed.
+
+    Everything here is fixed BEFORE it was run, on 2026-08-17, and none of it is a
+    threshold that anything is promoted on:
+
+      * tokenizer          `eval_freeze.ftoks`, the benchmark's own normalizer, on both
+                           sides; the `wtoks` identity rates in `contrasts` stay as they
+                           are and are reported next to these.
+      * diff typing        `exp_same_stack.sdi(ref=wt_false, hyp=wt_true)`. D = a word
+                           the wt=F pass emitted and the wt=T pass did not; I = a word
+                           only wt=T emitted; S = a word that changed.
+      * reference profile  `sdi(ftoks(ref), ftoks(text))` per pass per window, pooled
+                           over the analysis set, denominator = reference tokens.
+      * paired CI          2,000 bootstrap resamples of the MEETINGS in the analysis
+                           set, seed 21. Descriptive.
+      * per-window bins    [0], (0, .02], (.02, .05], (.05, .10], (.10, .20], (.20, 1].
+      * concentration      share of the total F-vs-T edit distance contributed by the
+                           10% most-changed windows.
+    """
+    import numpy as np
+
+    from eval.controlled_eval.eval_freeze import ftoks
+    from eval.controlled_eval.exp_same_stack import sdi
+    from eval.controlled_eval.scoring import edist
+
+    BIN_EDGES = [0.0, 0.02, 0.05, 0.10, 0.20, 1.01]
+
+    def segtoks(w):
+        """Per SEGMENT, never off the joined string - see `toks_of`. `word_timestamps`
+        moves segment boundaries, and 505 of 1,677 boundaries have no leading space, so
+        the joined string fuses words across exactly the boundaries under test."""
+        return [t for s in w["segments"] for t in ftoks(s["text"])]
+
+    rows = []
+    for wid in ids:
+        it = items[wid]
+        wf = have["wt_false"]["windows"][wid]
+        wt = have["wt_true"]["windows"][wid]
+        ref = ftoks(it["ref"])
+        a, b = segtoks(wf), segtoks(wt)
+        s_ft, d_ft, i_ft = sdi(a, b)
+        sf, df, if_ = sdi(ref, a)
+        st, dt, it_ = sdi(ref, b)
+        rows.append({
+            "wid": wid, "meeting": it["meeting_id"], "city": it["city_id"],
+            "n_ref": len(ref), "n_a": len(a), "n_b": len(b),
+            "ft_S": s_ft, "ft_D": d_ft, "ft_I": i_ft, "ft_e": edist(a, b),
+            "raw_exact": wf["text"] == wt["text"],
+            "ftok_exact": a == b,
+            "segs_false": wf["n_segments"], "segs_true": wt["n_segments"],
+            "F": {"S": sf, "D": df, "I": if_}, "T": {"S": st, "D": dt, "I": it_},
+        })
+
+    n_ref = sum(r["n_ref"] for r in rows)
+    n_a = sum(r["n_a"] for r in rows)
+
+    def prof(k):
+        S = sum(r[k]["S"] for r in rows)
+        D = sum(r[k]["D"] for r in rows)
+        I = sum(r[k]["I"] for r in rows)
+        return {"S": S, "D": D, "I": I, "n_ref_tokens": n_ref,
+                "n_hyp_tokens": n_ref - D + I,
+                "wer": (S + D + I) / n_ref, "deletion_rate": D / n_ref,
+                "insertion_rate": I / n_ref, "substitution_rate": S / n_ref}
+
+    def boot_paired(fn):
+        """Paired per-window quantity, resampled by meeting. Ratio-of-sums estimator."""
+        by = defaultdict(list)
+        for r in rows:
+            by[r["meeting"]].append(r)
+        keys = sorted(by)
+        rng = np.random.default_rng(SEED)
+        obs = fn(rows)
+        vals = []
+        for _ in range(N_BOOT):
+            pick = rng.integers(0, len(keys), len(keys))
+            samp = [r for k in pick for r in by[keys[k]]]
+            vals.append(fn(samp))
+        v = np.array(vals, dtype=float)
+        return {"estimate": obs,
+                "ci95_meeting_cluster_descriptive": [float(np.percentile(v, 2.5)),
+                                                     float(np.percentile(v, 97.5))],
+                "n_clusters": len(keys), "n_boot": len(vals)}
+
+    def _rate(rs, arm, op):
+        den = sum(r["n_ref"] for r in rs)
+        return sum(r[arm][op] for r in rs) / den if den else float("nan")
+
+    delta = {op: boot_paired(lambda rs, o=op: _rate(rs, "T", o) - _rate(rs, "F", o))
+             for op in ("S", "D", "I")}
+    delta["WER"] = boot_paired(
+        lambda rs: sum(sum(r["T"].values()) for r in rs) / sum(r["n_ref"] for r in rs)
+        - sum(sum(r["F"].values()) for r in rs) / sum(r["n_ref"] for r in rs))
+
+    per_window = sorted(r["ft_e"] / r["n_a"] for r in rows if r["n_a"])
+    # the exact-zero bin is its own bin; the rest are half-open (lo, hi]
+    hist = [{"label": "exactly 0", "lo": 0.0, "hi": 0.0,
+             "n": sum(1 for x in per_window if x == 0)}]
+    # the top bin is unbounded: e / n_a can exceed 1 when the wt=True pass emits far
+    # more tokens. Nothing here does, so this changes no count - it stops the partition
+    # from silently dropping a window if one ever did.
+    edges = BIN_EDGES[:-1] + [float("inf")]
+    for lo, hi in zip(edges, edges[1:]):
+        hist.append({"label": f"({lo}, {hi}]", "lo": lo, "hi": hi,
+                     "n": sum(1 for x in per_window if lo < x <= hi)})
+    assert sum(h["n"] for h in hist) == len(per_window)
+
+    tot_e = sum(r["ft_e"] for r in rows)
+    top = sorted(rows, key=lambda r: -r["ft_e"])[:max(1, len(rows) // 10)]
+    seg_delta = [r["segs_true"] - r["segs_false"] for r in rows]
+
+    return {
+        "frozen_before_running": ("tokenizer ftoks; diff typed by sdi(wt_false, "
+                                 "wt_true); bins [0],(0,.02],(.02,.05],(.05,.10],"
+                                 "(.10,.20],(.20,1]; 2000 meeting-cluster resamples, "
+                                 "seed 21; fixed 2026-08-17 before any of it was run"),
+        "n_windows": len(rows), "n_meetings": len({r["meeting"] for r in rows}),
+        "identity": {
+            "raw_identical": sum(r["raw_exact"] for r in rows),
+            "ftok_identical": sum(r["ftok_exact"] for r in rows),
+            "differ_only_in_punctuation_or_spacing": sum(
+                1 for r in rows if not r["raw_exact"] and r["ftok_exact"]),
+        },
+        "wt_false_vs_wt_true_ops": {
+            "S": sum(r["ft_S"] for r in rows), "D": sum(r["ft_D"] for r in rows),
+            "I": sum(r["ft_I"] for r in rows),
+            "denominator_wt_false_tokens": n_a,
+            "pooled_wer_denominator_wt_false": tot_e / n_a if n_a else None,
+            "note": ("D = a token the wt=False pass emitted and the wt=True pass did "
+                     "not; I = a token only wt=True emitted"),
+        },
+        "reference_anchored": {
+            "metric": "agreement-with-OpenCouncil (ftoks on both sides)",
+            "wt_false": prof("F"), "wt_true": prof("T"),
+            "paired_delta_true_minus_false": delta,
+        },
+        "reconciliation_with_the_descriptive_arm": {
+            "note": ("the descriptive 247-window arm builds its rows from the per-word "
+                     "output; this block aligns whole segment texts. They must agree "
+                     "token for token, and error for error, or one of them is wrong."),
+            "wt_true_hyp_tokens_here": n_ref - sum(r["T"]["D"] for r in rows)
+                                       + sum(r["T"]["I"] for r in rows),
+            "wt_true_S_plus_I_here": sum(r["T"]["S"] + r["T"]["I"] for r in rows),
+        },
+        "per_window_deletion_delta": {
+            "note": ("per-window (D_true - D_false). A near-zero pooled delta can hide "
+                     "large per-window swings that cancel."),
+            "sum": sum(r["T"]["D"] - r["F"]["D"] for r in rows),
+            "n_windows_nonzero": sum(1 for r in rows if r["T"]["D"] != r["F"]["D"]),
+            "n_windows_abs_ge_10": sum(
+                1 for r in rows if abs(r["T"]["D"] - r["F"]["D"]) >= 10),
+            "sum_abs": sum(abs(r["T"]["D"] - r["F"]["D"]) for r in rows),
+            "min": min(r["T"]["D"] - r["F"]["D"] for r in rows),
+            "max": max(r["T"]["D"] - r["F"]["D"] for r in rows),
+        },
+        "per_window_change": {
+            "bins": hist,
+            "min": per_window[0], "p25": per_window[len(per_window) // 4],
+            "p50": per_window[len(per_window) // 2],
+            "p75": per_window[3 * len(per_window) // 4], "max": per_window[-1],
+            "top_decile_share_of_total_edits": (
+                sum(r["ft_e"] for r in top) / tot_e) if tot_e else None,
+            "n_windows_in_top_decile": len(top),
+        },
+        "segmentation": {
+            "n_windows_with_different_segment_count": sum(1 for x in seg_delta if x),
+            "mean_segment_delta_true_minus_false": sum(seg_delta) / len(seg_delta),
+            "range": [min(seg_delta), max(seg_delta)],
+            "n_more_segments_under_wt_true": sum(1 for x in seg_delta if x > 0),
+            "n_fewer_segments_under_wt_true": sum(1 for x in seg_delta if x < 0),
+        },
+    }
 
 
 def _op_subset(units, op):

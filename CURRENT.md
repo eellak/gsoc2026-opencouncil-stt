@@ -9,8 +9,8 @@ are closed, 2026-08-12. Read
 first — it is the answer to the project's question, with its limits.
 
 What is left is the queue below: the name-lexicon deployment, one unresolved
-fidelity gap, the unfinished local adapter-confidence screen, and the external
-resource research ticket. The publish decision was carried out on 2026-08-16.
+fidelity gap, and the external resource research ticket. The publish decision was
+carried out on 2026-08-16. The adapter-confidence screen closed on 2026-08-17.
 
 Canonical research state: [`research/ledger.json`](research/ledger.json).
 Agent protocol: [`CLAUDE.md`](CLAUDE.md).
@@ -111,10 +111,29 @@ trained through the label-prefix bug and cannot answer it.
    mechanism gates passed, but the real-overlap audit had only 1/6 enrollable
    speakers and showed no recovered reference word. TSE is not a serving candidate.
    [`docs/reports/2026-08-16-tse-overlap.md`](docs/reports/2026-08-16-tse-overlap.md).
-5. `exp-2026-08-16-adapter-confidence` — **OPEN, local decode unfinished**. The
-   two 247-window passes with and without word timestamps are still running under
-   the Claude watchdog; do not quote a gate result until both finish and the report
-   is completed. [`docs/reports/2026-08-16-adapter-confidence.md`](docs/reports/2026-08-16-adapter-confidence.md).
+5. `exp-2026-08-16-adapter-confidence` — **CLOSED 2026-08-17**. Our own per-word
+   probability predicts our own errors: mean within-meeting AUROC **0.8151** on the
+   gold set (permutation null 0.4999, p = 0.0005; LOO 0.800–0.837; dropping the
+   error-dominant meeting raises it to 0.820), and it is **not the same signal** as
+   Soniox's — the errors co-occur strongly (56 against 21.0 expected) while the
+   bottom-decile flags overlap at 8 against 8.54, i.e. chance. **No combination gain
+   is established** (4/6 meetings positive, both CIs include zero), and 41.1% of our
+   edit operations are deletions, so confidence reaches only 58.9% of our damage
+   against Soniox's 77.2%. `exp(avg_logprob)` is not a substitute (0.611, worse in
+   all six meetings). **The gate failed**: asking for word timestamps changes the
+   transcript in 101 of 102 paired windows at a pooled 7.7%, so these confidences
+   belong to their own decode and **cannot be attached to the frozen fusion input W**.
+   The near-zero deletion delta is cancellation — 82 of 102 windows move, absolute
+   values summing to 613 against a net −5, with whole passages appearing and
+   disappearing. Read alongside the `exp-2026-08-16-w-rt-confidence` negative below:
+   **no downstream fusion gain from either confidence source is established, and
+   neither experiment identifies a binding constraint.** Two caveats travel with it:
+   the decode's frozen 23:45 stop was **mechanically violated** (the watchdog died
+   with the session, the passes overran ~1 h, timestamps were not recorded, 102 of
+   247 paired) — blindness survived and the binary gate result is invariant, but
+   every magnitude from those 102 is descriptive; and the earlier claim that our
+   local CPU decode is **bit-exactly reproducible is withdrawn** (16 of 18, not 18 of
+   18). [`docs/reports/2026-08-16-adapter-confidence.md`](docs/reports/2026-08-16-adapter-confidence.md).
 6. `exp-2026-08-16-open-task-resources` — **OPEN, research index started**. The
    primary-source resource index is at
    [`docs/reference/external-resources/2026-08-16-open-task-resources.md`](docs/reference/external-resources/2026-08-16-open-task-resources.md).

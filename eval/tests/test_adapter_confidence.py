@@ -174,3 +174,19 @@ def test_247_arm_tokenizes_hypothesis_with_the_same_normalizer_as_its_reference(
     units, dropped, _split = word_units_ftoks(words)
     assert dropped == 1, "the filler word must drop out, as it does from the reference"
     assert [u["tok"] for u in units] == ftoks("καλά")
+
+
+# ----------------------- the joined-string fusion hazard the gate contrast walked into
+def test_joining_segment_texts_without_a_separator_fuses_words():
+    """`"".join(segment.text)` is what the decode script stores, and faster-whisper does
+    not always put a leading space on a segment. Scoring the joined string charges a
+    `word_timestamps` contrast for fusions created by the join, at exactly the segment
+    boundaries the setting moves. Tokens must be built per segment."""
+    from eval.controlled_eval.scoring import wtoks
+
+    segs = [{"text": " το συμβούλιο"}, {"text": "δεν εισηγήθηκε"}]
+    joined = wtoks("".join(s["text"] for s in segs))
+    per_segment = [t for s in segs for t in wtoks(s["text"])]
+    assert per_segment == ["το", "συμβουλιο", "δεν", "εισηγηθηκε"]
+    assert joined != per_segment, "the join must be shown to lose a word boundary"
+    assert len(joined) == len(per_segment) - 1

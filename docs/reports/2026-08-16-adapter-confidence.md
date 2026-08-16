@@ -1,11 +1,14 @@
 # Does our own adapter's per-word confidence predict its errors — and is it the same signal as Soniox's?
 
-2026-08-16. `exp-2026-08-16-adapter-confidence`. Zero GPU, zero paid API, local CPU only.
+2026-08-16, completed 2026-08-17. `exp-2026-08-16-adapter-confidence`. Zero GPU, zero
+paid API, local CPU only.
 
 **Answer: yes it predicts, about as strongly as Soniox's does — and the two signals are
 not the same signal. But our confidence can reach a much smaller share of our damage,
 because 41% of our edit operations are deletions, which a per-word confidence cannot
-see by construction.**
+see by construction. And the gate fails: turning word probabilities on changes the
+transcript in 101 of 102 paired windows, so these confidences belong to their own decode
+and cannot be retrofitted to the frozen fusion input W.**
 
 Preregistered in
 [`docs/specs/2026-08-16-adapter-confidence-prereg.md`](../specs/2026-08-16-adapter-confidence-prereg.md),
@@ -19,7 +22,7 @@ two systems are measured the same way.
 | | gold set | 247 windows |
 |---|---|---|
 | metric | **fidelity-to-audio** (a human listened) | **agreement-with-OpenCouncil** |
-| n | 27 scored 15 s cores, 6 meetings, 6 cities | 247 two-minute windows, 144 meetings |
+| n | 27 scored 15 s cores, 6 meetings, 6 cities | **102** of 247 two-minute windows, 82 meetings — the decode was stopped |
 | Soniox confidences exist? | yes | **no** |
 | carries | the primary claim and the whole head-to-head | descriptive only |
 
@@ -233,9 +236,9 @@ demonstrated gain from the one combination rule that was preregistered.
 
 ## The 247 windows and the gate
 
-**Status: the two decode passes were still running when this report was written.** The
-section is completed below in [Gate result](#gate-result) once they land; nothing in
-the sections above depends on them.
+**Status: stopped, not finished. 102 of 247 windows are paired.** Completed 2026-08-17
+on what exists; the decodes will not be resumed. Nothing in the sections above depends
+on them.
 
 The question is whether asking faster-whisper for word probabilities changes the
 transcript. If it does, the confidences belong to a re-run and **cannot** be attached
@@ -261,19 +264,209 @@ only if the normalized token sequence is identical in **all 247** windows, and n
 analysis may afterwards be restricted to whichever windows happened to be stable.
 
 **Disclosure.** A 2-window smoke was run before the preregistration, to size the job.
-It showed (a) local CPU `wt=F` reproducing the cached control arm **bit-exactly** — our
-decode *is* deterministic on this stack, unlike Soniox's 97.8% re-run agreement — and
-(b) `wt=True` **changing the text on both windows** (segment count 17 → 19 on one). The
-gate *criterion* was frozen outcome-blind; the gate *outcome* was partially visible
-beforehand. Recorded as a development observation rather than claimed otherwise.
+It showed (a) local CPU `wt=F` reproducing the cached control arm bit-exactly on both
+windows, and (b) `wt=True` **changing the text on both windows** (segment count 17 → 19
+on one). The gate *criterion* was frozen outcome-blind; the gate *outcome* was partially
+visible beforehand. Recorded as a development observation rather than claimed otherwise.
 
-### Gate result
+> **Erratum, 2026-08-17.** That smoke was read too widely. This report previously said
+> our decode *is* deterministic on this stack. On the 18 windows where a cached local
+> `wt=F` control also exists, the re-run reproduces it in **16 of 18**, not 18 of 18.
+> The claim "the cached CPU decode is bit-exactly reproducible" is withdrawn. What
+> survives is measured below, next to the number it is needed for.
 
-*(pending)*
+### The stop rule was violated, and the sample is a protocol deviation
 
-### Descriptive arm
+The amendment froze a wall-clock stop at **23:45 EEST on 2026-08-16** and armed a
+watchdog to enforce it. **The watchdog process died when the session hit its API limit,
+and the decodes ran on to roughly 00:44 before being killed by hand — about an hour
+past the frozen stop.** Per-window completion timestamps were never recorded, so the
+realized set **cannot** be truncated back to the 23:45 boundary. There is no way to
+reconstruct the sample the preregistration actually specified.
 
-*(pending)*
+Realized: `wt=True` 102 windows, `wt=False` 133, verified **perfectly nested**
+(intersection exactly 102). The analysis set is those **102 of 247**, spanning 82
+meetings and all 10 cities (argos 15, athens 12, chalandri 8, chania 19, orestiada 3,
+samothraki 5, sparta 16, vrilissia 8, xylokastro 7, zografou 9).
+
+What survived and what did not:
+
+- **The frozen stop rule was mechanically violated.** State it that way. The realized
+  102-window sample is a protocol deviation and every quantitative summary computed on
+  it below is **descriptive**, not the preregistered estimate.
+- **Blindness survived.** The queue order was fixed by seed, applied to the full
+  247-item substrate, before any contrast statistic existed; which windows landed in
+  the set was never influenced by any outcome, and nobody chose n = 102 after seeing a
+  result. The stop slipping changed the sample **size**, not its blindness.
+- **The binary gate conclusion is invariant to the overrun, and this is checkable
+  rather than argued.** Nine paired windows were decoded *before* the 20:05 amendment,
+  so they are inside the 23:45 deadline set whatever time decoding stopped. Exactly
+  **one of those nine** is normalized-identical. The deadline set therefore contained at
+  least eight gate violations, and the gate is a conjunction. **The overrun cannot have
+  created the failure.**
+- **What the overrun does damage** is the precision and the framing of every
+  *magnitude* here — the 7.7% change rate, the per-window distribution, the descriptive
+  AUROC. An unenforced time stop can select on runtime, and runtime is not independent
+  of what a window contains: slow, segmentation-heavy windows are the ones least likely
+  to have finished. Combined with the disclosed city-clustered `argos` head, **the 102
+  are not a uniform random sample of the 247** and nothing here is an unbiased estimate
+  for the remaining 145.
+- Had the gate **passed**, this caveat would bite much harder: a pass is a claim about
+  windows one did not look at, and a runtime-conditioned, non-uniform sample is a bad
+  place to make it from.
+
+### Gate result: fails, decisively
+
+**One measurement correction first, because it moves the headline number.** The decode
+script stores `text` as `"".join(segment.text)`, and faster-whisper does not always put
+a leading space on a segment — **505 of 1,677 segment boundaries here have none**. The
+joined string therefore fuses the last word of a segment with the first word of the
+next, and `word_timestamps` *moves segment boundaries*, so scoring the joined string
+charges the gate for fusions the join invented at exactly the boundaries under test.
+Tokens are built **per segment** below. On the joined string the same contrast reads
+0.0804; the fusion-free number is **0.0770**. Both fail. The corrected pipeline now
+reconciles exactly with the descriptive arm — same 29,437 tokens, same 2,946 errors —
+which the joined-string version did not (a discrepancy Codex caught).
+
+| | value |
+|---|---|
+| raw text identical | **0 / 102** |
+| normalized token sequence identical | **1 / 102** |
+| — and that one window differs only in punctuation/spacing | yes |
+| pooled WER, `wt=False` as denominator | **0.0770** |
+| symmetric edit rate | 0.0769 |
+| op mix between the two settings (S / D / I) | 996 / 586 / 678 over 29,345 tokens |
+
+Per-window change rate: min 0, p25 0.029, **p50 0.053**, p75 0.102, max 0.352.
+
+| per-window change rate | windows |
+|---|---|
+| exactly 0 | 1 |
+| (0, 0.02] | 17 |
+| (0.02, 0.05] | 32 |
+| (0.05, 0.10] | 24 |
+| (0.10, 0.20] | 19 |
+| (0.20, 1] | 9 |
+
+Bins fixed before they were computed. The 10 most-changed windows carry **32.1%** of
+all edits, so the effect is broad *and* right-skewed: it is not one pathological window,
+and it is not evenly spread either.
+
+**The gate fails.** 101 of 102 paired outputs changed after normalization, at a pooled
+7.7% between the two settings. This is decisive for what the gate was for — these
+confidences **cannot** be attached retroactively to the frozen fusion input W or to the
+cached benchmark text. It is *not* a claim that all 247 windows would change, nor that
+7.7% is the benchmark-wide magnitude.
+
+### Is it `word_timestamps`, or is it just a different run?
+
+18 of the 102 windows also carry a cached local CPU `wt=False` decode from
+`exp-2026-08-12-decode-ablation` (arm A) — same config, same per-window seed, earlier
+run. That file stores only the joined string, so both rows below are scored on the
+joined string and are comparable only to each other.
+
+| on the same 18 windows | raw identical | symmetric edit rate |
+|---|---|---|
+| re-run, same config (`wt=F` vs cached arm A) | 16 / 18 | **0.0139** |
+| the gate (`wt=F` vs `wt=T`) | 0 / 18 | **0.0800** |
+
+So our decode is **not** bit-deterministic across runs on this stack, and the earlier
+"bit-exact" claim is withdrawn. The `word_timestamps` contrast is nevertheless **5.7×
+the observed re-run discrepancy on matched windows**, which makes ordinary run-to-run
+variability an implausible explanation for most of it. That is directional evidence, not
+a decomposition: n = 18, one historical re-run, arm A's CPU thread count was never
+recorded (this pass used 6), and the design cannot separate a causal `word_timestamps`
+effect from an interaction between the setting and nondeterminism. **For the gate it
+does not matter**: whatever the mechanism, the decode that produces the confidences
+demonstrably does not reproduce W.
+
+For context, the other two frozen contrasts on the same 102 windows. Both compare
+against the cached benchmark text, which exists only as a stored string, so each is
+reported twice — local side per segment, and both sides on the stored string:
+
+| | symmetric edit rate | normalized-identical |
+|---|---|---|
+| **stack** (cached GPU `wt=F` vs local CPU int8 `wt=F`) | 0.0926 / 0.0956 | 2 / 0 of 102 |
+| **end-to-end** (cached GPU `wt=F` vs local CPU `wt=T`) | 0.0979 / 0.1001 | 0 / 0 of 102 |
+
+Neither tokenization is unambiguously right here and the choice does not change what
+they say: **moving from the RunPod GPU to local CPU int8 already changes the text about
+as much as `word_timestamps` does**, so this pass was never a way to obtain confidences
+for the benchmark decode either. These do not sum — WER is nonlinear and they were never
+a decomposition.
+
+### Does asking for word timestamps delete more speech?
+
+The direction this project cares about most. Reference-anchored, so
+**agreement-with-OpenCouncil**, on the same 102 windows / 30,272 reference tokens:
+
+| | WER | deletions | insertions | substitutions |
+|---|---|---|---|---|
+| `wt=False` | 0.1474 | 0.05173 | 0.02111 | 0.07456 |
+| `wt=True` | 0.1489 | 0.05157 | 0.02398 | 0.07334 |
+
+Paired deltas (`wt=True` − `wt=False`), 2,000 meeting-cluster bootstrap resamples over
+the 82 meetings, seed 21, ratio-of-sums — **descriptive**, and four unadjusted
+quantities:
+
+| | delta | 95% (descriptive) |
+|---|---|---|
+| WER | +0.00149 | [−0.00562, +0.00935] |
+| deletions | −0.00017 | [−0.00727, +0.00808] |
+| insertions | **+0.00287** | [+0.00003, +0.00621] |
+| substitutions | −0.00122 | [−0.00389, +0.00120] |
+
+Nothing here establishes that `word_timestamps` improves or worsens WER. The insertion
+interval only just clears zero, at a lower bound of +0.00003, and it is one of four
+unadjusted quantities on a protocol-deviating sample — suggestive of a small insertion
+cost, not established.
+
+**And the near-zero deletion delta is cancellation, not stability.** Per-window
+`D_true − D_false` is **nonzero in 82 of 102 windows**, `|Δ| ≥ 10` in **18**, and the
+absolute values sum to **613** against a net sum of **−5**, ranging −32 to +48. In all
+18 large-swing windows the emitted-token count moves the opposite way by nearly the same
+amount — +48 deletions against 51 fewer emitted tokens, −32 deletions against 33 more —
+so these are whole passages appearing and disappearing between the two settings, not
+deletions being redistributed word by word. **The aggregate deletion burden is nearly
+unchanged in this sample. Deletion behaviour is not stable, and the interval does not
+establish equivalence.**
+
+### Are the differences systematic?
+
+Punctuation is already excluded — the normalizer keeps only `\w+` — so these are word
+differences, and exactly **one** window's disagreement was punctuation-only. Segment
+count differs in **82 of 102** windows (mean −0.28, range −11 to +9; more segments under
+`wt=True` in 36, fewer in 46). Combined with the passage-level deletion swings, the
+picture is that `word_timestamps` re-cuts the segmentation, the re-cut segments hit the
+temperature-fallback and threshold ladder differently, and whole chunks of text move.
+It is not a punctuation or tokenization technicality, and it is not scattered
+single-word jitter either.
+
+### Descriptive arm — agreement-with-OpenCouncil, never merged with the gold set
+
+The label here is disagreement with **our own published corrected text**, not fidelity
+to audio, and these confidences belong to the `wt=True` re-run, not to the cached
+benchmark text. 102 windows, 82 meetings, 29,437 normalized token rows, 2,946 errors,
+prevalence 0.1001.
+
+| | mean within-meeting AUROC | pooled |
+|---|---|---|
+| `p_word` | **0.8412** | 0.8622 |
+| `exp(avg_logprob)` segment proxy | 0.6048 | 0.7223 |
+
+Average precision 0.405 against a 0.100 null. All 82 meetings have a defined AUROC;
+leave-one-meeting-out stays in 0.8400–0.8430, which is what 82 clusters buys you.
+Insertions-vs-match 0.8751, substitutions-vs-match 0.8342. Deletions are **34.6%** of
+edit operations here, so edit-operation coverage is 65.4% — better than the gold set's
+58.9%, on a different metric against a different reference.
+
+**What must not be said about 0.8412 and the gold set's 0.8151.** They are close. That
+is not evidence of anything. Different labels, different targets, different sampling
+frames, different decode substrates — and this one's errors include places where
+OpenCouncil's published text is itself wrong or edited. Their proximity is **not**
+replication, not external validation, not equivalence, not transport from
+agreement-with-OpenCouncil to fidelity-to-audio, and not robustness across substrates.
+Both are above chance on their own task. That is the whole of it.
 
 ## Limits that must travel with every number here
 
@@ -307,23 +500,58 @@ beforehand. Recorded as a development observation rather than claimed otherwise.
   estimands.
 - The secondary analyses are sensitivity checks on one dataset, not independent
   replications. zografou jun18 contributes 2 errors and its 0.707 means almost nothing.
+- **The 247-window arm's stop rule was violated and it never finished.** 102 of 247
+  paired, and the 102 are not a uniform sample. Every magnitude from it is descriptive.
+  The binary gate failure is the one conclusion that does not depend on any of this.
+- **The gate failure is not a claim about the other 145 windows.** It is a claim that
+  the attachment precondition is not met, which one counterexample is enough to settle.
 
 ## What this changes
 
-- A confidence-weighted fusion vote now has **two** real per-word signals instead of
-  one, and they are measurably not the same signal. With no Scribe credential that is 2
-  of 3 voters, and their tails being independent is the precondition a weighted vote
-  needed. It is a precondition, **not** a demonstrated gain — the one preregistered
-  combination rule did not beat its parts.
+- **Per-word confidence from `artifact-adapter-fixed` cannot be retrofitted.** Asking
+  for it changes the transcript, so the probabilities belong to the decode that produced
+  them. Any consumer that wants them has to re-decode and accept a different text — and
+  that text is a different substrate from the frozen benchmark and from W. This is the
+  same wall the Soniox work hit from the other side, where a confidence-bearing re-run
+  forced the parallel **W-rt** substrate rather than being merged into W.
+- A confidence-weighted fusion vote does have **two** real per-word signals rather than
+  one, and they are measurably not the same signal — the errors co-occur strongly while
+  the flagged tails overlap at chance. That is a precondition a weighted vote needed. It
+  is **not** a demonstrated gain: the one preregistered combination rule did not beat
+  its parts, with both intervals including zero.
+- **And the precondition has since been tested and did not pay.**
+  `exp-2026-08-16-w-rt-confidence` closed NEGATIVE: on the full 247-window W-rt
+  substrate the Soniox occupancy arm and the minority-override arm each fitted a
+  threshold that **never fires** in all ten leave-one-city-out folds, and the weighted
+  identity vote gave −0.00035 with intervals including zero. A detector at AUROC ~0.82
+  bought nothing there. Post-hoc, its AUROC on the decisions a fusion arm actually makes
+  is 0.587–0.703 — weakest exactly where the mass is.
+- So the honest reading is narrow. **A strong marginal error-detection AUROC does not by
+  itself produce actionable fusion gain, and no downstream improvement from either
+  confidence source is established.** Panel asymmetry (one voter of three carrying a
+  confidence) and weak discrimination *conditional on the decisions fusion actually
+  makes* are both plausible limiting mechanisms; neither has been isolated, and the
+  0.587–0.703 figure makes "the signal quality is fine, the panel is the problem"
+  specifically hard to defend. Do not name a binding constraint. Neither experiment was
+  designed to identify one.
 - Whatever a vote gains, it cannot touch the 41% of our edit operations that are
   deletions. Confidence is not a route to the deletion problem.
 - If any serving-time consumer wants confidence, `exp(avg_logprob)` will not do.
+
+## Did this arm deliver what it was for?
+
+No. It existed to decide whether per-word confidences could be attached to the frozen
+fusion substrate; the answer is that they cannot, and the arm that would have quantified
+the cost of re-decoding was stopped at 41% coverage with its stop rule broken. What it
+did deliver is a clean negative on the attachment question, at zero cost, plus a
+correction to a determinism claim this project had started to lean on. The primary
+claim of the ticket never depended on it and stands on the gold set.
 
 ## Cost and reviews
 
 **Zero.** Local CPU only, no GPU pod, no paid API call.
 
-Two Codex reviews at high effort, both before the thing they governed:
+Three Codex reviews at high effort:
 
 - Job `06a6ad95a3d14af4bd53ba76308a6b66`, **before any scoring code**: renamed the
   analysis unit from "emitted word" to the normalized token instance it actually is,
@@ -341,3 +569,15 @@ Two Codex reviews at high effort, both before the thing they governed:
   calling the insertion gap a head-to-head advantage over Soniox, forbade an
   equivalence reading of 0.8151 vs 0.8167, and required Wilson intervals before the
   calibration curve was described.
+- Job `f2d5d496bb414420a6aa490e1bb5a878`, **on the closing findings, before any gate
+  claim was written**, asked directly whether the overrun invalidates the arm. It
+  endorsed the blindness argument but called it insufficient on its own, and supplied
+  the check that makes the binary conclusion invariant (the nine pre-amendment windows,
+  of which exactly one is identical). It required "protocol-deviating, quantitative
+  summaries descriptive" to be said explicitly; forbade calling 0.0139 a measured noise
+  floor or 5.7× a causal effect ratio; required the cancellation finding to be supported
+  by alignments rather than by the sum-of-absolutes alone; forbade every reading of the
+  0.8412/0.8151 proximity; refused "the binding constraint is the asymmetry of the voter
+  panel" as over-identified; and caught an accounting inconsistency — 29,437 rows
+  against 29,377 tokens — that turned out to be the joined-string segment fusion
+  corrected above. After the fix the two paths reconcile exactly.
