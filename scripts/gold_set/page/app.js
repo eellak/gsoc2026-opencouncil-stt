@@ -10,7 +10,7 @@ const SCHEMA = 1;
 
 let CELLS = [], idx = 0, A = {}, ctx = null, buf = null, wave = null;
 let audio = new Audio(), playEnd = null, rate = 1, undoStack = [], selStart = null, selEnd = null;
-let heardEnd = 0, tickT = Date.now(), phaseNow = "a";
+let heardEnd = 0, tickT = Date.now(), phaseNow = "a", lastPhase = null;
 
 const $ = s => document.querySelector(s);
 const now = () => Date.now();
@@ -175,7 +175,15 @@ function renderA() {
     $("#a-ov").value = a.a.overlap || "";
     $("#a-voices").value = a.a.max_voices || "";
   }
-  $("#a-submit").disabled = !(heardAll && $("#a-ov").value && $("#a-voices").value);
+  const missing = !$("#a-ov").value || !$("#a-voices").value;
+  $("#a-submit").disabled = !(heardAll && !missing);
+  // Say WHY it is disabled. A dead-looking button with no reason reads as a broken page.
+  $("#a-submit").title = !heardAll ? "άκουσε πρώτα ολόκληρο το απόσπασμα"
+    : missing ? "συμπλήρωσε και τις δύο ερωτήσεις" : "";
+  if (heardAll && missing) {
+    $("#a-heard").textContent = "συμπλήρωσε τις δύο ερωτήσεις";
+    $("#a-heard").className = "pill warn";
+  }
   $("#pa").classList.toggle("on", phaseNow === "a");
 }
 function submitA() {
@@ -370,6 +378,14 @@ function render() {
   $("#pblank").style.display = c.calib ? "" : "none";
   $("#blank-text").value = (a.blank && a.blank.text) || "";
   $("#b-locked").style.display = phaseNow === "a" ? "" : "none";
+  // The step cards sit below the waveform, so activating the next one left it off
+  // screen: the reviewer saw step 1 fade and read that as a dead button. Bring the
+  // active step into view whenever the phase actually changes.
+  if (phaseNow !== lastPhase) {
+    lastPhase = phaseNow;
+    const card = { a: "#pa", blank: "#pblank", b: "#pb", c: "#pc" }[phaseNow];
+    if (card) $(card).scrollIntoView({ behavior: "smooth", block: "center" });
+  }
 }
 
 /* ---------- keyboard -------------------------------------------------- */

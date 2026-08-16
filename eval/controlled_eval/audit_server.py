@@ -56,6 +56,17 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self._range_left = None
         super().__init__(*a, directory=str(ROOT), **kw)
 
+    def end_headers(self):
+        """Never let a browser cache the page code.
+
+        A reviewer sat on a stale app.js after a fix and reported the page as broken;
+        a review tool is edited mid-session by definition, so caching it is all cost
+        and no benefit. Audio clips are immutable and keep the default handling.
+        """
+        if not self.path.split("?")[0].endswith((".wav", ".mp3", ".m4a", ".ogg")):
+            self.send_header("Cache-Control", "no-store, must-revalidate")
+        super().end_headers()
+
     def send_head(self):
         """The parent's behaviour, plus single-range support so audio can seek."""
         rng = self.headers.get("Range")
