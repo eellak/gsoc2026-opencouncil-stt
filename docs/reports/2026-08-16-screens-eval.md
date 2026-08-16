@@ -14,8 +14,15 @@ below. A screen decides nothing by itself, and nothing here crowns a candidate.
 | arm | what it is | trained on |
 |---|---|---|
 | control | `artifact-adapter-fixed`, the current corrected adapter | — |
-| RUN 1 | stage-2 only: the in-domain targeted-deletion mix (42,204 presentations, 68.9/18.6/2.6/10.0 backbone/deletion-hard/names/other), seed 101, 10,552 steps | A40 |
+| RUN 1 | stage-2 only: the in-domain targeted-deletion mix, seed 101, 10,552 steps | A40 |
 | RUN 2 | stage-1 LoRA on the balanced external mix (STOMA + Common Voice scripted + EuroSpeech), 5,190 steps, then the **identical** stage-2 as RUN 1, same seed, same 10,552 steps | A5000 |
+
+The shared stage-2's **realized** mixture over 42,204 presentations was
+68.9/18.6/2.6/10.0 (backbone / deletion-hard / names / other). The deletion
+prereg's design was 55/25/10/10 — so what was trained is a *weaker* dose of
+deletion-hard and a much weaker dose of names than intended. Every number below
+belongs to the executed mixture, and the gap is itself one of the things the
+error analysis has to weigh.
 
 RUN 2's stage-1 adapter was scored too, as an extra; see the last section.
 

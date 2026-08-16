@@ -71,6 +71,21 @@ def log(m):
     print(m, flush=True)
 
 
+def check_state(state: dict, a: dict, dest: Path) -> None:
+    """Refuse to extend or score hypotheses that came from other weights or config.
+
+    Both halves matter: a stale `decode.json` under the right filename would
+    silently score the wrong adapter, and a decode produced under a different
+    decode configuration is not comparable to the control arm.
+    """
+    if state.get("model") != a["model"]:
+        raise SystemExit(f"{dest} holds a decode of {state.get('model')}, "
+                         f"not {a['model']}")
+    if state.get("config") != DA.CONTROL:
+        raise SystemExit(f"{dest} was decoded under a different config than the "
+                         f"frozen control configuration")
+
+
 def decode() -> None:
     import ctranslate2
     from faster_whisper import WhisperModel
@@ -81,8 +96,7 @@ def decode() -> None:
     dest.parent.mkdir(parents=True, exist_ok=True)
     state = json.loads(dest.read_text()) if dest.exists() else {
         "model": a["model"], "config": DA.CONTROL, "windows": {}}
-    if state.get("model") != a["model"]:
-        raise SystemExit(f"{dest} holds a decode of {state.get('model')}, not {a['model']}")
+    check_state(state, a, dest)
     todo = [r for r in rows if r["window_id"] not in state["windows"]]
     log(f"{a['name']}: {len(todo)} windows to decode ({len(state['windows'])} done)")
     if not todo:
@@ -126,8 +140,10 @@ def counts(texts: dict[str, str]) -> dict[str, tuple[int, int, int, int]]:
     return out
 
 
-def load_counts(path: Path) -> dict[str, tuple[int, int, int, int]]:
+def load_counts(path: Path, a: dict | None = None) -> dict[str, tuple[int, int, int, int]]:
     state = json.loads(path.read_text())
+    if a is not None:
+        check_state(state, a, path)
     return counts({k: v["text"] for k, v in state["windows"].items()})
 
 
@@ -181,7 +197,7 @@ def report(res: dict, out: Path) -> None:
 
 def score() -> None:
     a = arm()
-    arm_counts = load_counts(a["dest"])
+    arm_counts = load_counts(a["dest"], a)
     ctrl_counts = load_counts(DA.out_dir() / "eval-A.json")
     res = compare(arm_counts, a["label"], ctrl_counts, CTRL_LABEL,
                   {"comparison": f"{a['name']} vs control",
@@ -194,7 +210,7 @@ def score() -> None:
 def pair(name_a: str, name_b: str) -> None:
     """Paired per-window comparison of two screen arms (no control involved)."""
     a, b = arm(name_a), arm(name_b)
-    res = compare(load_counts(a["dest"]), a["label"], load_counts(b["dest"]), b["label"],
+    res = compare(load_counts(a["dest"], a), a["label"], load_counts(b["dest"], b), b["label"],
                   {"comparison": f"{a['name']} vs {b['name']}",
                    "arm_model": a["model"], "other_model": b["model"]})
     out = DA.sc() / "train-screens-2026-08" / f"pair-{a['name']}-vs-{b['name']}.json"
