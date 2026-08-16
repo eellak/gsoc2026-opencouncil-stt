@@ -892,6 +892,30 @@
         "Only the default STT (Parakeet-TDT) was measured. faster-whisper-large-v3-turbo is offered by the same endpoint and was NOT tested; it would not be an independent voter anyway, being the same family as our own model.",
         "247 two-minute windows, 10 cities, agreement-with-OpenCouncil references."
       ]
+    },
+    {
+      "id": "exp-2026-08-16-glossary-distillation",
+      "title": "Glossary provenance, leakage extent, and distillation to a usable term list",
+      "question": "Can the 2026-06-20 glossary's provenance be proven, how far does its leakage reach into the benchmark, and which of its terms deserve a place beside the frozen roster and per-city lists?",
+      "status": "CLOSED",
+      "conclusion": "Provenance PROVEN: scripts/glossary_manifest.py re-runs the miner over the reconstructed TRAIN fold and reproduces glossary.json BYTE-IDENTICAL (sha256 f5101f6c...), from 317 (city, meeting) pairs across 22 cities. THE LEAKAGE IS WORSE THAN THE TICKET ASSUMED: the glossary's fold is the eval harness hash-split, NOT the fine-tune's training manifest, and it covers MORE of the benchmark. Of the 253 common windows, 178 are in the glossary fold, 148 in the fine-tune train, 213 in at least one - only 40 are disjoint from BOTH. So 65 of the 105 windows the ticket called 'training-disjoint' are contaminated for a glossary arm, and bench_data.training_meetings() is the WRONG line to split on. Codex adds that even those 40 are not clean held-out, since the benchmark was already used developmentally when the global list was abandoned - so any glossary arm is exploratory, not confirmatory. DISTILLATION: from 3,543 per-city candidates, 853 passed the filters but only 35 carried category evidence (818 left as 'unverified' and NOT proposed); from 748 acronym candidates, 14 survived cross-city with expansions from gpt-5.6-luna; from 173 institutional/legal proposals, ZERO survived. Final: 47 terms for human review. The 5,894-term global list contributed nothing.",
+      "decision": "Do not merge the 47 terms into research/ds_wer/terms/*.json without an explicit decision: those lists were built under a stated guarantee that no term is derived from meeting transcripts, and all 47 are. Either rebuild them from external registries with a blind collector, or amend the guarantee in writing. Any glossary arm (wayfinder #18) must be scored on the 40 doubly-disjoint windows and labelled exploratory.",
+      "artifact_ids": [],
+      "capability_ids": [],
+      "reports": [
+        "docs/reports/2026-08-16-glossary-distillation.md"
+      ],
+      "specs": [],
+      "superseded_by": null,
+      "next_action": null,
+      "updated_at": "2026-08-16T14:00:00Z",
+      "caveats": [
+        "The 'missing legal/administrative term list' was NOT missing: 52 `procedural` terms already exist in build_ds_wer_terms_v2.py, built in August from the same Standard Regulation (FEK B' 109/2025). Of 173 terms gpt-5.6-luna proposed after reading 24 whole meetings, 29 were already there and the rest fell as everyday language or as non-recurring. The real gap was ACRONYMS, not phrases.",
+        "AMEA was cut despite being a genuine term: it scores 88.9 similarity against the ordinary word 'amesa' under the production scorer, so admitting it risks corrupting correct text. This is the precision principle working as intended.",
+        "Four bugs were found AFTER numbers were seen and are declared in the report; the most serious is that el_GR.dic is iso-8859-7, so the common-word check was silently loading 25 entries instead of 828,000.",
+        "35 of the 47 candidates carry category evidence; the remaining 818 per-city candidates sit in an 'unverified' tier and are deliberately NOT proposed.",
+        "No terms/*.json file was modified. The distillation output is a candidate list awaiting human review, not an admitted list."
+      ]
     }
   ],
   "artifacts": [

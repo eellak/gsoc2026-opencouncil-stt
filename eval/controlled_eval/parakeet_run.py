@@ -43,6 +43,14 @@ from eval.controlled_eval.exclusive_diar_api import (               # noqa: E402
 RUN_ID = "2026-08-10-corrected-adapter-label-prefix-fix-vs-ju"
 HOLDOUT = ROOT / "research/eval-freeze-2026-08/manifest.json"
 
+# STT choices behind precision-2's `transcription: true`, and the cache directory
+# each round's responses live in. The diarizer is the same in both rounds; only the
+# transcriber changes, which is what makes the two rounds comparable at all.
+STT = {
+    "parakeet": (None, "parakeet"),                         # the service default
+    "whisper-turbo": ("faster-whisper-large-v3-turbo", "whisper_turbo"),
+}
+
 
 def sc() -> Path:
     return Path(os.environ.get("SC", Path.home() / ".cache/oc-public"))
@@ -71,14 +79,17 @@ def main() -> None:
     ap.add_argument("--timeout", type=float, default=600)
     ap.add_argument("--no-flac", dest="flac", action="store_false",
                     help="upload the raw wav instead of a lossless FLAC")
+    ap.add_argument("--stt", choices=sorted(STT), default="parakeet",
+                    help="which STT precision-2 should transcribe with")
     ap.add_argument("--workers", type=int, default=1,
                     help="parallel jobs. Serial runs ~1 window/min (a 4.7 MB "
                          "upload plus polling), i.e. 4 h for the full sample.")
     args = ap.parse_args()
 
     key = api_key()
+    stt_model, out_name = STT[args.stt]
     wav_dir = sc() / "bench_windows"
-    out_dir = sc() / "parakeet"
+    out_dir = sc() / out_name
     out_dir.mkdir(parents=True, exist_ok=True)
 
     items = target_items()
@@ -91,7 +102,9 @@ def main() -> None:
         raise SystemExit(f"{len(missing)} windows have no local audio: {missing[:5]}")
 
     todo = [it for it in items if not (out_dir / f"{it['item_id']}.json").exists()]
-    log(f"{len(items)} windows targeted, {len(todo)} still to call")
+    log(f"{len(items)} windows targeted with stt={args.stt} "
+        f"({stt_model or 'service default'}) -> {out_dir.name}/, "
+        f"{len(todo)} still to call")
 
     failed = []
 
@@ -112,8 +125,8 @@ def main() -> None:
                 if p.returncode != 0 or not enc.exists():
                     return wid, f"flac encode failed: {p.stderr[:120]}"
                 src = enc
-            r = run_one(src, key, wid, exclusive=True,
-                        transcription=True, timeout=args.timeout)
+            r = run_one(src, key, wid, exclusive=True, transcription=True,
+                        timeout=args.timeout, stt=stt_model)
         except Exception as e:                                   # noqa: BLE001
             return wid, f"error: {e}"
         finally:
