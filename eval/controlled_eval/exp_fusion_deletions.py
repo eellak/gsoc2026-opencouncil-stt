@@ -108,6 +108,15 @@ def main():
     items = B.common_items(report, providers)
     log(f"{RUN_ID}: {len(items)} items common to all {len(providers)} providers")
 
+    # The 2026-08 evaluation freeze drew its 7 SEALED temporal holdout windows from this
+    # same benchmark run. Scoring on them would break the freeze, so they are removed
+    # before anything is computed. Discovered 2026-08-16 while resolving wayfinder #17.
+    sealed = {w["window_id"] for w in json.loads(
+        (ROOT / "research/eval-freeze-2026-08/manifest.json").read_text())["holdout_windows"]}
+    before = len(items)
+    items = [it for it in items if it["item_id"] not in sealed]
+    log(f"sealed holdout windows removed: {before - len(items)} -> {len(items)} items")
+
     clusters = [it["cluster"] for it in items]
     disjoint = [not it["in_training"] for it in items]
     log(f"training-disjoint windows: {sum(disjoint)}/{len(items)}")

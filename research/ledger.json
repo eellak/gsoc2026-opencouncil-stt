@@ -838,7 +838,7 @@
       "title": "Does the consensus vote win by deleting, and does the corrected adapter vote better",
       "question": "Does cross-system consensus fusion lower WER at the cost of a higher deletion rate, and does swapping the broken third voter for artifact-adapter-fixed change the result?",
       "status": "CLOSED",
-      "conclusion": "No on the first, not measurably on the second. The vote CUTS deletions rather than buying WER with them: del_rate 0.0245 against Scribe's 0.0381 (-0.0136 [-0.0162,-0.0112], CI excludes zero) and against our own adapter's 0.0455, i.e. nearly half. It pays +0.0070 [+0.0039,+0.0105] in insertions, a strongly favourable trade, and total WER falls -0.0121 [-0.0157,-0.0085]. Single-item domination check passes (dropping the most influential window moves the deletion delta only -0.01361 -> -0.01320). The mechanism is Soniox: it deletes 0.0140, three times less than Scribe and three times less than us, paying with the table's highest insertion rate 0.0741 - it is not the best system, it is the system that does not go silent. This is the first thing in this project that reaches the deletions: the serving-stack ladder showed they live in the weights and no decode-time technique touches them because the words are absent from all 8 hypotheses - OUR 8 hypotheses. They are not absent from Soniox. On the second question, swapping oc-minipc-finetune for oc-runpod-fixed-2026-08-10 in a paired design gives WER -0.00154 [-0.00351,+0.00053], CI includes zero, 197/253 windows tied. Two indications point the same way but are not results: the corrected adapter is picked more often by the vote (25 vs 16 windows) and it raises the trio oracle ceiling (0.1093 -> 0.1058). Incidentally, artifact-adapter-fixed is the SECOND-BEST single system on this benchmark at 0.1380, behind only Scribe 0.1314 and ahead of Soniox, Gladia, whisper-large-v3 and gpt-4o-transcribe.",
+      "conclusion": "No on the first, not measurably on the second. The vote CUTS deletions rather than buying WER with them: del_rate 0.0247 against Scribe's 0.0380 (-0.0133 [-0.0159,-0.0108], CI excludes zero) and against our own adapter's 0.0459, i.e. nearly half. It pays +0.0069 [+0.0037,+0.0104] in insertions, a strongly favourable trade, and total WER falls -0.0121 [-0.0158,-0.0084]. Single-item domination check passes (dropping the most influential window moves the deletion delta only -0.01331 -> -0.01289). The mechanism is Soniox: it deletes 0.0142, three times less than Scribe and three times less than us, paying with the table's highest insertion rate 0.0750 - it is not the best system, it is the system that does not go silent. This is the first thing in this project that reaches the deletions: the serving-stack ladder showed they live in the weights and no decode-time technique touches them because the words are absent from all 8 hypotheses - OUR 8 hypotheses. They are not absent from Soniox. On the second question, swapping oc-minipc-finetune for oc-runpod-fixed-2026-08-10 in a paired design gives WER -0.00128 [-0.00327,+0.00082], CI includes zero, the overwhelming majority of 247 windows tied. Two indications point the same way but are not results: the corrected adapter is picked more often by the vote (25 vs 16 windows) and it raises the trio oracle ceiling (0.1099 -> 0.1064). Incidentally, artifact-adapter-fixed is the SECOND-BEST single system on this benchmark at 0.1386, behind only Scribe 0.1322 and ahead of Soniox, Gladia, whisper-large-v3 and gpt-4o-transcribe.",
       "decision": "Use the corrected adapter as the third voter - there is no reason not to - but claim no gain from the swap. Fusion is the live route to the deletion problem and outranks further single-model training for the remaining runway. Any deployment decision is a cost decision for OpenCouncil (three ASR bills instead of one), not a WER decision.",
       "artifact_ids": [
         "artifact-adapter-fixed"
@@ -854,13 +854,43 @@
       "next_action": null,
       "updated_at": "2026-08-16T11:00:00Z",
       "caveats": [
+        "CORRECTED 2026-08-16 AFTER FIRST PUBLICATION: the first run scored 253 windows, which contained 6 of the 7 SEALED temporal holdout windows of eval-freeze-2026-08 - the freeze had drawn them from this same benchmark run. Caught while resolving wayfinder #17. They were removed and every number recomputed on 247 windows / 144 meetings. No conclusion changed (deletion delta -0.0136 -> -0.0133, CI still excludes zero). exp_fusion_deletions.py now filters the seal explicitly so it cannot recur.",
         "The trio was NOT re-selected here; it is inherited from exp-2026-08-02-asr-fusion where it was chosen by trying every subset against these same references - selection on the test set. The split-half check there shows the PROCEDURE generalises, not the specific trio.",
-        "Different sample from exp-2026-08-02-asr-fusion: that ran on 2026-06-10-oc-benchmark (250 windows), this on the 2026-08-10 report (253 windows common to all 9 providers). Absolute numbers are not directly comparable across the two reports.",
+        "Different sample from exp-2026-08-02-asr-fusion: that ran on 2026-06-10-oc-benchmark (250 windows), this on the 2026-08-10 report (247 windows: 253 common to all 9 providers minus the 6 sealed holdout). Absolute numbers are not directly comparable across the two reports.",
         "Agreement-with-OpenCouncil, not fidelity-to-audio. 'The vote recovers deletions' means it recovers words present in OUR reference text.",
-        "Training contamination does not produce the effect: on the 105 training-disjoint windows the vote scores 0.1173 against Scribe's 0.1325, a LARGER gain than on the contaminated ones.",
+        "Training contamination does not produce the effect: on the 99 training-disjoint windows the vote's gain is LARGER than on the contaminated ones.",
         "Scored with eval/controlled_eval/scoring.py, not the benchmark app's scorer (which trims window-boundary words), so these numbers are comparable to exp-2026-08-02-asr-fusion and NOT to the published leaderboard.",
         "The second-best-single-system observation was not the question and was not preregistered; it is an observation.",
-        "253 two-minute windows in 10 cities. Enough to show the effect is not city-specific, not enough to describe Greek council audio in general."
+        "247 two-minute windows in 10 cities. Enough to show the effect is not city-specific, not enough to describe Greek council audio in general."
+      ]
+    },
+    {
+      "id": "exp-2026-08-16-pyannote-transcription",
+      "title": "pyannoteAI precision-2 with transcription: fourth voter, omission detector, word-level speaker",
+      "question": "Does pyannoteAI precision-2 with transcription:true and exclusive:true give a useful fourth ASR voter, a lower deletion rate by virtue of a monotonic transducer, and a reference-free detector for missing speech?",
+      "status": "CLOSED",
+      "conclusion": "One of three. (1) Parakeet-TDT-0.6b-v3 is NOT usable for Greek council audio: WER 0.3567 against the corrected adapter's 0.1386, zero wins in 247 windows (+0.2181), and 78% of its error is substitutions - it does not lose speech, it does not know Greek. Published FLEURS/Common Voice figures do not transfer, as preregistered. (2) As a fourth voter it adds nothing: -0.0014 WER and -0.0009 del_rate, both CIs include zero, and the four-way oracle is IDENTICAL to the three-way oracle to four decimals - it is the best system in no window at all. THE MONOTONICITY HYPOTHESIS IS DISPROVEN: its deletion rate is 0.0453, 3.2x Soniox's 0.0142 and statistically indistinguishable from our own autoregressive adapter's 0.0459. Being a transducer did not buy a lower deletion rate. (3) The omission detector WORKS: intervals where exclusiveDiarization asserts speech while our transcript has no words hit real deletions at precision 0.320 against a fair random-interval null of 0.094 (+0.226 [+0.144,+0.324], CI excludes zero), recall 0.101. A precision alarm, not a net - and it is the only publishable piece here, since no reference-free detector for missing speech spans exists in the 2026 literature. Cost $1.88-$3.13 for 250 jobs / 10.16 audio hours, zero failures, zero GPU.",
+      "decision": "Do not add Parakeet as a voter and do not pursue faster-whisper-turbo through this API as an ASR source. Keep exclusiveDiarization as an omission-detection signal: it is the one place where an acoustic model supplies evidence our own hypotheses cannot. The CTC/transducer-monotonicity argument for a Whisper CTC head is weakened by this result and must not be quoted as motivation without acknowledging it.",
+      "artifact_ids": [
+        "artifact-adapter-fixed"
+      ],
+      "capability_ids": [
+        "cap-bench-http-api"
+      ],
+      "reports": [
+        "docs/reports/2026-08-16-pyannote-transcription.md"
+      ],
+      "specs": [],
+      "superseded_by": null,
+      "next_action": null,
+      "updated_at": "2026-08-16T13:00:00Z",
+      "caveats": [
+        "SEAL BREACH FOUND AND CONTAINED: 6 of the 7 sealed temporal holdout windows of eval-freeze-2026-08 sit inside the 253-window benchmark report. They were excluded here (n=247) and every comparison recomputed on the same 247. The same breach had already affected exp-2026-08-16-fusion-deletions, which was corrected in the same change.",
+        "The omission detector's ground truth is agreement-with-OpenCouncil, not a human listening to the audio, so precision 0.320 is a LOWER BOUND: a span our reference also omits counts as a false positive here.",
+        "Two measurement errors were caught by Codex review (high effort) BEFORE any number was seen: the random null was unfair (random intervals could land in silence) and the time interpolation snapped extreme deletion runs onto adjacent recognised speech. Both fixed and declared on the issue before analysis.",
+        "pyannoteAI publishes no balance endpoint; the cost is a projection from GET /v2/jobs quantity and the public price (EUR 0.112/h diarization, EUR 0.168/h STT orchestration), and the page does not state whether the two are additive, so both scenarios are carried.",
+        "Only the default STT (Parakeet-TDT) was measured. faster-whisper-large-v3-turbo is offered by the same endpoint and was NOT tested; it would not be an independent voter anyway, being the same family as our own model.",
+        "247 two-minute windows, 10 cities, agreement-with-OpenCouncil references."
       ]
     }
   ],

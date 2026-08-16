@@ -1,0 +1,1404 @@
+{
+ "artifact": {
+  "path": "data/glossary/glossary.json",
+  "built_at": "2026-06-20",
+  "builder": "eval/build_dataset.py -> eval.glossary.mine_glossary",
+  "sha256": "f5101f6c7ff8eca9f80377c235bb38d700f78d935bf04c19fd87603bd5c30a07",
+  "bytes": 272115,
+  "n_global_terms": 5894,
+  "per_city_term_counts": {
+   "argos": 166,
+   "athens": 1064,
+   "chalandri": 104,
+   "chania": 981,
+   "orestiada": 198,
+   "samothraki": 104,
+   "sparta": 295,
+   "vari-voula-vouliagmeni": 35,
+   "vrilissia": 163,
+   "xylokastro": 235,
+   "zografou": 198
+  },
+  "n_per_city_terms_total": 3543
+ },
+ "provenance_proof": {
+  "claim": "reconstructed provenance with byte-identical output",
+  "method": "re-run the miner on the reconstructed TRAIN fold and require a byte-identical reproduction of the artifact",
+  "reproduced_byte_identical": true,
+  "verified_at": "2026-08-16",
+  "verified_at_git_head": "1988ad8dd15333ce88bfe06db9a032f4fecb1e84",
+  "command": ".venv-eval/bin/python scripts/glossary_manifest.py",
+  "miner_sha256": {
+   "eval/glossary.py": "28280414e891b77de1f9e8f75392f95f8c7317b1fc2e993c9e1d73f5c5c6158d",
+   "eval/splits.py": "84c407788158cea5fb38954047bf0cf96616244e77a23293a097434c65b7c370",
+   "eval/build_dataset.py": "8fa56af5e0fcf871acebb6907cdd6410c3de804a55006a8da7fc75c0bb8441f6"
+  },
+  "python": "3.12.3",
+  "pandas": "3.0.3",
+  "residual_uncertainty": "Codex, job 45db933d: byte-identical reproduction does not prove the historical input set. Mining is lossy, so a meeting that contributed no surviving term can be added to or removed from the fold without changing the output. `source_meetings` is therefore the reconstructed fold under the current code, which is a superset of the meetings that actually contributed a term. Treat it as an upper bound on exposure, which is the safe direction for a leakage claim."
+ },
+ "inputs": {
+  "corrections_csv": {
+   "path": "data-1779206108158.csv",
+   "sha256": "97bb8b0b1c8e66ce003dc77ef2066e41ac6b0bd432dd22d132b8887f49748248"
+  },
+  "chains_parquet": {
+   "path": "data/eval/chains.parquet",
+   "sha256": "78c7aa559a5839f41d676175f839fca0ce0cb1fc9d3f0fcdfb7a17c1f3379f72"
+  },
+  "split_json": {
+   "path": "data/eval/split.json",
+   "sha256": "5bc49503496067d19361b7a7b238c4003788833055d2c46b5c58e820acab5336"
+  }
+ },
+ "mining_rule": {
+  "text_field": "gold_final (human-corrected text of the chain)",
+  "fold": "eval-harness TRAIN fold = every chain whose meeting_id is NOT in data/eval/split.json::eval_meeting_ids",
+  "split_key": "bare meeting_id string",
+  "split_key_caveat": "meeting_id is NOT unique across cities. The fold is defined on the bare string, so a meeting_id held out in one city is held out in every city, and conversely a meeting_id kept in one city is kept in every city that uses it. This is a defect of the 2026-06-20 split, recorded here rather than fixed, because fixing it would change the artifact.",
+  "keep_min_meetings": 2,
+  "global_min_cities": 2,
+  "stopword_count": 27,
+  "candidate_classes": [
+   "all-uppercase Greek token of length >= 2 (acronym)",
+   "capitalised token not in the stop list (proper noun)",
+   "run of >= 2 capitalised tokens (phrase)"
+  ]
+ },
+ "source_meetings": {
+  "n_pairs": 317,
+  "n_cities": 22,
+  "pairs": [
+   {
+    "city_id": "argithea",
+    "meeting_id": "mar26_2026"
+   },
+   {
+    "city_id": "argos",
+    "meeting_id": "apr24_2026"
+   },
+   {
+    "city_id": "argos",
+    "meeting_id": "aug14_2025"
+   },
+   {
+    "city_id": "argos",
+    "meeting_id": "aug29_2025"
+   },
+   {
+    "city_id": "argos",
+    "meeting_id": "dec11_2025"
+   },
+   {
+    "city_id": "argos",
+    "meeting_id": "dec18_2025"
+   },
+   {
+    "city_id": "argos",
+    "meeting_id": "dec23_2025"
+   },
+   {
+    "city_id": "argos",
+    "meeting_id": "dec29_2025"
+   },
+   {
+    "city_id": "argos",
+    "meeting_id": "dec3_2025"
+   },
+   {
+    "city_id": "argos",
+    "meeting_id": "dec5_2025"
+   },
+   {
+    "city_id": "argos",
+    "meeting_id": "feb26_2026"
+   },
+   {
+    "city_id": "argos",
+    "meeting_id": "feb27_2026"
+   },
+   {
+    "city_id": "argos",
+    "meeting_id": "feb27_2_2026"
+   },
+   {
+    "city_id": "argos",
+    "meeting_id": "feb6_2026"
+   },
+   {
+    "city_id": "argos",
+    "meeting_id": "jan19_2026"
+   },
+   {
+    "city_id": "argos",
+    "meeting_id": "jan30_2026"
+   },
+   {
+    "city_id": "argos",
+    "meeting_id": "jul28_2025"
+   },
+   {
+    "city_id": "argos",
+    "meeting_id": "mar10_2026"
+   },
+   {
+    "city_id": "argos",
+    "meeting_id": "mar23_2026"
+   },
+   {
+    "city_id": "argos",
+    "meeting_id": "mar23_2_2026"
+   },
+   {
+    "city_id": "argos",
+    "meeting_id": "may12_2026"
+   },
+   {
+    "city_id": "argos",
+    "meeting_id": "nov11_2025"
+   },
+   {
+    "city_id": "argos",
+    "meeting_id": "nov26_2025"
+   },
+   {
+    "city_id": "argos",
+    "meeting_id": "oct10_2025"
+   },
+   {
+    "city_id": "argos",
+    "meeting_id": "oct31_2025"
+   },
+   {
+    "city_id": "argos",
+    "meeting_id": "oct31__2_2025"
+   },
+   {
+    "city_id": "argos",
+    "meeting_id": "sep15_2025"
+   },
+   {
+    "city_id": "athens",
+    "meeting_id": "apr14_2025"
+   },
+   {
+    "city_id": "athens",
+    "meeting_id": "apr1_2026"
+   },
+   {
+    "city_id": "athens",
+    "meeting_id": "apr20_2026"
+   },
+   {
+    "city_id": "athens",
+    "meeting_id": "apr20_2_2026"
+   },
+   {
+    "city_id": "athens",
+    "meeting_id": "apr20_3_2026"
+   },
+   {
+    "city_id": "athens",
+    "meeting_id": "apr21_2026"
+   },
+   {
+    "city_id": "athens",
+    "meeting_id": "apr22_2026"
+   },
+   {
+    "city_id": "athens",
+    "meeting_id": "apr22_2_2026"
+   },
+   {
+    "city_id": "athens",
+    "meeting_id": "apr27_2_2026"
+   },
+   {
+    "city_id": "athens",
+    "meeting_id": "apr30_2025"
+   },
+   {
+    "city_id": "athens",
+    "meeting_id": "apr30_2025_2"
+   },
+   {
+    "city_id": "athens",
+    "meeting_id": "daem_conf_day2"
+   },
+   {
+    "city_id": "athens",
+    "meeting_id": "feb11_2026"
+   },
+   {
+    "city_id": "athens",
+    "meeting_id": "feb12_2025"
+   },
+   {
+    "city_id": "athens",
+    "meeting_id": "feb16_2_2026"
+   },
+   {
+    "city_id": "athens",
+    "meeting_id": "feb18_2026"
+   },
+   {
+    "city_id": "athens",
+    "meeting_id": "feb19_2026"
+   },
+   {
+    "city_id": "athens",
+    "meeting_id": "feb19_3_2026"
+   },
+   {
+    "city_id": "athens",
+    "meeting_id": "feb26_2025_2"
+   },
+   {
+    "city_id": "athens",
+    "meeting_id": "feb26_2026"
+   },
+   {
+    "city_id": "athens",
+    "meeting_id": "feb9_2_2026"
+   },
+   {
+    "city_id": "athens",
+    "meeting_id": "jan14_2026"
+   },
+   {
+    "city_id": "athens",
+    "meeting_id": "jan19_2026"
+   },
+   {
+    "city_id": "athens",
+    "meeting_id": "jan19_2_2026"
+   },
+   {
+    "city_id": "athens",
+    "meeting_id": "jan19_4_2026"
+   },
+   {
+    "city_id": "athens",
+    "meeting_id": "jan22_2026"
+   },
+   {
+    "city_id": "athens",
+    "meeting_id": "jan26_2026"
+   },
+   {
+    "city_id": "athens",
+    "meeting_id": "jan26_2_2026"
+   },
+   {
+    "city_id": "athens",
+    "meeting_id": "mar10_2025"
+   },
+   {
+    "city_id": "athens",
+    "meeting_id": "mar16_2026"
+   },
+   {
+    "city_id": "athens",
+    "meeting_id": "mar16_2_2026"
+   },
+   {
+    "city_id": "athens",
+    "meeting_id": "mar18_2026"
+   },
+   {
+    "city_id": "athens",
+    "meeting_id": "mar19_2026"
+   },
+   {
+    "city_id": "athens",
+    "meeting_id": "mar19_2_2026"
+   },
+   {
+    "city_id": "athens",
+    "meeting_id": "mar23_2026"
+   },
+   {
+    "city_id": "athens",
+    "meeting_id": "mar26_2025"
+   },
+   {
+    "city_id": "athens",
+    "meeting_id": "mar30_2026"
+   },
+   {
+    "city_id": "athens",
+    "meeting_id": "mar9_1_2026"
+   },
+   {
+    "city_id": "athens",
+    "meeting_id": "mar9_2026"
+   },
+   {
+    "city_id": "athens",
+    "meeting_id": "may18_3_2026"
+   },
+   {
+    "city_id": "athens",
+    "meeting_id": "may26_2025"
+   },
+   {
+    "city_id": "chalandri",
+    "meeting_id": "apr1_2026"
+   },
+   {
+    "city_id": "chalandri",
+    "meeting_id": "apr29_2_2026"
+   },
+   {
+    "city_id": "chalandri",
+    "meeting_id": "dec3_2025"
+   },
+   {
+    "city_id": "chalandri",
+    "meeting_id": "feb11_2026"
+   },
+   {
+    "city_id": "chalandri",
+    "meeting_id": "feb25_2026"
+   },
+   {
+    "city_id": "chalandri",
+    "meeting_id": "jan14_2026"
+   },
+   {
+    "city_id": "chalandri",
+    "meeting_id": "jan14_2_2026"
+   },
+   {
+    "city_id": "chalandri",
+    "meeting_id": "jul16_2025"
+   },
+   {
+    "city_id": "chalandri",
+    "meeting_id": "mar11_2026"
+   },
+   {
+    "city_id": "chalandri",
+    "meeting_id": "mar26_2026"
+   },
+   {
+    "city_id": "chalandri",
+    "meeting_id": "may13_2026"
+   },
+   {
+    "city_id": "chalandri",
+    "meeting_id": "nov12_2025"
+   },
+   {
+    "city_id": "chalandri",
+    "meeting_id": "nov26_2025"
+   },
+   {
+    "city_id": "chalandri",
+    "meeting_id": "oct15_2025"
+   },
+   {
+    "city_id": "chalandri",
+    "meeting_id": "oct15_2_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "apr14_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "apr15_2026"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "apr16_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "apr20_2026"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "apr22_2026"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "apr27_2026"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "apr28_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "apr28_2025_2"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "apr2_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "apr9_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "aug18_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "aug25_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "aug27_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "aug5_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "dec10_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "dec15_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "dec19_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "dec23_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "dec23_2025_2"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "dec29_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "dec2_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "dec3_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "dec8_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "feb11_2026"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "feb12_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "feb19_2026"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "feb19_2_2026"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "feb24_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "feb24_2026"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "feb5_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "jan19_2026"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "jan22_2026"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "jan26_2026"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "jan27_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "jan27_2025_2"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "jul14_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "jul21_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "jul28_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "jul28_2025_2"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "jul30_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "jul7_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "jul9_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "jun10_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "jun11_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "jun23_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "jun2_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "jun30_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "mar10_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "mar17_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "mar17_2026"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "mar23_2026"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "mar26_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "mar26_2026"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "mar2_2026"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "mar30_2026"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "mar31_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "mar4_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "mar4_2026"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "mar9_2026"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "may18_2026"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "may19_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "may26_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "may28_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "may4_2026"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "may5_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "may7_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "nov10_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "nov12_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "nov24_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "nov26_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "nov26_2025_2"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "nov3_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "oct13_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "oct15_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "oct27_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "oct6_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "sep15_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "sep1_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "sep22_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "sep29_2025"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "sep29_2025_2"
+   },
+   {
+    "city_id": "chania",
+    "meeting_id": "sep8_2025"
+   },
+   {
+    "city_id": "dafni-ymittos",
+    "meeting_id": "mar31_2026"
+   },
+   {
+    "city_id": "dorida",
+    "meeting_id": "jun6_2025"
+   },
+   {
+    "city_id": "kalamata",
+    "meeting_id": "feb5_2025"
+   },
+   {
+    "city_id": "karditsa",
+    "meeting_id": "apr20_2026"
+   },
+   {
+    "city_id": "meganisi",
+    "meeting_id": "mar23_2026"
+   },
+   {
+    "city_id": "nea-smyrni",
+    "meeting_id": "jan13_2025"
+   },
+   {
+    "city_id": "orestiada",
+    "meeting_id": "apr27_2026"
+   },
+   {
+    "city_id": "orestiada",
+    "meeting_id": "apr28_2026"
+   },
+   {
+    "city_id": "orestiada",
+    "meeting_id": "apr28_2_2026"
+   },
+   {
+    "city_id": "orestiada",
+    "meeting_id": "apr28_3_2026"
+   },
+   {
+    "city_id": "orestiada",
+    "meeting_id": "dec11_2025"
+   },
+   {
+    "city_id": "orestiada",
+    "meeting_id": "dec11_2025_2"
+   },
+   {
+    "city_id": "orestiada",
+    "meeting_id": "feb11_2026"
+   },
+   {
+    "city_id": "orestiada",
+    "meeting_id": "feb27_2026"
+   },
+   {
+    "city_id": "orestiada",
+    "meeting_id": "mar23_2026"
+   },
+   {
+    "city_id": "orestiada",
+    "meeting_id": "mar3_2_2026"
+   },
+   {
+    "city_id": "orestiada",
+    "meeting_id": "may18_2026"
+   },
+   {
+    "city_id": "orestiada",
+    "meeting_id": "nov21_2025"
+   },
+   {
+    "city_id": "peristeri",
+    "meeting_id": "dec23_2024"
+   },
+   {
+    "city_id": "plastiras",
+    "meeting_id": "apr21_2026"
+   },
+   {
+    "city_id": "rhodes",
+    "meeting_id": "jul17_2025"
+   },
+   {
+    "city_id": "samothraki",
+    "meeting_id": "apr6_2026"
+   },
+   {
+    "city_id": "samothraki",
+    "meeting_id": "dec15_2025"
+   },
+   {
+    "city_id": "samothraki",
+    "meeting_id": "dec29_2025"
+   },
+   {
+    "city_id": "samothraki",
+    "meeting_id": "feb24_2026"
+   },
+   {
+    "city_id": "samothraki",
+    "meeting_id": "jan28_2026"
+   },
+   {
+    "city_id": "samothraki",
+    "meeting_id": "mar4_2026"
+   },
+   {
+    "city_id": "samothraki",
+    "meeting_id": "may15_2026"
+   },
+   {
+    "city_id": "samothraki",
+    "meeting_id": "may6_2026"
+   },
+   {
+    "city_id": "samothraki",
+    "meeting_id": "may9_2026"
+   },
+   {
+    "city_id": "sparta",
+    "meeting_id": "apr15_2026"
+   },
+   {
+    "city_id": "sparta",
+    "meeting_id": "apr17_2026"
+   },
+   {
+    "city_id": "sparta",
+    "meeting_id": "apr21_2026"
+   },
+   {
+    "city_id": "sparta",
+    "meeting_id": "apr30_2025"
+   },
+   {
+    "city_id": "sparta",
+    "meeting_id": "dec10_2025"
+   },
+   {
+    "city_id": "sparta",
+    "meeting_id": "dec22_2025"
+   },
+   {
+    "city_id": "sparta",
+    "meeting_id": "dec22_2_2025"
+   },
+   {
+    "city_id": "sparta",
+    "meeting_id": "dec30_2025"
+   },
+   {
+    "city_id": "sparta",
+    "meeting_id": "feb10_2026"
+   },
+   {
+    "city_id": "sparta",
+    "meeting_id": "feb11_2026"
+   },
+   {
+    "city_id": "sparta",
+    "meeting_id": "feb13_2026"
+   },
+   {
+    "city_id": "sparta",
+    "meeting_id": "feb24_2026"
+   },
+   {
+    "city_id": "sparta",
+    "meeting_id": "feb24_2_2026"
+   },
+   {
+    "city_id": "sparta",
+    "meeting_id": "feb3_2026"
+   },
+   {
+    "city_id": "sparta",
+    "meeting_id": "jan13_2026"
+   },
+   {
+    "city_id": "sparta",
+    "meeting_id": "jan14_2026"
+   },
+   {
+    "city_id": "sparta",
+    "meeting_id": "jan19_2026"
+   },
+   {
+    "city_id": "sparta",
+    "meeting_id": "jan30_2026"
+   },
+   {
+    "city_id": "sparta",
+    "meeting_id": "mar10_2026"
+   },
+   {
+    "city_id": "sparta",
+    "meeting_id": "mar17_2026"
+   },
+   {
+    "city_id": "sparta",
+    "meeting_id": "mar18_2026"
+   },
+   {
+    "city_id": "sparta",
+    "meeting_id": "mar24_2026"
+   },
+   {
+    "city_id": "sparta",
+    "meeting_id": "mar30_2026"
+   },
+   {
+    "city_id": "sparta",
+    "meeting_id": "may12_2026"
+   },
+   {
+    "city_id": "sparta",
+    "meeting_id": "may13_2026"
+   },
+   {
+    "city_id": "sparta",
+    "meeting_id": "may19_2026"
+   },
+   {
+    "city_id": "sparta",
+    "meeting_id": "may26_2025"
+   },
+   {
+    "city_id": "sparta",
+    "meeting_id": "may6_2026"
+   },
+   {
+    "city_id": "sparta",
+    "meeting_id": "may6_2_2026"
+   },
+   {
+    "city_id": "thessaloniki",
+    "meeting_id": "apr1_2026"
+   },
+   {
+    "city_id": "vari-voula-vouliagmeni",
+    "meeting_id": "feb24_2025"
+   },
+   {
+    "city_id": "vari-voula-vouliagmeni",
+    "meeting_id": "jan20_2025"
+   },
+   {
+    "city_id": "vrilissia",
+    "meeting_id": "apr15_2026"
+   },
+   {
+    "city_id": "vrilissia",
+    "meeting_id": "apr1_2026"
+   },
+   {
+    "city_id": "vrilissia",
+    "meeting_id": "apr22_2026"
+   },
+   {
+    "city_id": "vrilissia",
+    "meeting_id": "apr29_2_2026"
+   },
+   {
+    "city_id": "vrilissia",
+    "meeting_id": "apr6_2026"
+   },
+   {
+    "city_id": "vrilissia",
+    "meeting_id": "dec1_2025"
+   },
+   {
+    "city_id": "vrilissia",
+    "meeting_id": "dec22_2025"
+   },
+   {
+    "city_id": "vrilissia",
+    "meeting_id": "dec8_2025"
+   },
+   {
+    "city_id": "vrilissia",
+    "meeting_id": "feb11_2026"
+   },
+   {
+    "city_id": "vrilissia",
+    "meeting_id": "feb18_2026"
+   },
+   {
+    "city_id": "vrilissia",
+    "meeting_id": "feb25_2026"
+   },
+   {
+    "city_id": "vrilissia",
+    "meeting_id": "feb4_2_2026"
+   },
+   {
+    "city_id": "vrilissia",
+    "meeting_id": "jan14_2026"
+   },
+   {
+    "city_id": "vrilissia",
+    "meeting_id": "jan19_2026"
+   },
+   {
+    "city_id": "vrilissia",
+    "meeting_id": "jan28_2026"
+   },
+   {
+    "city_id": "vrilissia",
+    "meeting_id": "jan29_2026"
+   },
+   {
+    "city_id": "vrilissia",
+    "meeting_id": "mar11_2026"
+   },
+   {
+    "city_id": "vrilissia",
+    "meeting_id": "mar18_2026"
+   },
+   {
+    "city_id": "vrilissia",
+    "meeting_id": "mar18_2_2026"
+   },
+   {
+    "city_id": "vrilissia",
+    "meeting_id": "mar18_3_2026"
+   },
+   {
+    "city_id": "vrilissia",
+    "meeting_id": "mar23_2026"
+   },
+   {
+    "city_id": "vrilissia",
+    "meeting_id": "mar4_2026"
+   },
+   {
+    "city_id": "vrilissia",
+    "meeting_id": "mar4_2_2026"
+   },
+   {
+    "city_id": "vrilissia",
+    "meeting_id": "may13_2026"
+   },
+   {
+    "city_id": "vrilissia",
+    "meeting_id": "may6_2026"
+   },
+   {
+    "city_id": "vrilissia",
+    "meeting_id": "nov26_2025"
+   },
+   {
+    "city_id": "vrilissia",
+    "meeting_id": "oct22_2025"
+   },
+   {
+    "city_id": "xylokastro",
+    "meeting_id": "apr28_2025"
+   },
+   {
+    "city_id": "xylokastro",
+    "meeting_id": "dec22_2025"
+   },
+   {
+    "city_id": "xylokastro",
+    "meeting_id": "dec8_2025"
+   },
+   {
+    "city_id": "xylokastro",
+    "meeting_id": "feb24_2025"
+   },
+   {
+    "city_id": "xylokastro",
+    "meeting_id": "feb25_2026"
+   },
+   {
+    "city_id": "xylokastro",
+    "meeting_id": "jan20_2025"
+   },
+   {
+    "city_id": "xylokastro",
+    "meeting_id": "jan28_2026"
+   },
+   {
+    "city_id": "xylokastro",
+    "meeting_id": "jan8_2026"
+   },
+   {
+    "city_id": "xylokastro",
+    "meeting_id": "jul28_2025"
+   },
+   {
+    "city_id": "xylokastro",
+    "meeting_id": "jun30_2025"
+   },
+   {
+    "city_id": "xylokastro",
+    "meeting_id": "mar12_2025"
+   },
+   {
+    "city_id": "xylokastro",
+    "meeting_id": "mar26_2025"
+   },
+   {
+    "city_id": "xylokastro",
+    "meeting_id": "mar30_2026"
+   },
+   {
+    "city_id": "xylokastro",
+    "meeting_id": "may28_2025"
+   },
+   {
+    "city_id": "xylokastro",
+    "meeting_id": "may4_2026"
+   },
+   {
+    "city_id": "xylokastro",
+    "meeting_id": "may7_2025"
+   },
+   {
+    "city_id": "xylokastro",
+    "meeting_id": "nov18_2025"
+   },
+   {
+    "city_id": "xylokastro",
+    "meeting_id": "nov24_2025"
+   },
+   {
+    "city_id": "xylokastro",
+    "meeting_id": "oct13_2025"
+   },
+   {
+    "city_id": "xylokastro",
+    "meeting_id": "oct6_2025"
+   },
+   {
+    "city_id": "xylokastro",
+    "meeting_id": "sep1_2025"
+   },
+   {
+    "city_id": "xylokastro",
+    "meeting_id": "zhr_sep9_2025"
+   },
+   {
+    "city_id": "xylokastro",
+    "meeting_id": "zrh_sep16_2025"
+   },
+   {
+    "city_id": "zografou",
+    "meeting_id": "apr15_2026"
+   },
+   {
+    "city_id": "zografou",
+    "meeting_id": "apr1_2026"
+   },
+   {
+    "city_id": "zografou",
+    "meeting_id": "apr21_2026"
+   },
+   {
+    "city_id": "zografou",
+    "meeting_id": "apr24_2026"
+   },
+   {
+    "city_id": "zografou",
+    "meeting_id": "apr28_2026"
+   },
+   {
+    "city_id": "zografou",
+    "meeting_id": "apr3_2026"
+   },
+   {
+    "city_id": "zografou",
+    "meeting_id": "dec11_2025"
+   },
+   {
+    "city_id": "zografou",
+    "meeting_id": "dec18_2025"
+   },
+   {
+    "city_id": "zografou",
+    "meeting_id": "dec22_2025"
+   },
+   {
+    "city_id": "zografou",
+    "meeting_id": "dec2_2025"
+   },
+   {
+    "city_id": "zografou",
+    "meeting_id": "feb10_2026"
+   },
+   {
+    "city_id": "zografou",
+    "meeting_id": "feb19_2026"
+   },
+   {
+    "city_id": "zografou",
+    "meeting_id": "feb24_2026"
+   },
+   {
+    "city_id": "zografou",
+    "meeting_id": "feb26_2026"
+   },
+   {
+    "city_id": "zografou",
+    "meeting_id": "feb3_2026"
+   },
+   {
+    "city_id": "zografou",
+    "meeting_id": "feb6_2026"
+   },
+   {
+    "city_id": "zografou",
+    "meeting_id": "jan26_2026"
+   },
+   {
+    "city_id": "zografou",
+    "meeting_id": "jan26_2_2026"
+   },
+   {
+    "city_id": "zografou",
+    "meeting_id": "jan26_3_2026"
+   },
+   {
+    "city_id": "zografou",
+    "meeting_id": "jan29_2026"
+   },
+   {
+    "city_id": "zografou",
+    "meeting_id": "jan29_2_2026"
+   },
+   {
+    "city_id": "zografou",
+    "meeting_id": "jan8_2026"
+   },
+   {
+    "city_id": "zografou",
+    "meeting_id": "jan8_2026_3"
+   },
+   {
+    "city_id": "zografou",
+    "meeting_id": "mar17_2026"
+   },
+   {
+    "city_id": "zografou",
+    "meeting_id": "mar18_2026"
+   },
+   {
+    "city_id": "zografou",
+    "meeting_id": "mar24_2026"
+   },
+   {
+    "city_id": "zografou",
+    "meeting_id": "may12_2026"
+   },
+   {
+    "city_id": "zografou",
+    "meeting_id": "may18_2026"
+   },
+   {
+    "city_id": "zografou",
+    "meeting_id": "may19_2026"
+   },
+   {
+    "city_id": "zografou",
+    "meeting_id": "may5_2026"
+   },
+   {
+    "city_id": "zografou",
+    "meeting_id": "nov11_2025"
+   },
+   {
+    "city_id": "zografou",
+    "meeting_id": "nov13_2025"
+   },
+   {
+    "city_id": "zografou",
+    "meeting_id": "nov18_2025"
+   },
+   {
+    "city_id": "zografou",
+    "meeting_id": "nov25_2025"
+   },
+   {
+    "city_id": "zografou",
+    "meeting_id": "nov4_2025"
+   },
+   {
+    "city_id": "zografou",
+    "meeting_id": "oct21_2025"
+   },
+   {
+    "city_id": "zografou",
+    "meeting_id": "oct22_2025"
+   },
+   {
+    "city_id": "zografou",
+    "meeting_id": "oct22_2_2025"
+   },
+   {
+    "city_id": "zografou",
+    "meeting_id": "oct30_2025"
+   },
+   {
+    "city_id": "zografou",
+    "meeting_id": "oct30_2_2025"
+   }
+  ]
+ },
+ "benchmark_leakage": {
+  "run_id": "2026-08-10-corrected-adapter-label-prefix-fix-vs-ju",
+  "all_items": {
+   "n_windows": 260,
+   "n_meetings": 203,
+   "windows_in_glossary_source": 184,
+   "windows_in_finetune_train": 151,
+   "windows_in_either": 219,
+   "windows_disjoint_from_both": 41
+  },
+  "common_items": {
+   "n_windows": 253,
+   "n_meetings": 198,
+   "windows_in_glossary_source": 178,
+   "windows_in_finetune_train": 148,
+   "windows_in_either": 213,
+   "windows_disjoint_from_both": 40,
+   "clean_window_ids": [
+    "win_argos_apr30_2_2026_1264428",
+    "win_argos_apr7_2026_960810",
+    "win_argos_jun3_2026_855222",
+    "win_argos_may22_2026_1650387",
+    "win_argos_sep10_2025_573077",
+    "win_argos_sep24_2025_371824",
+    "win_athens_may20_2026_1635240",
+    "win_athens_may20_2_2026_1191014",
+    "win_athens_may25_2026_20766856",
+    "win_athens_may25_2026_8442464",
+    "win_athens_may25_3_2026_4291840",
+    "win_athens_may28_2_2026_2067509",
+    "win_athens_may29_2026_9007819",
+    "win_chalandri_may25_2026_592579",
+    "win_chalandri_nov19_2025_1291570",
+    "win_chalandri_oct29_2025_3774121",
+    "win_chalandri_oct8_2025_1254808",
+    "win_chalandri_sep24_2025_1650859",
+    "win_chania_feb3_2025_1215489",
+    "win_chania_may20_2026_12827086",
+    "win_chania_may25_2026_1279832",
+    "win_chania_nov17_2025_596263",
+    "win_chania_oct8_2025_1224471",
+    "win_chania_sep10_2025_5657045",
+    "win_orestiada_apr7_2026_3737815",
+    "win_orestiada_jan21_2026_7536686",
+    "win_orestiada_jan21_2026_7985300",
+    "win_orestiada_mar3_2026_1332463",
+    "win_orestiada_mar3_2026_150289",
+    "win_sparta_jun9_2026_0",
+    "win_sparta_jun9_2026_434241",
+    "win_vrilissia_jun3_3_2026_8277907",
+    "win_vrilissia_may27_2_2026_4321935",
+    "win_xylokastro_aug27_2024_1237458",
+    "win_xylokastro_dec19_2024_552208",
+    "win_xylokastro_jun25_2025_599946",
+    "win_xylokastro_jun3_2026_1029425",
+    "win_xylokastro_oct29_2025_902828",
+    "win_zografou_jun4_2026_6168559",
+    "win_zografou_may21_2_2026_2734957"
+   ]
+  },
+  "verdict": "The glossary's source meetings cover more of this benchmark than the fine-tune's training set does. `bench_data.training_meetings()` is therefore NOT the right disjointness line for a glossary arm."
+ }
+}
