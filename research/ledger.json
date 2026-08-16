@@ -1,6 +1,6 @@
 {
  "schema_version": 1,
- "updated_at": "2026-08-16T22:00:00Z",
+ "updated_at": "2026-08-16T23:30:00Z",
  "note": "Authoritative state. Reports under docs/reports/ are immutable evidence; this file says whether their conclusions still stand. When a doc disagrees with this file, this file wins and the doc gets fixed in the same change.",
  "experiments": [
   {
@@ -694,7 +694,8 @@
    "conclusion": "SCREEN RESULT 2026-08-16 (single seed 101; measured per-seed spread is 2.1 WER points, so this decides nothing alone). Both screens were merged, converted to CT2 int8 and decoded on the LOCAL minipc stack only (CPU, 16 threads, frozen control decode config, common random numbers, same normalizer); four distinct model.bin sha256 (control 8a1a3b25, RUN1 d808868a, RUN2-stage1 96088a40, RUN2-stage2 444de4e9). 39 frozen windows / 31 meetings / 11,911 ref tokens; paired bootstrap over meetings, 4000 replicates. control WER 0.1589 del 0.0600 ins 0.0201 sub 0.0788 | RUN1 WER 0.1641 del 0.0788 ins 0.0174 sub 0.0680 | RUN2-stage2 WER 0.1591 del 0.0756 ins 0.0163 sub 0.0672. vs control both arms: WER delta includes zero (+0.0052 / +0.0002), del_rate RISES with CI excluding zero (+0.0187 [+0.0012,+0.0414] / +0.0155 [+0.0016,+0.0341]), sub_rate FALLS with CI excluding zero (-0.0107 / -0.0115), ins_rate falls but includes zero. Leave-one-window-out does not reverse any del/sub/ins sign; the RUN2 WER delta's sign flips on 13 of 39 windows and is read as flat, never as better. DS-WER v2 entities (primary, 274 occurrences, never decides alone): control 0.5365, RUN1 0.6058, RUN2 0.5657; the same S->D swap appears there (entities S/D 114/26 -> 70/93 -> 90/58). v1: 0.512 / 0.596 / 0.536. READING: both stage-2-containing screens traded substitutions for deletions - the mix built to REDUCE deletions is followed by MORE deletions in both arms, with WER flat, which a pooled-WER-only look would have missed entirely. Neither arm meets the frozen primary criterion (deletion drop without insertion/WER regression), so the control artifact-adapter-fixed keeps the candidate slot. Pipeline-bug check done first and clean: distinct fingerprints, stage2.log records LoRA initialized from trained stage-1 weights (192 nonzero lora_B), identical stage-2 substrate (n_train 42,204 / max_steps 10,552 in both runs), S+D+I reproduce the WERs, no arm near the +2-point bug threshold. FOR THIS RECORD: RUN1 IS this mix's screen, and the mixture it actually trained on is NOT the 55/25/10/10 of the question above: the realized exposure over 42,204 presentations was 68.9/18.6/2.6/10.0 (backbone/deletion-hard/names/other). 55/25/10/10 is the PLANNED mix; every result below belongs to the executed 68.9/18.6/2.6/10.0 one, and the gap (a smaller deletion-hard and a much smaller names share than designed) is itself a candidate explanation for the outcome. It did not lower the deletion rate; it raised it (+0.0187 per ref token, CI excludes zero, 715 -> 938 deletions) while lowering substitutions (938 -> 810) and leaving WER statistically flat. The stated goal of the mix is therefore not achieved on one seed, in the direction opposite to the hypothesis. Association, not proof of cause: one seed per arm, no ablation separating data composition from anything else in the run, and aggregate counts do not show that particular substitutions became deletions.",
    "decision": null,
    "reports": [
-    "docs/reports/2026-08-16-screens-eval.md"
+    "docs/reports/2026-08-16-screens-eval.md",
+    "docs/reports/2026-08-16-deletion-hard-coverage-audit.md"
    ],
    "specs": [
     "docs/specs/2026-08-15-targeted-deletion-training-prereg.md"
@@ -706,14 +707,15 @@
     "cap-runpod-gpu-pod"
    ],
    "superseded_by": null,
-   "next_action": "Error analysis of the deletion-hard supply BEFORE any retrain (frozen-tree branch 'both worse on deletions -> no blind retries'). Audit whether deletion-hard targets are themselves truncated and whether the mining criterion rewards omission; then decide whether the 25% deletion-hard share is the problem or the rows are. The prereg v2 3-seed gates stay frozen and unused. No GPU spend authorised.",
+   "next_action": "DONE 2026-08-16: the error analysis of the deletion-hard supply ran as exp-2026-08-16-deletion-hard-coverage and NEITHER frozen gate was established, so the user's training freeze holds for this cycle. The 25% deletion-hard share is not shown to be the problem and the rows are not shown to be truncated; the largest recorded anomaly is the realized mixture itself (names 2.6% against a designed 10%, and names 6.8x/4.4x enriched in the new deletions). The prereg v2 3-seed gates stay frozen and unused. No GPU spend authorised. Reopening needs a new reason, not this one.",
    "caveats": [
     "Per-seed spread 2.1 WER points: single-seed results from this experiment are screens, never conclusions.",
     "Mining artifacts: gap-candidates-2026-08-12.{md,jsonl}, gap-mining-summary, backbone-headroom (all under data/reports/finetune-research/, gitignored).",
     "Auto-accepted labels (username=auto-verifier) carry ~2.6% expected contamination (audit-calibrated); exclude or down-weight them if a later gate failure implicates label quality.",
-    "The screen's failure is visible ONLY in the error decomposition: pooled WER moved +0.005 with a CI including zero, so a WER-only report would have called this mix neutral."
+    "The screen's failure is visible ONLY in the error decomposition: pooled WER moved +0.005 with a CI including zero, so a WER-only report would have called this mix neutral.",
+    "The deletion-hard supply audit (exp-2026-08-16-deletion-hard-coverage) could only measure the AUTO-VERIFIED stratum: the 1,260 pre-wave human-reviewed rows have no Soniox witness and were never checked for coverage."
    ],
-   "updated_at": "2026-08-16T18:30:00Z"
+   "updated_at": "2026-08-16T23:30:00Z"
   },
   {
    "id": "exp-2026-08-14-hparl-probe",
@@ -762,7 +764,8 @@
    "decision": null,
    "reports": [
     "docs/reports/2026-08-15-external-sources-probe.md",
-    "docs/reports/2026-08-16-screens-eval.md"
+    "docs/reports/2026-08-16-screens-eval.md",
+    "docs/reports/2026-08-16-deletion-hard-coverage-audit.md"
    ],
    "specs": [
     "docs/specs/2026-08-15-external-packs-screens-prereg.md",
@@ -779,7 +782,7 @@
     "cap-runpod-gpu-pod"
    ],
    "superseded_by": null,
-   "next_action": "BRANCH REACHED IN THE FROZEN TREE: both arms worse on deletions than the control -> NO BLIND RETRY, error analysis first. Next is a zero-GPU look at the deletion-hard supply itself: which rows it contains, whether any deletion-hard target is itself truncated, whether the selection criterion favours examples where omission is the correct label, and what the losing meetings have in common. Any confirmation round after that needs 3 seeds and MATCHED GPUs per the frozen gates in docs/specs/2026-08-15-targeted-deletion-training-prereg.md. No further external-pack screen is authorised: the pack question cannot be advanced while the shared stage-2 is regressing deletions.",
+   "next_action": "The zero-GPU look at the deletion-hard supply is DONE 2026-08-16 (exp-2026-08-16-deletion-hard-coverage): neither frozen gate established, training stays closed for this cycle. No further external-pack screen is authorised - the pack question cannot be advanced while the shared stage-2 is regressing deletions, and the stage-2 is not being rebuilt. Any confirmation round after that needs 3 seeds and MATCHED GPUs per the frozen gates in docs/specs/2026-08-15-targeted-deletion-training-prereg.md.",
    "caveats": [
     "EuroSpeech licence UNRESOLVED: HF card 'other', per-country pointer to Greek copyright law (n.2121/1993) for parliament proceedings - same legal call as HParl before any commercial shipping.",
     "EuroSpeech overlaps hparl2 in domain and possibly in sessions (both Hellenic Parliament): never use both packs without cross-pack dedupe. EuroSpeech solves both HParl defects (fragments at ~3s boundaries, no punctuation), so it likely supersedes hparl2 as the parliament source if its keep rate holds.",
@@ -793,7 +796,7 @@
     "DS-WER v2 here is the first PROSPECTIVE use of a retrospectively specified metric; no paired uncertainty was computed for it, so it corroborates and never decides.",
     "Both runs share a stage-2 whose REALIZED mixture was 68.9/18.6/2.6/10.0 (backbone/deletion-hard/names/other), not the planned 55/25/10/10 of the deletion prereg; quote the executed shares whenever the screens are discussed."
    ],
-   "updated_at": "2026-08-16T18:30:00Z"
+   "updated_at": "2026-08-16T23:30:00Z"
   },
   {
    "id": "exp-2026-08-16-harness-mde",
@@ -957,33 +960,39 @@
    "id": "exp-2026-08-16-gold-set",
    "title": "Human-verified reference with speaker labels and overlap",
    "question": "What are the fidelity-to-audio WER, the deletion rate against what was actually said, and the speaker-attribution accuracy - overall and inside overlap - of our systems on council audio nobody has touched?",
-   "status": "OPEN",
-   "conclusion": null,
-   "decision": null,
-   "artifact_ids": [],
+   "status": "CLOSED",
+   "conclusion": "THE HEADLINE QUESTION WAS NOT ANSWERED AND MUST NOT BE REPORTED AS IF IT WERE: W, the per-column composition of exp-2026-08-16-composition-over-selection, COULD NOT BE RUN on this audio - it is defined over ElevenLabs Scribe v2 + Soniox + the adapter and no ElevenLabs credential exists in this environment (checked .env, shell env, the OpenCouncil repos; the benchmark API only runs its own windows; GPU spend forbidden). W's added-word precision remains UNMEASURED. | WHAT WAS MEASURED, on 27 cores / 6 meetings / 6 cities, 999 certain tokens in the declared primary core-envelope region, meeting-cluster bootstrap (6 clusters, descriptive not significance): (1) FIDELITY-TO-AUDIO, the first ever in this project. ADP (artifact-adapter-fixed) 0.284 [0.169,0.455], deletions 0.116; PUB (the PUBLISHED OpenCouncil pipeline output) 0.198 [0.102,0.327], deletions 0.121; the anchored prefill 0.230. Paired ADP-PUB = +0.086 [+0.035,+0.135] - but the RANKING IS NOT REGION-INVARIANT: core-strict reverses it to -0.091 [-0.232,-0.022] while the full clip agrees with the envelope (+0.061). NO SYSTEM RANKING IS CLAIMED. (2) THE CANDIDATE AUDIT, in place of the W question and built from ADP+PUB alone with the gold consulted only afterwards under multiset capacity: 53 of 66 token occurrences that PUB has and ADP does not are SUPPORTED BY THE HUMAN REFERENCE, 80.3%, meeting CI [0.647,0.979], 5 informative meetings. Four times in five, a word a second system has and ours lacks was really said. This is a corpus audit yield, NOT W's precision. (3) 116 certain gold tokens are ADP deletions (11.6%); 104 of them (89.7%) are lexically witnessed by PUB and/or Soniox - witnessed, NOT recoverable. (4) SPEAKER ATTRIBUTION, never measured before anywhere in this project, PUB only (the adapter has no diarization), permutation locked once per cell and reused inside overlap: conditional accuracy 0.984 overall and 0.994 inside overlap, but that conditions on tokens PUB already recognised and is NOT overlap performance; the informative figure is speaker-attributed RECALL, 0.815 overall and 0.714 inside overlap - 62 of 217 certain simultaneous-speech tokens never reach a correct speaker. (5) WHAT THE PIPELINE DROPS: 8 of 137 gold blocks (5.8% [0.8%,10.2%]) have NO published utterance overlapping them in time at all; PUB's lexical deletion rate against the audio is 0.121. Observed absence of coverage - the applyDiarization SKIPPING branch is NOT proven, there is no production log. (6) ONE SPEAKER PER UTTERANCE, 38 overlap blocks in core: 12 have zero of their words in the published text, 23 are attributed to the same published speaker as their overlap partner, 21 show a single speaker; 201 of 270 tokens survive (0.744 [0.581,0.896]). (7) THE OMISSION DETECTOR COULD NOT BE RE-ESTIMATED: exactly ONE 'pyannote says speech, your text has none' flag in 27 cells, adjudicated non-speech. The 0.320 of exp-2026-08-16-pyannote-transcription is neither updated nor validated, and its 'lower bound' label is WITHDRAWN as unproven. (8) A different flag stream did work: of 106 'the published text has words here' prompts, the human called 17 (16.0%) real lost speech - and those 17 were NOT added to the frozen reference, so the reference knowingly under-covers and PUB is charged insertions for speech that happened. (9) AGREEMENT IS NOT FIDELITY: WER(ADP vs PUB) 0.304 vs WER(ADP vs gold) 0.284, with agreement LOWER in 8 of 25 cells - a different quantity, not a correctable offset.",
+   "decision": "Freeze the set as a challenge set; this was its one confirmatory pass and nothing was tuned on it. Do NOT quote any system ranking from it: the ADP-vs-PUB order flips between scoring regions. Do NOT quote 0.803 as W's added-word precision, and do not quote 0.994 as overlap speaker accuracy - the overlap number that means something is the 0.714 recall. The open work item is to obtain a Scribe v2 credential and run W on this audio; until then the ticket's headline question is unanswered. The pipeline-loss findings (5.8% of blocks temporally uncovered, 12 of 38 overlap blocks entirely absent, 28.6% of certain overlap words unattributed) are the first evidence that a share of what this project has called 'model deletions' is produced downstream of the model, and they belong in any future deletion work.",
+   "artifact_ids": [
+    "artifact-adapter-fixed"
+   ],
    "capability_ids": [],
-   "reports": [],
+   "reports": [
+    "docs/reports/2026-08-16-gold-set-findings.md"
+   ],
    "specs": [
     "docs/specs/2026-08-16-gold-set-prereg.md",
     "docs/specs/listening-protocol.md"
    ],
    "superseded_by": null,
-   "next_action": "HUMAN VERIFICATION IS DONE, 2026-08-16: all 30 cells complete in 140 active minutes (4.7 min/cell), inside the pre-declared 96-145 band. FROZEN by hash - answers fa7a5dec12a9d2787e4151d2388388b480e19de8a35c8fb7e3585da3a5d1f063, cells 7f734db8c0de2a4cc07892544f806607a29b190a5819da8c33ed238ac2b1b46a, both under ~/.cache/oc-public/gold-set-2026-08/ with research/gold-set-2026-08/verified-manifest.json in git. 3 warmup cells excluded, 27 scored. Content: 177 blocks, 52 with human-set boundaries, and REAL simultaneous speech in 16 of 30 cells across 41 blocks - enough overlap to measure something. NEXT: this is the first fidelity-to-audio reference this project has ever had. Score against it (a) WER of the composed text from exp-2026-08-16-composition-over-selection, (b) deletion rate against what was actually said rather than against our published text, (c) speaker-attribution accuracy overall AND inside overlap, which nothing here has ever been able to measure, (d) the omission detector, whose 0.320 precision is a LOWER BOUND because its ground truth was our own text.",
-   "updated_at": "2026-08-16T13:50:00Z",
+   "next_action": null,
+   "updated_at": "2026-08-16T23:30:00Z",
    "caveats": [
-    "NOTHING HAS BEEN MEASURED. This record exists to hold the frozen design, not a result.",
-    "Selection frame: the 151 untouched public meetings of exp-2026-08-04-public-meetings minus every meeting touched by the 39 frozen windows, the 7 SEALED holdout windows, the 2026-08-10 benchmark run (253/247) and the 2026-08-04/09 listening cohorts -> 84 meetings, 107.1 h, 11 cities. Disjointness is checked programmatically by scripts/gold_set/verify_disjoint.py and passes at meeting level and at time level.",
-    "The overlap stratum is selected BY pyannoteAI precision-2, so it is a 'pyannote-visible overlap challenge set', not natural overlap. pyannote's own overlap recall / false-negative rate is explicitly OUT OF SCOPE and cannot be estimated from this set. A second, independent candidate stream (short interjections in the published OpenCouncil transcript) exists to surface examples pyannote missed, but it cannot produce a rate either.",
-    "Unweighted results are NOT population estimates. Inclusion probabilities are recorded per meeting and per cell; any domain-level claim needs survey weighting, and the 2.2% time-based overlap rate is not a valid weight for word-denominator metrics.",
-    "The reference is prefilled from pyannoteAI precision-2 + faster-whisper-large-v3-turbo and CORRECTED by the human, which is known to under-catch omissions in this project (17.5% disagreement, 70.5% of missing words real). Mitigations: an audio-only pass before the text is unlocked, an omission audit against a second transcript after correction, and 3 of 27 cells transcribed blind first. The 3 blind cells are a sentinel, NOT a rate estimate.",
-    "27 scored cells x 15 s = 6.75 minutes of scored audio in 6 meetings / 6 cities. Bootstrap must resample MEETINGS, not cells.",
-    "Speaker letters are local to each cell. Named-speaker accuracy and cross-cell voice identity are NOT ground truth here.",
-    "Zero GPU. pyannoteAI cost: EUR 0.77 whole-meeting diarization + ~EUR 0.13 clip transcription. Running total on the key is about USD 6.2 against the USD 20 cap of eval/controlled_eval/exclusive_cost_check.py.",
-    "Three Codex reviews (high effort) ran before any audio was chosen and before any code was written: on the stratification and its selection bias, on the UI/schema and the overlap representation, and on anchoring mitigation. What was accepted and what was rejected is recorded in the spec.",
-    "Audio and transcript text live in ~/.cache/oc-public/gold-set/ and ~/oc-gold-set/. Git holds only manifests, hashes, aggregates and code.",
-    "Pass 1 (blind overlap judgement) is NOT usable as recorded: the question asked how many voices sound at once and the reviewer read it as how many distinct voices appear in the core, so turn-taking cells were answered 2 or 3. 7 of 30 pass-1 answers disagree with the pass-2 geometry and 9 were revised after the wording was fixed mid-session. Pass 2 is the authoritative overlap record - it is computed from the reviewer's own block times and speaker labels - and no metric should be built on pass 1.",
-    "One reviewer, one pass, no second annotator. There is no inter-annotator agreement number and therefore no measurement of the reference's own error rate.",
-    "The text was prefilled from pyannoteAI precision-2 + faster-whisper-large-v3-turbo and corrected rather than written from scratch, which anchors it toward that system. The three warmup cells include one written blind precisely to size that anchoring; it is 3 cells, so it indicates rather than measures."
+    "W WAS NOT RUN. No ElevenLabs credential in this environment and no GPU budget. Every number here describes ADP, the published pipeline, the anchored prefill, or Soniox as a witness - never W.",
+    "THE RANKING IS NOT REGION-INVARIANT. ADP-PUB is +0.086 on the declared primary envelope and on the clip (+0.061) but -0.091 on core-strict. The utterance-timestamp explanation for the reversal is plausible and UNPROVEN: the two regions also hold different content (486 vs 999 certain tokens).",
+    "Six meetings, one meeting per city, so MEETING AND CITY ARE FULLY CONFOUNDED. Cluster-bootstrap intervals over 6 clusters are descriptive sensitivity summaries; a CI excluding zero here is not statistical significance and no p-value is quoted.",
+    "19% of core-envelope tokens (233 of 1232) sit in blocks the human marked text-uncertain and are excluded from every denominator, WITH THEIR TIME MASKED OUT of the scored intervals. Without that masking every WER on this set roughly doubled - the system words spoken over an uncertain block returned as insertions. The bug was found and fixed before any number was read.",
+    "The reference is prefilled from pyannote precision-2 + whisper-turbo and corrected, so it is anchored toward a Whisper-family system; ADP is Whisper-family, PUB is Scribe-family. That anchoring would tend to flatter ADP, which is the opposite of the measured direction, so it does not explain PUB's advantage - but no bound on it exists. The 3 blind calibration cells show the listener neither copied the prefill nor was independent of it (12/5/11 token occurrences written blind that the prefill never had); 3 non-random cells with a post-exposure 'final' bound nothing.",
+    "The 17 spans the human judged as lost speech were NOT written into the frozen reference: pass 3 records a verdict only and cannot edit blocks. The reference therefore knowingly under-covers, and PUB's fidelity WER is conservative by that much.",
+    "The candidate audit's 66 occurrences come from 5 informative meetings and are not 66 independent trials. The naive token interval [0.692,0.881] is reported as naive and must not headline.",
+    "'104 of 116 ADP deletions are witnessed' is lexical witnessing under multiset capacity. It says nothing about timing, speaker, or the insertion cost of actually restoring them, and Soniox's witness covers the whole 35 s clip rather than the scored core, which makes it optimistic.",
+    "Speaker attribution is measured for PUB only. The adapter emits no speaker labels, so it has no speaker metric and adding a diarizer would define a different system.",
+    "The overlap stratum is 'overlap pyannote can see'. pyannote's own overlap recall stays out of scope and is not estimable from this set. Unweighted results are not population estimates.",
+    "One listener, one pass, no second annotator: there is no inter-annotator number and the intervals do not include the reference's own error.",
+    "Pass 1 (blind overlap judgement) was unusable as recorded and NO metric here touches it. Pass 2 is the authority throughout.",
+    "Two Codex reviews (high effort) shaped this. Job 75bfc337 ran before any code and forced the uncertainty time-masking, the gold-free candidate construction, multiset capacity, and the ban on exact binomial intervals as inferential. Job 6d2b98f1 ran on the findings and before the conclusion, and killed three sentences: '0.994 overlap speaker accuracy', '89.7% recoverable', and any region-invariant ADP/PUB ranking.",
+    "Zero GPU. The adapter ran on the local CPU endpoint (artifact-ct2-fixed, ~14 s per 35 s clip) and Soniox through a realtime websocket with no timestamps. No new external spend.",
+    "27 scored cells x 15 s = 6.75 minutes of scored core in 6 meetings / 6 cities."
    ]
   },
   {
@@ -1059,6 +1068,67 @@
     "247 two-minute windows, 144 meetings, 10 cities, 74,917 reference tokens. Enough to show the effect is not city-specific, not enough to describe Greek council audio in general.",
     "CodeRabbit ran against the CORRECT diff base (the commit before this change), unlike the #18 run that never saw its own experiment script. Five findings, all fixed before this record was final. One was substantive: three LLM batches had failed in transport and been cached as no-ops, inflating the 'invalid or missing' count with questions the model was never asked; those entries were purged, re-asked, and the W+L numbers here are the corrected ones (the earlier figures were -0.00035 and 221 no-ops). The others: the report had inverted the 27% oracle recovery; the band guard was described as a proof of the unbanded optimum when it is a heuristic; and the common-word frequency table read the sealed windows' reference text. The W, W+len and W+D arms use none of that machinery and did not move."
    ]
+  },
+  {
+   "id": "exp-2026-08-16-deletion-hard-coverage",
+   "title": "Does the deletion-hard training supply teach omission?",
+   "question": "Do the deletion-hard training rows carry target text that does not cover the speech in their clip, so the model is taught to stay silent over uncovered audio - and do the two screens' new deletions concentrate in one mechanically explainable category?",
+   "status": "CLOSED",
+   "conclusion": "NEITHER FROZEN GATE IS ESTABLISHED; under a proof-to-reopen rule the training freeze holds. Gate (b) is cleanly not met: the new deletions of both arms on the 39 frozen windows are 67.7% (RUN1) / 72.2% (RUN2) 'ordinary speech', which is the RESIDUAL category and not a mechanical explanation; the largest mechanical category is names at 18.0% / 11.8% against a >40% threshold. That holds under an alternative category precedence (edge>overlap>name), under a flipped alignment tie-break, and when contiguous runs are counted as single events (RUN1 n=104, ordinary 75.0%). Gate (a) is NOT DEMONSTRATED and NOT CONCLUSIVELY ADJUDICATED. Soniox witnesses exist for only 2,661 of the 3,921 deletion_hard rows, and the 1,260 without one are exactly the pre-wave HUMAN-reviewed stratum, so the audit measures the auto-verified stratum and structurally cannot measure the human one. On the witnessed rows the conservative estimator gives 10.75% over the 1.0 s gate (286 rows), ~8-9% if the measured proxy calibration transports, 9.39% duration-matched over the full bucket, 7.29% as a cohort lower bound. Reaching 15% cohort-wide would require a 24.0% positive rate among the 1,260 unwitnessed rows against ~6.5% implied by duration matching - unlikely, but not excluded. The ticket froze a threshold and not an ESTIMATOR: a deliberately loose upper-bound estimator (every difflib `replace` counted as uncovered) gives 22.7% witnessed = 605 rows = 15.4% of the whole cohort even counting every unwitnessed row as clean, i.e. it passes. That is recorded, not hidden; the conservative estimator is read as primary because it answers the ticket's own wording ('speech matching NO word of the target') and was fixed before any number existed. SUBSTANCE, none of it gate-passing: coverage is bimodal, not uniformly degraded - 67.2% of witnessed rows have ZERO uncovered tokens, median uncovered 0.0 s, p90 1.08 s, and the worst 5% of rows carry half of all uncovered seconds. The uncovered dose is 6.79% of clip audio against 3.78% on the 300 cleanliness-audited backbone rows, a pipeline-estimated ratio that is strongly duration-confounded (median 4.36 s vs 1.58 s) and not a clean 1.8x excess. In absolute terms ~22 minutes of uncovered audio in a 45.2 h mix = 0.81% of audio, ~1.26% exposure-weighted. That arithmetic does NOT falsify the causal hypothesis (repeated sampling, disproportionate loss and a global blank/speech operating-point shift can all amplify a small contaminated exposure, and the simultaneous substitution drop is consistent with such a shift) but it does not make target truncation the likely explanation either; only an ablation - retraining after filtering - would decide. Clip edges cut the target's own first or last word in 37.0% of the 2,655 testable deletion-hard rows (17.5% head, 23.8% tail) - against 69.7% on the 89 testable backbone comparison rows, i.e. NOT elevated in the deletion-hard bucket. Edge cutting tracks clip DURATION (backbone median 1.58 s vs 4.36 s), reproducing what exp-2026-08-09-clip-boundaries found by blind listening, and it is directionally OPPOSITE to the uncovered-speech hypothesis: it teaches output without acoustic support, not silence over speech. The realized mixture is the larger anomaly: dropping every flagged row moves 68.9/18.6/2.6/10.0 to 70.2/17.2/2.6/10.0, while the executed mix is already 4x under its own design on names (2.6% vs 10%) - and names are the one mechanical category enriched in the new deletions (6.8x over base rate in RUN1, 4.4x in RUN2), matching the DS-WER v2 entities S->D swap. Two candidate explanations therefore stay open with no causal support: mixture composition (better localized evidence) and target noise (a plausible global mechanism, no localized evidence).",
+   "decision": "Training stays frozen for this cycle. No retrain, no GPU spend. If it is ever reopened for another reason, three zero-cost changes are ready: drop the 286 flagged rows, pad clip boundaries, and restore the names dose to its designed 10%.",
+   "reports": [
+    "docs/reports/2026-08-16-deletion-hard-coverage-audit.md"
+   ],
+   "artifact_ids": [
+    "artifact-adapter-fixed"
+   ],
+   "superseded_by": null,
+   "next_action": null,
+   "caveats": [
+    "The seconds figure is a PROXY (uncovered_tokens x clip_duration / n_soniox_tokens): Soniox was run text-only and word timestamps were never saved. Calibrated against cached whisper-turbo word timestamps over 16,395 draws whose pseudo-clip durations are weighted to the audited rows' own duration distribution: estimate/true ratio median 1.32, p90 2.81, median absolute error 0.48 s, precision 0.830 / recall 0.980 at the 1.0 s gate, and 73.3% true positives in the 1-3 s estimate band where the flagged rows actually sit. The bias is UPWARD, so the headline share is more likely an over-estimate. The calibration validates the tokens->seconds step only, never that a Soniox token was really spoken, and its transport from benchmark windows to training clips is assumed, not shown.",
+    "1,260 of 3,921 deletion_hard rows (the pre-wave human-reviewed stratum) have no witness and were never measured. 'Gate not established' is not 'no gap exists', and a cohort-level FAILURE is not provable from these data.",
+    "The 300 backbone rows are a false-positive floor for the pipeline, not an unbiased control: they were selected for cleanliness and their median duration is 1.58 s against 4.36 s. Do not read 6.79% vs 3.78% causally.",
+    "Edge-cut rates are over TESTABLE rows only (both a Soniox exact and a padded transcript that align): 2,655 of 2,661 deletion-hard rows but only 89 of 300 backbone rows. Counting the untestable backbone rows as clean would have inverted the comparison, and an earlier draft of this record did exactly that.",
+    "The gate is strongly duration-dependent: 0.5% of rows under 2 s exceed it against 64% of rows over 20 s. A row-prevalence threshold is partly a statement about how the rows were cut.",
+    "The auto-verifier / manual stratification is RECONSTRUCTED from the pre-wave baseline export plus the recorded auto-accept rules; review-events.jsonl with username=auto-verifier lives on the review VM, not in this repo. Descriptive, never causal.",
+    "The new-deletion taxonomy uses two independent per-arm alignments, not a lattice of all optimal alignments; flipping the backtrace tie-break moves every share by under one point. 78.8% of reference tokens anchor to a real word timestamp, and 2 of 39 windows have no pyannote cache.",
+    "Zero GPU, zero pods, zero new API spend. The 7 sealed holdout windows were not touched and no transcript text left the cache."
+   ],
+   "updated_at": "2026-08-16T23:30:00Z"
+  },
+  {
+   "id": "exp-2026-08-16-char-vote-homophones",
+   "title": "Per-character voting and homophone arbitration on top of the per-column composition",
+   "question": "Does WER fall below W's 0.1005 using the same three systems, with a per-character vote inside disagreement columns (C) and homophone arbitration (H), measured leave-one-city-out?",
+   "status": "CLOSED",
+   "conclusion": "NO, and the census answered it before either arm was built. Of 80,659 alignment columns only 34 are strict-homophone columns an arm H could touch - 0.042%, seven times below the user's standing 0.3% do-not-build line - so H was NOT BUILT (no KenLM, no LLM). Arm C was built because it is text-only and cheap: out-of-fold over 10 leave-one-city-out folds it gives 0.10046 -> 0.10038, -0.00008 [-0.00026,+0.00009], CI INCLUDES ZERO, so it fails the primary gate. Both rate gates pass identically to the digit (empirically, not by construction: C cannot change the token count but a substitution can still move the scorer's alignment). C fired on all 136 eligible columns: 57 composites reproduced W's own token, 58 produced a different candidate, 2 produced a string no system proposed that the closed lexicon admitted, 19 were rejected off-lexicon. 49 of 247 windows changed, 16 better / 218 tied / 13 worse, 5 cities better / 4 worse, zero LOO sign flips of an effect indistinguishable from zero. THE STRUCTURAL FINDING is what survives: the 5.30-point gap between W (0.1005) and the alignment-conditional column oracle (0.0475) is NOT mostly in the columns where the three systems disagree about which word was said. Only 1,396 unresolved columns have W differing from the oracle, so one full edit gained per column would close at most 35.2% of the gap, and a hindsight replay over EVERY unresolved column closes 12.7%. The same replay over exact 2-of-3 token majorities closes 25.0% - twice every unresolved column together - and over occupancy columns 14.2%, taking deletions 0.0203 -> 0.0124 while pushing insertions 0.0374 -> 0.0391 and failing the frozen insertion gate even with hindsight. In the agree class the oracle disagrees with W ZERO times: it never drops or replaces a token all three systems produced.",
+   "decision": "C does not ship and H is not implemented. Word-choice arbitration between these three transcripts is a small room and both arms of #24 are inside it. The next lever is NOT another per-column arbiter over the same three texts: the mass sits where the systems agree, or agree 2-of-1, and are wrong together, which is exactly where their text carries no signal. Codex forbade the stronger reading that text-only arbitration is exhausted in general - what is shown is that arbitration restricted to THESE sparse eligible sets has little demonstrated value.",
+   "artifact_ids": [
+    "artifact-adapter-fixed"
+   ],
+   "capability_ids": [],
+   "reports": [
+    "docs/reports/2026-08-16-char-vote-homophones.md"
+   ],
+   "specs": [
+    "docs/specs/2026-08-16-char-vote-homophones-prereg.md"
+   ],
+   "superseded_by": null,
+   "next_action": null,
+   "updated_at": "2026-08-16T23:30:00Z",
+   "caveats": [
+    "FIFTH PASS over the same 247 windows / 144 meetings / 10 cities / 74,917 reference tokens. Freezing a design does not remove adaptive-overfitting pressure across passes.",
+    "NOT a clean out-of-sample estimate. The common-word set is properly cross-fitted leave-one-city-out, but it changed 2 decisions in the whole substrate, so LOCO is technically real and practically inert here. The city term lists and rosters were mined from material overlapping this benchmark and are NOT cross-fitted, and the class definitions were chosen after four previous passes over these same windows. Codex job 46892fd0 named this a partially cross-fitted, benchmark-adapted result.",
+    "The per-column oracle attribution is read off the oracle DP's own backtrace (msa.oracle_select, added here). The first version matched the oracle's TOKEN LIST back onto the columns by membership, which mis-attributes repeated words - it inflated the agree class to 530 spurious disagreements and understated the occupancy replay by 6.5 points of the gap. CodeRabbit found it; every number in the record is post-fix.",
+    "The hindsight replays are NOT ceilings. The column oracle's entry is replayed token-only, so it can substitute where the oracle chose a token but never deletes what W kept: each is a lower bound on that class's unrestricted hindsight value and an optimistic target for any learnable method. Do not add the percentages - edit-distance effects make the interventions non-additive.",
+    "The phonemic maps are pronunciation keys UNDER THE SCORER'S NORMALIZATION, not phonetic transcriptions. The frozen scorer strips diacritics, so stress and diaeresis are gone before the map sees a token and the diaeresis distinction is unrecoverable. STRICT keeps the au/eu digraphs opaque, deliberately under-merging the common auto/afto class; the loose variant catches it and moved ONE column.",
+    "Arm H was never implemented, so nothing here is evidence about what a KenLM or an LLM would decide on a homophone column. The evidence is that there are 34 of them.",
+    "The meeting-clustered CI is conditional on the ten fitted folds and on these ten cities, with no refitting inside replicates. Ten cities are too few for a city-level bootstrap, so per-city deltas and the city-unweighted mean are reported instead.",
+    "The 6 sealed temporal-holdout windows of eval-freeze-2026-08 were removed by the same explicit filter exp_fusion_deletions.py carries, before anything was computed. They were never scored.",
+    "Scored with eval/controlled_eval/scoring.py, not the benchmark app's scorer, so these numbers are comparable to exp-2026-08-16-composition-over-selection and NOT to the published leaderboard. Agreement-with-OpenCouncil, not fidelity-to-audio.",
+    "Two Codex passes shaped this. Job 55293f6b, BEFORE any number: added the exact_2_of_3 class (the first draft would have let an arm overturn a real token majority), the split/merge quarantine, the rule that epsilon is never offered to H, the exclusion of two-string columns from C, and found the vowel-collapse bug that made poiitis collide with pitis. Job 46892fd0, before the conclusion: cut back the structural claim to what the counts support and supplied the count-based bounds.",
+    "The reusable evaluator (eval/controlled_eval/fusion_lab.py) is new and has been exercised by exactly one experiment. Its cross-fitting is only as honest as the idea handed to it: an idea that fits nothing gets fitted:false and an out-of-fold number identical to its in-fold one."
+   ]
   }
  ],
  "artifacts": [
@@ -1104,7 +1174,6 @@
     "verified_at": "2026-08-16"
    },
    "caveats": [
-    "NOT yet uploaded to HuggingFace. The public model card at opencouncil/whisper-large-v3-el-council-lora has promised a replacement since 2026-08-01 and still serves the broken weights (artifact-adapter-july-broken).",
     "Its only in-training measurement is 32 dev windows (WER 0.2176). Its benchmark measurement is exp-2026-08-10-benchmark-fixed-adapter (0.1542 wer-nofillers on the 39 clean validation windows).",
     "Published 2026-08-16. The model card states in its own text that this adapter does NOT beat Scribe v2 or Soniox on unseen cities (both intervals contain zero) and is clearly WORSE on domain terms (DS-WER 0.4880 vs Soniox 0.3280). Anyone quoting the publication as a win is misreading it."
    ],

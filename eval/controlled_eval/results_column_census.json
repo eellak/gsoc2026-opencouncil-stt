@@ -1,0 +1,189 @@
+{
+ "substrate": {
+  "run_id": "2026-08-10-corrected-adapter-label-prefix-fix-vs-ju",
+  "trio": [
+   "scribe-v2-clean",
+   "soniox",
+   "oc-runpod-fixed-2026-08-10"
+  ],
+  "n_windows": 247,
+  "n_meetings": 144,
+  "n_cities": 10,
+  "ref_tokens": 74917,
+  "align_cache": "/home/harold/.cache/oc-public/fusion_lab/align_65b1c4d64618a429.json"
+ },
+ "n_columns": 80659,
+ "classes": {
+  "agree": {
+   "n": 62919,
+   "share": 0.7800617414051749,
+   "windows_containing": 247,
+   "w_differs_from_column_oracle": 0,
+   "w_differs_share_of_class": 0.0
+  },
+  "exact_2_of_3": {
+   "n": 6645,
+   "share": 0.08238386292912137,
+   "windows_containing": 247,
+   "w_differs_from_column_oracle": 1245,
+   "w_differs_share_of_class": 0.1873589164785553
+  },
+  "two_present_same": {
+   "n": 4569,
+   "share": 0.05664587956706629,
+   "windows_containing": 246,
+   "w_differs_from_column_oracle": 1532,
+   "w_differs_share_of_class": 0.3353031297876997
+  },
+  "singleton": {
+   "n": 4460,
+   "share": 0.05529451146183315,
+   "windows_containing": 245,
+   "w_differs_from_column_oracle": 715,
+   "w_differs_share_of_class": 0.16031390134529147
+  },
+  "unresolved_three": {
+   "n": 1104,
+   "share": 0.013687251267682466,
+   "windows_containing": 219,
+   "w_differs_from_column_oracle": 601,
+   "w_differs_share_of_class": 0.5443840579710145
+  },
+  "unresolved_two": {
+   "n": 962,
+   "share": 0.011926753369121858,
+   "windows_containing": 191,
+   "w_differs_from_column_oracle": 795,
+   "w_differs_share_of_class": 0.8264033264033264
+  }
+ },
+ "flags_within_unresolved": {
+  "unresolved_three:chardist_1": 23,
+  "unresolved_three:chardist_2": 126,
+  "unresolved_three:chardist_3": 955,
+  "unresolved_three:loose_homophone": 15,
+  "unresolved_three:partial_homophone": 130,
+  "unresolved_three:strict_homophone": 14,
+  "unresolved_two:chardist_1": 138,
+  "unresolved_two:chardist_2": 150,
+  "unresolved_two:chardist_3": 674,
+  "unresolved_two:loose_homophone": 20,
+  "unresolved_two:strict_homophone": 20
+ },
+ "flags_w_differs": {
+  "unresolved_three:loose_homophone": 9,
+  "unresolved_three:partial_homophone": 73,
+  "unresolved_three:strict_homophone": 8,
+  "unresolved_two:loose_homophone": 15,
+  "unresolved_two:strict_homophone": 15
+ },
+ "split_merge": {
+  "columns_flagged": 291,
+  "share_of_all": 0.0036077809047967368,
+  "unresolved_columns_blocked": {
+   "unresolved_two": 22,
+   "unresolved_three": 22
+  }
+ },
+ "eligible": {
+  "C": 136,
+  "C:unresolved_three": 136,
+  "H": 34,
+  "H:unresolved_three": 14,
+  "H:unresolved_two": 20
+ },
+ "eligible_w_differs_from_oracle": {
+  "C": 77,
+  "C:unresolved_three": 77,
+  "H": 23,
+  "H:unresolved_three": 8,
+  "H:unresolved_two": 15
+ },
+ "eligible_loose_variant": {
+  "H_loose": 35,
+  "H_loose_wrong": 24
+ },
+ "per_city_class_shares": {
+  "argos": {
+   "agree": 0.7561426196194347,
+   "exact_2_of_3": 0.0910770367633475,
+   "two_present_same": 0.056530574542767414,
+   "singleton": 0.0596711620173656,
+   "unresolved_two": 0.016441899131719933,
+   "unresolved_three": 0.02013670792536486
+  },
+  "athens": {
+   "agree": 0.751895752042995,
+   "two_present_same": 0.054700728852241774,
+   "exact_2_of_3": 0.0981373776043584,
+   "singleton": 0.058013693587572704,
+   "unresolved_three": 0.01980416697342266,
+   "unresolved_two": 0.017448280939409557
+  },
+  "chalandri": {
+   "exact_2_of_3": 0.06578267608059239,
+   "unresolved_three": 0.0051661787497847425,
+   "agree": 0.8121232994661616,
+   "two_present_same": 0.06337179266402618,
+   "singleton": 0.04615119683141037,
+   "unresolved_two": 0.0074048562080247975
+  },
+  "chania": {
+   "agree": 0.774259771022503,
+   "two_present_same": 0.07003553099091986,
+   "exact_2_of_3": 0.0713778128701145,
+   "singleton": 0.06348203711014608,
+   "unresolved_two": 0.011133043821555468,
+   "unresolved_three": 0.009711804184761154
+  },
+  "orestiada": {
+   "agree": 0.8140853946746495,
+   "singleton": 0.03875846856782732,
+   "unresolved_three": 0.011343942019851899,
+   "two_present_same": 0.03907357806837876,
+   "exact_2_of_3": 0.08870332440523082,
+   "unresolved_two": 0.008035292264061761
+  },
+  "samothraki": {
+   "singleton": 0.07892363199037883,
+   "agree": 0.69167167769092,
+   "exact_2_of_3": 0.1134996993385448,
+   "two_present_same": 0.07426337943475646,
+   "unresolved_two": 0.0208959711365003,
+   "unresolved_three": 0.02074564040889958
+  },
+  "sparta": {
+   "two_present_same": 0.0406112799729821,
+   "singleton": 0.04601485984464708,
+   "exact_2_of_3": 0.07666328942924687,
+   "agree": 0.8142519419115164,
+   "unresolved_three": 0.013086795001688618,
+   "unresolved_two": 0.009371833839918946
+  },
+  "vrilissia": {
+   "agree": 0.795500387897595,
+   "unresolved_three": 0.00682699767261443,
+   "exact_2_of_3": 0.06749418153607448,
+   "two_present_same": 0.05927075252133437,
+   "singleton": 0.0639255236617533,
+   "unresolved_two": 0.0069821567106283944
+  },
+  "xylokastro": {
+   "agree": 0.8203084387454513,
+   "singleton": 0.02876451221625368,
+   "exact_2_of_3": 0.07693640616877491,
+   "unresolved_three": 0.02044706290071045,
+   "two_present_same": 0.044533009876971064,
+   "unresolved_two": 0.009010570091838503
+  },
+  "zografou": {
+   "agree": 0.7857142857142857,
+   "singleton": 0.06245923026744944,
+   "unresolved_three": 0.007501630789302022,
+   "exact_2_of_3": 0.06979778212654925,
+   "two_present_same": 0.0657208088714938,
+   "unresolved_two": 0.008806262230919765
+  }
+ },
+ "note": "w_differs_from_column_oracle READS THE REFERENCE and is descriptive only. Eligibility is the frozen rule of column_classes.eligibility."
+}

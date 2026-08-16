@@ -282,7 +282,21 @@ def compose(cols, pivot: int, priority=(0, 1, 2)):
 
 # ------------------------------------------------------- alignment-conditional oracle
 def oracle_columns(cols, ref: list[str]):
-    """Best text obtainable by choosing one entry per column, against `ref`.
+    """The oracle's text: `oracle_select` with the epsilon choices dropped."""
+    return [t for t in oracle_select(cols, ref) if t is not None]
+
+
+def oracle_select(cols, ref: list[str]):
+    """Per-COLUMN oracle choice: one entry (or None for epsilon) per input column.
+
+    Added for wayfinder #24. Callers that need to know WHICH column the oracle's
+    tokens came from must use this: matching the token list back onto the columns by
+    membership silently mis-attributes a token whenever the same word is a candidate
+    in two nearby columns, which is common in Greek (articles, «και», repeated
+    surnames). CodeRabbit flagged exactly that in the first version of the ceiling
+    arms.
+
+    Best text obtainable by choosing one entry per column, against `ref`.
 
     Exact DP over columns x reference. Codex job 8112dc72 confirmed the recurrence
     and fixed the boundary row, and required that the result be RECONSTRUCTED and
@@ -337,14 +351,11 @@ def oracle_columns(cols, ref: list[str]):
                     best, bkb = v, (i - 1, j, ci)
             dp[i][j] = best
             bk[i][j] = bkb
-    out = []
+    out: list[str | None] = [None] * n
     i, j = n, m
     while i or j:
         pi, pj, ci = bk[i][j]
         if ci != NEG:
-            e = cands[i - 1][ci]
-            if e is not None:
-                out.append(e)
+            out[i - 1] = cands[i - 1][ci]
         i, j = pi, pj
-    out.reverse()
     return out

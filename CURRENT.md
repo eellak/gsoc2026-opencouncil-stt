@@ -8,8 +8,8 @@ are closed, 2026-08-12. Read
 [`docs/reports/2026-08-20-final-report.md`](docs/reports/2026-08-20-final-report.md)
 first — it is the answer to the project's question, with its limits.
 
-What is left is the queue below: one decision (publish), one experiment (name
-lexicon), one gap (fidelity-to-audio).
+What is left is the queue below: one experiment (name lexicon) and one gap
+(fidelity-to-audio). The publish decision was carried out on 2026-08-16.
 
 Canonical research state: [`research/ledger.json`](research/ledger.json).
 Agent protocol: [`CLAUDE.md`](CLAUDE.md).
@@ -43,9 +43,9 @@ trained through the label-prefix bug and cannot answer it.
    beam hypotheses) — no serving-time technique reaches them; Scribe is not
    beatable without targeted retraining. Remaining task: deploy E behind the
    Βήμα-3 shadow gates (`exp-2026-08-11-name-repair`, OPEN).
-1. Publish `artifact-adapter-fixed` to HuggingFace. The benchmark now prices the
-   delay: the published weights cost **1.77 WER points on unseen cities**. **Done
-   when** the hub weights are the corrected ones.
+1. Publish `artifact-adapter-fixed` to HuggingFace — **done 2026-08-16**, commit
+   `e214de71` at `opencouncil/whisper-large-v3-el-council-lora`. The hub weights are
+   the corrected ones.
 1b. `exp-2026-08-13-targeted-deletion-training` — OPEN, **its first screen came
    back negative, 2026-08-16**: the deletion-targeted mix *raised* the deletion
    rate (0.0600 → 0.0788 per reference token, CI excludes zero) while lowering
@@ -56,15 +56,28 @@ trained through the label-prefix bug and cannot answer it.
    the frozen tree's branch is **no blind retry, error analysis of the
    deletion-hard supply first**.
    [`docs/reports/2026-08-16-screens-eval.md`](docs/reports/2026-08-16-screens-eval.md).
-   Prior state, unchanged: **candidate supply
+   **That error analysis ran the same day and closed as
+   `exp-2026-08-16-deletion-hard-coverage`: neither frozen gate was established,
+   so the user's training freeze holds for this cycle.** New deletions are 68–72%
+   "ordinary speech" (the residual bucket, not a mechanism); the largest
+   mechanical category is names at 18.0%/11.8% against a >40% gate. Uncovered
+   speech >1.0 s reaches 10.75% of the rows that have a Soniox witness — under the
+   15% gate, and ~8–9% if the measured seconds-proxy calibration transports
+   (not established) — but 1,260 of the
+   3,921 deletion-hard rows are the pre-wave human-reviewed stratum with **no
+   witness at all**, so a cohort-level failure is not provable either. The
+   realized mixture is the bigger anomaly: names got 2.6% against a designed 10%,
+   and names are the one category enriched (6.8x/4.4x) in the new deletions.
+   [`docs/reports/2026-08-16-deletion-hard-coverage-audit.md`](docs/reports/2026-08-16-deletion-hard-coverage-audit.md).
+   Prior state: **candidate supply
    unblocked 2026-08-13**: user audited 228 gap3 items (94.7% accept overall);
    the calibrated strict stratum (found_frac≥0.85 ∧ n_added≥5, 97.4% agreement)
-   was bulk-accepted (324 items, username=auto-verifier) with user consent —
-   ~540 verified deletion examples so far. Soniox verification of the remaining
-   ~10.9k unreviewed deletion-shaped rows is running (expected +1,500–2,000).
-   Recipe is frozen (Codex-reviewed 55/25/10/10, 3 seeds/arm, deletion gate +
-   insertion guard); +78h trusted clean backbone available at zero human cost.
-   Next: preregistration spec once the verification wave lands.
+   was bulk-accepted (324 items, username=auto-verifier) with user consent. The
+   full Soniox wave then finished and 2,643 rule passers were auto-accepted; the
+   built `deletion_hard` bucket is 3,921 rows / 5.4 h.
+   Recipe stays frozen (Codex-reviewed 55/25/10/10, 3 seeds/arm, deletion gate +
+   insertion guard) and **unused**; +78h trusted clean backbone still available at
+   zero human cost.
 2. Name work continues as the **post-hoc roster repair** arm of
    `exp-2026-08-11-name-repair` (inside the ladder above). Decode-time hotword
    biasing is closed: it lifts name recall 51→65% but costs +0.34 WER in
@@ -78,13 +91,21 @@ trained through the label-prefix bug and cannot answer it.
    its −0.083 does not transfer to it unexamined.
 3. Decide whether fidelity-to-audio changes this ranking. The benchmark measures
    agreement-with-OpenCouncil; the one time both were measured, the ranking flipped.
-   **Done when** the corrected adapter has a fidelity-to-audio number on unseen
-   meetings. **Blocked on a human decision, 2026-08-16:** `exp-2026-08-16-gold-set`
-   has a frozen design, a candidate audio manifest and a verification tool
-   ([prereg](docs/specs/2026-08-16-gold-set-prereg.md), wayfinder #21). It waits
-   for approval and then for about 2 hours of the user's listening (96–145 min
-   modelled, hard stop at 150). It also carries
-   the project's first speaker ground truth.
+   **`exp-2026-08-16-gold-set` CLOSED 2026-08-16** — the corrected adapter now has a
+   fidelity-to-audio number on untouched meetings: **0.284** [0.169, 0.455] against
+   a human who listened, deletions 0.116, on 27 cores in 6 meetings / 6 cities.
+   The published OpenCouncil pipeline scores 0.198 on the same audio, but **the
+   ranking flips between scoring regions and no system ordering is claimed**.
+   [Report](docs/reports/2026-08-16-gold-set-findings.md).
+   Three things it did settle: 4 of every 5 words a second system has and ours
+   lacks were really said (53/66); the production pipeline leaves **5.8% of
+   spoken blocks with no published utterance at all** and loses 28.6% of certain
+   words inside overlap; and agreement-WER is a different quantity from
+   fidelity-WER, not a correctable offset.
+   **Still open:** W itself was never run on this audio — there is no ElevenLabs
+   credential in this environment — so the question the gold set was built for
+   ("are the words the fusion recovers real?") is answered only for the candidate
+   pool, not for W. Getting a Scribe v2 key is the unblocking step.
 
 ## Product decision: answered 2026-08-12 — transcripts are **clean**
 
@@ -98,8 +119,7 @@ decision governs new data collection, not any number already measured.
 
 ## Blockers
 
-- Item 1 is blocked on nothing technical — it is a decision. The corrected weights
-  exist locally and are now measured.
+- Item 1 is done: the corrected weights are on the hub since 2026-08-16.
 - The dataset itself remains on **legal hold** (DPO, 2026-07-17): text-level PII
   removal does not anonymise it because each row links audio carrying the voice. See
   [decisions/data.md](docs/decisions/data.md).
@@ -124,6 +144,19 @@ have released them.
 
 ## Recently changed
 
+- `exp-2026-08-16-char-vote-homophones` closed: **the columns are not there.** A census
+  run before either arm was built found 34 strict-homophone columns out of 80,659
+  (0.042%), so the homophone arm was **not built**; the per-character vote was built
+  and out-of-fold (leave-one-city-out) gives 0.10046 → 0.10038, CI [−0.00026, +0.00009],
+  which includes zero. What survives is structural: only 1,396 unresolved columns have
+  W differing from the column oracle, so word-choice arbitration between the three
+  transcripts can close at most ~35% of the 5.3-point gap to 0.0475, and a hindsight
+  replay over every unresolved column closes 12.7% — against 25.0% for overriding
+  2-of-3 token majorities and 14.2% for occupancy columns, the latter still failing
+  the insertion gate. The mass sits where the systems agree, or agree 2-of-1, and are
+  wrong together.
+  [`docs/reports/2026-08-16-char-vote-homophones.md`](docs/reports/2026-08-16-char-vote-homophones.md).
+  Reusable evaluator: `eval/controlled_eval/fusion_lab.py`.
 - `exp-2026-08-16-composition-over-selection` closed: **stop selecting, compose.**
   An exact three-way word alignment of scribe + soniox + `artifact-adapter-fixed`
   with a per-column vote — no LLM, no audio, no speaker information — takes WER

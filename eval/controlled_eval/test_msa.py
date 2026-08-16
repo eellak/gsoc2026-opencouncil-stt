@@ -14,7 +14,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path("/home/harold/opencouncil-fine-tuning")))
 from eval.controlled_eval.msa import (  # noqa: E402
-    align3, columns_cost, compose, oracle_columns, progressive_align, vote_column,
+    align3, columns_cost, compose, oracle_columns, oracle_select, progressive_align,
+    vote_column,
 )
 
 
@@ -164,3 +165,23 @@ def test_oracle_beats_or_matches_the_vote_everywhere():
         voted, _ = compose(cols, pivot=0)
         orc = oracle_columns(cols, ref)
         assert edist(orc, ref) <= edist(voted, ref), (a, b, c, ref, voted, orc)
+
+
+# ---------------------------------------------------- per-column oracle provenance
+def test_oracle_select_is_per_column_and_agrees_with_oracle_columns():
+    """Added for wayfinder #24: the ceiling arms need to know WHICH column each
+    oracle token came from. Matching the token list back by membership silently
+    mis-attributes a repeated word - here `και` is a candidate in two columns."""
+    cols = [("και", "κι", "και"), ("δημος", "δημος", "δημος"),
+            ("και", "και", "κ")]
+    ref = ["κι", "δημος", "και"]
+    sel = oracle_select(cols, ref)
+    assert len(sel) == len(cols)
+    assert [t for t in sel if t is not None] == oracle_columns(cols, ref)
+    assert sel[0] == "κι" and sel[2] == "και"
+
+
+def test_oracle_select_marks_dropped_columns_as_none():
+    cols = [("α", "α", "α"), ("θορυβος", None, None)]
+    sel = oracle_select(cols, ["α"])
+    assert sel[0] == "α" and sel[1] is None

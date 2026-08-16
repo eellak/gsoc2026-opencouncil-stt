@@ -25,9 +25,13 @@ ART_STATUS = {"ACTIVE", "HISTORICAL", "KNOWN_BROKEN", "SUPERSEDED", "MISSING"}
 CAP_STATUS = {"AVAILABLE", "DEGRADED", "UNKNOWN", "RETIRED"}
 
 # Narrative pieces that predate the ledger and are deliberately not experiments.
+# Advice is not evidence. A report that records what an outside reviewer *recommended*
+# has no experiment behind it by construction, and inventing a record to satisfy this
+# check would make the ledger claim a result that was never measured.
 REPORT_EXEMPT = {
     "README.md", "month-1-2026-06.md", "research-findings-simple.md",
     "minipc-slides-prompt.md", "diarization-conditioned-asr-review.md",
+    "2026-08-16-advisory-what-remains.md",
 }
 
 
