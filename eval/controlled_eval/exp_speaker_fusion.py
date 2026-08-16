@@ -187,7 +187,8 @@ def overlap_intervals(segs: list[dict]) -> list[tuple[float, float]]:
 
 
 def in_any(t: float, ivs: list[tuple[float, float]]) -> bool:
-    return any(a <= t <= b for a, b in ivs)
+    """Half-open, matching `active_intervals`. Endpoint contact is not membership."""
+    return any(a <= t < b for a, b in ivs)
 
 
 # ------------------------------------------------------------------ partitioning
@@ -384,12 +385,12 @@ def main() -> None:
             if na <= 1:
                 diag[p]["zero_or_one_anchor_windows"] += 1
             diag[p]["outside_regular"] += sum(1 for t in tm if not in_any(t, cov))
+        cuts, spans = handover_cuts(reg)
+        cuts_exc, _ = handover_cuts(exc)
         win.append({"item": it, "reg": reg, "exc": exc, "toks": toks, "times": times,
-                    "audio_end": audio_end,
-                    "cuts": handover_cuts(reg),
-                    "placebo_pool": other_boundary_times(reg),
-                    "cuts_exc": handover_cuts(exc),
-                    "ov": overlap_intervals(reg)})
+                    "audio_end": audio_end, "cuts": cuts,
+                    "placebo_pool": other_boundary_times(reg, spans),
+                    "cuts_exc": cuts_exc, "ov": overlap_intervals(reg)})
 
     # ------------------------------------------------------- reconstruction invariant
     bad = []
@@ -413,10 +414,12 @@ def main() -> None:
     a2 = {"turn_cells": 0, "disagree_cells": 0, "changed_choice_cells": 0,
           "changed_win": 0, "changed_tie": 0, "changed_loss": 0,
           "disagree_ref_tokens": 0, "total_ref_tokens": 0,
-          "placebo_topped_up": 0, "turn_picks": {}, "window_picks": {},
+          "placebo_short": 0, "turn_picks": {}, "window_picks": {},
           "overlap_cells": 0, "overlap_disagree_cells": 0,
           "overlap_changed_choice_cells": 0, "overlap_changed_win": 0,
-          "overlap_changed_tie": 0, "overlap_changed_loss": 0}
+          "overlap_changed_tie": 0, "overlap_changed_loss": 0,
+          "changed_provider_cells": 0, "changed_text_cells": 0}
+    ov_rows = {"turn": [], "window": [], "placebo": []}
 
     for w in win:
         it = w["item"]
@@ -442,18 +445,21 @@ def main() -> None:
         arm_rows["greedy_turn_oracle"].append(sdi(ref, " ".join(greedy_local_oracle(
             w["toks"]["REF"], w["times"]["REF"], ct, cm, w["cuts"], TRIO))))
 
+        # Placebo: the same NUMBER of cuts, drawn from non-handover boundary times.
+        # Uniform top-up was in the first draft and is gone: a cut sampled uniformly
+        # in time is not matched on anything, and calling it a matched control would
+        # be a lie. When the pool is short we take what there is and count it.
         k = len(w["cuts"])
         pool = w["placebo_pool"]
+        placebo_cells = []
         acc = []
         for _ in range(N_PLACEBO):
-            if k == 0:
-                pc = []
-            elif len(pool) >= k:
-                pc = sorted(float(x) for x in rng.choice(pool, size=k, replace=False))
-            else:
-                a2["placebo_topped_up"] += 1
-                extra = rng.uniform(0, w["audio_end"], size=k - len(pool))
-                pc = sorted([float(x) for x in pool] + [float(x) for x in extra])
+            take = min(k, len(pool))
+            if take < k:
+                a2["placebo_short"] += 1
+            pc = sorted(float(x) for x in
+                        rng.choice(pool, size=take, replace=False)) if take else []
+            placebo_cells.append(pc)
             hp, _ = partition_vote(ct, cm, pc, TRIO)
             acc.append(sdi(ref, " ".join(hp)))
         arm_rows["vote3_placebo"].append(
@@ -464,11 +470,39 @@ def main() -> None:
         per = {p: split_tokens(ct[p], cm[p], cs) for p in TRIO}
         rslice = split_tokens(w["toks"]["REF"], w["times"]["REF"], cs)
         win_pick = pick_by_similarity({p: ct[p] for p in TRIO}, TRIO)
+
+        # Overlap-restricted contrast on a COMMON support: the speaker-partition cells
+        # that contain detected overlap. All three arms are scored on the same time
+        # region and differ only in which system they selected there, so this isolates
+        # the selection rule rather than the partition geometry.
+        ov_cells = [i for i, (lo, hi) in enumerate(cs)
+                    if any(overlaps((lo, hi), o) for o in w["ov"])]
+        a2["overlap_cells"] += len(ov_cells)
+        ov_ref = sum(len(rslice[i]) for i in ov_cells)
+        e_turn = sum(edist(rslice[i], per[pick_by_similarity(
+            {p: per[p][i] for p in TRIO}, TRIO)][i]) for i in ov_cells)
+        e_win = sum(edist(rslice[i], per[win_pick][i]) for i in ov_cells)
+        e_plc = 0.0
+        for pc in placebo_cells:
+            pcells = cells(pc)
+            pper = {p: split_tokens(ct[p], cm[p], pcells) for p in TRIO}
+            pwin = [pick_by_similarity({p: pper[p][j] for p in TRIO}, TRIO)
+                    for j in range(len(pcells))]
+            for i in ov_cells:
+                lo, hi = cs[i]
+                mid = ((lo if lo != float("-inf") else 0.0)
+                       + (hi if hi != float("inf") else w["audio_end"])) / 2
+                j = next((j for j, (a, b) in enumerate(pcells) if a <= mid < b),
+                         len(pcells) - 1)
+                e_plc += edist(rslice[i], per[pwin[j]][i])
+        e_plc /= max(len(placebo_cells), 1)
+        ov_rows["turn"].append((e_turn, ov_ref))
+        ov_rows["window"].append((e_win, ov_ref))
+        ov_rows["placebo"].append((e_plc, ov_ref))
+
         for i, (lo, hi) in enumerate(cs):
             cands = {p: per[p][i] for p in TRIO}
-            has_ov = any(overlaps((max(lo, -1e9), min(hi, 1e9)), o) for o in w["ov"])
-            if has_ov:
-                a2["overlap_cells"] += 1
+            has_ov = i in set(ov_cells)
             if len({tuple(v) for v in cands.values()}) <= 1:
                 continue
             a2["disagree_cells"] += 1
@@ -478,6 +512,13 @@ def main() -> None:
             tp = pick_by_similarity(cands, TRIO)
             if tp == win_pick:
                 continue
+            # a changed PROVIDER is not necessarily changed TEXT: two systems can emit
+            # the same tokens in a cell. Counted separately so the win/tie/loss table
+            # is not inflated by choices that changed nothing.
+            a2["changed_provider_cells"] += 1
+            if cands[tp] == cands[win_pick]:
+                continue
+            a2["changed_text_cells"] += 1
             ca, cb = edist(rslice[i], cands[tp]), edist(rslice[i], cands[win_pick])
             key = "win" if ca < cb else ("tie" if ca == cb else "loss")
             a2["changed_choice_cells"] += 1
@@ -613,6 +654,23 @@ def main() -> None:
                       "exclusive timeline kept one",
     }
 
+    for a_lbl, b_lbl in (("turn", "window"), ("placebo", "window"),
+                         ("turn", "placebo")):
+        res["contrasts"][f"OVERLAP-ONLY {a_lbl} vs {b_lbl}"] = cluster_bootstrap(
+            ov_rows[a_lbl], ov_rows[b_lbl], clusters, n_boot=N_BOOT)
+    res["A2_overlap_support"] = {
+        "ref_tokens_in_overlap_cells": sum(r[1] for r in ov_rows["turn"]),
+        "error_rate_turn": (sum(r[0] for r in ov_rows["turn"])
+                            / max(sum(r[1] for r in ov_rows["turn"]), 1)),
+        "error_rate_window": (sum(r[0] for r in ov_rows["window"])
+                              / max(sum(r[1] for r in ov_rows["window"]), 1)),
+        "error_rate_placebo": (sum(r[0] for r in ov_rows["placebo"])
+                               / max(sum(r[1] for r in ov_rows["placebo"]), 1)),
+        "note": "common support: the speaker-partition cells containing detected "
+                "overlap. All arms scored on the same cells; only the selection "
+                "differs. Cell-local edit distance, not window-level WER.",
+    }
+
     dd_turn = res["contrasts"]["turn vs window"]["wer"]["delta"]
     dd_plac = res["contrasts"]["placebo vs window"]["wer"]["delta"]
     res["A2_difference_of_differences_wer"] = {
@@ -670,12 +728,19 @@ def strata_ci(a_counts, b_counts, clusters):
         da, db = a[idx, 1].sum(), b[idx, 1].sum()
         diffs[i] = (a[idx, 0].sum() / da if da else np.nan) - \
                    (b[idx, 0].sum() / db if db else np.nan)
+    undefined = int(np.isnan(diffs).sum())
+    da, db = a[:, 1].sum(), b[:, 1].sum()
+    if da == 0 or db == 0:
+        return {"delta": None, "ci95": None, "excludes_zero": False,
+                "n_clusters": len(keys), "undefined_replicates": undefined,
+                "note": "a stratum is empty in the full sample; not estimable"}
     lo, hi = np.nanpercentile(diffs, [2.5, 97.5])
-    point = (a[:, 0].sum() / max(a[:, 1].sum(), 1)) - \
-            (b[:, 0].sum() / max(b[:, 1].sum(), 1))
+    point = (a[:, 0].sum() / da) - (b[:, 0].sum() / db)
     return {"delta": float(point), "ci95": [float(lo), float(hi)],
             "excludes_zero": bool(lo > 0 or hi < 0), "n_clusters": len(keys),
-            "note": "disjoint strata, meetings resampled"}
+            "undefined_replicates": undefined,
+            "note": "disjoint strata, meetings resampled. Replicates where a stratum "
+                    "had no tokens are counted, not silently dropped."}
 
 
 if __name__ == "__main__":

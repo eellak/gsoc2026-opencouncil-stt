@@ -4,6 +4,36 @@ CSV ingest, content categorisation, stable IDs, task version, dataset split.
 
 ## Accepted
 
+### 2026-08-16 - Correction terms MAY come from meeting transcripts; the guarantee was a category error
+
+**Status: accepted, by user decision.** The `research/ds_wer/terms/*.json` lists were
+built under a stated rule that no term is derived from meeting transcripts, only from
+registries, ELSTAT, OSM and FEK. That rule is **withdrawn**.
+
+The reasoning behind withdrawing it: a correction lexicon is not a training set. Its
+purpose is to fix the terms that *actually recur in council speech*, so meeting
+transcripts are the correct source — arguably the only honest one. A list mined from
+registries is full of terms nobody ever said, and every unused term is pure risk with
+no upside, because each entry is one more chance to overwrite a word that was already
+right.
+
+**What replaces it.** The admission criterion is no longer provenance, it is
+**collision safety**: a term earns its place if it recurs across meetings *and* cannot
+be confused with ordinary language. That test already exists and already works — it is
+what cut **ΑΜΕΑ**, a genuine term, because it scores 88.9 similarity against the
+everyday word «άμεσα» under the production scorer. ΑΜΕΑ stays out.
+
+**What this costs, and it is not zero.** A term mined from meeting X and then scored on
+meeting X inflates the measured gain. This does not make the artifact wrong; it makes
+one number unusable. So the split survives *for measurement only*: any arm using these
+lists reports on the windows disjoint from the mining fold (40 of 253 for the June
+glossary — see `exp-2026-08-16-glossary-distillation`), because that is the number that
+predicts a city we have never mined. Both facts are carried together: mine from
+transcripts, measure on untouched meetings.
+
+Consequence for the frozen lists: terms admitted from 2026-08-16 onward carry
+transcript provenance, and every result quoting them says so.
+
 ### 2026-07-17 - HF publication on legal hold (DPO); PII removal is harm-reduction, not a green light
 
 **Status: do NOT publish the dataset publicly.** OpenCouncil's DPO (Δικηγορική
