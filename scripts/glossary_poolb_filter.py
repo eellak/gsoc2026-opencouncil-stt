@@ -33,12 +33,11 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from scripts.glossary_distill import (CROSS_CITY_MIN_CITIES,  # noqa: E402
-                                      MODELREG, PHRASE_REJECT, PHRASE_REVIEW,
-                                      UNIVERSAL_MIN_CITIES,
+                                      MODELREG, UNIVERSAL_MIN_CITIES,
                                       UNIVERSAL_MIN_CITY_MEETINGS,
                                       ZIPF_MAX_PHRASE_CONTENT, _FUNCTION_WORDS,
-                                      build_bg_ngrams, frozen_aliases, match_norm,
-                                      nfc_lower, zipf_max)
+                                      build_bg_ngrams, build_common, confusability,
+                                      frozen_aliases, match_norm, nfc_lower, zipf_max)
 from scripts.glossary_poolb_mine import meeting_text, source_meetings  # noqa: E402
 
 PROPOSALS = ROOT / "data/glossary/poolb_proposals.json"
@@ -73,7 +72,7 @@ def attestation(terms: list[str]) -> dict[str, tuple[set, set]]:
 
 def main() -> None:
     from rapidfuzz import fuzz
-    from wordfreq import zipf_frequency
+    from wordfreq import iter_wordlist, zipf_frequency
 
     prop = json.loads(PROPOSALS.read_text())
     proposed = [r["term"] for r in prop["proposals"]]
@@ -86,17 +85,20 @@ def main() -> None:
     modelreg = (" " + match_norm(MODELREG.read_text(errors="replace")).replace("\n", " ")
                 + " ") if MODELREG.exists() else ""
     bg = build_bg_ngrams()
+    common, common_z = build_common(zipf_frequency, iter_wordlist)
 
     att = attestation(proposed)
-    rows, rejections = [], defaultdict(int)
+    rows, rejections, audit = [], defaultdict(int), []
     for term in proposed:
         n = match_norm(term)
         rec = {"term": term, "kind": kinds.get(term), "why_not_common": why.get(term)}
         if n in proc:
             rejections["C0 already in v2 procedural"] += 1
+            audit.append({**rec, "rejected_by": "C0 already in v2 procedural"})
             continue
         if n in frozen_all:
             rejections["C0 already frozen per-city"] += 1
+            audit.append({**rec, "rejected_by": "C0 already frozen per-city"})
             continue
         meets, cities = att[term]
         rec["n_meetings_attested"] = len(meets)
@@ -109,29 +111,26 @@ def main() -> None:
             rec["scope"] = "cross_city"
         else:
             rejections["C1 attestation"] += 1
+            audit.append({**rec, "rejected_by": "C1 attestation"})
             continue
         content = [w for w in nfc_lower(term).split() if w not in _FUNCTION_WORDS]
         zs = [zipf_max(w, zipf_frequency) for w in content] or [9.0]
         rec["zipf_content_min"] = round(min(zs), 2)
         if min(zs) > ZIPF_MAX_PHRASE_CONTENT:
             rejections["C2 rarity"] += 1
+            audit.append({**rec, "rejected_by": "C2 rarity"})
             continue
-        best, best_g = 0.0, None
-        for g in bg:
-            if g == n:
-                continue
-            s = fuzz.partial_ratio(n, g)
-            if s > best:
-                best, best_g = s, g
-        rec["confusability"] = {
-            "scorer": "partial_ratio", "score": round(best, 1), "nearest": best_g,
-            "verdict": ("reject" if best >= PHRASE_REJECT
-                        else "review" if best >= PHRASE_REVIEW else "clear")}
+        # Single-word proposals go through the word scorer, phrases through the phrase
+        # scorer, exactly as select_glossary_terms does. Running partial_ratio on a
+        # single word against an n-gram that contains it trivially returns 100.
+        rec["confusability"] = confusability(term, common, common_z, bg, fuzz)
         if rec["confusability"]["verdict"] == "reject":
             rejections["C3 confusable"] += 1
+            audit.append({**rec, "rejected_by": "C3 confusable"})
             continue
         if not (modelreg and f" {n} " in modelreg):
             rejections["C4 no external attestation"] += 1
+            audit.append({**rec, "rejected_by": "C4 no external attestation"})
             continue
         rec["category"] = "legal_procedural"
         rec["category_evidence"] = "modelreg:ΦΕΚ Β' 109/2025"
@@ -145,6 +144,7 @@ def main() -> None:
         "source": prop["source"], "llm": prop["model"],
         "n_proposed": len(proposed), "n_survivors": len(rows),
         "rejections": dict(rejections), "candidates": rows,
+        "rejection_audit": audit,
     }, ensure_ascii=False, indent=1) + "\n")
     print(json.dumps({"n_proposed": len(proposed), "n_survivors": len(rows),
                       "rejections": dict(rejections),
