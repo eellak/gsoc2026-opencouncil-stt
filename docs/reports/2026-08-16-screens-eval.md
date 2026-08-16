@@ -181,12 +181,13 @@ CPU.
 
 ## Extra: RUN 2 stage-1 alone
 
-Scored only because the machine was free. It is an intermediate checkpoint — the
-externals with no in-domain stage-2 — and it is **not** RUN 2's candidate; RUN 2's
-candidate is stage-2. Numbers are in
-`~/.cache/oc-public/train-screens-2026-08/run2-eval-stage1/results.json` if the
-decode completed; it answers "what did the external packs alone do to the frozen
-windows", which no gate in either prereg refers to.
+Started only because the machine was free, and **still decoding when this report
+was written** (the CPU is shared with another experiment). It is an intermediate
+checkpoint — the externals with no in-domain stage-2 — and it is **not** RUN 2's
+candidate; RUN 2's candidate is stage-2. When it finishes, its numbers land in
+`~/.cache/oc-public/train-screens-2026-08/run2-eval-stage1/{decode,results}.json`.
+It answers "what did the external packs alone do to the frozen windows", which no
+gate in either prereg refers to, so it cannot change anything above.
 
 ## Artifacts
 
