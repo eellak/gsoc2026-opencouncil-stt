@@ -1,0 +1,722 @@
+{
+ "leaderboard": {
+  "protocol": "autoresearch-2026-08-16b",
+  "denominator": {
+   "registered": 11,
+   "searched": 11,
+   "duplicate_refused": 1,
+   "screen_passed": 0,
+   "confirmed": 0,
+   "confirmation_budget": 5,
+   "confirmation_batches_frozen": 0,
+   "confirmations_remaining": 5
+  },
+  "search": [
+   {
+    "name": "null_identity",
+    "idea_key": "3704a980a5c76996",
+    "dwer": 0.0,
+    "wild_p": 1.0,
+    "search_bh_adjusted_p": 1.0,
+    "percentile_ci95": [
+     0.0,
+     0.0
+    ],
+    "screen": false,
+    "duplicate_of": null
+   },
+   {
+    "name": "occupancy_restore",
+    "idea_key": "53fc32b1d97a3143",
+    "dwer": 0.0,
+    "wild_p": 1.0,
+    "search_bh_adjusted_p": 1.0,
+    "percentile_ci95": [
+     0.0,
+     0.0
+    ],
+    "screen": false,
+    "duplicate_of": null
+   },
+   {
+    "name": "singleton_oov_drop",
+    "idea_key": "73f8027d32227bce",
+    "dwer": 0.0,
+    "wild_p": 1.0,
+    "search_bh_adjusted_p": 1.0,
+    "percentile_ci95": [
+     0.0,
+     0.0
+    ],
+    "screen": false,
+    "duplicate_of": null
+   },
+   {
+    "name": "unresolved_lexicon_pick",
+    "idea_key": "17fa09a38c158bc8",
+    "dwer": 0.00021163125370354693,
+    "wild_p": 0.2542,
+    "search_bh_adjusted_p": 0.349525,
+    "percentile_ci95": [
+     -0.00012845828198767092,
+     0.0005398590300185614
+    ],
+    "screen": false,
+    "duplicate_of": null
+   },
+   {
+    "name": "majority_oov_override",
+    "idea_key": "0309426def7d0a74",
+    "dwer": 0.001587234402776602,
+    "wild_p": 0.0001,
+    "search_bh_adjusted_p": 0.00015714285714285716,
+    "percentile_ci95": [
+     0.001139333028336712,
+     0.0020964547235511597
+    ],
+    "screen": false,
+    "duplicate_of": null
+   },
+   {
+    "name": "majority_oov_override_restyled",
+    "idea_key": "3102687724447dba",
+    "dwer": 0.001587234402776602,
+    "wild_p": 0.0001,
+    "search_bh_adjusted_p": 0.00015714285714285716,
+    "percentile_ci95": [
+     0.001139333028336712,
+     0.0020964547235511597
+    ],
+    "screen": false,
+    "duplicate_of": "0309426def7d0a74"
+   },
+   {
+    "name": "two_present_oov_drop",
+    "idea_key": "2380b3612d8d0c54",
+    "dwer": 0.002158638787776179,
+    "wild_p": 0.0001,
+    "search_bh_adjusted_p": 0.00015714285714285716,
+    "percentile_ci95": [
+     0.001252278018499076,
+     0.0031057287613478852
+    ],
+    "screen": false,
+    "duplicate_of": null
+   },
+   {
+    "name": "majority_freq_ratio",
+    "idea_key": "7d50f33c9b20a5cd",
+    "dwer": 0.0024760856683314993,
+    "wild_p": 0.0001,
+    "search_bh_adjusted_p": 0.00015714285714285716,
+    "percentile_ci95": [
+     0.0018614012114552241,
+     0.0031974782565733196
+    ],
+    "screen": false,
+    "duplicate_of": null
+   },
+   {
+    "name": "majority_function_word",
+    "idea_key": "0492e683ff790a2c",
+    "dwer": 0.0027088800474054007,
+    "wild_p": 0.0001,
+    "search_bh_adjusted_p": 0.00015714285714285716,
+    "percentile_ci95": [
+     0.0017506977118575422,
+     0.0037961633609475288
+    ],
+    "screen": false,
+    "duplicate_of": null
+   },
+   {
+    "name": "occupancy_restore_singleton_strict",
+    "idea_key": "38a55ada6af8e6fb",
+    "dwer": 0.018856344704986032,
+    "wild_p": 0.0001,
+    "search_bh_adjusted_p": 0.00015714285714285716,
+    "percentile_ci95": [
+     0.015264492821983208,
+     0.022764673766319993
+    ],
+    "screen": false,
+    "duplicate_of": null
+   },
+   {
+    "name": "occupancy_restore_singleton",
+    "idea_key": "1bdeda2b63249205",
+    "dwer": 0.02852789299923813,
+    "wild_p": 0.0001,
+    "search_bh_adjusted_p": 0.00015714285714285716,
+    "percentile_ci95": [
+     0.023027685872681895,
+     0.03497233322512622
+    ],
+    "screen": false,
+    "duplicate_of": null
+   }
+  ],
+  "search_family_bh": {
+   "m": 11,
+   "note": "reported as a fishing diagnostic only; the ship gate is Holm over the frozen confirmation batch"
+  },
+  "confirm": []
+ },
+ "search": {
+  "null_identity": {
+   "wer": 0.09280030474900533,
+   "wer_W": 0.09280030474900533,
+   "del_rate": 0.017374925929061202,
+   "ins_rate": 0.03485566748497418,
+   "sub_rate": 0.04056971133496995,
+   "dwer": 0.0,
+   "percentile_ci95": [
+    0.0,
+    0.0
+   ],
+   "wild_p": 1.0,
+   "wild_t": 0.0,
+   "wild_se": 0.0,
+   "wild_p_min_effect": 1.0,
+   "wild_p_min_effect_alternative": "less",
+   "min_effect": 0.001,
+   "meetings_touched": 0,
+   "n_meetings": 103,
+   "domination": 0.0,
+   "domination_meeting": "apr16_2025",
+   "windows_changed_vs_W": 0,
+   "firing_size": 0,
+   "firing_digest": "e3b0c44298fc1c149afbf4c8996fb924",
+   "loo_sign_flips": {
+    "window": 0,
+    "meeting": 0,
+    "city": 0
+   },
+   "cities_better": 0,
+   "cities_worse": 0,
+   "screen": {
+    "wer_improves": false,
+    "del_rate_gate": true,
+    "ins_rate_gate": true,
+    "effect_floor": false,
+    "support": false,
+    "no_domination": true,
+    "ci_excludes_zero": false,
+    "min_effect_test": false,
+    "pass": false
+   },
+   "type": "SEARCH_RESULT",
+   "idea_key": "3704a980a5c76996",
+   "name": "null_identity",
+   "partition": "search",
+   "n_windows": 153,
+   "n_folds": 6,
+   "dedup_key_id": "51a456654f97",
+   "duplicate_of": null
+  },
+  "majority_oov_override": {
+   "wer": 0.09438753915178194,
+   "wer_W": 0.09280030474900533,
+   "del_rate": 0.017374925929061202,
+   "ins_rate": 0.03485566748497418,
+   "sub_rate": 0.04215694573774655,
+   "dwer": 0.001587234402776602,
+   "percentile_ci95": [
+    0.001139333028336712,
+    0.0020964547235511597
+   ],
+   "wild_p": 0.0001,
+   "wild_t": 6.49133310068753,
+   "wild_se": 0.0002445159381219383,
+   "wild_p_min_effect": 1.0,
+   "wild_p_min_effect_alternative": "less",
+   "min_effect": 0.001,
+   "meetings_touched": 50,
+   "n_meetings": 103,
+   "domination": 0.08045977011494253,
+   "domination_meeting": "apr7_2026",
+   "windows_changed_vs_W": 70,
+   "firing_size": 121,
+   "firing_digest": "6b4fe6762a90f5916dd26bdd82d967b5",
+   "loo_sign_flips": {
+    "window": 0,
+    "meeting": 0,
+    "city": 0
+   },
+   "cities_better": 0,
+   "cities_worse": 6,
+   "screen": {
+    "wer_improves": false,
+    "del_rate_gate": true,
+    "ins_rate_gate": true,
+    "effect_floor": false,
+    "support": true,
+    "no_domination": true,
+    "ci_excludes_zero": true,
+    "min_effect_test": false,
+    "pass": false
+   },
+   "type": "SEARCH_RESULT",
+   "idea_key": "0309426def7d0a74",
+   "name": "majority_oov_override",
+   "partition": "search",
+   "n_windows": 153,
+   "n_folds": 6,
+   "dedup_key_id": "51a456654f97",
+   "duplicate_of": null
+  },
+  "majority_freq_ratio": {
+   "wer": 0.09527639041733683,
+   "wer_W": 0.09280030474900533,
+   "del_rate": 0.017374925929061202,
+   "ins_rate": 0.03485566748497418,
+   "sub_rate": 0.043045797003301446,
+   "dwer": 0.0024760856683314993,
+   "percentile_ci95": [
+    0.0018614012114552241,
+    0.0031974782565733196
+   ],
+   "wild_p": 0.0001,
+   "wild_t": 7.350869463138903,
+   "wild_se": 0.0003368425572985462,
+   "wild_p_min_effect": 1.0,
+   "wild_p_min_effect_alternative": "less",
+   "min_effect": 0.001,
+   "meetings_touched": 70,
+   "n_meetings": 103,
+   "domination": 0.072992700729927,
+   "domination_meeting": "apr7_2026",
+   "windows_changed_vs_W": 102,
+   "firing_size": 211,
+   "firing_digest": "7d4914bbaa8a01dc3b0d8898003f2a9c",
+   "loo_sign_flips": {
+    "window": 0,
+    "meeting": 0,
+    "city": 0
+   },
+   "cities_better": 0,
+   "cities_worse": 6,
+   "screen": {
+    "wer_improves": false,
+    "del_rate_gate": true,
+    "ins_rate_gate": true,
+    "effect_floor": false,
+    "support": true,
+    "no_domination": true,
+    "ci_excludes_zero": true,
+    "min_effect_test": false,
+    "pass": false
+   },
+   "type": "SEARCH_RESULT",
+   "idea_key": "7d50f33c9b20a5cd",
+   "name": "majority_freq_ratio",
+   "partition": "search",
+   "n_windows": 153,
+   "n_folds": 6,
+   "dedup_key_id": "51a456654f97",
+   "duplicate_of": null
+  },
+  "majority_function_word": {
+   "wer": 0.09550918479641074,
+   "wer_W": 0.09280030474900533,
+   "del_rate": 0.017417252179801914,
+   "ins_rate": 0.03489799373571489,
+   "sub_rate": 0.04319393888089393,
+   "dwer": 0.0027088800474054007,
+   "percentile_ci95": [
+    0.0017506977118575422,
+    0.0037961633609475288
+   ],
+   "wild_p": 0.0001,
+   "wild_t": 5.265927640774086,
+   "wild_se": 0.0005144164964270565,
+   "wild_p_min_effect": 1.0,
+   "wild_p_min_effect_alternative": "less",
+   "min_effect": 0.001,
+   "meetings_touched": 86,
+   "n_meetings": 103,
+   "domination": 0.0392156862745098,
+   "domination_meeting": "apr1_2_2026",
+   "windows_changed_vs_W": 138,
+   "firing_size": 412,
+   "firing_digest": "5118e66b5c70d786c0ae33cea837f60a",
+   "loo_sign_flips": {
+    "window": 0,
+    "meeting": 0,
+    "city": 0
+   },
+   "cities_better": 0,
+   "cities_worse": 6,
+   "screen": {
+    "wer_improves": false,
+    "del_rate_gate": false,
+    "ins_rate_gate": false,
+    "effect_floor": false,
+    "support": true,
+    "no_domination": true,
+    "ci_excludes_zero": true,
+    "min_effect_test": false,
+    "pass": false
+   },
+   "type": "SEARCH_RESULT",
+   "idea_key": "0492e683ff790a2c",
+   "name": "majority_function_word",
+   "partition": "search",
+   "n_windows": 153,
+   "n_folds": 6,
+   "dedup_key_id": "51a456654f97",
+   "duplicate_of": null
+  },
+  "occupancy_restore": {
+   "wer": 0.09280030474900533,
+   "wer_W": 0.09280030474900533,
+   "del_rate": 0.017374925929061202,
+   "ins_rate": 0.03485566748497418,
+   "sub_rate": 0.04056971133496995,
+   "dwer": 0.0,
+   "percentile_ci95": [
+    0.0,
+    0.0
+   ],
+   "wild_p": 1.0,
+   "wild_t": 0.0,
+   "wild_se": 0.0,
+   "wild_p_min_effect": 1.0,
+   "wild_p_min_effect_alternative": "less",
+   "min_effect": 0.001,
+   "meetings_touched": 0,
+   "n_meetings": 103,
+   "domination": 0.0,
+   "domination_meeting": "apr16_2025",
+   "windows_changed_vs_W": 0,
+   "firing_size": 0,
+   "firing_digest": "e3b0c44298fc1c149afbf4c8996fb924",
+   "loo_sign_flips": {
+    "window": 0,
+    "meeting": 0,
+    "city": 0
+   },
+   "cities_better": 0,
+   "cities_worse": 0,
+   "screen": {
+    "wer_improves": false,
+    "del_rate_gate": true,
+    "ins_rate_gate": true,
+    "effect_floor": false,
+    "support": false,
+    "no_domination": true,
+    "ci_excludes_zero": false,
+    "min_effect_test": false,
+    "pass": false
+   },
+   "type": "SEARCH_RESULT",
+   "idea_key": "53fc32b1d97a3143",
+   "name": "occupancy_restore",
+   "partition": "search",
+   "n_windows": 153,
+   "n_folds": 6,
+   "dedup_key_id": "51a456654f97",
+   "duplicate_of": null
+  },
+  "unresolved_lexicon_pick": {
+   "wer": 0.09301193600270888,
+   "wer_W": 0.09280030474900533,
+   "del_rate": 0.017374925929061202,
+   "ins_rate": 0.03485566748497418,
+   "sub_rate": 0.0407813425886735,
+   "dwer": 0.00021163125370354693,
+   "percentile_ci95": [
+    -0.00012845828198767092,
+    0.0005398590300185614
+   ],
+   "wild_p": 0.2542,
+   "wild_t": 1.2048804410859113,
+   "wild_se": 0.00017564502376087376,
+   "wild_p_min_effect": 1.0,
+   "wild_p_min_effect_alternative": "less",
+   "min_effect": 0.001,
+   "meetings_touched": 35,
+   "n_meetings": 103,
+   "domination": 0.06521739130434782,
+   "domination_meeting": "feb11_2026",
+   "windows_changed_vs_W": 74,
+   "firing_size": 176,
+   "firing_digest": "fbd059298d45e24abbd52fee43df27c0",
+   "loo_sign_flips": {
+    "window": 0,
+    "meeting": 0,
+    "city": 0
+   },
+   "cities_better": 1,
+   "cities_worse": 4,
+   "screen": {
+    "wer_improves": false,
+    "del_rate_gate": true,
+    "ins_rate_gate": true,
+    "effect_floor": false,
+    "support": true,
+    "no_domination": true,
+    "ci_excludes_zero": false,
+    "min_effect_test": false,
+    "pass": false
+   },
+   "type": "SEARCH_RESULT",
+   "idea_key": "17fa09a38c158bc8",
+   "name": "unresolved_lexicon_pick",
+   "partition": "search",
+   "n_windows": 153,
+   "n_folds": 6,
+   "dedup_key_id": "51a456654f97",
+   "duplicate_of": null
+  },
+  "singleton_oov_drop": {
+   "wer": 0.09280030474900533,
+   "wer_W": 0.09280030474900533,
+   "del_rate": 0.017374925929061202,
+   "ins_rate": 0.03485566748497418,
+   "sub_rate": 0.04056971133496995,
+   "dwer": 0.0,
+   "percentile_ci95": [
+    0.0,
+    0.0
+   ],
+   "wild_p": 1.0,
+   "wild_t": 0.0,
+   "wild_se": 0.0,
+   "wild_p_min_effect": 1.0,
+   "wild_p_min_effect_alternative": "less",
+   "min_effect": 0.001,
+   "meetings_touched": 0,
+   "n_meetings": 103,
+   "domination": 0.0,
+   "domination_meeting": "apr16_2025",
+   "windows_changed_vs_W": 0,
+   "firing_size": 0,
+   "firing_digest": "e3b0c44298fc1c149afbf4c8996fb924",
+   "loo_sign_flips": {
+    "window": 0,
+    "meeting": 0,
+    "city": 0
+   },
+   "cities_better": 0,
+   "cities_worse": 0,
+   "screen": {
+    "wer_improves": false,
+    "del_rate_gate": true,
+    "ins_rate_gate": true,
+    "effect_floor": false,
+    "support": false,
+    "no_domination": true,
+    "ci_excludes_zero": false,
+    "min_effect_test": false,
+    "pass": false
+   },
+   "type": "SEARCH_RESULT",
+   "idea_key": "73f8027d32227bce",
+   "name": "singleton_oov_drop",
+   "partition": "search",
+   "n_windows": 153,
+   "n_folds": 6,
+   "dedup_key_id": "51a456654f97",
+   "duplicate_of": null
+  },
+  "occupancy_restore_singleton": {
+   "wer": 0.12132819774824347,
+   "wer_W": 0.09280030474900533,
+   "del_rate": 0.009163633285363583,
+   "ins_rate": 0.07239905189198341,
+   "sub_rate": 0.03976551257089647,
+   "dwer": 0.02852789299923813,
+   "percentile_ci95": [
+    0.023027685872681895,
+    0.03497233322512622
+   ],
+   "wild_p": 0.0001,
+   "wild_t": 9.719123418934817,
+   "wild_se": 0.002935233124384451,
+   "wild_p_min_effect": 1.0,
+   "wild_p_min_effect_alternative": "less",
+   "min_effect": 0.001,
+   "meetings_touched": 98,
+   "n_meetings": 103,
+   "domination": 0.04685212298682284,
+   "domination_meeting": "mar18_2026",
+   "windows_changed_vs_W": 148,
+   "firing_size": 2162,
+   "firing_digest": "410c5fc697810f216d17a5f3a15fd3b6",
+   "loo_sign_flips": {
+    "window": 0,
+    "meeting": 0,
+    "city": 0
+   },
+   "cities_better": 0,
+   "cities_worse": 6,
+   "screen": {
+    "wer_improves": false,
+    "del_rate_gate": true,
+    "ins_rate_gate": false,
+    "effect_floor": false,
+    "support": true,
+    "no_domination": true,
+    "ci_excludes_zero": true,
+    "min_effect_test": false,
+    "pass": false
+   },
+   "type": "SEARCH_RESULT",
+   "idea_key": "1bdeda2b63249205",
+   "name": "occupancy_restore_singleton",
+   "partition": "search",
+   "n_windows": 153,
+   "n_folds": 6,
+   "dedup_key_id": "51a456654f97",
+   "duplicate_of": null
+  },
+  "occupancy_restore_singleton_strict": {
+   "wer": 0.11165664945399137,
+   "wer_W": 0.09280030474900533,
+   "del_rate": 0.011216456446287987,
+   "ins_rate": 0.060272581054770166,
+   "sub_rate": 0.04016761195293321,
+   "dwer": 0.018856344704986032,
+   "percentile_ci95": [
+    0.015264492821983208,
+    0.022764673766319993
+   ],
+   "wild_p": 0.0001,
+   "wild_t": 9.95168221207541,
+   "wild_se": 0.0018947896750667612,
+   "wild_p_min_effect": 1.0,
+   "wild_p_min_effect_alternative": "less",
+   "min_effect": 0.001,
+   "meetings_touched": 97,
+   "n_meetings": 103,
+   "domination": 0.04381161007667032,
+   "domination_meeting": "mar18_2026",
+   "windows_changed_vs_W": 148,
+   "firing_size": 1492,
+   "firing_digest": "c018f1511689f4e5140583a4b4bc107e",
+   "loo_sign_flips": {
+    "window": 0,
+    "meeting": 0,
+    "city": 0
+   },
+   "cities_better": 0,
+   "cities_worse": 6,
+   "screen": {
+    "wer_improves": false,
+    "del_rate_gate": true,
+    "ins_rate_gate": false,
+    "effect_floor": false,
+    "support": true,
+    "no_domination": true,
+    "ci_excludes_zero": true,
+    "min_effect_test": false,
+    "pass": false
+   },
+   "type": "SEARCH_RESULT",
+   "idea_key": "38a55ada6af8e6fb",
+   "name": "occupancy_restore_singleton_strict",
+   "partition": "search",
+   "n_windows": 153,
+   "n_folds": 6,
+   "dedup_key_id": "51a456654f97",
+   "duplicate_of": null
+  },
+  "two_present_oov_drop": {
+   "wer": 0.09495894353678151,
+   "wer_W": 0.09280030474900533,
+   "del_rate": 0.021247777871836113,
+   "ins_rate": 0.033035638703123676,
+   "sub_rate": 0.04067552696182172,
+   "dwer": 0.002158638787776179,
+   "percentile_ci95": [
+    0.001252278018499076,
+    0.0031057287613478852
+   ],
+   "wild_p": 0.0001,
+   "wild_t": 4.599446136898998,
+   "wild_se": 0.000469325810875037,
+   "wild_p_min_effect": 1.0,
+   "wild_p_min_effect_alternative": "less",
+   "min_effect": 0.001,
+   "meetings_touched": 78,
+   "n_meetings": 103,
+   "domination": 0.056818181818181816,
+   "domination_meeting": "feb26_2026",
+   "windows_changed_vs_W": 108,
+   "firing_size": 269,
+   "firing_digest": "5b8f9fd0b9021b000c99ee641402046d",
+   "loo_sign_flips": {
+    "window": 0,
+    "meeting": 0,
+    "city": 0
+   },
+   "cities_better": 0,
+   "cities_worse": 6,
+   "screen": {
+    "wer_improves": false,
+    "del_rate_gate": false,
+    "ins_rate_gate": true,
+    "effect_floor": false,
+    "support": true,
+    "no_domination": true,
+    "ci_excludes_zero": true,
+    "min_effect_test": false,
+    "pass": false
+   },
+   "type": "SEARCH_RESULT",
+   "idea_key": "2380b3612d8d0c54",
+   "name": "two_present_oov_drop",
+   "partition": "search",
+   "n_windows": 153,
+   "n_folds": 6,
+   "dedup_key_id": "51a456654f97",
+   "duplicate_of": null
+  },
+  "majority_oov_override_restyled": {
+   "wer": 0.09438753915178194,
+   "wer_W": 0.09280030474900533,
+   "del_rate": 0.017374925929061202,
+   "ins_rate": 0.03485566748497418,
+   "sub_rate": 0.04215694573774655,
+   "dwer": 0.001587234402776602,
+   "percentile_ci95": [
+    0.001139333028336712,
+    0.0020964547235511597
+   ],
+   "wild_p": 0.0001,
+   "wild_t": 6.49133310068753,
+   "wild_se": 0.0002445159381219383,
+   "wild_p_min_effect": 1.0,
+   "wild_p_min_effect_alternative": "less",
+   "min_effect": 0.001,
+   "meetings_touched": 50,
+   "n_meetings": 103,
+   "domination": 0.08045977011494253,
+   "domination_meeting": "apr7_2026",
+   "windows_changed_vs_W": 70,
+   "firing_size": 121,
+   "firing_digest": "6b4fe6762a90f5916dd26bdd82d967b5",
+   "loo_sign_flips": {
+    "window": 0,
+    "meeting": 0,
+    "city": 0
+   },
+   "cities_better": 0,
+   "cities_worse": 6,
+   "screen": {
+    "pass": false,
+    "reason": "cosmetic variant of 0309426def7d0a74"
+   },
+   "type": "SEARCH_RESULT",
+   "idea_key": "3102687724447dba",
+   "name": "majority_oov_override_restyled",
+   "partition": "search",
+   "n_windows": 153,
+   "n_folds": 6,
+   "dedup_key_id": "51a456654f97",
+   "duplicate_of": "0309426def7d0a74"
+  }
+ },
+ "survivors": []
+}

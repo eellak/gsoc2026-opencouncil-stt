@@ -1,8 +1,40 @@
 {
  "schema_version": 1,
- "updated_at": "2026-08-16T23:30:00Z",
+ "updated_at": "2026-08-16",
  "note": "Authoritative state. Reports under docs/reports/ are immutable evidence; this file says whether their conclusions still stand. When a doc disagrees with this file, this file wins and the doc gets fixed in the same change.",
  "experiments": [
+  {
+   "id": "exp-2026-08-16-soniox-confidence",
+   "title": "Does Soniox per-word confidence predict human-verified errors?",
+   "question": "Soniox returns a per-word confidence our client throws away. Does it predict the errors a human listener actually found, well enough to justify one paid stt-async-v5 re-run over the 247 benchmark windows?",
+   "status": "CLOSED",
+   "conclusion": "YES on the FREE realtime model, and the decision is GO for one ~$0.82 paid run AS A HYPOTHESIS TEST, not as a validated capability. PRIMARY, frozen with its threshold before any outcome was computed: the equal-weight mean of the six WITHIN-MEETING AUROCs of 1-min-confidence for predicting that an EMITTED Soniox word is an error is 0.8167 (GO threshold 0.60, AUROC null 0.5), meeting-cluster 95% [0.790, 0.852] over 6 clusters (descriptive, not significance). All six meetings 0.782-0.900; leave-one-meeting-out 0.800-0.824; within-meeting permutation null (2000 perms) mean 0.4986, 95% [0.403, 0.602], observed outside the whole band, one-sided p=0.0005. Pooled AUROC 0.8185, average precision 0.453 against a prevalence null of 0.1453 on n=1005 emitted words / 146 errors. Bottom confidence decile: 0.510 error rate, 3.51x lift. | THE CEILING IS PART OF THE RESULT: in core_envelope M=859 S=97 D=43 I=49, so DELETIONS ARE 22.8% OF ALL EDIT OPERATIONS AND ARE INVISIBLE to a per-word confidence by construction. Every AUROC here is about substitutions and insertions among EMITTED words, never about all the errors the human found. Insertion detection is the WEAKEST of the three (mean WM 0.773, AP 0.226) and insertions are exactly what fails the occupancy gate in exp-2026-08-16-char-vote-homophones. | REPRODUCTION, the check that decided how much the rest was worth: pooled WER(cached, new) = 0.0216 over 27 cells (97.8% word agreement), but only 14/27 cells token-identical and 12/27 raw-identical. Realtime Soniox is not deterministic; word-level reproduction is strong, so the confidences attach to THIS re-run but not retroactively to the cached hyp/soniox text token by token. | FIRST CALIBRATION OF THE PRODUCTION THRESHOLD: the user's soniox-core flags min-lexical-rune confidence < 0.5, a UX judgement unchanged since 2026-06-14 and never checked against ground truth. Here it flags 3.4% of words at precision 0.706 / recall 0.164 / lift 4.86x - a high-specificity triage rule, not broad error detection. Calibration is broadly ordered but NOT strictly monotone ([0.8,0.9) sits 5.1 points above [0.7,0.8), SE ~8.5, noise-compatible) and NO calibrated error probability is claimed: 738 of 1005 words sit in one wide bucket. | TOOLING: soniox-tools gained a strictly additive on_token callback and a --json mode preserving text/confidence/start_ms/end_ms/is_final; stdout without --json is byte-identical, so every existing caller still works.",
+   "decision": "GO for ONE paid stt-async-v5 run over the 247 windows (~8 audio hours, ~$0.82) to test whether the discrimination transports. Do NOT build a fusion arm on confidence before that run returns. Do NOT quote 0.8167 as coverage of ASR error - it is conditional on the word being emitted and 22.8% of edits are deletions it cannot see. Do NOT quote it as evidence about stt-async-v5. Keep the 247 windows on stt-async-v5: re-running them on rt-v4 would change one third of W and invalidate every frozen number. Silence trimming (soniox-core ?trim=1) stays OFF - it loses ~11% of words, this project's exact failure mode.",
+   "artifact_ids": [],
+   "capability_ids": [],
+   "reports": [
+    "docs/reports/2026-08-16-soniox-confidence-probe.md"
+   ],
+   "specs": [],
+   "superseded_by": null,
+   "next_action": "Run stt-async-v5 with per-token confidence over the 247 benchmark windows (~$0.82) as a separate, preregistered experiment; freeze its analysis before results. Blocked on nothing but a paid Soniox key (SONIOX_API_KEY is empty in soniox-tools/.env; the free Perplexity temp key only unlocks the realtime path).",
+   "updated_at": "2026-08-16T00:00:00Z",
+   "caveats": [
+    "30 cells, 27 scored, 6 meetings, 6 cities, ONE MEETING PER CITY so meeting and city are fully confounded. The cell is the independent unit and clustering is by meeting. This CANNOT support a population claim or any promotion gate; a 6-cluster interval excluding a null is not significance.",
+    "stt-rt-v4 IS NOT stt-async-v5. Everything here is indirect evidence motivating an experiment, never evidence about the paid model's confidence.",
+    "The AUROC is conditional on the word being EMITTED. Deletions (22.8% of edits in the primary region, 31.2% in core_strict) are invisible to this rule. That is a limit of this rule, not a proof that deletions are undetectable - a neighbouring-word signal is conceivable and untested.",
+    "NOTHING WAS TUNED ON THE GOLD SET. Primary statistic, GO threshold 0.60, region, bucket edges, alignment tie-break and all nulls were written into the scorer docstring before the first metric ran. conf_min (min over ALL runes) is the preregistered aggregate; conf_min_lex (min over LEXICAL runes, the production definition) was added AFTER freezing once soniox-core's algorithm became known, and is reported alongside rather than substituted.",
+    "The overlap / insertion / substitution / region / alignment / subtoken analyses are SENSITIVITY CHECKS on one dataset varying one choice at a time. They are not independent replications. zografou jun18 contributes a single error and its 0.900 means almost nothing.",
+    "One meeting (samothraki jul6) supplies 69 of 146 errors (47%). Checked: its own AUROC is 0.783, at the low end, and excluding it the mean is 0.823. The headline is not one meeting's effect.",
+    "min-over-runes is mildly length-confounded (subtoken count alone predicts error at AUROC 0.555). Within fixed subtoken counts 1-6 the AUROCs are 0.79/0.81/0.86/0.88/0.85/0.78, so the signal survives the control; counts >=7 have n<=22 and are uninformative.",
+    "The 93.2% run-to-run word similarity from the user's soniox-core is a SEPARATE repeatability estimate (different metric, audio and client configuration), not a ceiling this run was scored against.",
+    "The 'maxJobs = 18 parallel sessions, so 8 audio hours is ~27 min wall clock' logistics note comes from soniox-core and was NOT verified here; it traces to an initial commit with no surviving measurement artefact.",
+    "soniox-tools at /home/harold/projects/soniox-tools is NOT a git repository, so the tooling change has no commit or revision to cite.",
+    "Every gold-set caveat still applies: one listener, one pass, no inter-annotator number, 19% of core tokens excluded as text-uncertain with their time masked out, and a reference that knowingly under-covers.",
+    "Two Codex reviews at high effort, each before the thing it governed. Job 4759402624f643efacc4fb2e9cd63beb ran BEFORE any scoring code and replaced a pooled AUROC with the within-meeting mean, corrected the null from 0 to 0.5, forced the deletion ceiling up front, required a within-meeting rather than global permutation null, and required the alignment envelope and length control. Job 69c1a01b05a54aa08deb776df756af8a ran on the findings BEFORE any claim was written and killed three sentences: 'nothing here is evidence about async-v5', 'robust across all six meetings', and 93.2% framed as a reproduction ceiling.",
+    "ZERO GPU, ZERO PAID API. Free Perplexity temp key on the realtime path, local CPU. The ~$0.82 is the proposed next step, not spend incurred."
+   ]
+  },
   {
    "id": "exp-2026-07-23-benchmark-first",
    "title": "First OpenCouncil benchmark run of the fine-tune",
@@ -1129,6 +1161,41 @@
     "Two Codex passes shaped this. Job 55293f6b, BEFORE any number: added the exact_2_of_3 class (the first draft would have let an arm overturn a real token majority), the split/merge quarantine, the rule that epsilon is never offered to H, the exclusion of two-string columns from C, and found the vowel-collapse bug that made poiitis collide with pitis. Job 46892fd0, before the conclusion: cut back the structural claim to what the counts support and supplied the count-based bounds.",
     "The reusable evaluator (eval/controlled_eval/fusion_lab.py) is new and has been exercised by exactly one experiment. Its cross-fitting is only as honest as the idea handed to it: an idea that fits nothing gets fitted:false and an out-of-fold number identical to its in-fold one."
    ]
+  },
+  {
+   "id": "exp-2026-08-16-autoresearch-harness",
+   "title": "An autonomous idea-search harness over fusion_lab with an explicit multiple-comparisons defence",
+   "question": "Can an automated loop propose and score ideas on top of W without manufacturing a false positive, and what does its first small run find?",
+   "status": "CLOSED",
+   "conclusion": "THE HARNESS EXISTS AND THE FIRST RUN FOUND NOTHING, which is the honest outcome for a smoke test. Denominator: 11 ideas registered, 11 evaluated on the search partition, 1 refused as a cosmetic variant, 0 passed the search screen, 0 of 5 confirmations spent, confirmation partition never read. The 10 benchmark cities are cut once by an outcome-blind token-balance rule into SEARCH (athens, chalandri, chania, orestiada, vrilissia, zografou - 153 windows, 103 meetings, 47,252 ref tokens, W=0.09280) and CONFIRM (argos, samothraki, sparta, xylokastro - 94 windows, 61 meetings, 27,665 ref tokens, W=0.11354); each side holds one city that contributed nothing to fine-tuning. The defence, protocol autoresearch-2026-08-16b, after Codex job 362e2a7b rewrote three parts of the design and job 59c9564 found eight implementation defects: the split is ENFORCED by the API (run_search refuses a substrate holding a confirmation city, run_confirmation refuses anything but the whole confirmation partition); EXACTLY ONE confirmation batch is frozen per cycle before any confirmation number exists, because five sequential singleton batches each Holm-corrected inside themselves give a familywise error of 22.6%; the p-value is a null-imposed studentized wild cluster bootstrap-t over meetings with shared Rademacher weights, NOT the percentile tail mass, which is centred on the observed effect and is not a p-value under H0; THE SHIP TEST IS A ONE-SIDED MINIMUM-EFFECT TEST of H0: dWER >= -0.0010, Holm-corrected at familywise 0.05, because testing against zero is the wrong test when a MONOTONE arm touching 4 meeting clusters excites a percentile CI at any effect size; BH is reported beside Holm as description only, since its guarantee needs independence or PRDS which shared bootstrap weights do not establish. A support floor (>= 8 meetings with a NON-ZERO error delta) and a single-item domination check sit beside the test. The journal is hash-chained WITH a tail checkpoint (the chain alone accepts any prefix, so deleting the tail would be invisible) and every read-decide-append runs inside one file lock; the dedup guard fails closed when its cache is gone. Measured under the exact null with the harness's own inference code: P(some idea has raw p<0.05) is 0.207 / 0.415 / 0.873 at 5 / 10 / 40 ideas, while P(some idea ships under Holm) stays 0.060 / 0.055 / 0.055, and marginal p is calibrated (P(p<0.05)=0.046-0.054). RESULTS OF THE FIRST RUN, all negative: three text-only rules for overriding a 2-of-3 token majority - the class holding 25.0% of the W-to-oracle gap in hindsight - cost +0.16, +0.25 and +0.27 WER points, each with a CI excluding zero on the WRONG side and each worse in all six search cities. Learnable occupancy restoration at singleton columns halves deletions (0.01737 -> 0.00916) and more than doubles insertions (0.03486 -> 0.07240) for +2.85 points, which is the #24 hindsight insertion-gate failure reproduced and amplified. Re-arbitration of unresolved columns gave +0.00021, p=0.25, as its declared poor-bet status predicted. TWO IDEAS FIRED ON ZERO COLUMNS and would have looked like clean zeros with both rate gates passing to the digit; only the firing-set size revealed they were never tested. The deliberately restyled copy of an evaluated rule was refused by the behavioural dedup guard before it could be scored twice.",
+   "decision": "Use the harness for any further idea search on this substrate; do not evaluate ideas against W outside it. Nothing from this run ships and nothing is quoted as a result about the model: no idea reached the screen, so no confirmation batch was frozen and all 5 confirmations remain. The only directional signal - two_present_oov_drop moved insertions 0.03486 -> 0.03304 while losing on deletions - is recorded in the journal as a hypothesis to beat, not as a finding. The majority-override family is now negative on measurement as well as on argument and should not be retried in a fourth costume.",
+   "artifact_ids": [
+    "artifact-adapter-fixed"
+   ],
+   "capability_ids": [],
+   "reports": [
+    "docs/reports/2026-08-16-autoresearch-harness.md"
+   ],
+   "specs": [
+    "docs/specs/2026-08-16-autoresearch-partition-prereg.md"
+   ],
+   "superseded_by": null,
+   "caveats": [
+    "Smoke test of the harness, not a result about the model. Eleven ideas is not a search.",
+    "Sixth pass over the same 247 windows. Sample splitting controls the multiplicity of TESTING, not the adaptivity of PROPOSING: these ideas were written by an agent that has read five prior reports about this substrate, confirmation cities included. Round 2 of the seed set was written after seeing round 1's search numbers.",
+    "The partitions are not exchangeable: W is 0.09280 on search and 0.11354 on confirm, column oracle 0.03847 vs 0.06286. A confirmation failure will always be ambiguous between overfitting and city heterogeneity, and a confirmation success licenses a claim about meetings in those four cities only - four city clusters cannot support a population-of-cities claim.",
+    "Agreement-with-OpenCouncil, not fidelity-to-audio. Scored with eval/controlled_eval/scoring.py, comparable to exp-2026-08-16-composition-over-selection, not to the leaderboard.",
+    "The 16 locked evaluation windows are sealed and unavailable to the harness; the 6 sealed temporal-holdout windows inside this run are filtered out before anything is computed, which is why the substrate is 247.",
+    "The dedup guard is behavioural, not semantic: two genuinely different ideas that fire identically are indistinguishable to it, and an idea can dilute its Jaccard by adding irrelevant firings.",
+    "The implementation fingerprint pins the factory, its MRO, fusion_lab and autoresearch, but NOT free helper functions in a caller's module; ideas must keep their logic inside the class.",
+    "The wild bootstrap's calibration was verified under a well-behaved simulated null with unequal cluster sizes, not under adversarial nulls (single dominating meeting, near-degenerate cluster variance); the domination and support floors stand in front of those.",
+    "R_WILD=9999 makes 0.0001 the smallest attainable p - a Monte-Carlo floor, not a measurement.",
+    "The journal was reset once during bring-up, before any confirmation existed and before any number was reported; a reset is visible because sequence numbers restart at 1.",
+    "The journal is tamper EVIDENCE, not a security boundary: the chain is unkeyed and both it and its checkpoint are writable.",
+    "CodeRabbit could not review this change - the free CLI allowance for this repository was exhausted (3 included reviews used). Codex job 59c9564 stood in; all eight of its findings were addressed and the suite went from 336 to 351 passing tests."
+   ],
+   "next_action": null,
+   "updated_at": "2026-08-16"
   }
  ],
  "artifacts": [

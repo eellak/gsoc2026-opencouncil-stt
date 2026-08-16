@@ -256,12 +256,20 @@ def _per_city(sub: Substrate, rows_a, rows_b) -> dict:
 
 
 def evaluate(idea: Idea, sub: Substrate, fold: str = "city",
-             n_boot: int = N_BOOT, extra: dict | None = None) -> dict:
+             n_boot: int = N_BOOT, extra: dict | None = None,
+             return_detail: bool = False) -> dict:
     """Out-of-fold evaluation of one idea against W (and V), under the frozen gates.
 
     Returns out_of_fold WER/del/ins/sub, both rate gates, the paired
     meeting-clustered bootstrap CI, leave-one-out over window/meeting/city, and the
     share of the alignment-conditional column oracle recovered.
+
+    `return_detail=True` additionally attaches `res["detail"]`: the per-window (S, D,
+    I, ref_tokens) rows for the arm and for W, their item/meeting/city keys, and the
+    arm's output token streams. It is purely additive — no number above changes — and
+    it exists so a caller can compute its own cluster statistics without applying the
+    idea a second time. **`detail` carries verbatim council speech in `out_tokens`; it
+    must never be serialized to git.**
     """
     keyf = {"city": lambda w: w.city, "meeting": lambda w: w.meeting}[fold]
     groups: dict = {}
@@ -348,6 +356,16 @@ def evaluate(idea: Idea, sub: Substrate, fold: str = "city",
         and res["gates"]["loo_sign_stable"])
     if extra:
         res["extra"] = extra
+    if return_detail:
+        res["detail"] = {
+            "item_ids": [w.item_id for w in sub.windows],
+            "meetings": list(clusters),
+            "cities": [w.city for w in sub.windows],
+            "rows_arm": rows_arm,
+            "rows_W": rows_w,
+            "out_tokens": {w.item_id: out_tokens[w.item_id] for w in sub.windows},
+            "w_tokens": {w.item_id: list(w.w_tokens) for w in sub.windows},
+        }
     return res
 
 

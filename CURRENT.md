@@ -144,6 +144,32 @@ have released them.
 
 ## Recently changed
 
+- `exp-2026-08-16-autoresearch-harness` closed: **the idea loop exists and its first run
+  found nothing**, which is the honest outcome for a smoke test. 11 ideas registered, 11
+  evaluated, 1 refused as a cosmetic variant, 0 through the screen, **0 of 5
+  confirmations spent — the confirmation partition has never been read.** The 10 cities
+  are cut once by an outcome-blind token-balance rule into a 6-city search partition and
+  a sealed 4-city confirmation partition, and the API enforces the split; exactly one
+  confirmation batch may be frozen per cycle, before any confirmation number exists; the
+  p-value is a null-imposed studentized wild cluster bootstrap-t, not the percentile
+  tail; and the ship gate is a **one-sided minimum-effect test** (H0: dWER ≥ −0.0010)
+  under Holm, with BH reported beside it, because a monotone arm touching 4 meetings
+  excites a percentile CI at any effect size. Measured under the null: 40 ideas give "some idea significant" 87% of the time
+  and "some idea ships" 5.5%. All three ways of overriding a 2-of-3 majority — the class
+  holding 25% of the gap in hindsight — came back **worse**, CI excluding zero on the
+  wrong side, in all six search cities. Any further idea search on this substrate goes
+  through the harness.
+  [`docs/reports/2026-08-16-autoresearch-harness.md`](docs/reports/2026-08-16-autoresearch-harness.md).
+- `exp-2026-08-16-soniox-confidence` closed: **Soniox per-word confidence does predict
+  human-verified errors** — mean within-meeting AUROC **0.8167** (preregistered GO
+  threshold 0.60, null 0.5), all six meetings 0.78–0.90, permutation null topping out at
+  0.602. But it is conditional on the word being *emitted*: **22.8% of edits in the
+  scored region are deletions confidence cannot see**, and insertion detection — the
+  thing that fails the occupancy gate — is the weakest arm at 0.773. The production
+  `< 0.5` threshold gets its first ever calibration: precision 0.706, recall 0.164.
+  Decision is **GO for one ~$0.82 `stt-async-v5` run** to test whether this transports
+  off the free `stt-rt-v4` path; no fusion arm until it returns. Zero spend so far.
+  [`docs/reports/2026-08-16-soniox-confidence-probe.md`](docs/reports/2026-08-16-soniox-confidence-probe.md).
 - `exp-2026-08-16-char-vote-homophones` closed: **the columns are not there.** A census
   run before either arm was built found 34 strict-homophone columns out of 80,659
   (0.042%), so the homophone arm was **not built**; the per-character vote was built
