@@ -53,7 +53,21 @@ if [[ -z "${!TOKEN_VAR:-}" && -f "$ENV_FILE" ]]; then
   # shellcheck disable=SC1090
   set -a; source "$ENV_FILE"; set +a
 fi
-[[ -n "${!TOKEN_VAR:-}" ]] || die "\$$TOKEN_VAR is not set (looked in the environment and in $ENV_FILE).
+# Fallback: the huggingface CLI's own token store. Found 2026-08-16 under the 'oc'
+# profile; it is the angelospk identity with write on the opencouncil org, which is
+# exactly what this publish needs. Value is never echoed.
+HF_STORE="$HOME/.cache/huggingface/stored_tokens"
+if [[ -z "${!TOKEN_VAR:-}" && -f "$HF_STORE" ]]; then
+  _tok="$(sed -n 's/^[[:space:]]*hf_token[[:space:]]*=[[:space:]]*\(.*\)$/\1/p' "$HF_STORE" | head -1)"
+  if [[ -n "$_tok" ]]; then
+    printf -v "$TOKEN_VAR" '%s' "$_tok"
+    export "${TOKEN_VAR?}"
+    echo "Credential  : taken from $HF_STORE (not from $ENV_FILE)."
+  fi
+  unset _tok
+fi
+
+[[ -n "${!TOKEN_VAR:-}" ]] || die "\$$TOKEN_VAR is not set (looked in the environment, in $ENV_FILE, and in $HF_STORE).
 Add a line '$TOKEN_VAR=<org-write token for the opencouncil org>' to $ENV_FILE.
 The identity is the 'angelospk' account, which has write access to the org."
 echo "Credential  : \$$TOKEN_VAR is set (value not shown)."
