@@ -968,8 +968,8 @@
     "docs/specs/listening-protocol.md"
    ],
    "superseded_by": null,
-   "next_action": "AWAITING HUMAN VERIFICATION. The proposal, the frozen stratification, the candidate audio manifest and the verification tool are built and reviewed; nothing has been listened to and no number exists. The user must approve the design on issue #21, then run `python3 scripts/gold_set/build_page.py && AUDIT_DIR=~/oc-gold-set PORT=8790 python3 eval/controlled_eval/audit_server.py` and verify 27 cells (estimated 2 h 13 min, hard stop at 150 min).",
-   "updated_at": "2026-08-16T00:00:00Z",
+   "next_action": "HUMAN VERIFICATION IS DONE, 2026-08-16: all 30 cells complete in 140 active minutes (4.7 min/cell), inside the pre-declared 96-145 band. FROZEN by hash - answers fa7a5dec12a9d2787e4151d2388388b480e19de8a35c8fb7e3585da3a5d1f063, cells 7f734db8c0de2a4cc07892544f806607a29b190a5819da8c33ed238ac2b1b46a, both under ~/.cache/oc-public/gold-set-2026-08/ with research/gold-set-2026-08/verified-manifest.json in git. 3 warmup cells excluded, 27 scored. Content: 177 blocks, 52 with human-set boundaries, and REAL simultaneous speech in 16 of 30 cells across 41 blocks - enough overlap to measure something. NEXT: this is the first fidelity-to-audio reference this project has ever had. Score against it (a) WER of the composed text from exp-2026-08-16-composition-over-selection, (b) deletion rate against what was actually said rather than against our published text, (c) speaker-attribution accuracy overall AND inside overlap, which nothing here has ever been able to measure, (d) the omission detector, whose 0.320 precision is a LOWER BOUND because its ground truth was our own text.",
+   "updated_at": "2026-08-16T13:50:00Z",
    "caveats": [
     "NOTHING HAS BEEN MEASURED. This record exists to hold the frozen design, not a result.",
     "Selection frame: the 151 untouched public meetings of exp-2026-08-04-public-meetings minus every meeting touched by the 39 frozen windows, the 7 SEALED holdout windows, the 2026-08-10 benchmark run (253/247) and the 2026-08-04/09 listening cohorts -> 84 meetings, 107.1 h, 11 cities. Disjointness is checked programmatically by scripts/gold_set/verify_disjoint.py and passes at meeting level and at time level.",
@@ -980,7 +980,10 @@
     "Speaker letters are local to each cell. Named-speaker accuracy and cross-cell voice identity are NOT ground truth here.",
     "Zero GPU. pyannoteAI cost: EUR 0.77 whole-meeting diarization + ~EUR 0.13 clip transcription. Running total on the key is about USD 6.2 against the USD 20 cap of eval/controlled_eval/exclusive_cost_check.py.",
     "Three Codex reviews (high effort) ran before any audio was chosen and before any code was written: on the stratification and its selection bias, on the UI/schema and the overlap representation, and on anchoring mitigation. What was accepted and what was rejected is recorded in the spec.",
-    "Audio and transcript text live in ~/.cache/oc-public/gold-set/ and ~/oc-gold-set/. Git holds only manifests, hashes, aggregates and code."
+    "Audio and transcript text live in ~/.cache/oc-public/gold-set/ and ~/oc-gold-set/. Git holds only manifests, hashes, aggregates and code.",
+    "Pass 1 (blind overlap judgement) is NOT usable as recorded: the question asked how many voices sound at once and the reviewer read it as how many distinct voices appear in the core, so turn-taking cells were answered 2 or 3. 7 of 30 pass-1 answers disagree with the pass-2 geometry and 9 were revised after the wording was fixed mid-session. Pass 2 is the authoritative overlap record - it is computed from the reviewer's own block times and speaker labels - and no metric should be built on pass 1.",
+    "One reviewer, one pass, no second annotator. There is no inter-annotator agreement number and therefore no measurement of the reference's own error rate.",
+    "The text was prefilled from pyannoteAI precision-2 + faster-whisper-large-v3-turbo and corrected rather than written from scratch, which anchors it toward that system. The three warmup cells include one written blind precisely to size that anchoring; it is 3 cells, so it indicates rather than measures."
    ]
   },
   {
