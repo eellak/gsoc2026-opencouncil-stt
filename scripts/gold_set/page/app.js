@@ -167,9 +167,14 @@ function renderA() {
   const heardAll = heardEnd >= c.dur - 1.2;
   $("#a-heard").textContent = heardAll ? "ακούστηκε ολόκληρο" : `ακούστηκε ${heardEnd.toFixed(0)}/${c.dur.toFixed(0)}s`;
   $("#a-heard").className = "pill " + (heardAll ? "ok" : "warn");
-  const v = a.a || {};
-  $("#a-ov").value = v.overlap || "";
-  $("#a-voices").value = v.max_voices || "";
+  // Restore ONLY from a submitted answer. Before submit the DOM is the source of
+  // truth: renderA also runs on the selects' own onchange and on audio 'ended', so
+  // writing here unconditionally wiped the pick the instant it was made and left
+  // the submit button disabled forever. go() clears the selects on cell change.
+  if (a.a) {
+    $("#a-ov").value = a.a.overlap || "";
+    $("#a-voices").value = a.a.max_voices || "";
+  }
   $("#a-submit").disabled = !(heardAll && $("#a-ov").value && $("#a-voices").value);
   $("#pa").classList.toggle("on", phaseNow === "a");
 }
@@ -343,6 +348,7 @@ function go(i) {
     : a.status === "b_done" ? "c" : "c";
   if (phaseNow === "b" && !a.b) initB();
   if (phaseNow === "c" && !a.c) initC();
+  if (!a.a) { $("#a-ov").value = ""; $("#a-voices").value = ""; }  // fresh cell starts empty
   loadAudio(cur()); render(); location.hash = cur().id;
 }
 function next() { const n = CELLS.findIndex((c, i) => i > idx && !["complete", "excluded"].includes((A[c.id] || {}).status)); go(n < 0 ? Math.min(idx + 1, CELLS.length - 1) : n); }
