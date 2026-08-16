@@ -46,7 +46,17 @@ trained through the label-prefix bug and cannot answer it.
 1. Publish `artifact-adapter-fixed` to HuggingFace. The benchmark now prices the
    delay: the published weights cost **1.77 WER points on unseen cities**. **Done
    when** the hub weights are the corrected ones.
-1b. `exp-2026-08-13-targeted-deletion-training` — OPEN, **candidate supply
+1b. `exp-2026-08-13-targeted-deletion-training` — OPEN, **its first screen came
+   back negative, 2026-08-16**: the deletion-targeted mix *raised* the deletion
+   rate (0.0600 → 0.0788 per reference token, CI excludes zero) while lowering
+   substitutions, with WER flat, and the external-pack stage-1 of
+   `exp-2026-08-14-external-packs` (RUN 2) changed nothing detectable on top of
+   it (every paired CI includes zero). Both are single-seed screens against a
+   2.1-point per-seed spread. `artifact-adapter-fixed` keeps the candidate slot;
+   the frozen tree's branch is **no blind retry, error analysis of the
+   deletion-hard supply first**.
+   [`docs/reports/2026-08-16-screens-eval.md`](docs/reports/2026-08-16-screens-eval.md).
+   Prior state, unchanged: **candidate supply
    unblocked 2026-08-13**: user audited 228 gap3 items (94.7% accept overall);
    the calibrated strict stratum (found_frac≥0.85 ∧ n_added≥5, 97.4% agreement)
    was bulk-accepted (324 items, username=auto-verifier) with user consent —
