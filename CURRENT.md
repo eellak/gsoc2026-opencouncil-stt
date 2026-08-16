@@ -62,6 +62,10 @@ trained through the label-prefix bug and cannot answer it.
    now has a number on top of the fusion vote across all 10 benchmark cities —
    −0.083 WER points, CI excludes zero, both rate gates pass identically because
    it only moves substitutions (`exp-2026-08-16-roster-grounded-selection`).
+   **Later the same day:** that measurement sits on top of the whole-window vote,
+   which `exp-2026-08-16-composition-over-selection` has now displaced as the fusion
+   arm. The repair has not been re-measured on top of the per-column composition and
+   its −0.083 does not transfer to it unexamined.
 3. Decide whether fidelity-to-audio changes this ranking. The benchmark measures
    agreement-with-OpenCouncil; the one time both were measured, the ranking flipped.
    **Done when** the corrected adapter has a fidelity-to-audio number on unseen
@@ -110,6 +114,18 @@ have released them.
 
 ## Recently changed
 
+- `exp-2026-08-16-composition-over-selection` closed: **stop selecting, compose.**
+  An exact three-way word alignment of scribe + soniox + `artifact-adapter-fixed`
+  with a per-column vote — no LLM, no audio, no speaker information — takes WER
+  0.1201 → **0.1005** and lowers deletions, insertions *and* substitutions at once,
+  every CI excluding zero, both rate gates passing, no LOO sign flip over windows,
+  meetings or cities. It lands **below** the whole-window trio oracle (0.1064),
+  because its output is a text none of the three systems produced: whole-window
+  selection is not an upper bound on composition. The new per-position ceiling is
+  the alignment-conditional column oracle at **0.0475** (range 0.0461–0.0479 across
+  alignments — not an attainable ceiling). An LLM arbiter restricted to tie-broken
+  columns shows no detected benefit; the length guard and the pyannote-grounded
+  restoration of dropped text both fail the insertion gate, 2026-08-16.
 - `exp-2026-08-16-roster-grounded-selection` closed: a closed term list inside the
   fusion selector helps only through the FREE phonetic repair (−0.083 WER points,
   CI excludes zero, both rate gates pass identically, 6% of the trio-oracle gap).
