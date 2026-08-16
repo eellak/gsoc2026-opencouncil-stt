@@ -21,10 +21,13 @@ sensitivity that prices exactly that bias.
   cost        sum over the three pairs: 0 if equal or both epsilon, else 1
   tie-break   fewest columns, then a fixed transition order (frozen, see ORDER)
 
-Banding is an optimisation, not an approximation that is taken on faith:
-`align3` verifies that the recovered path never touches the band edge and widens
-the band and re-runs if it does. Three ASR transcripts of the same two minutes do
-not need a wide band; the check is what makes that a fact rather than a hope.
+Banding is an optimisation with a guard, not a silent approximation: `align3` widens
+the band and re-runs whenever the recovered path pressed against the band edge. That
+guard is a HEURISTIC, not a certificate — a path that stays clear of the edge is
+strong evidence the band did not bind, but it does not prove the unbanded optimum was
+reachable. Three ASR transcripts of the same two minutes do not need a wide band; the
+band is also floored per window at the largest pairwise length difference by the
+caller, which is the constraint that actually binds here.
 
 VOTING is hierarchical, also on Codex's correction. A flat vote in which epsilon is
 just another candidate deletes speech that two of three systems heard: the column
@@ -64,8 +67,9 @@ def align3(a: list[str], b: list[str], c: list[str], band: int = 40):
     """Exact sum-of-pairs 3-way alignment. Returns a list of (ea, eb, ec) columns.
 
     `band` constrains |i-j|, |i-k|, |j-k|. The returned path is checked against the
-    band and the alignment is redone with a wider band if it ever pressed against
-    it, so the result is the unbanded optimum or the function does not return.
+    band and the alignment is redone with a wider band if it ever pressed against it.
+    That check is a heuristic guard, not a proof of the unbanded optimum; it becomes
+    one only when the band is widened all the way to `lim`, which is the fallback.
     """
     na, nb, nc = len(a), len(b), len(c)
     if na == 0 and nb == 0 and nc == 0:

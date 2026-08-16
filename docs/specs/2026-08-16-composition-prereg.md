@@ -28,8 +28,10 @@ the one this experiment claims.
 ## Alignment (frozen)
 
 Exact three-way dynamic programming, unit-cost sum-of-pairs, banded, with the band
-verified against the recovered path and widened and re-run if the path ever pressed
-against it.
+checked against the recovered path and widened and re-run if the path ever pressed
+against it. That check is a heuristic guard, not a certificate of the unbanded
+optimum; the band is additionally floored per window at the largest pairwise length
+difference, which is the constraint that actually binds on this data.
 
 - state `(i, j, k)`; a transition advances any non-empty subset of the three token
   streams; entries are the advanced tokens, epsilon elsewhere;

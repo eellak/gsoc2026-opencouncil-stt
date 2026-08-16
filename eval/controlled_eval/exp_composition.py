@@ -248,16 +248,22 @@ def llm_pass(questions: list[dict], batch_size: int = 24):
     def run(chunk):
         try:
             return chunk, call_llm(chunk)
-        except Exception as e:                       # a failed batch is a no-op
+        except Exception as e:
             return chunk, e
 
     lock = threading.Lock()
-    done = 0
+    done = failed_q = 0
     with open(LLM_CACHE, "a") as f, ThreadPoolExecutor(max_workers=3) as pool:
         for chunk, got in pool.map(run, chunks):
+            # A TRANSPORT failure is not an answer. Caching it as a no-op makes the
+            # failure permanent and silently inflates the "invalid or missing" count
+            # with questions the model was never asked. Leave it uncached so the next
+            # run asks again.
             if isinstance(got, Exception):
-                log(f"  batch failed: {got}")
-                got = []
+                log(f"  batch failed, NOT cached: {got}")
+                failed_q += len(chunk)
+                done += len(chunk)
+                continue
             by = {g.get("id"): g for g in got if isinstance(g, dict)}
             with lock:
                 for q in chunk:
@@ -268,6 +274,8 @@ def llm_pass(questions: list[dict], batch_size: int = 24):
                 f.flush()
                 done += len(chunk)
                 log(f"  {done}/{len(todo)}")
+    if failed_q:
+        log(f"  {failed_q} questions left unanswered by failed batches")
     return cache
 
 
@@ -282,6 +290,9 @@ def main():
     items = [it for it in items if it["item_id"] not in sealed]
     log(f"{RUN_ID}: {before} common -> {len(items)} after removing "
         f"{before - len(items)} sealed holdout windows")
+    assert before - len(items) == 6, \
+        f"expected 6 sealed holdout windows inside this run, removed {before - len(items)}"
+    assert len(items) == 247, f"expected 247 windows, got {len(items)}"
     if os.environ.get("LIMIT"):          # smoke only; never used for a reported number
         items = items[:int(os.environ["LIMIT"])]
         log(f"LIMIT set: {len(items)} windows - SMOKE RUN, not reportable")
@@ -413,7 +424,11 @@ def main():
         mined_by_city, _ = admitted_mined()
         per_city_freq = {c: Counter() for c in city_terms}
         total = Counter()
+        # over the UNSEALED items only: the sealed holdout windows' reference text
+        # must not reach any part of this pipeline, not even a frequency table
         for x in report["items"]:
+            if x["itemId"] in sealed:
+                continue
             for tok in wtoks(x["referenceText"]):
                 total[tok] += 1
                 if x["cityId"] in per_city_freq:
@@ -639,6 +654,13 @@ def main():
     }
 
     v = res["arms"]["V"]
+    # The preregistration says reproducing V exactly is what makes this the declared
+    # substrate. Assert it rather than eyeballing the log.
+    if not os.environ.get("LIMIT"):
+        for metric, frozen in (("wer", 0.1201), ("del_rate", 0.0247),
+                               ("ins_rate", 0.0443), ("sub_rate", 0.0512)):
+            assert abs(v[metric] - frozen) < 5e-5, \
+                f"baseline V {metric} is {v[metric]}, preregistered {frozen}"
     o_win = res["arms"]["oracle_window_trio"]["wer"]
     o_col = res["arms"]["oracle_column"]["wer"]
     o_all = res["arms"]["oracle_window_all"]["wer"]

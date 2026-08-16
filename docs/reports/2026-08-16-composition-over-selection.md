@@ -17,7 +17,7 @@ That is the largest single move this project has measured on this benchmark, and
 is free.
 
 Everything bolted on top of it failed. The LLM arbiter changes nothing detectable
-(−0.00035 [−0.00093, +0.00023]). The length guard and the speaker-grounded
+(−0.00021 [−0.00083, +0.00042]). The length guard and the speaker-grounded
 restoration both **fail the insertion gate** and both make WER worse than plain W.
 
 ## Why the ceiling moved
@@ -40,10 +40,10 @@ whole-window oracle, and within 0.001 of the nine-system one.
 | oracle, whole-window trio | 0.1064 | 0.0257 | 0.0295 | 0.0511 |
 | oracle, whole-window all 9 | 0.0995 | 0.0233 | 0.0229 | 0.0532 |
 | **W** — per-column vote | **0.1005** | **0.0203** | **0.0374** | **0.0427** |
-| **W+L** — plus LLM arbiter | 0.1001 | 0.0203 | 0.0374 | 0.0424 |
+| **W+L** — plus LLM arbiter | 0.1002 | 0.0203 | 0.0374 | 0.0426 |
 | W+len — plus length guard | 0.1108 | 0.0177 | 0.0467 | 0.0464 |
 | W+D — plus speaker restoration | 0.1087 | 0.0187 | 0.0478 | 0.0421 |
-| W+L+D | 0.1084 | 0.0187 | 0.0478 | 0.0419 |
+| W+L+D | 0.1085 | 0.0187 | 0.0478 | 0.0420 |
 | *alignment-conditional column oracle* | *0.0475* | *0.0157* | *0.0131* | *0.0187* |
 
 Read the percentages carefully. W recovers **143%** of the gap between V and the
@@ -79,7 +79,8 @@ happens to open up and that no implementable voter can use. So: the exact alignm
 is the right one for the arm, and the oracle number is a range, not a target.
 
 What it does say is that three transcripts of this audio carry far more correct text
-than any of them emits, and that 73% of that headroom survives W.
+than any of them emits. W recovers **27%** of that headroom; the other 73% is still
+sitting there after W has run.
 
 ## What the vote actually does
 
@@ -104,11 +105,11 @@ check of the alignment against brute force on every input triple of length ≤ 3
 
 **W+L (the LLM as arbiter).** 2,066 arbitration points, 2.6% of columns, each shown
 ±8 tokens of decided context, that column's own candidates and the meeting's closed
-term list, and mechanically restricted to returning an *index*. 1,845 valid answers,
-221 no-ops, 850 changed W's choice. Result: −0.00035 [−0.00093, +0.00023], 77 windows
-better / 123 tied / 47 worse. This is **not detected as a benefit**; it is not
-evidence that an LLM arbiter cannot help. One model, one prompt, one stochastic run,
-221 no-ops, and no equivalence margin was preregistered.
+term list, and mechanically restricted to returning an *index*. 1,925 valid answers,
+141 invalid or missing (no-ops), 906 changed W's choice. Result: −0.00021 [−0.00083,
++0.00042], 78 windows better / 117 tied / 52 worse. This is **not detected as a
+benefit**; it is not evidence that an LLM arbiter cannot help. One model, one prompt,
+one stochastic run, 141 no-ops, and no equivalence margin was preregistered.
 
 Worth recording beside #18: given the *narrow* job — one position, a fixed candidate
 list, no ability to write text — the LLM at least stopped doing damage. In #18, given
