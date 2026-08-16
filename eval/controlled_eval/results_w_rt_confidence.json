@@ -1,0 +1,2071 @@
+{
+ "spec": "docs/specs/2026-08-16-w-rt-confidence-prereg.md",
+ "meta": {
+  "substrate": "W-rt",
+  "run_id": "2026-08-10-corrected-adapter-label-prefix-fix-vs-ju",
+  "trio": [
+   "scribe-v2-clean",
+   "soniox",
+   "oc-runpod-fixed-2026-08-10"
+  ],
+  "soniox_model": "stt-rt-v4",
+  "n_windows": 247,
+  "n_meetings": 144,
+  "n_cities": 10,
+  "ref_tokens": 74917,
+  "n_missing_token_files": 0,
+  "missing_item_ids": [],
+  "strict": true,
+  "align_cache": "/home/harold/.cache/oc-public/composition-rt-2026-08/align_f399c791caa2c159.json",
+  "token_manifest_sha256": "8bd5debdb04e1cb95a9d75f574278752c10b278cc21c3541ee6249a7c7fd1964"
+ },
+ "census_W_rt": {
+  "total_columns": 80347,
+  "by_class": {
+   "agree": 62615,
+   "exact_2_of_3": 6960,
+   "two_present_same": 4491,
+   "singleton": 4301,
+   "unresolved_three": 1092,
+   "unresolved_two": 888
+  },
+  "share": {
+   "agree": 0.7793072547823814,
+   "exact_2_of_3": 0.08662426724084285,
+   "unresolved_three": 0.013591048825718446,
+   "singleton": 0.05353031227052659,
+   "two_present_same": 0.05589505519807834,
+   "unresolved_two": 0.011052061682452362
+  }
+ },
+ "soniox_rt_stats": {
+  "n_words": 78425,
+  "n_units": 79007,
+  "words_without_timestamp": 0,
+  "words_without_confidence": 0,
+  "words_without_lexical_rune": 4,
+  "words_dropped_by_normalization": 4,
+  "words_split_into_several_tokens": 483,
+  "units_with_invalid_confidence": 0,
+  "residual_nonfinal_tokens": 0
+ },
+ "eligible_columns": {
+  "O": 3167,
+  "O2": 811,
+  "A": 1889,
+  "M": 1515
+ },
+ "grid": [
+  0.0,
+  0.05,
+  0.1,
+  0.15,
+  0.2,
+  0.25,
+  0.3,
+  0.35,
+  0.4,
+  0.45,
+  0.5,
+  0.55,
+  0.6,
+  0.65,
+  0.7,
+  0.75,
+  0.8,
+  0.85,
+  0.9,
+  0.95,
+  0.99,
+  0.999,
+  1.0,
+  1.01
+ ],
+ "k_other": 0.5,
+ "arms": {
+  "O": {
+   "idea": "O",
+   "fold": "city",
+   "fitted": true,
+   "fold_note": "parameters fitted leave-one-city-out over 10 folds; only held-out outputs scored",
+   "n_windows": 247,
+   "n_folds": 10,
+   "windows_changed_vs_W": 0,
+   "out_of_fold": {
+    "S": 3239,
+    "D": 1536,
+    "I": 2665,
+    "ref_tokens": 74917,
+    "wer": 0.09930990295927493,
+    "del_rate": 0.020502689643205146,
+    "ins_rate": 0.035572700455170386,
+    "sub_rate": 0.043234512860899396
+   },
+   "baseline_W": {
+    "S": 3239,
+    "D": 1536,
+    "I": 2665,
+    "ref_tokens": 74917,
+    "wer": 0.09930990295927493,
+    "del_rate": 0.020502689643205146,
+    "ins_rate": 0.035572700455170386,
+    "sub_rate": 0.043234512860899396
+   },
+   "baseline_V": {
+    "S": 3995,
+    "D": 1761,
+    "I": 3583,
+    "ref_tokens": 74917,
+    "wer": 0.12465795480331567,
+    "del_rate": 0.023506013321409027,
+    "ins_rate": 0.04782626106224221,
+    "sub_rate": 0.05332568041966443
+   },
+   "oracle_column": {
+    "S": 1426,
+    "D": 1186,
+    "I": 983,
+    "ref_tokens": 74917,
+    "wer": 0.047986438325079754,
+    "del_rate": 0.01583085281044356,
+    "ins_rate": 0.013121187447441836,
+    "sub_rate": 0.019034398067194362
+   },
+   "vs_W": {
+    "wer": {
+     "delta": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "excludes_zero": false,
+     "n_clusters": 144
+    },
+    "sub_rate": {
+     "delta": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "excludes_zero": false,
+     "n_clusters": 144
+    },
+    "del_rate": {
+     "delta": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "excludes_zero": false,
+     "n_clusters": 144
+    },
+    "ins_rate": {
+     "delta": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "excludes_zero": false,
+     "n_clusters": 144
+    },
+    "head2head_wer": {
+     "a_better": 0,
+     "tie": 247,
+     "b_better": 0
+    }
+   },
+   "vs_V": {
+    "wer": {
+     "delta": -0.025348051844040737,
+     "ci95": [
+      -0.028302144921982113,
+      -0.022521147818660454
+     ],
+     "excludes_zero": true,
+     "n_clusters": 144
+    },
+    "sub_rate": {
+     "delta": -0.010091167558765032,
+     "ci95": [
+      -0.011612159494430717,
+      -0.008578169710192712
+     ],
+     "excludes_zero": true,
+     "n_clusters": 144
+    },
+    "del_rate": {
+     "delta": -0.0030033236782038807,
+     "ci95": [
+      -0.004684066403069109,
+      -0.0013485200311199289
+     ],
+     "excludes_zero": true,
+     "n_clusters": 144
+    },
+    "ins_rate": {
+     "delta": -0.012253560607071827,
+     "ci95": [
+      -0.015138590614663027,
+      -0.009632879889140375
+     ],
+     "excludes_zero": true,
+     "n_clusters": 144
+    },
+    "head2head_wer": {
+     "a_better": 219,
+     "tie": 11,
+     "b_better": 17
+    }
+   },
+   "gates": {
+    "del_rate_gate": {
+     "W": 0.020502689643205146,
+     "arm": 0.020502689643205146,
+     "pass": true
+    },
+    "ins_rate_gate": {
+     "W": 0.035572700455170386,
+     "arm": 0.035572700455170386,
+     "pass": true
+    },
+    "wer_ci_excludes_zero": false,
+    "wer_improves": false,
+    "loo_sign_stable": true,
+    "all_pass": false
+   },
+   "loo_vs_W": {
+    "window": {
+     "full": 0.0,
+     "min": 0.0,
+     "min_group": "win_argos_apr30_2_2026_1264428",
+     "max": 0.0,
+     "max_group": "win_zografou_oct30_2_2025_3939586",
+     "n_groups": 247,
+     "sign_flips": 0
+    },
+    "meeting": {
+     "full": 0.0,
+     "min": 0.0,
+     "min_group": "apr15_2026",
+     "max": 0.0,
+     "max_group": "sep29_2025_2",
+     "n_groups": 144,
+     "sign_flips": 0
+    },
+    "city": {
+     "full": 0.0,
+     "min": 0.0,
+     "min_group": "argos",
+     "max": 0.0,
+     "max_group": "zografou",
+     "n_groups": 10,
+     "sign_flips": 0
+    }
+   },
+   "oracle_recovery_vs_W": 0.0,
+   "per_city": {
+    "per_city": {
+     "argos": {
+      "n_windows": 18,
+      "ref_tokens": 5149,
+      "wer_arm": 0.13051077879199843,
+      "wer_W": 0.13051077879199843,
+      "delta": 0.0
+     },
+     "athens": {
+      "n_windows": 40,
+      "ref_tokens": 12596,
+      "wer_arm": 0.11194029850746269,
+      "wer_W": 0.11194029850746269,
+      "delta": 0.0
+     },
+     "chalandri": {
+      "n_windows": 18,
+      "ref_tokens": 5468,
+      "wer_arm": 0.06217995610826628,
+      "wer_W": 0.06217995610826628,
+      "delta": 0.0
+     },
+     "chania": {
+      "n_windows": 40,
+      "ref_tokens": 11407,
+      "wer_arm": 0.09432804418339616,
+      "wer_W": 0.09432804418339616,
+      "delta": 0.0
+     },
+     "orestiada": {
+      "n_windows": 19,
+      "ref_tokens": 6142,
+      "wer_arm": 0.08368609573428851,
+      "wer_W": 0.08368609573428851,
+      "delta": 0.0
+     },
+     "samothraki": {
+      "n_windows": 19,
+      "ref_tokens": 5737,
+      "wer_arm": 0.16681192260763464,
+      "wer_W": 0.16681192260763464,
+      "delta": 0.0
+     },
+     "sparta": {
+      "n_windows": 38,
+      "ref_tokens": 11267,
+      "wer_arm": 0.08405076772876542,
+      "wer_W": 0.08405076772876542,
+      "delta": 0.0
+     },
+     "vrilissia": {
+      "n_windows": 18,
+      "ref_tokens": 6002,
+      "wer_arm": 0.08313895368210597,
+      "wer_W": 0.08313895368210597,
+      "delta": 0.0
+     },
+     "xylokastro": {
+      "n_windows": 19,
+      "ref_tokens": 5512,
+      "wer_arm": 0.09161828737300436,
+      "wer_W": 0.09161828737300436,
+      "delta": 0.0
+     },
+     "zografou": {
+      "n_windows": 18,
+      "ref_tokens": 5637,
+      "wer_arm": 0.09224764945893206,
+      "wer_W": 0.09224764945893206,
+      "delta": 0.0
+     }
+    },
+    "cities_better": 0,
+    "cities_worse": 0,
+    "cities_unchanged": 10,
+    "city_unweighted_mean_delta": 0.0
+   },
+   "fold_params": {
+    "argos": 1.01,
+    "athens": 1.01,
+    "chalandri": 1.01,
+    "chania": 1.01,
+    "orestiada": 1.01,
+    "samothraki": 1.01,
+    "sparta": 1.01,
+    "vrilissia": 1.01,
+    "xylokastro": 1.01,
+    "zografou": 1.01
+   },
+   "adjusted_ci": {
+    "level": 0.9833333333333333,
+    "quantiles": [
+     0.8333333333333334,
+     99.16666666666667
+    ],
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "excludes_zero": false
+   },
+   "city_sign_test": {
+    "n_effective": 0,
+    "p_two_sided": null
+   },
+   "domination": {
+    "applicable": false,
+    "total_improvement": 0,
+    "note": "no improvement to dominate"
+   },
+   "exposure": {
+    "eligible_columns": 3167,
+    "fired": 0,
+    "fired_matching_oracle": 0,
+    "fired_against_oracle": 0,
+    "windows_changed_vs_W_rt": 0,
+    "fold_thresholds": {
+     "argos": 1.01,
+     "athens": 1.01,
+     "chalandri": 1.01,
+     "chania": 1.01,
+     "orestiada": 1.01,
+     "samothraki": 1.01,
+     "sparta": 1.01,
+     "vrilissia": 1.01,
+     "xylokastro": 1.01,
+     "zografou": 1.01
+    }
+   },
+   "in_family": true
+  },
+  "O2": {
+   "idea": "O2",
+   "fold": "city",
+   "fitted": true,
+   "fold_note": "parameters fitted leave-one-city-out over 10 folds; only held-out outputs scored",
+   "n_windows": 247,
+   "n_folds": 10,
+   "windows_changed_vs_W": 44,
+   "out_of_fold": {
+    "S": 3214,
+    "D": 1538,
+    "I": 2667,
+    "ref_tokens": 74917,
+    "wer": 0.09902959274930924,
+    "del_rate": 0.02052938585367807,
+    "ins_rate": 0.03559939666564331,
+    "sub_rate": 0.04290081022998785
+   },
+   "baseline_W": {
+    "S": 3239,
+    "D": 1536,
+    "I": 2665,
+    "ref_tokens": 74917,
+    "wer": 0.09930990295927493,
+    "del_rate": 0.020502689643205146,
+    "ins_rate": 0.035572700455170386,
+    "sub_rate": 0.043234512860899396
+   },
+   "baseline_V": {
+    "S": 3995,
+    "D": 1761,
+    "I": 3583,
+    "ref_tokens": 74917,
+    "wer": 0.12465795480331567,
+    "del_rate": 0.023506013321409027,
+    "ins_rate": 0.04782626106224221,
+    "sub_rate": 0.05332568041966443
+   },
+   "oracle_column": {
+    "S": 1426,
+    "D": 1186,
+    "I": 983,
+    "ref_tokens": 74917,
+    "wer": 0.047986438325079754,
+    "del_rate": 0.01583085281044356,
+    "ins_rate": 0.013121187447441836,
+    "sub_rate": 0.019034398067194362
+   },
+   "vs_W": {
+    "wer": {
+     "delta": -0.00028031020996568956,
+     "ci95": [
+      -0.0005098170822369122,
+      -5.8817906530040057e-05
+     ],
+     "excludes_zero": true,
+     "n_clusters": 144
+    },
+    "sub_rate": {
+     "delta": -0.00033370263091154345,
+     "ci95": [
+      -0.0006496867661231992,
+      -6.785406776124963e-05
+     ],
+     "excludes_zero": true,
+     "n_clusters": 144
+    },
+    "del_rate": {
+     "delta": 2.6696210472923476e-05,
+     "ci95": [
+      -2.7445204846542322e-05,
+      0.00010029037220777562
+     ],
+     "excludes_zero": false,
+     "n_clusters": 144
+    },
+    "ins_rate": {
+     "delta": 2.6696210472923476e-05,
+     "ci95": [
+      -2.7445204846542322e-05,
+      0.00010029037220777562
+     ],
+     "excludes_zero": false,
+     "n_clusters": 144
+    },
+    "head2head_wer": {
+     "a_better": 20,
+     "tie": 221,
+     "b_better": 6
+    }
+   },
+   "vs_V": {
+    "wer": {
+     "delta": -0.025628362054006426,
+     "ci95": [
+      -0.028615239601134202,
+      -0.02275281053355699
+     ],
+     "excludes_zero": true,
+     "n_clusters": 144
+    },
+    "sub_rate": {
+     "delta": -0.010424870189676576,
+     "ci95": [
+      -0.01201297499497707,
+      -0.008834304512828127
+     ],
+     "excludes_zero": true,
+     "n_clusters": 144
+    },
+    "del_rate": {
+     "delta": -0.002976627467730957,
+     "ci95": [
+      -0.004633726986772908,
+      -0.0013267008142908222
+     ],
+     "excludes_zero": true,
+     "n_clusters": 144
+    },
+    "ins_rate": {
+     "delta": -0.012226864396598904,
+     "ci95": [
+      -0.015122618677387293,
+      -0.009591902859327713
+     ],
+     "excludes_zero": true,
+     "n_clusters": 144
+    },
+    "head2head_wer": {
+     "a_better": 219,
+     "tie": 10,
+     "b_better": 18
+    }
+   },
+   "gates": {
+    "del_rate_gate": {
+     "W": 0.020502689643205146,
+     "arm": 0.02052938585367807,
+     "pass": false
+    },
+    "ins_rate_gate": {
+     "W": 0.035572700455170386,
+     "arm": 0.03559939666564331,
+     "pass": false
+    },
+    "wer_ci_excludes_zero": true,
+    "wer_improves": true,
+    "loo_sign_stable": true,
+    "all_pass": false
+   },
+   "loo_vs_W": {
+    "window": {
+     "full": -0.00028031020996569536,
+     "min": -0.0003214788024914607,
+     "min_group": "win_vrilissia_dec8_2025_751776",
+     "max": -0.00022809912919803028,
+     "max_group": "win_athens_mar19_2026_3211573",
+     "n_groups": 247,
+     "sign_flips": 0
+    },
+    "meeting": {
+     "full": -0.00028031020996569536,
+     "min": -0.00033739102269966803,
+     "min_group": "dec8_2025",
+     "max": -0.00022809912919803028,
+     "max_group": "mar19_2026",
+     "n_groups": 144,
+     "sign_flips": 0
+    },
+    "city": {
+     "full": -0.00028031020996569536,
+     "min": -0.00033065658951346243,
+     "min_group": "chania",
+     "max": -0.00016045955616886764,
+     "max_group": "athens",
+     "n_groups": 10,
+     "sign_flips": 0
+    }
+   },
+   "oracle_recovery_vs_W": 0.005461638491547351,
+   "per_city": {
+    "per_city": {
+     "argos": {
+      "n_windows": 18,
+      "ref_tokens": 5149,
+      "wer_arm": 0.13031656632355798,
+      "wer_W": 0.13051077879199843,
+      "delta": -0.0001942124684404739
+     },
+     "athens": {
+      "n_windows": 40,
+      "ref_tokens": 12596,
+      "wer_arm": 0.11106700539853921,
+      "wer_W": 0.11194029850746269,
+      "delta": -0.0008732931089234677
+     },
+     "chalandri": {
+      "n_windows": 18,
+      "ref_tokens": 5468,
+      "wer_arm": 0.06217995610826628,
+      "wer_W": 0.06217995610826628,
+      "delta": 0.0
+     },
+     "chania": {
+      "n_windows": 40,
+      "ref_tokens": 11407,
+      "wer_arm": 0.09432804418339616,
+      "wer_W": 0.09432804418339616,
+      "delta": 0.0
+     },
+     "orestiada": {
+      "n_windows": 19,
+      "ref_tokens": 6142,
+      "wer_arm": 0.08368609573428851,
+      "wer_W": 0.08368609573428851,
+      "delta": 0.0
+     },
+     "samothraki": {
+      "n_windows": 19,
+      "ref_tokens": 5737,
+      "wer_arm": 0.16628900122014992,
+      "wer_W": 0.16681192260763464,
+      "delta": -0.0005229213874847481
+     },
+     "sparta": {
+      "n_windows": 38,
+      "ref_tokens": 11267,
+      "wer_arm": 0.08369574864648975,
+      "wer_W": 0.08405076772876542,
+      "delta": -0.0003550190822756723
+     },
+     "vrilissia": {
+      "n_windows": 18,
+      "ref_tokens": 6002,
+      "wer_arm": 0.08313895368210597,
+      "wer_W": 0.08313895368210597,
+      "delta": 0.0
+     },
+     "xylokastro": {
+      "n_windows": 19,
+      "ref_tokens": 5512,
+      "wer_arm": 0.09161828737300436,
+      "wer_W": 0.09161828737300436,
+      "delta": 0.0
+     },
+     "zografou": {
+      "n_windows": 18,
+      "ref_tokens": 5637,
+      "wer_arm": 0.09189285080716693,
+      "wer_W": 0.09224764945893206,
+      "delta": -0.0003547986517651233
+     }
+    },
+    "cities_better": 5,
+    "cities_worse": 0,
+    "cities_unchanged": 5,
+    "city_unweighted_mean_delta": -0.00023002446988894853
+   },
+   "fold_params": {
+    "argos": 0.95,
+    "athens": 0.95,
+    "chalandri": 0.95,
+    "chania": 0.95,
+    "orestiada": 0.95,
+    "samothraki": 0.95,
+    "sparta": 0.95,
+    "vrilissia": 0.95,
+    "xylokastro": 0.95,
+    "zografou": 0.95
+   },
+   "adjusted_ci": null,
+   "city_sign_test": {
+    "cities_better": 5,
+    "cities_worse": 0,
+    "n_effective": 5,
+    "p_two_sided": 0.0625
+   },
+   "domination": {
+    "applicable": true,
+    "total_improvement": 21,
+    "top_meeting": "mar19_2026",
+    "top_share": 0.19047619047619047,
+    "dominated": false
+   },
+   "exposure": {
+    "eligible_columns": 811,
+    "fired": 289,
+    "fired_matching_oracle": 74,
+    "fired_against_oracle": 8,
+    "windows_changed_vs_W_rt": 44,
+    "fold_thresholds": {
+     "argos": 0.95,
+     "athens": 0.95,
+     "chalandri": 0.95,
+     "chania": 0.95,
+     "orestiada": 0.95,
+     "samothraki": 0.95,
+     "sparta": 0.95,
+     "vrilissia": 0.95,
+     "xylokastro": 0.95,
+     "zografou": 0.95
+    }
+   },
+   "in_family": false
+  },
+  "A": {
+   "idea": "A",
+   "fold": "city",
+   "fitted": false,
+   "fold_note": "out-of-fold == in-fold by construction: this idea fits no parameter",
+   "n_windows": 247,
+   "n_folds": 10,
+   "windows_changed_vs_W": 150,
+   "out_of_fold": {
+    "S": 3201,
+    "D": 1542,
+    "I": 2671,
+    "ref_tokens": 74917,
+    "wer": 0.09896285222312692,
+    "del_rate": 0.020582778274623917,
+    "ins_rate": 0.03565278908658916,
+    "sub_rate": 0.04272728486191385
+   },
+   "baseline_W": {
+    "S": 3239,
+    "D": 1536,
+    "I": 2665,
+    "ref_tokens": 74917,
+    "wer": 0.09930990295927493,
+    "del_rate": 0.020502689643205146,
+    "ins_rate": 0.035572700455170386,
+    "sub_rate": 0.043234512860899396
+   },
+   "baseline_V": {
+    "S": 3995,
+    "D": 1761,
+    "I": 3583,
+    "ref_tokens": 74917,
+    "wer": 0.12465795480331567,
+    "del_rate": 0.023506013321409027,
+    "ins_rate": 0.04782626106224221,
+    "sub_rate": 0.05332568041966443
+   },
+   "oracle_column": {
+    "S": 1426,
+    "D": 1186,
+    "I": 983,
+    "ref_tokens": 74917,
+    "wer": 0.047986438325079754,
+    "del_rate": 0.01583085281044356,
+    "ins_rate": 0.013121187447441836,
+    "sub_rate": 0.019034398067194362
+   },
+   "vs_W": {
+    "wer": {
+     "delta": -0.0003470507361480052,
+     "ci95": [
+      -0.0010478130568234512,
+      0.00027042657075585896
+     ],
+     "excludes_zero": false,
+     "n_clusters": 144
+    },
+    "sub_rate": {
+     "delta": -0.000507227998985546,
+     "ci95": [
+      -0.0013087920455616296,
+      0.00017397483033628172
+     ],
+     "excludes_zero": false,
+     "n_clusters": 144
+    },
+    "del_rate": {
+     "delta": 8.008863141877043e-05,
+     "ci95": [
+      0.0,
+      0.00017156613688446638
+     ],
+     "excludes_zero": false,
+     "n_clusters": 144
+    },
+    "ins_rate": {
+     "delta": 8.008863141877043e-05,
+     "ci95": [
+      0.0,
+      0.00017156613688446638
+     ],
+     "excludes_zero": false,
+     "n_clusters": 144
+    },
+    "head2head_wer": {
+     "a_better": 48,
+     "tie": 154,
+     "b_better": 45
+    }
+   },
+   "vs_V": {
+    "wer": {
+     "delta": -0.02569510258018874,
+     "ci95": [
+      -0.02876603577468887,
+      -0.022720952940068807
+     ],
+     "excludes_zero": true,
+     "n_clusters": 144
+    },
+    "sub_rate": {
+     "delta": -0.010598395557750578,
+     "ci95": [
+      -0.01228044790246686,
+      -0.008883210267054652
+     ],
+     "excludes_zero": true,
+     "n_clusters": 144
+    },
+    "del_rate": {
+     "delta": -0.0029232350467851102,
+     "ci95": [
+      -0.004590865637319027,
+      -0.0012744674436473656
+     ],
+     "excludes_zero": true,
+     "n_clusters": 144
+    },
+    "ins_rate": {
+     "delta": -0.012173471975653057,
+     "ci95": [
+      -0.015069196959277545,
+      -0.009535760908582118
+     ],
+     "excludes_zero": true,
+     "n_clusters": 144
+    },
+    "head2head_wer": {
+     "a_better": 218,
+     "tie": 8,
+     "b_better": 21
+    }
+   },
+   "gates": {
+    "del_rate_gate": {
+     "W": 0.020502689643205146,
+     "arm": 0.020582778274623917,
+     "pass": false
+    },
+    "ins_rate_gate": {
+     "W": 0.035572700455170386,
+     "arm": 0.03565278908658916,
+     "pass": false
+    },
+    "wer_ci_excludes_zero": false,
+    "wer_improves": true,
+    "loo_sign_stable": true,
+    "all_pass": false
+   },
+   "loo_vs_W": {
+    "window": {
+     "full": -0.0003470507361480038,
+     "min": -0.0004156387428939183,
+     "min_group": "win_samothraki_may6_2026_15737141",
+     "max": -0.00018788415599753065,
+     "max_group": "win_athens_may20_2_2026_1191014",
+     "n_groups": 247,
+     "sign_flips": 0
+    },
+    "meeting": {
+     "full": -0.0003470507361480038,
+     "min": -0.00043186050905557504,
+     "min_group": "dec8_2025",
+     "max": -0.00018788415599753065,
+     "max_group": "may20_2_2026",
+     "n_groups": 144,
+     "sign_flips": 0
+    },
+    "city": {
+     "full": -0.0003470507361480038,
+     "min": -0.00045662100456621003,
+     "min_group": "chania",
+     "max": -0.0001283676449350941,
+     "max_group": "athens",
+     "n_groups": 10,
+     "sign_flips": 0
+    }
+   },
+   "oracle_recovery_vs_W": 0.0067620286085826025,
+   "per_city": {
+    "per_city": {
+     "argos": {
+      "n_windows": 18,
+      "ref_tokens": 5149,
+      "wer_arm": 0.1307049912604389,
+      "wer_W": 0.13051077879199843,
+      "delta": 0.0001942124684404739
+     },
+     "athens": {
+      "n_windows": 40,
+      "ref_tokens": 12596,
+      "wer_arm": 0.11051127342013338,
+      "wer_W": 0.11194029850746269,
+      "delta": -0.0014290250873293109
+     },
+     "chalandri": {
+      "n_windows": 18,
+      "ref_tokens": 5468,
+      "wer_arm": 0.06291148500365765,
+      "wer_W": 0.06217995610826628,
+      "delta": 0.000731528895391368
+     },
+     "chania": {
+      "n_windows": 40,
+      "ref_tokens": 11407,
+      "wer_arm": 0.09459104058911195,
+      "wer_W": 0.09432804418339616,
+      "delta": 0.00026299640571578853
+     },
+     "orestiada": {
+      "n_windows": 19,
+      "ref_tokens": 6142,
+      "wer_arm": 0.08319765548681211,
+      "wer_W": 0.08368609573428851,
+      "delta": -0.0004884402474763921
+     },
+     "samothraki": {
+      "n_windows": 19,
+      "ref_tokens": 5737,
+      "wer_arm": 0.1655917727035036,
+      "wer_W": 0.16681192260763464,
+      "delta": -0.001220149904131079
+     },
+     "sparta": {
+      "n_windows": 38,
+      "ref_tokens": 11267,
+      "wer_arm": 0.08342948433478299,
+      "wer_W": 0.08405076772876542,
+      "delta": -0.0006212833939824266
+     },
+     "vrilissia": {
+      "n_windows": 18,
+      "ref_tokens": 6002,
+      "wer_arm": 0.0838053982005998,
+      "wer_W": 0.08313895368210597,
+      "delta": 0.0006664445184938354
+     },
+     "xylokastro": {
+      "n_windows": 19,
+      "ref_tokens": 5512,
+      "wer_arm": 0.09052975326560232,
+      "wer_W": 0.09161828737300436,
+      "delta": -0.0010885341074020319
+     },
+     "zografou": {
+      "n_windows": 18,
+      "ref_tokens": 5637,
+      "wer_arm": 0.09277984743657974,
+      "wer_W": 0.09224764945893206,
+      "delta": 0.0005321979776476849
+     }
+    },
+    "cities_better": 5,
+    "cities_worse": 5,
+    "cities_unchanged": 0,
+    "city_unweighted_mean_delta": -0.000246005247463209
+   },
+   "fold_params": {
+    "argos": null,
+    "athens": null,
+    "chalandri": null,
+    "chania": null,
+    "orestiada": null,
+    "samothraki": null,
+    "sparta": null,
+    "vrilissia": null,
+    "xylokastro": null,
+    "zografou": null
+   },
+   "adjusted_ci": {
+    "level": 0.9833333333333333,
+    "quantiles": [
+     0.8333333333333334,
+     99.16666666666667
+    ],
+    "ci": [
+     -0.00124008956325051,
+     0.0003938600756024818
+    ],
+    "excludes_zero": false
+   },
+   "city_sign_test": {
+    "cities_better": 5,
+    "cities_worse": 5,
+    "n_effective": 10,
+    "p_two_sided": 1.0
+   },
+   "domination": {
+    "applicable": true,
+    "total_improvement": 26,
+    "top_meeting": "may20_2_2026",
+    "top_share": 0.46153846153846156,
+    "dominated": false
+   },
+   "exposure": {
+    "eligible_columns": 1889,
+    "fired": 750,
+    "fired_matching_oracle": 169,
+    "fired_against_oracle": 301
+   },
+   "in_family": true
+  },
+  "M": {
+   "idea": "M",
+   "fold": "city",
+   "fitted": true,
+   "fold_note": "parameters fitted leave-one-city-out over 10 folds; only held-out outputs scored",
+   "n_windows": 247,
+   "n_folds": 10,
+   "windows_changed_vs_W": 0,
+   "out_of_fold": {
+    "S": 3239,
+    "D": 1536,
+    "I": 2665,
+    "ref_tokens": 74917,
+    "wer": 0.09930990295927493,
+    "del_rate": 0.020502689643205146,
+    "ins_rate": 0.035572700455170386,
+    "sub_rate": 0.043234512860899396
+   },
+   "baseline_W": {
+    "S": 3239,
+    "D": 1536,
+    "I": 2665,
+    "ref_tokens": 74917,
+    "wer": 0.09930990295927493,
+    "del_rate": 0.020502689643205146,
+    "ins_rate": 0.035572700455170386,
+    "sub_rate": 0.043234512860899396
+   },
+   "baseline_V": {
+    "S": 3995,
+    "D": 1761,
+    "I": 3583,
+    "ref_tokens": 74917,
+    "wer": 0.12465795480331567,
+    "del_rate": 0.023506013321409027,
+    "ins_rate": 0.04782626106224221,
+    "sub_rate": 0.05332568041966443
+   },
+   "oracle_column": {
+    "S": 1426,
+    "D": 1186,
+    "I": 983,
+    "ref_tokens": 74917,
+    "wer": 0.047986438325079754,
+    "del_rate": 0.01583085281044356,
+    "ins_rate": 0.013121187447441836,
+    "sub_rate": 0.019034398067194362
+   },
+   "vs_W": {
+    "wer": {
+     "delta": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "excludes_zero": false,
+     "n_clusters": 144
+    },
+    "sub_rate": {
+     "delta": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "excludes_zero": false,
+     "n_clusters": 144
+    },
+    "del_rate": {
+     "delta": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "excludes_zero": false,
+     "n_clusters": 144
+    },
+    "ins_rate": {
+     "delta": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "excludes_zero": false,
+     "n_clusters": 144
+    },
+    "head2head_wer": {
+     "a_better": 0,
+     "tie": 247,
+     "b_better": 0
+    }
+   },
+   "vs_V": {
+    "wer": {
+     "delta": -0.025348051844040737,
+     "ci95": [
+      -0.028302144921982113,
+      -0.022521147818660454
+     ],
+     "excludes_zero": true,
+     "n_clusters": 144
+    },
+    "sub_rate": {
+     "delta": -0.010091167558765032,
+     "ci95": [
+      -0.011612159494430717,
+      -0.008578169710192712
+     ],
+     "excludes_zero": true,
+     "n_clusters": 144
+    },
+    "del_rate": {
+     "delta": -0.0030033236782038807,
+     "ci95": [
+      -0.004684066403069109,
+      -0.0013485200311199289
+     ],
+     "excludes_zero": true,
+     "n_clusters": 144
+    },
+    "ins_rate": {
+     "delta": -0.012253560607071827,
+     "ci95": [
+      -0.015138590614663027,
+      -0.009632879889140375
+     ],
+     "excludes_zero": true,
+     "n_clusters": 144
+    },
+    "head2head_wer": {
+     "a_better": 219,
+     "tie": 11,
+     "b_better": 17
+    }
+   },
+   "gates": {
+    "del_rate_gate": {
+     "W": 0.020502689643205146,
+     "arm": 0.020502689643205146,
+     "pass": true
+    },
+    "ins_rate_gate": {
+     "W": 0.035572700455170386,
+     "arm": 0.035572700455170386,
+     "pass": true
+    },
+    "wer_ci_excludes_zero": false,
+    "wer_improves": false,
+    "loo_sign_stable": true,
+    "all_pass": false
+   },
+   "loo_vs_W": {
+    "window": {
+     "full": 0.0,
+     "min": 0.0,
+     "min_group": "win_argos_apr30_2_2026_1264428",
+     "max": 0.0,
+     "max_group": "win_zografou_oct30_2_2025_3939586",
+     "n_groups": 247,
+     "sign_flips": 0
+    },
+    "meeting": {
+     "full": 0.0,
+     "min": 0.0,
+     "min_group": "apr15_2026",
+     "max": 0.0,
+     "max_group": "sep29_2025_2",
+     "n_groups": 144,
+     "sign_flips": 0
+    },
+    "city": {
+     "full": 0.0,
+     "min": 0.0,
+     "min_group": "argos",
+     "max": 0.0,
+     "max_group": "zografou",
+     "n_groups": 10,
+     "sign_flips": 0
+    }
+   },
+   "oracle_recovery_vs_W": 0.0,
+   "per_city": {
+    "per_city": {
+     "argos": {
+      "n_windows": 18,
+      "ref_tokens": 5149,
+      "wer_arm": 0.13051077879199843,
+      "wer_W": 0.13051077879199843,
+      "delta": 0.0
+     },
+     "athens": {
+      "n_windows": 40,
+      "ref_tokens": 12596,
+      "wer_arm": 0.11194029850746269,
+      "wer_W": 0.11194029850746269,
+      "delta": 0.0
+     },
+     "chalandri": {
+      "n_windows": 18,
+      "ref_tokens": 5468,
+      "wer_arm": 0.06217995610826628,
+      "wer_W": 0.06217995610826628,
+      "delta": 0.0
+     },
+     "chania": {
+      "n_windows": 40,
+      "ref_tokens": 11407,
+      "wer_arm": 0.09432804418339616,
+      "wer_W": 0.09432804418339616,
+      "delta": 0.0
+     },
+     "orestiada": {
+      "n_windows": 19,
+      "ref_tokens": 6142,
+      "wer_arm": 0.08368609573428851,
+      "wer_W": 0.08368609573428851,
+      "delta": 0.0
+     },
+     "samothraki": {
+      "n_windows": 19,
+      "ref_tokens": 5737,
+      "wer_arm": 0.16681192260763464,
+      "wer_W": 0.16681192260763464,
+      "delta": 0.0
+     },
+     "sparta": {
+      "n_windows": 38,
+      "ref_tokens": 11267,
+      "wer_arm": 0.08405076772876542,
+      "wer_W": 0.08405076772876542,
+      "delta": 0.0
+     },
+     "vrilissia": {
+      "n_windows": 18,
+      "ref_tokens": 6002,
+      "wer_arm": 0.08313895368210597,
+      "wer_W": 0.08313895368210597,
+      "delta": 0.0
+     },
+     "xylokastro": {
+      "n_windows": 19,
+      "ref_tokens": 5512,
+      "wer_arm": 0.09161828737300436,
+      "wer_W": 0.09161828737300436,
+      "delta": 0.0
+     },
+     "zografou": {
+      "n_windows": 18,
+      "ref_tokens": 5637,
+      "wer_arm": 0.09224764945893206,
+      "wer_W": 0.09224764945893206,
+      "delta": 0.0
+     }
+    },
+    "cities_better": 0,
+    "cities_worse": 0,
+    "cities_unchanged": 10,
+    "city_unweighted_mean_delta": 0.0
+   },
+   "fold_params": {
+    "argos": 1.01,
+    "athens": 1.01,
+    "chalandri": 1.01,
+    "chania": 1.01,
+    "orestiada": 1.01,
+    "samothraki": 1.01,
+    "sparta": 1.01,
+    "vrilissia": 1.01,
+    "xylokastro": 1.01,
+    "zografou": 1.01
+   },
+   "adjusted_ci": {
+    "level": 0.9833333333333333,
+    "quantiles": [
+     0.8333333333333334,
+     99.16666666666667
+    ],
+    "ci": [
+     0.0,
+     0.0
+    ],
+    "excludes_zero": false
+   },
+   "city_sign_test": {
+    "n_effective": 0,
+    "p_two_sided": null
+   },
+   "domination": {
+    "applicable": false,
+    "total_improvement": 0,
+    "note": "no improvement to dominate"
+   },
+   "exposure": {
+    "eligible_columns": 1515,
+    "fired": 0,
+    "fired_matching_oracle": 0,
+    "fired_against_oracle": 0,
+    "windows_changed_vs_W_rt": 0,
+    "fold_thresholds": {
+     "argos": 1.01,
+     "athens": 1.01,
+     "chalandri": 1.01,
+     "chania": 1.01,
+     "orestiada": 1.01,
+     "samothraki": 1.01,
+     "sparta": 1.01,
+     "vrilissia": 1.01,
+     "xylokastro": 1.01,
+     "zografou": 1.01
+    }
+   },
+   "in_family": true
+  }
+ },
+ "controls": {
+  "O-all": {
+   "idea": "O-all",
+   "fold": "city",
+   "fitted": false,
+   "fold_note": "out-of-fold == in-fold by construction: this idea fits no parameter",
+   "n_windows": 247,
+   "n_folds": 10,
+   "windows_changed_vs_W": 239,
+   "out_of_fold": {
+    "S": 3236,
+    "D": 963,
+    "I": 5259,
+    "ref_tokens": 74917,
+    "wer": 0.1262463793264546,
+    "del_rate": 0.012854225342712602,
+    "ins_rate": 0.070197685438552,
+    "sub_rate": 0.04319446854519001
+   },
+   "baseline_W": {
+    "S": 3239,
+    "D": 1536,
+    "I": 2665,
+    "ref_tokens": 74917,
+    "wer": 0.09930990295927493,
+    "del_rate": 0.020502689643205146,
+    "ins_rate": 0.035572700455170386,
+    "sub_rate": 0.043234512860899396
+   },
+   "baseline_V": {
+    "S": 3995,
+    "D": 1761,
+    "I": 3583,
+    "ref_tokens": 74917,
+    "wer": 0.12465795480331567,
+    "del_rate": 0.023506013321409027,
+    "ins_rate": 0.04782626106224221,
+    "sub_rate": 0.05332568041966443
+   },
+   "oracle_column": {
+    "S": 1426,
+    "D": 1186,
+    "I": 983,
+    "ref_tokens": 74917,
+    "wer": 0.047986438325079754,
+    "del_rate": 0.01583085281044356,
+    "ins_rate": 0.013121187447441836,
+    "sub_rate": 0.019034398067194362
+   },
+   "vs_W": {
+    "wer": {
+     "delta": 0.026936476367179676,
+     "ci95": [
+      0.023214206320889778,
+      0.030951765206010794
+     ],
+     "excludes_zero": true,
+     "n_clusters": 144
+    },
+    "sub_rate": {
+     "delta": -4.0044315709385214e-05,
+     "ci95": [
+      -0.0007805461167527554,
+      0.0007173732038810417
+     ],
+     "excludes_zero": false,
+     "n_clusters": 144
+    },
+    "del_rate": {
+     "delta": -0.007648464300492545,
+     "ci95": [
+      -0.009086577348901862,
+      -0.006366109064838329
+     ],
+     "excludes_zero": true,
+     "n_clusters": 144
+    },
+    "ins_rate": {
+     "delta": 0.03462498498338161,
+     "ci95": [
+      0.030410142576839896,
+      0.03911855408805539
+     ],
+     "excludes_zero": true,
+     "n_clusters": 144
+    },
+    "head2head_wer": {
+     "a_better": 19,
+     "tie": 18,
+     "b_better": 210
+    }
+   },
+   "vs_V": {
+    "wer": {
+     "delta": 0.00158842452313894,
+     "ci95": [
+      -0.0019064811811254241,
+      0.005403214335726205
+     ],
+     "excludes_zero": false,
+     "n_clusters": 144
+    },
+    "sub_rate": {
+     "delta": -0.010131211874474418,
+     "ci95": [
+      -0.011737781761192518,
+      -0.008623510696984301
+     ],
+     "excludes_zero": true,
+     "n_clusters": 144
+    },
+    "del_rate": {
+     "delta": -0.010651787978696425,
+     "ci95": [
+      -0.012668417148678657,
+      -0.008707965085563556
+     ],
+     "excludes_zero": true,
+     "n_clusters": 144
+    },
+    "ins_rate": {
+     "delta": 0.022371424376309783,
+     "ci95": [
+      0.017975070164385064,
+      0.02702849818764017
+     ],
+     "excludes_zero": true,
+     "n_clusters": 144
+    },
+    "head2head_wer": {
+     "a_better": 138,
+     "tie": 16,
+     "b_better": 93
+    }
+   },
+   "gates": {
+    "del_rate_gate": {
+     "W": 0.020502689643205146,
+     "arm": 0.012854225342712602,
+     "pass": true
+    },
+    "ins_rate_gate": {
+     "W": 0.035572700455170386,
+     "arm": 0.070197685438552,
+     "pass": false
+    },
+    "wer_ci_excludes_zero": true,
+    "wer_improves": false,
+    "loo_sign_stable": true,
+    "all_pass": false
+   },
+   "loo_vs_W": {
+    "window": {
+     "full": 0.02693647636717968,
+     "min": 0.026419494933247547,
+     "min_group": "win_argos_sep24_2025_371824",
+     "max": 0.027138334406525005,
+     "max_group": "win_zografou_apr30_2026_1203213",
+     "n_groups": 247,
+     "sign_flips": 0
+    },
+    "meeting": {
+     "full": 0.02693647636717968,
+     "min": 0.02634230216407184,
+     "min_group": "feb16_2026",
+     "max": 0.02730231354766671,
+     "max_group": "jan21_2026",
+     "n_groups": 144,
+     "sign_flips": 0
+    },
+    "city": {
+     "full": 0.02693647636717968,
+     "min": 0.025585429314830876,
+     "min_group": "samothraki",
+     "max": 0.02818240760752107,
+     "max_group": "xylokastro",
+     "n_groups": 10,
+     "sign_flips": 0
+    }
+   },
+   "oracle_recovery_vs_W": -0.5248374512353706,
+   "per_city": {
+    "per_city": {
+     "argos": {
+      "n_windows": 18,
+      "ref_tokens": 5149,
+      "wer_arm": 0.1648863857059623,
+      "wer_W": 0.13051077879199843,
+      "delta": 0.03437560691396388
+     },
+     "athens": {
+      "n_windows": 40,
+      "ref_tokens": 12596,
+      "wer_arm": 0.14218799618926645,
+      "wer_W": 0.11194029850746269,
+      "delta": 0.030247697681803746
+     },
+     "chalandri": {
+      "n_windows": 18,
+      "ref_tokens": 5468,
+      "wer_arm": 0.08394294074615948,
+      "wer_W": 0.06217995610826628,
+      "delta": 0.021762984637893196
+     },
+     "chania": {
+      "n_windows": 40,
+      "ref_tokens": 11407,
+      "wer_arm": 0.1258876128692908,
+      "wer_W": 0.09432804418339616,
+      "delta": 0.03155956868589463
+     },
+     "orestiada": {
+      "n_windows": 19,
+      "ref_tokens": 6142,
+      "wer_arm": 0.09736242266362748,
+      "wer_W": 0.08368609573428851,
+      "delta": 0.013676326929338978
+     },
+     "samothraki": {
+      "n_windows": 19,
+      "ref_tokens": 5737,
+      "wer_arm": 0.21004009063970716,
+      "wer_W": 0.16681192260763464,
+      "delta": 0.04322816803207251
+     },
+     "sparta": {
+      "n_windows": 38,
+      "ref_tokens": 11267,
+      "wer_arm": 0.11165350137569895,
+      "wer_W": 0.08405076772876542,
+      "delta": 0.02760273364693352
+     },
+     "vrilissia": {
+      "n_windows": 18,
+      "ref_tokens": 6002,
+      "wer_arm": 0.10413195601466178,
+      "wer_W": 0.08313895368210597,
+      "delta": 0.020993002332555816
+     },
+     "xylokastro": {
+      "n_windows": 19,
+      "ref_tokens": 5512,
+      "wer_arm": 0.10286647314949202,
+      "wer_W": 0.09161828737300436,
+      "delta": 0.011248185776487663
+     },
+     "zografou": {
+      "n_windows": 18,
+      "ref_tokens": 5637,
+      "wer_arm": 0.1188575483413163,
+      "wer_W": 0.09224764945893206,
+      "delta": 0.026609898882384245
+     }
+    },
+    "cities_better": 0,
+    "cities_worse": 10,
+    "cities_unchanged": 0,
+    "city_unweighted_mean_delta": 0.026130417351932816
+   },
+   "fold_params": {
+    "argos": 0.0,
+    "athens": 0.0,
+    "chalandri": 0.0,
+    "chania": 0.0,
+    "orestiada": 0.0,
+    "samothraki": 0.0,
+    "sparta": 0.0,
+    "vrilissia": 0.0,
+    "xylokastro": 0.0,
+    "zografou": 0.0
+   }
+  },
+  "M-all": {
+   "idea": "M-all",
+   "fold": "city",
+   "fitted": false,
+   "fold_note": "out-of-fold == in-fold by construction: this idea fits no parameter",
+   "n_windows": 247,
+   "n_folds": 10,
+   "windows_changed_vs_W": 245,
+   "out_of_fold": {
+    "S": 4201,
+    "D": 1535,
+    "I": 2664,
+    "ref_tokens": 74917,
+    "wer": 0.11212408398627814,
+    "del_rate": 0.020489341537968685,
+    "ins_rate": 0.035559352349933925,
+    "sub_rate": 0.05607539009837553
+   },
+   "baseline_W": {
+    "S": 3239,
+    "D": 1536,
+    "I": 2665,
+    "ref_tokens": 74917,
+    "wer": 0.09930990295927493,
+    "del_rate": 0.020502689643205146,
+    "ins_rate": 0.035572700455170386,
+    "sub_rate": 0.043234512860899396
+   },
+   "baseline_V": {
+    "S": 3995,
+    "D": 1761,
+    "I": 3583,
+    "ref_tokens": 74917,
+    "wer": 0.12465795480331567,
+    "del_rate": 0.023506013321409027,
+    "ins_rate": 0.04782626106224221,
+    "sub_rate": 0.05332568041966443
+   },
+   "oracle_column": {
+    "S": 1426,
+    "D": 1186,
+    "I": 983,
+    "ref_tokens": 74917,
+    "wer": 0.047986438325079754,
+    "del_rate": 0.01583085281044356,
+    "ins_rate": 0.013121187447441836,
+    "sub_rate": 0.019034398067194362
+   },
+   "vs_W": {
+    "wer": {
+     "delta": 0.012814181027003213,
+     "ci95": [
+      0.011535306371885271,
+      0.014089003799086681
+     ],
+     "excludes_zero": true,
+     "n_clusters": 144
+    },
+    "sub_rate": {
+     "delta": 0.012840877237476137,
+     "ci95": [
+      0.01152653056914831,
+      0.014144298398262454
+     ],
+     "excludes_zero": true,
+     "n_clusters": 144
+    },
+    "del_rate": {
+     "delta": -1.3348105236461738e-05,
+     "ci95": [
+      -0.00011612105573482192,
+      7.60775917191328e-05
+     ],
+     "excludes_zero": false,
+     "n_clusters": 144
+    },
+    "ins_rate": {
+     "delta": -1.3348105236461738e-05,
+     "ci95": [
+      -0.00011612105573482192,
+      7.60775917191328e-05
+     ],
+     "excludes_zero": false,
+     "n_clusters": 144
+    },
+    "head2head_wer": {
+     "a_better": 17,
+     "tie": 14,
+     "b_better": 216
+    }
+   },
+   "vs_V": {
+    "wer": {
+     "delta": -0.012533870817037523,
+     "ci95": [
+      -0.015343854994251359,
+      -0.009824422273978601
+     ],
+     "excludes_zero": true,
+     "n_clusters": 144
+    },
+    "sub_rate": {
+     "delta": 0.002749709678711104,
+     "ci95": [
+      0.0013897824585373051,
+      0.004169482469679597
+     ],
+     "excludes_zero": true,
+     "n_clusters": 144
+    },
+    "del_rate": {
+     "delta": -0.0030166717834403424,
+     "ci95": [
+      -0.00471445041610913,
+      -0.0013554899861736725
+     ],
+     "excludes_zero": true,
+     "n_clusters": 144
+    },
+    "ins_rate": {
+     "delta": -0.012266908712308289,
+     "ci95": [
+      -0.015162705879534409,
+      -0.009636089567697185
+     ],
+     "excludes_zero": true,
+     "n_clusters": 144
+    },
+    "head2head_wer": {
+     "a_better": 168,
+     "tie": 21,
+     "b_better": 58
+    }
+   },
+   "gates": {
+    "del_rate_gate": {
+     "W": 0.020502689643205146,
+     "arm": 0.020489341537968685,
+     "pass": true
+    },
+    "ins_rate_gate": {
+     "W": 0.035572700455170386,
+     "arm": 0.035559352349933925,
+     "pass": true
+    },
+    "wer_ci_excludes_zero": true,
+    "wer_improves": false,
+    "loo_sign_stable": true,
+    "all_pass": false
+   },
+   "loo_vs_W": {
+    "window": {
+     "full": 0.012814181027003217,
+     "min": 0.012655851990883496,
+     "min_group": "win_sparta_feb17_2026_1026862",
+     "max": 0.012940166814171159,
+     "max_group": "win_athens_jan26_2026_806322",
+     "n_groups": 247,
+     "sign_flips": 0
+    },
+    "meeting": {
+     "full": 0.012814181027003217,
+     "min": 0.012644831425154967,
+     "min_group": "mar18_2026",
+     "max": 0.012978691497048438,
+     "max_group": "jan14_2026",
+     "n_groups": 144,
+     "sign_flips": 0
+    },
+    "city": {
+     "full": 0.012814181027003217,
+     "min": 0.012518068806013298,
+     "min_group": "samothraki",
+     "max": 0.013350235073249787,
+     "max_group": "athens",
+     "n_groups": 10,
+     "sign_flips": 0
+    }
+   },
+   "oracle_recovery_vs_W": -0.24967490247074114,
+   "per_city": {
+    "per_city": {
+     "argos": {
+      "n_windows": 18,
+      "ref_tokens": 5149,
+      "wer_arm": 0.14410565158283162,
+      "wer_W": 0.13051077879199843,
+      "delta": 0.01359487279083317
+     },
+     "athens": {
+      "n_windows": 40,
+      "ref_tokens": 12596,
+      "wer_arm": 0.12210225468402668,
+      "wer_W": 0.11194029850746269,
+      "delta": 0.010161956176563989
+     },
+     "chalandri": {
+      "n_windows": 18,
+      "ref_tokens": 5468,
+      "wer_arm": 0.07626188734455011,
+      "wer_W": 0.06217995610826628,
+      "delta": 0.014081931236283833
+     },
+     "chania": {
+      "n_windows": 40,
+      "ref_tokens": 11407,
+      "wer_arm": 0.1078285263434733,
+      "wer_W": 0.09432804418339616,
+      "delta": 0.013500482160077145
+     },
+     "orestiada": {
+      "n_windows": 19,
+      "ref_tokens": 6142,
+      "wer_arm": 0.09964181048518397,
+      "wer_W": 0.08368609573428851,
+      "delta": 0.015955714750895474
+     },
+     "samothraki": {
+      "n_windows": 19,
+      "ref_tokens": 5737,
+      "wer_arm": 0.18319679274882342,
+      "wer_W": 0.16681192260763464,
+      "delta": 0.016384870141188775
+     },
+     "sparta": {
+      "n_windows": 38,
+      "ref_tokens": 11267,
+      "wer_arm": 0.09399130203248425,
+      "wer_W": 0.08405076772876542,
+      "delta": 0.009940534303718825
+     },
+     "vrilissia": {
+      "n_windows": 18,
+      "ref_tokens": 6002,
+      "wer_arm": 0.09463512162612463,
+      "wer_W": 0.08313895368210597,
+      "delta": 0.01149616794401866
+     },
+     "xylokastro": {
+      "n_windows": 19,
+      "ref_tokens": 5512,
+      "wer_arm": 0.10377358490566038,
+      "wer_W": 0.09161828737300436,
+      "delta": 0.012155297532656022
+     },
+     "zografou": {
+      "n_windows": 18,
+      "ref_tokens": 5637,
+      "wer_arm": 0.10839098811424516,
+      "wer_W": 0.09224764945893206,
+      "delta": 0.01614333865531311
+     }
+    },
+    "cities_better": 0,
+    "cities_worse": 10,
+    "cities_unchanged": 0,
+    "city_unweighted_mean_delta": 0.013341516569154901
+   },
+   "fold_params": {
+    "argos": 0.0,
+    "athens": 0.0,
+    "chalandri": 0.0,
+    "chania": 0.0,
+    "orestiada": 0.0,
+    "samothraki": 0.0,
+    "sparta": 0.0,
+    "vrilissia": 0.0,
+    "xylokastro": 0.0,
+    "zografou": 0.0
+   }
+  },
+  "permutation": {
+   "O": {
+    "n": 200,
+    "mean": 0.0,
+    "p05": 0.0,
+    "p50": 0.0,
+    "p95": 0.0,
+    "min": 0.0,
+    "max": 0.0
+   },
+   "M": {
+    "n": 200,
+    "mean": 0.0,
+    "p05": 0.0,
+    "p50": 0.0,
+    "p95": 0.0,
+    "min": 0.0,
+    "max": 0.0
+   },
+   "A": {
+    "n": 200,
+    "mean": -8.943230508429327e-06,
+    "p05": -0.00020022157854692526,
+    "p50": -1.3348105236461684e-05,
+    "p95": 0.00018687347331046357,
+    "min": -0.0003470507361480038,
+    "max": 0.00029365831520215705
+   }
+  }
+ },
+ "sensitivity": {
+  "A_k=0.3": {
+   "wer": 0.0993232510645114,
+   "delta": 1.3348105236468677e-05,
+   "ci95": [
+    -0.0006932490285112643,
+    0.0006175353638339911
+   ],
+   "gates": {
+    "del_rate_gate": {
+     "W": 0.020502689643205146,
+     "arm": 0.020569430169387455,
+     "pass": false
+    },
+    "ins_rate_gate": {
+     "W": 0.035572700455170386,
+     "arm": 0.035639440981352695,
+     "pass": false
+    },
+    "wer_ci_excludes_zero": false,
+    "wer_improves": false,
+    "loo_sign_stable": false,
+    "all_pass": false
+   }
+  },
+  "A_k=0.4": {
+   "wer": 0.09910968138072801,
+   "delta": -0.00020022157854691913,
+   "ci95": [
+    -0.0009556462344570045,
+    0.00042627669498331055
+   ],
+   "gates": {
+    "del_rate_gate": {
+     "W": 0.020502689643205146,
+     "arm": 0.020582778274623917,
+     "pass": false
+    },
+    "ins_rate_gate": {
+     "W": 0.035572700455170386,
+     "arm": 0.03565278908658916,
+     "pass": false
+    },
+    "wer_ci_excludes_zero": false,
+    "wer_improves": true,
+    "loo_sign_stable": false,
+    "all_pass": false
+   }
+  },
+  "A_k=0.6": {
+   "wer": 0.09877597874981646,
+   "delta": -0.0005339242094584695,
+   "ci95": [
+    -0.0012201082670198432,
+    7.629907601418766e-05
+   ],
+   "gates": {
+    "del_rate_gate": {
+     "W": 0.020502689643205146,
+     "arm": 0.02059612637986038,
+     "pass": false
+    },
+    "ins_rate_gate": {
+     "W": 0.035572700455170386,
+     "arm": 0.03566613719182562,
+     "pass": false
+    },
+    "wer_ci_excludes_zero": false,
+    "wer_improves": true,
+    "loo_sign_stable": true,
+    "all_pass": false
+   }
+  },
+  "A_k=0.7": {
+   "wer": 0.09862914959221539,
+   "delta": -0.0006807533670595417,
+   "ci95": [
+    -0.001268397848450446,
+    -0.00014558575100091838
+   ],
+   "gates": {
+    "del_rate_gate": {
+     "W": 0.020502689643205146,
+     "arm": 0.02059612637986038,
+     "pass": false
+    },
+    "ins_rate_gate": {
+     "W": 0.035572700455170386,
+     "arm": 0.03566613719182562,
+     "pass": false
+    },
+    "wer_ci_excludes_zero": true,
+    "wer_improves": true,
+    "loo_sign_stable": true,
+    "all_pass": false
+   }
+  }
+ },
+ "baseline_W_rt": {
+  "S": 3239,
+  "D": 1536,
+  "I": 2665,
+  "ref_tokens": 74917,
+  "wer": 0.09930990295927493,
+  "del_rate": 0.020502689643205146,
+  "ins_rate": 0.035572700455170386,
+  "sub_rate": 0.043234512860899396
+ },
+ "oracle_column_W_rt": {
+  "S": 1426,
+  "D": 1186,
+  "I": 983,
+  "ref_tokens": 74917,
+  "wer": 0.047986438325079754,
+  "del_rate": 0.01583085281044356,
+  "ins_rate": 0.013121187447441836,
+  "sub_rate": 0.019034398067194362
+ },
+ "baseline_V_rt": {
+  "S": 3995,
+  "D": 1761,
+  "I": 3583,
+  "ref_tokens": 74917,
+  "wer": 0.12465795480331567,
+  "del_rate": 0.023506013321409027,
+  "ins_rate": 0.04782626106224221,
+  "sub_rate": 0.05332568041966443
+ },
+ "descriptive_old_W": {
+  "note": "MODEL SWAP, NOT AN EXPERIMENTAL RESULT. Old W uses the paid stt-async-v5 Soniox arm; W-rt uses the free stt-rt-v4. The difference confounds model, decode path, pacing and non-determinism, and is unpaired in any causal sense.",
+  "old_W": {
+   "S": 3200,
+   "D": 1522,
+   "I": 2804,
+   "ref_tokens": 74917,
+   "wer": 0.10045784000961064,
+   "del_rate": 0.020315816169894682,
+   "ins_rate": 0.03742808708303856,
+   "sub_rate": 0.04271393675667739
+  },
+  "old_V": {
+   "S": 3833,
+   "D": 1849,
+   "I": 3317,
+   "ref_tokens": 74917,
+   "wer": 0.1201195990229187,
+   "del_rate": 0.024680646582217653,
+   "ins_rate": 0.044275665069343405,
+   "sub_rate": 0.051163287371357634
+  },
+  "old_oracle_column": {
+   "S": 1397,
+   "D": 1177,
+   "I": 983,
+   "ref_tokens": 74917,
+   "wer": 0.04747921032609421,
+   "del_rate": 0.015710719863315403,
+   "ins_rate": 0.013121187447441836,
+   "sub_rate": 0.018647303015336972
+  },
+  "old_meta": {
+   "run_id": "2026-08-10-corrected-adapter-label-prefix-fix-vs-ju",
+   "trio": [
+    "scribe-v2-clean",
+    "soniox",
+    "oc-runpod-fixed-2026-08-10"
+   ],
+   "n_windows": 247,
+   "n_meetings": 144,
+   "n_cities": 10,
+   "ref_tokens": 74917,
+   "align_cache": "/home/harold/.cache/oc-public/fusion_lab/align_65b1c4d64618a429.json"
+  }
+ },
+ "deployable_threshold": {
+  "O": 1.01,
+  "O2": 0.95,
+  "M": 1.01
+ }
+}

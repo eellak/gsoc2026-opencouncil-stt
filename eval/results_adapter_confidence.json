@@ -1,0 +1,2034 @@
+{
+ "protocol": "adapter-confidence-2026-08-16",
+ "prereg": "docs/specs/2026-08-16-adapter-confidence-prereg.md",
+ "system": "artifact-adapter-fixed via faster-whisper CTranslate2 int8",
+ "answers_sha256": "fa7a5dec12a9d2787e4151d2388388b480e19de8a35c8fb7e3585da3a5d1f063",
+ "frozen_before_looking": {
+  "unit": "normalized hypothesis-token instance (0-token words excluded, >1-token words duplicated with the same probability)",
+  "primary_statistic": "mean of within-meeting AUROC of 1 - p_word, ties 0.5",
+  "informative_threshold": 0.6,
+  "threshold_status": "inherited from the Soniox probe for comparability; NOT a promotion gate",
+  "auroc_null": 0.5,
+  "primary_region": "core_envelope",
+  "permutation_unit": "emitted word (segment, for the segment proxy)",
+  "segment_proxy": "exp(avg_logprob) - a RANKING score; no calibrated word probability is claimed",
+  "combination": "mean of within-meeting percentile ranks; no fitted weight",
+  "gold_decode": "local server, beam_size=2, CPU int8 - NOT the 247-window benchmark config (beam 5, RunPod GPU)"
+ },
+ "n_cells_scored": 27,
+ "n_meetings": 6,
+ "regions": {
+  "core_strict": {
+   "edit_op_ceiling": {
+    "D": 81,
+    "M": 341,
+    "S": 64,
+    "I": 16,
+    "deletions": 81,
+    "deletion_share_of_edits": 0.5031055900621118,
+    "edit_operation_coverage": 0.4968944099378882,
+    "punctuation_only_words_dropped": 0,
+    "words_splitting_into_multiple_tokens": 0
+   },
+   "p_word": {
+    "n": 421,
+    "n_err": 80,
+    "prevalence": 0.19002375296912113,
+    "pooled_auroc": 0.8794904692082112,
+    "average_precision": 0.6185400824943021,
+    "ap_null_prevalence": 0.19002375296912113,
+    "per_meeting": {
+     "jul1_2026": {
+      "auroc": 0.8571428571428571,
+      "n": 24,
+      "n_err": 3
+     },
+     "jul29_2026": {
+      "auroc": 0.8712121212121212,
+      "n": 37,
+      "n_err": 4
+     },
+     "jul6_2026": {
+      "auroc": 0.7558139534883721,
+      "n": 79,
+      "n_err": 43
+     },
+     "jun18_2026": {
+      "auroc": 0.875,
+      "n": 26,
+      "n_err": 2
+     },
+     "jun24_2026": {
+      "auroc": 0.8476040848389631,
+      "n": 153,
+      "n_err": 19
+     },
+     "jun29_2026": {
+      "auroc": 0.8649940262843488,
+      "n": 102,
+      "n_err": 9
+     }
+    },
+    "mean_within_meeting_auroc": 0.8452945071611104,
+    "n_meetings_informative": 6,
+    "leave_one_meeting_out_mean": {
+     "jul1_2026": 0.842924837164761,
+     "jul29_2026": 0.8401109843509083,
+     "jul6_2026": 0.863190617895658,
+     "jun18_2026": 0.8393534085933325,
+     "jun24_2026": 0.8448325916255399,
+     "jun29_2026": 0.8413546033364627
+    },
+    "n_meetings_undefined_auroc": 0,
+    "loo_range": [
+     0.8393534085933325,
+     0.863190617895658
+    ],
+    "loo_all_above_0.5": true,
+    "loo_all_above_0.60": true
+   },
+   "seg_conf_segment_proxy": {
+    "n": 421,
+    "n_err": 80,
+    "prevalence": 0.19002375296912113,
+    "pooled_auroc": 0.7642228739002933,
+    "average_precision": 0.5062395577884539,
+    "ap_null_prevalence": 0.19002375296912113,
+    "per_meeting": {
+     "jul1_2026": {
+      "auroc": 0.6666666666666666,
+      "n": 24,
+      "n_err": 3
+     },
+     "jul29_2026": {
+      "auroc": 0.4962121212121212,
+      "n": 37,
+      "n_err": 4
+     },
+     "jul6_2026": {
+      "auroc": 0.6185400516795866,
+      "n": 79,
+      "n_err": 43
+     },
+     "jun18_2026": {
+      "auroc": 0.7291666666666666,
+      "n": 26,
+      "n_err": 2
+     },
+     "jun24_2026": {
+      "auroc": 0.6406127258444619,
+      "n": 153,
+      "n_err": 19
+     },
+     "jun29_2026": {
+      "auroc": 0.5173237753882916,
+      "n": 102,
+      "n_err": 9
+     }
+    },
+    "mean_within_meeting_auroc": 0.6114203345762991,
+    "n_meetings_informative": 6,
+    "leave_one_meeting_out_mean": {
+     "jul1_2026": 0.6003710681582255,
+     "jul29_2026": 0.6344619772491347,
+     "jul6_2026": 0.6099963911556416,
+     "jun18_2026": 0.5878710681582255,
+     "jun24_2026": 0.6055818563226666,
+     "jun29_2026": 0.6302396464139006
+    },
+    "n_meetings_undefined_auroc": 0,
+    "loo_range": [
+     0.5878710681582255,
+     0.6344619772491347
+    ],
+    "loo_all_above_0.5": true,
+    "loo_all_above_0.60": false
+   }
+  },
+  "core_envelope": {
+   "edit_op_ceiling": {
+    "M": 749,
+    "D": 116,
+    "S": 134,
+    "I": 32,
+    "deletions": 116,
+    "deletion_share_of_edits": 0.41134751773049644,
+    "edit_operation_coverage": 0.5886524822695035,
+    "punctuation_only_words_dropped": 0,
+    "words_splitting_into_multiple_tokens": 0
+   },
+   "p_word": {
+    "n": 915,
+    "n_err": 166,
+    "prevalence": 0.1814207650273224,
+    "pooled_auroc": 0.8778330947287146,
+    "average_precision": 0.606900641212307,
+    "ap_null_prevalence": 0.1814207650273224,
+    "per_meeting": {
+     "jul1_2026": {
+      "auroc": 0.8916666666666667,
+      "n": 118,
+      "n_err": 10
+     },
+     "jul29_2026": {
+      "auroc": 0.8608757062146892,
+      "n": 130,
+      "n_err": 12
+     },
+     "jul6_2026": {
+      "auroc": 0.7904627197413618,
+      "n": 199,
+      "n_err": 101
+     },
+     "jun18_2026": {
+      "auroc": 0.7068965517241379,
+      "n": 31,
+      "n_err": 2
+     },
+     "jun24_2026": {
+      "auroc": 0.8539196310935442,
+      "n": 277,
+      "n_err": 24
+     },
+     "jun29_2026": {
+      "auroc": 0.7865076100370219,
+      "n": 160,
+      "n_err": 17
+     }
+    },
+    "mean_within_meeting_auroc": 0.8150548142462369,
+    "n_meetings_informative": 6,
+    "leave_one_meeting_out_mean": {
+     "jul1_2026": 0.7997324437621509,
+     "jul29_2026": 0.8058906358525466,
+     "jul6_2026": 0.819973233147212,
+     "jun18_2026": 0.8366864667506567,
+     "jun24_2026": 0.8072818508767755,
+     "jun29_2026": 0.82076425508808
+    },
+    "n_meetings_undefined_auroc": 0,
+    "loo_range": [
+     0.7997324437621509,
+     0.8366864667506567
+    ],
+    "loo_all_above_0.5": true,
+    "loo_all_above_0.60": true
+   },
+   "seg_conf_segment_proxy": {
+    "n": 915,
+    "n_err": 166,
+    "prevalence": 0.1814207650273224,
+    "pooled_auroc": 0.7860520855116059,
+    "average_precision": 0.5184735720803866,
+    "ap_null_prevalence": 0.1814207650273224,
+    "per_meeting": {
+     "jul1_2026": {
+      "auroc": 0.549537037037037,
+      "n": 118,
+      "n_err": 10
+     },
+     "jul29_2026": {
+      "auroc": 0.7168079096045198,
+      "n": 130,
+      "n_err": 12
+     },
+     "jul6_2026": {
+      "auroc": 0.6291675085875934,
+      "n": 199,
+      "n_err": 101
+     },
+     "jun18_2026": {
+      "auroc": 0.646551724137931,
+      "n": 31,
+      "n_err": 2
+     },
+     "jun24_2026": {
+      "auroc": 0.6447628458498024,
+      "n": 277,
+      "n_err": 24
+     },
+     "jun29_2026": {
+      "auroc": 0.479020979020979,
+      "n": 160,
+      "n_err": 17
+     }
+    },
+    "mean_within_meeting_auroc": 0.6109746673729771,
+    "n_meetings_informative": 6,
+    "leave_one_meeting_out_mean": {
+     "jul1_2026": 0.6232621934401651,
+     "jul29_2026": 0.5898080189266686,
+     "jul6_2026": 0.6073360991300538,
+     "jun18_2026": 0.6038592560199862,
+     "jun24_2026": 0.6042170316776121,
+     "jun29_2026": 0.6373654050433768
+    },
+    "n_meetings_undefined_auroc": 0,
+    "loo_range": [
+     0.5898080189266686,
+     0.6373654050433768
+    ],
+    "loo_all_above_0.5": true,
+    "loo_all_above_0.60": false
+   },
+   "calibration_equal_width_p_word": [
+    {
+     "lo": 0.0,
+     "hi": 0.1,
+     "n": 3,
+     "n_err": 3,
+     "err_rate": 1.0,
+     "n_meetings": 2,
+     "wilson95": [
+      0.43849391955098227,
+      1.0
+     ]
+    },
+    {
+     "lo": 0.1,
+     "hi": 0.2,
+     "n": 9,
+     "n_err": 7,
+     "err_rate": 0.7777777777777778,
+     "n_meetings": 1,
+     "wilson95": [
+      0.4525833436728054,
+      0.9367762376877727
+     ]
+    },
+    {
+     "lo": 0.2,
+     "hi": 0.3,
+     "n": 13,
+     "n_err": 8,
+     "err_rate": 0.6153846153846154,
+     "n_meetings": 3,
+     "wilson95": [
+      0.35522480972268555,
+      0.8229055341876319
+     ]
+    },
+    {
+     "lo": 0.3,
+     "hi": 0.4,
+     "n": 10,
+     "n_err": 4,
+     "err_rate": 0.4,
+     "n_meetings": 2,
+     "wilson95": [
+      0.16817758120350967,
+      0.6873304525498135
+     ]
+    },
+    {
+     "lo": 0.4,
+     "hi": 0.5,
+     "n": 16,
+     "n_err": 11,
+     "err_rate": 0.6875,
+     "n_meetings": 4,
+     "wilson95": [
+      0.4440393186673406,
+      0.8583556494803894
+     ]
+    },
+    {
+     "lo": 0.5,
+     "hi": 0.6,
+     "n": 23,
+     "n_err": 19,
+     "err_rate": 0.8260869565217391,
+     "n_meetings": 4,
+     "wilson95": [
+      0.6286194521470433,
+      0.9302145964938723
+     ]
+    },
+    {
+     "lo": 0.6,
+     "hi": 0.7,
+     "n": 34,
+     "n_err": 18,
+     "err_rate": 0.5294117647058824,
+     "n_meetings": 5,
+     "wilson95": [
+      0.3673644042005483,
+      0.6854874836688863
+     ]
+    },
+    {
+     "lo": 0.7,
+     "hi": 0.8,
+     "n": 62,
+     "n_err": 29,
+     "err_rate": 0.46774193548387094,
+     "n_meetings": 6,
+     "wilson95": [
+      0.34908630867622215,
+      0.5901618262415199
+     ]
+    },
+    {
+     "lo": 0.8,
+     "hi": 0.9,
+     "n": 77,
+     "n_err": 31,
+     "err_rate": 0.4025974025974026,
+     "n_meetings": 6,
+     "wilson95": [
+      0.30021845862969854,
+      0.5142335066950848
+     ]
+    },
+    {
+     "lo": 0.9,
+     "hi": 1.0,
+     "n": 668,
+     "n_err": 36,
+     "err_rate": 0.05389221556886228,
+     "n_meetings": 6,
+     "wilson95": [
+      0.0391787657763463,
+      0.0737073669073101
+     ]
+    }
+   ],
+   "calibration_deciles_p_word": [
+    {
+     "lo": 0.0643,
+     "hi": 0.6685,
+     "n": 92,
+     "n_err": 65,
+     "err_rate": 0.7065217391304348,
+     "n_meetings": 6,
+     "wilson95": [
+      0.6067033690450713,
+      0.7897841687255837
+     ]
+    },
+    {
+     "lo": 0.6685,
+     "hi": 0.8266,
+     "n": 91,
+     "n_err": 44,
+     "err_rate": 0.4835164835164835,
+     "n_meetings": 6,
+     "wilson95": [
+      0.3836068307058106,
+      0.5847614802463456
+     ]
+    },
+    {
+     "lo": 0.8266,
+     "hi": 0.9158,
+     "n": 90,
+     "n_err": 26,
+     "err_rate": 0.28888888888888886,
+     "n_meetings": 6,
+     "wilson95": [
+      0.2054199396270598,
+      0.38964237815098307
+     ]
+    },
+    {
+     "lo": 0.9158,
+     "hi": 0.9579,
+     "n": 93,
+     "n_err": 9,
+     "err_rate": 0.0967741935483871,
+     "n_meetings": 6,
+     "wilson95": [
+      0.05175108300166125,
+      0.17378835459540445
+     ]
+    },
+    {
+     "lo": 0.9579,
+     "hi": 0.9785,
+     "n": 91,
+     "n_err": 10,
+     "err_rate": 0.10989010989010989,
+     "n_meetings": 6,
+     "wilson95": [
+      0.06079407536219415,
+      0.19058928383883156
+     ]
+    },
+    {
+     "lo": 0.9785,
+     "hi": 0.989,
+     "n": 90,
+     "n_err": 5,
+     "err_rate": 0.05555555555555555,
+     "n_meetings": 6,
+     "wilson95": [
+      0.023960618284343184,
+      0.12353899809048416
+     ]
+    },
+    {
+     "lo": 0.989,
+     "hi": 0.9947,
+     "n": 92,
+     "n_err": 2,
+     "err_rate": 0.021739130434782608,
+     "n_meetings": 6,
+     "wilson95": [
+      0.005981915837670909,
+      0.0758364177460756
+     ]
+    },
+    {
+     "lo": 0.9947,
+     "hi": 0.9975,
+     "n": 87,
+     "n_err": 4,
+     "err_rate": 0.04597701149425287,
+     "n_meetings": 5,
+     "wilson95": [
+      0.018022396823237183,
+      0.11233197826482823
+     ]
+    },
+    {
+     "lo": 0.9975,
+     "hi": 0.9991,
+     "n": 96,
+     "n_err": 1,
+     "err_rate": 0.010416666666666666,
+     "n_meetings": 6,
+     "wilson95": [
+      0.001841122818436635,
+      0.056667554927112326
+     ]
+    },
+    {
+     "lo": 0.9991,
+     "hi": 0.9999,
+     "n": 93,
+     "n_err": 0,
+     "err_rate": 0.0,
+     "n_meetings": 5,
+     "wilson95": [
+      0.0,
+      0.0396689026203615
+     ]
+    }
+   ],
+   "calibration_equal_width_seg_conf": [
+    {
+     "lo": 0.0,
+     "hi": 0.1,
+     "n": 0,
+     "n_err": 0,
+     "err_rate": null,
+     "n_meetings": 0
+    },
+    {
+     "lo": 0.1,
+     "hi": 0.2,
+     "n": 0,
+     "n_err": 0,
+     "err_rate": null,
+     "n_meetings": 0
+    },
+    {
+     "lo": 0.2,
+     "hi": 0.3,
+     "n": 0,
+     "n_err": 0,
+     "err_rate": null,
+     "n_meetings": 0
+    },
+    {
+     "lo": 0.3,
+     "hi": 0.4,
+     "n": 0,
+     "n_err": 0,
+     "err_rate": null,
+     "n_meetings": 0
+    },
+    {
+     "lo": 0.4,
+     "hi": 0.5,
+     "n": 6,
+     "n_err": 5,
+     "err_rate": 0.8333333333333334,
+     "n_meetings": 1
+    },
+    {
+     "lo": 0.5,
+     "hi": 0.6,
+     "n": 9,
+     "n_err": 6,
+     "err_rate": 0.6666666666666666,
+     "n_meetings": 2
+    },
+    {
+     "lo": 0.6,
+     "hi": 0.7,
+     "n": 155,
+     "n_err": 81,
+     "err_rate": 0.5225806451612903,
+     "n_meetings": 2
+    },
+    {
+     "lo": 0.7,
+     "hi": 0.8,
+     "n": 108,
+     "n_err": 22,
+     "err_rate": 0.2037037037037037,
+     "n_meetings": 4
+    },
+    {
+     "lo": 0.8,
+     "hi": 0.9,
+     "n": 549,
+     "n_err": 47,
+     "err_rate": 0.08561020036429873,
+     "n_meetings": 6
+    },
+    {
+     "lo": 0.9,
+     "hi": 1.0,
+     "n": 88,
+     "n_err": 5,
+     "err_rate": 0.056818181818181816,
+     "n_meetings": 2
+    }
+   ],
+   "split_overlap": {
+    "n": 179,
+    "n_err": 43,
+    "prevalence": 0.24022346368715083,
+    "pooled_auroc": 0.8496922024623803,
+    "average_precision": 0.616696591913822,
+    "ap_null_prevalence": 0.24022346368715083,
+    "per_meeting": {
+     "jul1_2026": {
+      "auroc": 0.9583333333333334,
+      "n": 35,
+      "n_err": 3
+     },
+     "jul29_2026": {
+      "auroc": 0.96875,
+      "n": 18,
+      "n_err": 2
+     },
+     "jul6_2026": {
+      "auroc": 0.7608294930875577,
+      "n": 66,
+      "n_err": 31
+     },
+     "jun24_2026": {
+      "auroc": 0.6071428571428571,
+      "n": 11,
+      "n_err": 4
+     },
+     "jun29_2026": {
+      "auroc": 0.8768115942028986,
+      "n": 49,
+      "n_err": 3
+     }
+    },
+    "mean_within_meeting_auroc": 0.8343734555533293,
+    "n_meetings_informative": 5,
+    "leave_one_meeting_out_mean": {
+     "jul1_2026": 0.8033834861083283,
+     "jul29_2026": 0.8007793194416617,
+     "jul6_2026": 0.8527594461697723,
+     "jun24_2026": 0.8911811051559474,
+     "jun29_2026": 0.8237639208909371
+    },
+    "n_meetings_undefined_auroc": 0,
+    "loo_range": [
+     0.8007793194416617,
+     0.8911811051559474
+    ],
+    "loo_all_above_0.5": true,
+    "loo_all_above_0.60": true
+   },
+   "split_non_overlap": {
+    "n": 736,
+    "n_err": 123,
+    "prevalence": 0.1671195652173913,
+    "pooled_auroc": 0.884587328744413,
+    "average_precision": 0.6038242217704062,
+    "ap_null_prevalence": 0.1671195652173913,
+    "per_meeting": {
+     "jul1_2026": {
+      "auroc": 0.8646616541353384,
+      "n": 83,
+      "n_err": 7
+     },
+     "jul29_2026": {
+      "auroc": 0.8480392156862745,
+      "n": 112,
+      "n_err": 10
+     },
+     "jul6_2026": {
+      "auroc": 0.7967120181405896,
+      "n": 133,
+      "n_err": 70
+     },
+     "jun18_2026": {
+      "auroc": 0.7068965517241379,
+      "n": 31,
+      "n_err": 2
+     },
+     "jun24_2026": {
+      "auroc": 0.8917682926829268,
+      "n": 266,
+      "n_err": 20
+     },
+     "jun29_2026": {
+      "auroc": 0.7584683357879234,
+      "n": 111,
+      "n_err": 14
+     }
+    },
+    "mean_within_meeting_auroc": 0.8110910113595318,
+    "n_meetings_informative": 6,
+    "leave_one_meeting_out_mean": {
+     "jul1_2026": 0.8003768828043704,
+     "jul29_2026": 0.8037013704941831,
+     "jul6_2026": 0.8139668100033202,
+     "jun18_2026": 0.8319299032866105,
+     "jun24_2026": 0.7949555550948528,
+     "jun29_2026": 0.8216155464738535
+    },
+    "n_meetings_undefined_auroc": 0,
+    "loo_range": [
+     0.7949555550948528,
+     0.8319299032866105
+    ],
+    "loo_all_above_0.5": true,
+    "loo_all_above_0.60": true
+   },
+   "insertions_vs_match": {
+    "n": 781,
+    "n_err": 32,
+    "prevalence": 0.040973111395646605,
+    "pooled_auroc": 0.8578104138851802,
+    "average_precision": 0.24384669450185023,
+    "ap_null_prevalence": 0.040973111395646605,
+    "per_meeting": {
+     "jul1_2026": {
+      "auroc": 0.9861111111111112,
+      "n": 110,
+      "n_err": 2
+     },
+     "jul29_2026": {
+      "auroc": 0.4152542372881356,
+      "n": 119,
+      "n_err": 1
+     },
+     "jul6_2026": {
+      "auroc": 0.7840136054421769,
+      "n": 116,
+      "n_err": 18
+     },
+     "jun18_2026": {
+      "auroc": 0.5172413793103449,
+      "n": 30,
+      "n_err": 1
+     },
+     "jun24_2026": {
+      "auroc": 0.7811264822134387,
+      "n": 257,
+      "n_err": 4
+     },
+     "jun29_2026": {
+      "auroc": 0.865967365967366,
+      "n": 149,
+      "n_err": 6
+     }
+    },
+    "mean_within_meeting_auroc": 0.7249523635554289,
+    "n_meetings_informative": 6,
+    "leave_one_meeting_out_mean": {
+     "jul1_2026": 0.6727206140442924,
+     "jul29_2026": 0.7868919888088876,
+     "jul6_2026": 0.7131401151780793,
+     "jun18_2026": 0.7664945604044456,
+     "jun24_2026": 0.7137175398238269,
+     "jun29_2026": 0.6967493630730415
+    },
+    "n_meetings_undefined_auroc": 0,
+    "loo_range": [
+     0.6727206140442924,
+     0.7868919888088876
+    ],
+    "loo_all_above_0.5": true,
+    "loo_all_above_0.60": true
+   },
+   "substitutions_vs_match": {
+    "n": 883,
+    "n_err": 134,
+    "prevalence": 0.15175537938844846,
+    "pooled_auroc": 0.8826146304525437,
+    "average_precision": 0.5659303624076081,
+    "ap_null_prevalence": 0.15175537938844846,
+    "per_meeting": {
+     "jul1_2026": {
+      "auroc": 0.8680555555555556,
+      "n": 116,
+      "n_err": 8
+     },
+     "jul29_2026": {
+      "auroc": 0.901386748844376,
+      "n": 129,
+      "n_err": 11
+     },
+     "jul6_2026": {
+      "auroc": 0.79186132284239,
+      "n": 181,
+      "n_err": 83
+     },
+     "jun18_2026": {
+      "auroc": 0.896551724137931,
+      "n": 30,
+      "n_err": 1
+     },
+     "jun24_2026": {
+      "auroc": 0.8684782608695653,
+      "n": 273,
+      "n_err": 20
+     },
+     "jun29_2026": {
+      "auroc": 0.7431659249841068,
+      "n": 154,
+      "n_err": 11
+     }
+    },
+    "mean_within_meeting_auroc": 0.8449165895389874,
+    "n_meetings_informative": 6,
+    "leave_one_meeting_out_mean": {
+     "jul1_2026": 0.8402887963356738,
+     "jul29_2026": 0.8336225576779098,
+     "jul6_2026": 0.8555276428783068,
+     "jun18_2026": 0.8345895626191988,
+     "jun24_2026": 0.8402042552728719,
+     "jun29_2026": 0.8652667224499636
+    },
+    "n_meetings_undefined_auroc": 0,
+    "loo_range": [
+     0.8336225576779098,
+     0.8652667224499636
+    ],
+    "loo_all_above_0.5": true,
+    "loo_all_above_0.60": true
+   },
+   "bottom_decile": {
+    "n": 91,
+    "realized_rate": 0.0994535519125683,
+    "err_rate": 0.7032967032967034,
+    "prevalence": 0.1814207650273224,
+    "lift": 3.876605322388455
+   },
+   "permutation_null_p_word": {
+    "observed": 0.8150548142462369,
+    "null_mean": 0.49985259851015335,
+    "null_p2.5": 0.41366848978265564,
+    "null_p97.5": 0.5865451474358064,
+    "p_value_one_sided": 0.0004997501249375312,
+    "n_perm": 2000,
+    "permutation_unit": "emitted word"
+   },
+   "permutation_null_seg_conf": {
+    "observed": 0.6109746673729771,
+    "null_mean": 0.49942685447204566,
+    "null_p2.5": 0.4219845834719014,
+    "null_p97.5": 0.5763691524322334,
+    "p_value_one_sided": 0.00399800099950025,
+    "n_perm": 2000,
+    "permutation_unit": "segment"
+   },
+   "meeting_cluster_ci_p_word": {
+    "ci95_meeting_cluster": [
+     0.764228590318854,
+     0.8615578120373518
+    ],
+    "n_clusters": 6,
+    "n_boot": 2000,
+    "replicates_dropped_no_informative_meeting": 0
+   },
+   "proxy_vs_word_paired_per_meeting": {
+    "jul1_2026": {
+     "p_word": 0.8916666666666667,
+     "seg_conf": 0.549537037037037,
+     "diff": 0.3421296296296297
+    },
+    "jul29_2026": {
+     "p_word": 0.8608757062146892,
+     "seg_conf": 0.7168079096045198,
+     "diff": 0.14406779661016944
+    },
+    "jul6_2026": {
+     "p_word": 0.7904627197413618,
+     "seg_conf": 0.6291675085875934,
+     "diff": 0.16129521115376844
+    },
+    "jun18_2026": {
+     "p_word": 0.7068965517241379,
+     "seg_conf": 0.646551724137931,
+     "diff": 0.06034482758620685
+    },
+    "jun24_2026": {
+     "p_word": 0.8539196310935442,
+     "seg_conf": 0.6447628458498024,
+     "diff": 0.20915678524374182
+    },
+    "jun29_2026": {
+     "p_word": 0.7865076100370219,
+     "seg_conf": 0.479020979020979,
+     "diff": 0.30748663101604284
+    }
+   },
+   "alignment_sensitivity": [
+    {
+     "priority": "SDI",
+     "reversed": false,
+     "mean_within_meeting_auroc": 0.8150548142462369,
+     "pooled_auroc": 0.8778330947287146,
+     "n_S": 134,
+     "n_I": 32,
+     "n": 915
+    },
+    {
+     "priority": "SDI",
+     "reversed": true,
+     "mean_within_meeting_auroc": 0.8151811023852549,
+     "pooled_auroc": 0.8780381874628018,
+     "n_S": 134,
+     "n_I": 32,
+     "n": 915
+    },
+    {
+     "priority": "SID",
+     "reversed": false,
+     "mean_within_meeting_auroc": 0.8150548142462369,
+     "pooled_auroc": 0.8778330947287146,
+     "n_S": 134,
+     "n_I": 32,
+     "n": 915
+    },
+    {
+     "priority": "SID",
+     "reversed": true,
+     "mean_within_meeting_auroc": 0.8151811023852549,
+     "pooled_auroc": 0.8780381874628018,
+     "n_S": 134,
+     "n_I": 32,
+     "n": 915
+    },
+    {
+     "priority": "DSI",
+     "reversed": false,
+     "mean_within_meeting_auroc": 0.813715068026717,
+     "pooled_auroc": 0.875592705660745,
+     "n_S": 130,
+     "n_I": 34,
+     "n": 915
+    },
+    {
+     "priority": "DSI",
+     "reversed": true,
+     "mean_within_meeting_auroc": 0.8146333516273012,
+     "pooled_auroc": 0.8774357766879932,
+     "n_S": 130,
+     "n_I": 34,
+     "n": 915
+    },
+    {
+     "priority": "DIS",
+     "reversed": false,
+     "mean_within_meeting_auroc": 0.8141455396453074,
+     "pooled_auroc": 0.8756159443936823,
+     "n_S": 128,
+     "n_I": 35,
+     "n": 915
+    },
+    {
+     "priority": "DIS",
+     "reversed": true,
+     "mean_within_meeting_auroc": 0.8136260326318077,
+     "pooled_auroc": 0.8750185346886996,
+     "n_S": 124,
+     "n_I": 37,
+     "n": 915
+    },
+    {
+     "priority": "ISD",
+     "reversed": false,
+     "mean_within_meeting_auroc": 0.8146333516273012,
+     "pooled_auroc": 0.8774357766879932,
+     "n_S": 130,
+     "n_I": 34,
+     "n": 915
+    },
+    {
+     "priority": "ISD",
+     "reversed": true,
+     "mean_within_meeting_auroc": 0.813715068026717,
+     "pooled_auroc": 0.875592705660745,
+     "n_S": 130,
+     "n_I": 34,
+     "n": 915
+    },
+    {
+     "priority": "IDS",
+     "reversed": false,
+     "mean_within_meeting_auroc": 0.8136260326318077,
+     "pooled_auroc": 0.8750185346886996,
+     "n_S": 124,
+     "n_I": 37,
+     "n": 915
+    },
+    {
+     "priority": "IDS",
+     "reversed": true,
+     "mean_within_meeting_auroc": 0.8136260326318077,
+     "pooled_auroc": 0.8750185346886996,
+     "n_S": 124,
+     "n_I": 37,
+     "n": 915
+    }
+   ]
+  },
+  "clip": {
+   "edit_op_ceiling": {
+    "M": 834,
+    "D": 134,
+    "S": 140,
+    "I": 37,
+    "deletions": 134,
+    "deletion_share_of_edits": 0.43086816720257237,
+    "edit_operation_coverage": 0.5691318327974276,
+    "punctuation_only_words_dropped": 0,
+    "words_splitting_into_multiple_tokens": 0
+   },
+   "p_word": {
+    "n": 1011,
+    "n_err": 177,
+    "prevalence": 0.17507418397626112,
+    "pooled_auroc": 0.8776944546058069,
+    "average_precision": 0.5982812146573064,
+    "ap_null_prevalence": 0.17507418397626112,
+    "per_meeting": {
+     "jul1_2026": {
+      "auroc": 0.8916666666666667,
+      "n": 118,
+      "n_err": 10
+     },
+     "jul29_2026": {
+      "auroc": 0.8653846153846154,
+      "n": 142,
+      "n_err": 12
+     },
+     "jul6_2026": {
+      "auroc": 0.802795584045584,
+      "n": 212,
+      "n_err": 104
+     },
+     "jun18_2026": {
+      "auroc": 0.9264705882352942,
+      "n": 36,
+      "n_err": 2
+     },
+     "jun24_2026": {
+      "auroc": 0.8396039603960396,
+      "n": 333,
+      "n_err": 30
+     },
+     "jun29_2026": {
+      "auroc": 0.7849424886720111,
+      "n": 170,
+      "n_err": 19
+     }
+    },
+    "mean_within_meeting_auroc": 0.8518106505667018,
+    "n_meetings_informative": 6,
+    "leave_one_meeting_out_mean": {
+     "jul1_2026": 0.8438394473467088,
+     "jul29_2026": 0.8490958576031191,
+     "jul6_2026": 0.8616136638709253,
+     "jun18_2026": 0.8368786630329833,
+     "jun24_2026": 0.8542519886008343,
+     "jun29_2026": 0.8651842829456399
+    },
+    "n_meetings_undefined_auroc": 0,
+    "loo_range": [
+     0.8368786630329833,
+     0.8651842829456399
+    ],
+    "loo_all_above_0.5": true,
+    "loo_all_above_0.60": true
+   },
+   "seg_conf_segment_proxy": {
+    "n": 1011,
+    "n_err": 177,
+    "prevalence": 0.17507418397626112,
+    "pooled_auroc": 0.7726767738351692,
+    "average_precision": 0.4708710921960548,
+    "ap_null_prevalence": 0.17507418397626112,
+    "per_meeting": {
+     "jul1_2026": {
+      "auroc": 0.549537037037037,
+      "n": 118,
+      "n_err": 10
+     },
+     "jul29_2026": {
+      "auroc": 0.7391025641025641,
+      "n": 142,
+      "n_err": 12
+     },
+     "jul6_2026": {
+      "auroc": 0.5818198005698005,
+      "n": 212,
+      "n_err": 104
+     },
+     "jun18_2026": {
+      "auroc": 0.5882352941176471,
+      "n": 36,
+      "n_err": 2
+     },
+     "jun24_2026": {
+      "auroc": 0.6442244224422442,
+      "n": 333,
+      "n_err": 30
+     },
+     "jun29_2026": {
+      "auroc": 0.472812826768909,
+      "n": 170,
+      "n_err": 19
+     }
+    },
+    "mean_within_meeting_auroc": 0.5959553241730337,
+    "n_meetings_informative": 6,
+    "leave_one_meeting_out_mean": {
+     "jul1_2026": 0.605238981600233,
+     "jul29_2026": 0.5673258761871276,
+     "jul6_2026": 0.5987824288936803,
+     "jun18_2026": 0.5974993301841109,
+     "jun24_2026": 0.5863015045191916,
+     "jun29_2026": 0.6205838236538586
+    },
+    "n_meetings_undefined_auroc": 0,
+    "loo_range": [
+     0.5673258761871276,
+     0.6205838236538586
+    ],
+    "loo_all_above_0.5": true,
+    "loo_all_above_0.60": false
+   }
+  }
+ },
+ "head_to_head_soniox": {
+  "n_shared": 866,
+  "n_meetings": 6,
+  "note": "conditioned subset: excludes every deletion by either system and every insertion; not a comparison of overall confidence quality",
+  "error_cooccurrence": {
+   "neither": 706,
+   "adapter_only": 74,
+   "both": 56,
+   "soniox_only": 30
+  },
+  "n_err_adapter": 130,
+  "n_err_soniox": 86,
+  "spearman_per_meeting": {
+   "jul1_2026": 0.16906570031578338,
+   "jul29_2026": 0.2496148028786545,
+   "jul6_2026": 0.15660040194620287,
+   "jun18_2026": 0.17548139048507408,
+   "jun24_2026": 0.34736983916232117,
+   "jun29_2026": 0.38339659106163376
+  },
+  "spearman_pooled_secondary": 0.35102287102508917,
+  "ties": {
+   "adapter": {
+    "n_unique": 540,
+    "tied_share": 0.37644341801385683
+   },
+   "soniox": {
+    "n_unique": 244,
+    "tied_share": 0.7182448036951501
+   }
+  },
+  "predict_adapter_error": {
+   "adapter_alone": {
+    "per_meeting": {
+     "jul1_2026": {
+      "auroc": 0.8680555555555556,
+      "n": 116,
+      "n_err": 8
+     },
+     "jul29_2026": {
+      "auroc": 0.9003831417624522,
+      "n": 125,
+      "n_err": 9
+     },
+     "jul6_2026": {
+      "auroc": 0.7992939666238768,
+      "n": 177,
+      "n_err": 82
+     },
+     "jun18_2026": {
+      "auroc": 0.8928571428571429,
+      "n": 29,
+      "n_err": 1
+     },
+     "jun24_2026": {
+      "auroc": 0.8696892834495878,
+      "n": 268,
+      "n_err": 19
+     },
+     "jun29_2026": {
+      "auroc": 0.7467532467532467,
+      "n": 151,
+      "n_err": 11
+     }
+    },
+    "n_meetings_informative": 6,
+    "mean_within_meeting_auroc": 0.846172056166977,
+    "pooled_auroc": 0.7594795150501672
+   },
+   "soniox_alone": {
+    "per_meeting": {
+     "jul1_2026": {
+      "auroc": 0.7094907407407407,
+      "n": 116,
+      "n_err": 8
+     },
+     "jul29_2026": {
+      "auroc": 0.7030651340996169,
+      "n": 125,
+      "n_err": 9
+     },
+     "jul6_2026": {
+      "auroc": 0.686007702182285,
+      "n": 177,
+      "n_err": 82
+     },
+     "jun18_2026": {
+      "auroc": 0.9285714285714286,
+      "n": 29,
+      "n_err": 1
+     },
+     "jun24_2026": {
+      "auroc": 0.6935108856478546,
+      "n": 268,
+      "n_err": 19
+     },
+     "jun29_2026": {
+      "auroc": 0.7717532467532467,
+      "n": 151,
+      "n_err": 11
+     }
+    },
+    "n_meetings_informative": 6,
+    "mean_within_meeting_auroc": 0.7487331896658621,
+    "pooled_auroc": 0.6629232859531773
+   },
+   "combination_mean_rank": {
+    "per_meeting": {
+     "jul1_2026": {
+      "auroc": 0.8796296296296297,
+      "n": 116,
+      "n_err": 8
+     },
+     "jul29_2026": {
+      "auroc": 0.8773946360153256,
+      "n": 125,
+      "n_err": 9
+     },
+     "jul6_2026": {
+      "auroc": 0.818806161745828,
+      "n": 177,
+      "n_err": 82
+     },
+     "jun18_2026": {
+      "auroc": 0.9821428571428571,
+      "n": 29,
+      "n_err": 1
+     },
+     "jun24_2026": {
+      "auroc": 0.8389346861128726,
+      "n": 268,
+      "n_err": 19
+     },
+     "jun29_2026": {
+      "auroc": 0.7967532467532468,
+      "n": 151,
+      "n_err": 11
+     }
+    },
+    "n_meetings_informative": 6,
+    "mean_within_meeting_auroc": 0.86561020289996,
+    "pooled_auroc": 0.7651964882943144
+   }
+  },
+  "predict_soniox_error": {
+   "soniox_alone": {
+    "per_meeting": {
+     "jul1_2026": {
+      "auroc": 0.8113636363636364,
+      "n": 116,
+      "n_err": 6
+     },
+     "jul29_2026": {
+      "auroc": 0.7801120448179272,
+      "n": 125,
+      "n_err": 6
+     },
+     "jul6_2026": {
+      "auroc": 0.8259182127981826,
+      "n": 177,
+      "n_err": 38
+     },
+     "jun18_2026": {
+      "auroc": 0.8928571428571429,
+      "n": 29,
+      "n_err": 1
+     },
+     "jun24_2026": {
+      "auroc": 0.8266820898399846,
+      "n": 268,
+      "n_err": 21
+     },
+     "jun29_2026": {
+      "auroc": 0.8420229405630866,
+      "n": 151,
+      "n_err": 14
+     }
+    },
+    "n_meetings_informative": 6,
+    "mean_within_meeting_auroc": 0.8298260112066601,
+    "pooled_auroc": 0.8115608228980322
+   },
+   "adapter_alone": {
+    "per_meeting": {
+     "jul1_2026": {
+      "auroc": 0.8212121212121212,
+      "n": 116,
+      "n_err": 6
+     },
+     "jul29_2026": {
+      "auroc": 0.7955182072829131,
+      "n": 125,
+      "n_err": 6
+     },
+     "jul6_2026": {
+      "auroc": 0.6002461188943582,
+      "n": 177,
+      "n_err": 38
+     },
+     "jun18_2026": {
+      "auroc": 0.5714285714285714,
+      "n": 29,
+      "n_err": 1
+     },
+     "jun24_2026": {
+      "auroc": 0.7756892230576441,
+      "n": 268,
+      "n_err": 21
+     },
+     "jun29_2026": {
+      "auroc": 0.7914494264859229,
+      "n": 151,
+      "n_err": 14
+     }
+    },
+    "n_meetings_informative": 6,
+    "mean_within_meeting_auroc": 0.7259239447269218,
+    "pooled_auroc": 0.7013267740011926
+   },
+   "combination_mean_rank": {
+    "per_meeting": {
+     "jul1_2026": {
+      "auroc": 0.9121212121212121,
+      "n": 116,
+      "n_err": 6
+     },
+     "jul29_2026": {
+      "auroc": 0.8669467787114846,
+      "n": 125,
+      "n_err": 6
+     },
+     "jul6_2026": {
+      "auroc": 0.787107156380159,
+      "n": 177,
+      "n_err": 38
+     },
+     "jun18_2026": {
+      "auroc": 0.8571428571428571,
+      "n": 29,
+      "n_err": 1
+     },
+     "jun24_2026": {
+      "auroc": 0.8694813957971853,
+      "n": 268,
+      "n_err": 21
+     },
+     "jun29_2026": {
+      "auroc": 0.8555787278415016,
+      "n": 151,
+      "n_err": 14
+     }
+    },
+    "n_meetings_informative": 6,
+    "mean_within_meeting_auroc": 0.8580630213324,
+    "pooled_auroc": 0.8229427549194991
+   }
+  },
+  "uncertainty_flag_agreement": {
+   "adapter_flag": {
+    "cutoff": 0.09659090909090909,
+    "n_flagged": 86,
+    "realized_flag_rate": 0.09930715935334873
+   },
+   "soniox_flag": {
+    "cutoff": 0.0967741935483871,
+    "n_flagged": 86,
+    "realized_flag_rate": 0.09930715935334873
+   },
+   "both": 8,
+   "adapter_only": 78,
+   "soniox_only": 78,
+   "neither": 702,
+   "expected_both_pooled_independence": 8.540415704387991,
+   "expected_both_meeting_stratified": 8.539238621512292
+  },
+  "error_cooccurrence_detail": {
+   "expected_both_pooled_independence": 12.909930715935335,
+   "expected_both_meeting_stratified": 20.993469155898396,
+   "odds_ratio": 17.80900900900901,
+   "share_of_adapter_errors_shared": 0.4307692307692308,
+   "share_of_soniox_errors_shared": 0.6511627906976745
+  },
+  "combination_paired_gain": {
+   "predict_adapter_error_vs_adapter_alone": {
+    "per_meeting": {
+     "jul1_2026": 0.01157407407407407,
+     "jul29_2026": -0.02298850574712652,
+     "jul6_2026": 0.019512195121951237,
+     "jun18_2026": 0.08928571428571419,
+     "jun24_2026": -0.03075459733671526,
+     "jun29_2026": 0.050000000000000044
+    },
+    "mean": 0.01943814673298296,
+    "range": [
+     -0.03075459733671526,
+     0.08928571428571419
+    ],
+    "n_positive": 4,
+    "n_meetings": 6,
+    "leave_one_meeting_out_mean_range": [
+     0.005468633222436714,
+     0.029476695546922605
+    ],
+    "ci95_meeting_cluster_descriptive": [
+     -0.012733322828609709,
+     0.052932636469221826
+    ]
+   },
+   "predict_soniox_error_vs_soniox_alone": {
+    "per_meeting": {
+     "jul1_2026": 0.10075757575757571,
+     "jul29_2026": 0.08683473389355745,
+     "jul6_2026": -0.038811056418023515,
+     "jun18_2026": -0.03571428571428581,
+     "jun24_2026": 0.04279930595720072,
+     "jun29_2026": 0.013555787278414999
+    },
+    "mean": 0.028237010125739925,
+    "range": [
+     -0.038811056418023515,
+     0.10075757575757571
+    ],
+    "n_positive": 4,
+    "n_meetings": 6,
+    "leave_one_meeting_out_mean_range": [
+     0.013732896999372768,
+     0.041646623434492616
+    ],
+    "ci95_meeting_cluster_descriptive": [
+     -0.01544926517150049,
+     0.07192328542298033
+    ]
+   }
+  }
+ },
+ "gate_and_247": {
+  "n_windows": 247,
+  "decoded": {
+   "wt_true": 9,
+   "wt_false": 11
+  },
+  "config": {
+   "language": "el",
+   "beam_size": 5,
+   "condition_on_previous_text": false,
+   "word_timestamps": true,
+   "vad_filter": false,
+   "task": "transcribe",
+   "temperature": [
+    0.0,
+    0.2,
+    0.4,
+    0.6,
+    0.8,
+    1.0
+   ],
+   "no_speech_threshold": 0.6,
+   "log_prob_threshold": -1.0,
+   "compression_ratio_threshold": 2.4
+  },
+  "contrasts": {
+   "stack__cachedGPU_wtF_vs_localCPU_wtF__247": {
+    "n": 11,
+    "raw_identical_rate": 0.0,
+    "norm_identical_rate": 0.0,
+    "pooled_wer_denominator_a": 0.09934685458920592,
+    "pooled_wer_denominator_b": 0.09870218579234973,
+    "symmetric_edit_rate": 0.09902347096111017,
+    "per_window_wer_a": {
+     "min": 0.02608695652173913,
+     "p50": 0.10899182561307902,
+     "max": 0.19915254237288135
+    },
+    "n_windows_changed": 11
+   },
+   "gate__localCPU_wtF_vs_localCPU_wtT__247": {
+    "n": 9,
+    "raw_identical_rate": 0.0,
+    "norm_identical_rate": 0.1111111111111111,
+    "pooled_wer_denominator_a": 0.0633888663145063,
+    "pooled_wer_denominator_b": 0.06260032102728733,
+    "symmetric_edit_rate": 0.06299212598425197,
+    "per_window_wer_a": {
+     "min": 0.0,
+     "p50": 0.06967213114754098,
+     "max": 0.11382113821138211
+    },
+    "n_windows_changed": 8
+   },
+   "endtoend__cachedGPU_wtF_vs_localCPU_wtT__247": {
+    "n": 9,
+    "raw_identical_rate": 0.0,
+    "norm_identical_rate": 0.0,
+    "pooled_wer_denominator_a": 0.08901592486729278,
+    "pooled_wer_denominator_b": 0.08747993579454254,
+    "symmetric_edit_rate": 0.08824124671119207,
+    "per_window_wer_a": {
+     "min": 0.030434782608695653,
+     "p50": 0.08163265306122448,
+     "max": 0.19491525423728814
+    },
+    "n_windows_changed": 9
+   },
+   "reproducibility__localCPU_wtF_vs_armA__overlap": {
+    "n": 11,
+    "raw_identical_rate": 0.8181818181818182,
+    "norm_identical_rate": 0.8181818181818182,
+    "pooled_wer_denominator_a": 0.023735810113519093,
+    "pooled_wer_denominator_b": 0.0235655737704918,
+    "symmetric_edit_rate": 0.02365038560411311,
+    "per_window_wer_a": {
+     "min": 0.0,
+     "p50": 0.0,
+     "max": 0.24561403508771928
+    },
+    "n_windows_changed": 2
+   },
+   "n_overlap_windows": 37
+  },
+  "coverage_complete": false,
+  "coverage_warning": "PARTIAL: both decode passes must cover all 247 windows before any number in this block is quotable",
+  "gate": {
+   "criterion": "normalized token sequence identical in ALL 247 windows",
+   "coverage_complete": false,
+   "passed": false,
+   "note": "if this is false, the confidences belong to THIS re-run and cannot be attached to the frozen fusion input W"
+  },
+  "descriptive_247": {
+   "metric": "agreement-with-OpenCouncil, NOT fidelity-to-audio",
+   "n_windows_covered": 9,
+   "n_windows_expected": 247,
+   "coverage_complete": false,
+   "edit_operation_coverage": 0.6552706552706553,
+   "deletion_share_of_edits": 0.34472934472934474,
+   "p_word": {
+    "n": 2505,
+    "n_err": 230,
+    "prevalence": 0.09181636726546906,
+    "pooled_auroc": 0.8613196368848542,
+    "average_precision": 0.3547935468420064,
+    "ap_null_prevalence": 0.09181636726546906,
+    "per_meeting": {
+     "apr30_2_2026": {
+      "auroc": 0.9030554507732931,
+      "n": 252,
+      "n_err": 11
+     },
+     "apr7_2026": {
+      "auroc": 0.8141907925961082,
+      "n": 315,
+      "n_err": 14
+     },
+     "aug14_2025": {
+      "auroc": 0.8598130841121495,
+      "n": 249,
+      "n_err": 35
+     },
+     "aug29_2025": {
+      "auroc": 0.8400276052449965,
+      "n": 242,
+      "n_err": 35
+     },
+     "dec23_2025": {
+      "auroc": 0.8686061381074168,
+      "n": 250,
+      "n_err": 46
+     },
+     "dec3_2025": {
+      "auroc": 0.7763157894736842,
+      "n": 229,
+      "n_err": 1
+     },
+     "dec5_2025": {
+      "auroc": 0.896281540504648,
+      "n": 281,
+      "n_err": 30
+     },
+     "feb27_2_2026": {
+      "auroc": 0.8316358024691358,
+      "n": 294,
+      "n_err": 24
+     },
+     "feb6_2026": {
+      "auroc": 0.7865803703096838,
+      "n": 393,
+      "n_err": 34
+     }
+    },
+    "mean_within_meeting_auroc": 0.8418340637323463,
+    "n_meetings_informative": 9,
+    "leave_one_meeting_out_mean": {
+     "apr30_2_2026": 0.8341813903522278,
+     "apr7_2026": 0.8452894726243759,
+     "aug14_2025": 0.8395866861848708,
+     "aug29_2025": 0.842059871043265,
+     "dec23_2025": 0.8384875544354624,
+     "dec3_2025": 0.850023848014679,
+     "dec5_2025": 0.8350281291358085,
+     "feb27_2_2026": 0.8431088463902475,
+     "feb6_2026": 0.848740775410179
+    },
+    "n_meetings_undefined_auroc": 0,
+    "loo_range": [
+     0.8341813903522278,
+     0.850023848014679
+    ],
+    "loo_all_above_0.5": true,
+    "loo_all_above_0.60": true
+   },
+   "seg_conf": {
+    "n": 2505,
+    "n_err": 230,
+    "prevalence": 0.09181636726546906,
+    "pooled_auroc": 0.6540057333970377,
+    "average_precision": 0.1770012481131554,
+    "ap_null_prevalence": 0.09181636726546906,
+    "per_meeting": {
+     "apr30_2_2026": {
+      "auroc": 0.4862316107129385,
+      "n": 252,
+      "n_err": 11
+     },
+     "apr7_2026": {
+      "auroc": 0.5359515899383009,
+      "n": 315,
+      "n_err": 14
+     },
+     "aug14_2025": {
+      "auroc": 0.4046728971962617,
+      "n": 249,
+      "n_err": 35
+     },
+     "aug29_2025": {
+      "auroc": 0.6202208419599724,
+      "n": 242,
+      "n_err": 35
+     },
+     "dec23_2025": {
+      "auroc": 0.7081202046035806,
+      "n": 250,
+      "n_err": 46
+     },
+     "dec3_2025": {
+      "auroc": 0.6337719298245614,
+      "n": 229,
+      "n_err": 1
+     },
+     "dec5_2025": {
+      "auroc": 0.7139442231075698,
+      "n": 281,
+      "n_err": 30
+     },
+     "feb27_2_2026": {
+      "auroc": 0.6158179012345679,
+      "n": 294,
+      "n_err": 24
+     },
+     "feb6_2026": {
+      "auroc": 0.5719728002621661,
+      "n": 393,
+      "n_err": 34
+     }
+    },
+    "mean_within_meeting_auroc": 0.5878559998711022,
+    "n_meetings_informative": 9,
+    "leave_one_meeting_out_mean": {
+     "apr30_2_2026": 0.6005590485158726,
+     "apr7_2026": 0.5943440511127023,
+     "aug14_2025": 0.6107538877054572,
+     "aug29_2025": 0.5838103946099934,
+     "dec23_2025": 0.5728229742795423,
+     "dec3_2025": 0.5821165086269198,
+     "dec5_2025": 0.5720949719665437,
+     "feb27_2_2026": 0.5843607622006689,
+     "feb6_2026": 0.5898413998222192
+    },
+    "n_meetings_undefined_auroc": 0,
+    "loo_range": [
+     0.5720949719665437,
+     0.6107538877054572
+    ],
+    "loo_all_above_0.5": true,
+    "loo_all_above_0.60": false
+   },
+   "calibration_equal_width_p_word": [
+    {
+     "lo": 0.0,
+     "hi": 0.1,
+     "n": 2,
+     "n_err": 1,
+     "err_rate": 0.5,
+     "n_meetings": 2
+    },
+    {
+     "lo": 0.1,
+     "hi": 0.2,
+     "n": 4,
+     "n_err": 2,
+     "err_rate": 0.5,
+     "n_meetings": 3
+    },
+    {
+     "lo": 0.2,
+     "hi": 0.3,
+     "n": 7,
+     "n_err": 3,
+     "err_rate": 0.42857142857142855,
+     "n_meetings": 4
+    },
+    {
+     "lo": 0.3,
+     "hi": 0.4,
+     "n": 9,
+     "n_err": 3,
+     "err_rate": 0.3333333333333333,
+     "n_meetings": 5
+    },
+    {
+     "lo": 0.4,
+     "hi": 0.5,
+     "n": 18,
+     "n_err": 9,
+     "err_rate": 0.5,
+     "n_meetings": 7
+    },
+    {
+     "lo": 0.5,
+     "hi": 0.6,
+     "n": 33,
+     "n_err": 13,
+     "err_rate": 0.3939393939393939,
+     "n_meetings": 8
+    },
+    {
+     "lo": 0.6,
+     "hi": 0.7,
+     "n": 43,
+     "n_err": 15,
+     "err_rate": 0.3488372093023256,
+     "n_meetings": 8
+    },
+    {
+     "lo": 0.7,
+     "hi": 0.8,
+     "n": 103,
+     "n_err": 45,
+     "err_rate": 0.4368932038834951,
+     "n_meetings": 9
+    },
+    {
+     "lo": 0.8,
+     "hi": 0.9,
+     "n": 242,
+     "n_err": 70,
+     "err_rate": 0.2892561983471074,
+     "n_meetings": 9
+    },
+    {
+     "lo": 0.9,
+     "hi": 1.0,
+     "n": 2044,
+     "n_err": 69,
+     "err_rate": 0.0337573385518591,
+     "n_meetings": 9
+    }
+   ],
+   "calibration_deciles_p_word": [
+    {
+     "lo": 2e-06,
+     "hi": 0.821615,
+     "n": 250,
+     "n_err": 101,
+     "err_rate": 0.404,
+     "n_meetings": 9
+    },
+    {
+     "lo": 0.821615,
+     "hi": 0.910781,
+     "n": 251,
+     "n_err": 68,
+     "err_rate": 0.27091633466135456,
+     "n_meetings": 9
+    },
+    {
+     "lo": 0.910781,
+     "hi": 0.956293,
+     "n": 251,
+     "n_err": 24,
+     "err_rate": 0.09561752988047809,
+     "n_meetings": 9
+    },
+    {
+     "lo": 0.956293,
+     "hi": 0.977867,
+     "n": 250,
+     "n_err": 12,
+     "err_rate": 0.048,
+     "n_meetings": 9
+    },
+    {
+     "lo": 0.977867,
+     "hi": 0.989002,
+     "n": 250,
+     "n_err": 9,
+     "err_rate": 0.036,
+     "n_meetings": 9
+    },
+    {
+     "lo": 0.989002,
+     "hi": 0.994266,
+     "n": 251,
+     "n_err": 7,
+     "err_rate": 0.027888446215139442,
+     "n_meetings": 9
+    },
+    {
+     "lo": 0.994266,
+     "hi": 0.997217,
+     "n": 251,
+     "n_err": 3,
+     "err_rate": 0.01195219123505976,
+     "n_meetings": 9
+    },
+    {
+     "lo": 0.997217,
+     "hi": 0.998559,
+     "n": 250,
+     "n_err": 5,
+     "err_rate": 0.02,
+     "n_meetings": 9
+    },
+    {
+     "lo": 0.998559,
+     "hi": 0.999378,
+     "n": 250,
+     "n_err": 0,
+     "err_rate": 0.0,
+     "n_meetings": 9
+    },
+    {
+     "lo": 0.999378,
+     "hi": 0.999988,
+     "n": 251,
+     "n_err": 1,
+     "err_rate": 0.00398406374501992,
+     "n_meetings": 9
+    }
+   ],
+   "insertions_vs_match": {
+    "n": 2310,
+    "n_err": 35,
+    "prevalence": 0.015151515151515152,
+    "pooled_auroc": 0.8720753532182104,
+    "average_precision": 0.12217246312643515,
+    "ap_null_prevalence": 0.015151515151515152,
+    "per_meeting": {
+     "apr30_2_2026": {
+      "auroc": 0.983402489626556,
+      "n": 242,
+      "n_err": 1
+     },
+     "apr7_2026": {
+      "auroc": null,
+      "n": 301,
+      "n_err": 0
+     },
+     "aug14_2025": {
+      "auroc": 0.9380841121495327,
+      "n": 218,
+      "n_err": 4
+     },
+     "aug29_2025": {
+      "auroc": 0.9782608695652174,
+      "n": 209,
+      "n_err": 2
+     },
+     "dec23_2025": {
+      "auroc": 0.9444444444444444,
+      "n": 210,
+      "n_err": 6
+     },
+     "dec3_2025": {
+      "auroc": null,
+      "n": 228,
+      "n_err": 0
+     },
+     "dec5_2025": {
+      "auroc": 0.9163346613545816,
+      "n": 254,
+      "n_err": 3
+     },
+     "feb27_2_2026": {
+      "auroc": 0.8300925925925926,
+      "n": 278,
+      "n_err": 8
+     },
+     "feb6_2026": {
+      "auroc": 0.7594327677893138,
+      "n": 370,
+      "n_err": 11
+     }
+    },
+    "mean_within_meeting_auroc": 0.9071502767888912,
+    "n_meetings_informative": 7,
+    "leave_one_meeting_out_mean": {
+     "apr30_2_2026": 0.8944415746492803,
+     "apr7_2026": 0.9071502767888912,
+     "aug14_2025": 0.9019946375621176,
+     "aug29_2025": 0.8952985113261702,
+     "dec23_2025": 0.9009345821796324,
+     "dec3_2025": 0.9071502767888912,
+     "dec5_2025": 0.9056195460279429,
+     "feb27_2_2026": 0.919993224154941,
+     "feb6_2026": 0.9317698616221541
+    },
+    "n_meetings_undefined_auroc": 2,
+    "loo_range": [
+     0.8944415746492803,
+     0.9317698616221541
+    ],
+    "loo_all_above_0.5": true,
+    "loo_all_above_0.60": true
+   },
+   "substitutions_vs_match": {
+    "n": 2470,
+    "n_err": 195,
+    "prevalence": 0.07894736842105263,
+    "pooled_auroc": 0.859389123696816,
+    "average_precision": 0.3074060188801708,
+    "ap_null_prevalence": 0.07894736842105263,
+    "per_meeting": {
+     "apr30_2_2026": {
+      "auroc": 0.8950207468879668,
+      "n": 251,
+      "n_err": 10
+     },
+     "apr7_2026": {
+      "auroc": 0.8141907925961082,
+      "n": 315,
+      "n_err": 14
+     },
+     "aug14_2025": {
+      "auroc": 0.8497135966234549,
+      "n": 245,
+      "n_err": 31
+     },
+     "aug29_2025": {
+      "auroc": 0.8316498316498316,
+      "n": 240,
+      "n_err": 33
+     },
+     "dec23_2025": {
+      "auroc": 0.8572303921568627,
+      "n": 244,
+      "n_err": 40
+     },
+     "dec3_2025": {
+      "auroc": 0.7763157894736842,
+      "n": 229,
+      "n_err": 1
+     },
+     "dec5_2025": {
+      "auroc": 0.8940534159657666,
+      "n": 278,
+      "n_err": 27
+     },
+     "feb27_2_2026": {
+      "auroc": 0.8324074074074074,
+      "n": 286,
+      "n_err": 16
+     },
+     "feb6_2026": {
+      "auroc": 0.7995640062976868,
+      "n": 382,
+      "n_err": 23
+     }
+    },
+    "mean_within_meeting_auroc": 0.8389051087843077,
+    "n_meetings_informative": 9,
+    "leave_one_meeting_out_mean": {
+     "apr30_2_2026": 0.8318906540213503,
+     "apr7_2026": 0.8419943983078326,
+     "aug14_2025": 0.8375540478044143,
+     "aug29_2025": 0.8398120184261172,
+     "dec23_2025": 0.8366144483627383,
+     "dec3_2025": 0.8467287736981356,
+     "dec5_2025": 0.8320115703866253,
+     "feb27_2_2026": 0.8397173214564202,
+     "feb6_2026": 0.8438227465951353
+    },
+    "n_meetings_undefined_auroc": 0,
+    "loo_range": [
+     0.8318906540213503,
+     0.8467287736981356
+    ],
+    "loo_all_above_0.5": true,
+    "loo_all_above_0.60": true
+   },
+   "normalizer": "eval_freeze.ftoks (filler-stripped)"
+  }
+ },
+ "headline": {
+  "mean_within_meeting_auroc_p_word": 0.8150548142462369,
+  "informative_threshold": 0.6,
+  "informative": true,
+  "note": "27 cells / 6 meetings. Not a population claim, not a promotion gate."
+ }
+}

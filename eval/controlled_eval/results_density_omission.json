@@ -1,0 +1,163 @@
+{
+ "spec": "docs/specs/2026-08-16-overlap-speaker-arms-prereg.md",
+ "run_id": "2026-08-10-corrected-adapter-label-prefix-fix-vs-ju",
+ "n_windows": 247,
+ "n_meetings": 144,
+ "ours": "oc-runpod-fixed-2026-08-10",
+ "time_axis": "whisper-turbo word stream (comparable to round 2 A6, not to round 1's 0.320)",
+ "rho_single_loco": {
+  "argos": 2.4509,
+  "athens": 2.44854,
+  "chalandri": 2.43891,
+  "chania": 2.45358,
+  "orestiada": 2.43014,
+  "samothraki": 2.4291,
+  "sparta": 2.44476,
+  "vrilissia": 2.42931,
+  "xylokastro": 2.43105,
+  "zografou": 2.43083
+ },
+ "rho_single_pooled": 2.43841,
+ "n_truth_events": 307,
+ "rules": {
+  "old_rule (regular)": {
+   "tp": 33,
+   "n_flags": 107,
+   "n_truth": 307,
+   "precision": 0.308411214953271,
+   "recall": 0.10749185667752444
+  },
+  "old_rule (exclusive)": {
+   "tp": 41,
+   "n_flags": 122,
+   "n_truth": 307,
+   "precision": 0.3360655737704918,
+   "recall": 0.13355048859934854
+  },
+  "speaker_aware primary (thr=1.0) [reg]": {
+   "tp": 62,
+   "n_flags": 243,
+   "n_truth": 307,
+   "precision": 0.2551440329218107,
+   "recall": 0.20195439739413681,
+   "flag_seconds": 550.2,
+   "flags_touching_overlap": 146
+  },
+  "speaker_aware primary (thr=1.0) [exc]": {
+   "tp": 41,
+   "n_flags": 122,
+   "n_truth": 307,
+   "precision": 0.3360655737704918,
+   "recall": 0.13355048859934854,
+   "flag_seconds": 303.0,
+   "flags_touching_overlap": 0
+  },
+  "speaker_aware sens_low (thr=0.75) [reg]": {
+   "tp": 64,
+   "n_flags": 274,
+   "n_truth": 307,
+   "precision": 0.23357664233576642,
+   "recall": 0.20846905537459284,
+   "flag_seconds": 621.3,
+   "flags_touching_overlap": 177
+  },
+  "speaker_aware sens_low (thr=0.75) [exc]": {
+   "tp": 41,
+   "n_flags": 122,
+   "n_truth": 307,
+   "precision": 0.3360655737704918,
+   "recall": 0.13355048859934854,
+   "flag_seconds": 303.0,
+   "flags_touching_overlap": 0
+  },
+  "speaker_aware sens_high (thr=1.25) [reg]": {
+   "tp": 54,
+   "n_flags": 208,
+   "n_truth": 307,
+   "precision": 0.25961538461538464,
+   "recall": 0.1758957654723127,
+   "flag_seconds": 473.4,
+   "flags_touching_overlap": 108
+  },
+  "speaker_aware sens_high (thr=1.25) [exc]": {
+   "tp": 41,
+   "n_flags": 122,
+   "n_truth": 307,
+   "precision": 0.3360655737704918,
+   "recall": 0.13355048859934854,
+   "flag_seconds": 303.0,
+   "flags_touching_overlap": 0
+  },
+  "duration_only comparator [reg]": {
+   "tp": 49,
+   "n_flags": 244,
+   "n_truth": 307,
+   "precision": 0.20081967213114754,
+   "recall": 0.15960912052117263,
+   "calibrated_threshold": 0.7275,
+   "budget_target": 243
+  }
+ },
+ "contrasts": {
+  "PRIMARY speaker_aware - duration_only (precision)": {
+   "delta": 0.05432436079066316,
+   "ci95": [
+    0.004167499556973252,
+    0.10885415675711436
+   ],
+   "excludes_zero": true,
+   "n_clusters": 144
+  },
+  "speaker_aware - duration_only (recall)": {
+   "delta": 0.04234527687296419,
+   "ci95": [
+    -0.003194888178913724,
+    0.08469055374592835
+   ],
+   "excludes_zero": false,
+   "n_clusters": 144
+  },
+  "speaker_aware - old_rule (precision)": {
+   "delta": -0.0532671820314603,
+   "ci95": [
+    -0.12863194393340807,
+    0.01589821746612854
+   ],
+   "excludes_zero": false,
+   "n_clusters": 144
+  },
+  "speaker_aware - old_rule (recall)": {
+   "delta": 0.09446254071661238,
+   "ci95": [
+    0.05806341517119892,
+    0.13230882352941173
+   ],
+   "excludes_zero": true,
+   "n_clusters": 144
+  }
+ },
+ "nulls": {
+  "caliper_matched": {
+   "precision": 0.04406190072693217,
+   "mean_flags_per_draw": 224.23,
+   "mean_unmatched_flags_per_draw": 18.77,
+   "note": "exact speaker cardinality is implied by the caliper pool being the eligible intervals of the same window; flagged intervals excluded"
+  },
+  "unstratified_matched (round 2 comparator)": {
+   "precision": 0.08109294643977087,
+   "mean_flags_per_draw": 239.17
+  }
+ },
+ "diagnostics": {
+  "eligible_intervals": {
+   "reg": 6425,
+   "exc": 6350
+  },
+  "eligible_overlap_intervals": {
+   "reg": 214,
+   "exc": 0
+  },
+  "anchor_coverage_ours": 0.8801721781907625,
+  "anchor_coverage_ref": 0.8665189476353832
+ }
+}

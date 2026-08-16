@@ -144,6 +144,27 @@ have released them.
 
 ## Recently changed
 
+- `exp-2026-08-16-overlap-speaker-arms` closed: **one negative that must not be
+  overstated, and one positive.** The inside-overlap speaker advantage of
+  `exp-2026-08-16-pyannote-transcription` (−0.00558 on top of whole-window selection)
+  was carried onto W under preregistration, on a cut-independent mask with a
+  dose-matched placebo, and **was not demonstrated**: turn minus placebo +0.00094, CI
+  [−0.00600, +0.00833] — which still contains −0.00558, so this is a failed
+  demonstration, not a demonstrated failure (power ≈33% against that effect, 80% MDE
+  ≈0.0103, only 43 of 103 meetings informative). What is established: W is the best
+  thing inside its own overlap neighbourhood, the three selection-shaped patches cost
+  +0.0022 to +0.0036 WER with CIs excluding zero, the two composition-shaped ones are
+  unresolved, **all five failed the search screen and zero of five confirmations were
+  spent** — and none could have been, because the hypothesis was generated on all 247
+  windows including the sealed confirmation cities. Separately, the per-speaker
+  omission rule the parent refused to try was preregistered and **works**: the obvious
+  density form provably cannot fire on the one-lost-speaker case, so the quantity became
+  a missing-speaker count; recall goes 0.1075 → 0.2020 (CI excludes zero) and against a
+  duration-only detector at a matched alert budget precision is +0.0543
+  [+0.0042, +0.1089]. The price is 2.27× the alerts at an unresolved 5.3-point precision
+  loss. The gold set gave 4 flags in 27 cells, below its own preregistered floor, so the
+  withdrawn "lower bound" label stays withdrawn. Zero pyannote calls, zero GPU.
+  [`docs/reports/2026-08-16-overlap-speaker-arms.md`](docs/reports/2026-08-16-overlap-speaker-arms.md).
 - `exp-2026-08-16-autoresearch-harness` closed: **the idea loop exists and its first run
   found nothing**, which is the honest outcome for a smoke test. 11 ideas registered, 11
   evaluated, 1 refused as a cosmetic variant, 0 through the screen, **0 of 5
