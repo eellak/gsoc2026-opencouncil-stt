@@ -119,6 +119,14 @@ trained through the label-prefix bug and cannot answer it.
    credential in this environment — so the question the gold set was built for
    ("are the words the fusion recovers real?") is answered only for the candidate
    pool, not for W. Getting a Scribe v2 key is the unblocking step.
+   **2026-08-17, the mirror question is now answered for the systems we can run**
+   (`exp-2026-08-17-insertion-fidelity`): **23.7% of the adapter's scored
+   insertions and 40.8% of Soniox's sit on words the human has and the published
+   text cannot be reading**, with a further 36.8% / 12.3% undecidable. Insertions
+   both systems emit are 0.72–0.80 human-supported — the class the cut F3 family
+   would have deleted is the worst possible class to delete. Same limits as its
+   parent: description only, no ranking, no transport to the benchmark.
+   [Report](docs/reports/2026-08-17-insertion-fidelity.md).
 4. `exp-2026-08-16-tse-overlap` — **CLOSED 2026-08-16**. All four synthetic
    mechanism gates passed, but the real-overlap audit had only 1/6 enrollable
    speakers and showed no recovered reference word. TSE is not a serving candidate.
@@ -189,6 +197,26 @@ have released them.
 
 ## Recently changed
 
+- `exp-2026-08-17-insertion-fidelity` closed: **the insertion metric is partly
+  charging us for being right, and most for the system that inserts most.** On the
+  frozen gold set, 18 of 76 (23.7%) of `artifact-adapter-fixed`'s scored insertions
+  and 53 of 130 (40.8%) of Soniox `stt-rt-v4`'s are matched to a certain gold
+  occurrence the published text fails to match under *every* minimum-cost
+  alignment; 36.8% / 12.3% are undecidable, 31.6% / 28.5% unsupported, and the
+  residual 7.9% / 14.6% are supported but on occurrences the published text does
+  match — duplications, not omissions. As
+  rates, 0.0199 of the adapter's 0.0840 and 0.0586 of Soniox's 0.1436 are
+  reference-omission-consistent. **Insertions echoed by the other system are
+  0.72–0.80 gold-supported at every window size** — the F3 family the composer
+  draft cut would have deleted exactly those. The direct overlap test, on a gold
+  denominator, recapitulates the pipeline-loss finding: gold occurrences whose
+  block touches simultaneous speech go unmatched by the published text at
+  25/74 = 0.338 against 140/925 = 0.151 elsewhere. **No transport to the 247-window
+  benchmark**: the levels do not carry, and the only permitted statement about it
+  is that insertion headroom must not be equated with hallucination headroom. Two
+  Codex reviews, one before the design was coded and one on the findings; the
+  second found a rate-denominator error that had been flattering us.
+  [`docs/reports/2026-08-17-insertion-fidelity.md`](docs/reports/2026-08-17-insertion-fidelity.md).
 - `exp-2026-08-17-confirmation-audit` closed: **the autoresearch confirmation partition
   is invalid as confirmation for the LLM-composer family F1, and no confirmation is
   spent.** F1 was selected by reading oracle counts, the majority-error taxonomy and the
