@@ -42,8 +42,12 @@ trained through the label-prefix bug and cannot answer it.
    rejected with evidence. Standing finding: **the deletions live in the
    weights** (thresholds never fire, audio is covered, words absent from all 8
    beam hypotheses) — no serving-time technique reaches them; Scribe is not
-   beatable without targeted retraining. Remaining task: deploy E behind the
-   Βήμα-3 shadow gates (`exp-2026-08-11-name-repair`, OPEN).
+   beatable without targeted retraining. **`exp-2026-08-11-name-repair` CLOSED
+   2026-08-17**: E was re-measured on W and survives (−0.00075
+   [−0.00109, −0.00044]), but four of the six Βήμα-3 gates cannot be evaluated
+   without a name-level adjudication that has never been done for W, and the
+   ≥300-activatable-points gate is unassessable on a holdout with no rosters.
+   Shadow only. [Report](docs/reports/2026-08-17-name-repair-on-w.md).
 1. Publish `artifact-adapter-fixed` to HuggingFace — **done 2026-08-16**, commit
    `e214de71` at `opencouncil/whisper-large-v3-el-council-lora`. The hub weights are
    the corrected ones.
@@ -88,8 +92,16 @@ trained through the label-prefix bug and cannot answer it.
    it only moves substitutions (`exp-2026-08-16-roster-grounded-selection`).
    **Later the same day:** that measurement sits on top of the whole-window vote,
    which `exp-2026-08-16-composition-over-selection` has now displaced as the fusion
-   arm. The repair has not been re-measured on top of the per-column composition and
-   its −0.083 does not transfer to it unexamined.
+   arm. **2026-08-17: it has now been re-measured on W and it transfers.**
+   W 0.10046 → 0.09971, −0.00075 [−0.00109, −0.00044], directional primary endpoint
+   met, both rate gates unchanged *and* zero of 247 windows show any change in
+   deletions or insertions, no single window or meeting carrying more than 8.9% of
+   the 56 net edits. The firing rule had to be re-specified from a token-set rule to
+   an MSA-column rule first (protect `agree` columns), and that restriction is what
+   the number depends on: firing on unanimous columns as well gives −0.00031 with a
+   CI including zero. **Roster coverage is 94%, not 21.5%** — the untried-inventory's
+   figure was the fetch-failure count. Record CLOSED, shadow only.
+   [Report](docs/reports/2026-08-17-name-repair-on-w.md).
 3. Decide whether fidelity-to-audio changes this ranking. The benchmark measures
    agreement-with-OpenCouncil; the one time both were measured, the ranking flipped.
    **`exp-2026-08-16-gold-set` CLOSED 2026-08-16** — the corrected adapter now has a
@@ -177,6 +189,42 @@ have released them.
 
 ## Recently changed
 
+- `exp-2026-08-11-name-repair` closed: **the project's one measured positive survives
+  its substrate change, and the coverage story that would have killed it was wrong.**
+  Arm E on W: 0.10046 → 0.09971, −0.00075 [−0.00109, −0.00044], preregistered
+  directional endpoint met, S 3200 → 3144 with D and I byte-identical in *every* one
+  of the 247 windows, LOO stable over windows, meetings and cities, largest window and
+  largest meeting each 8.9% of the 56 net edits. The crux was re-specifying "act only
+  where the three systems disagree" from a token-set rule (meaningless once the output
+  is composed per column) to "protected iff the token's MSA column is class `agree`";
+  the paired contrast against firing everywhere is +0.00044 [+0.00020, +0.00069], so
+  the restriction is load-bearing. Roster coverage is **232/247 windows (94%)**, not
+  the 21.5% the untried-inventory reported — 56 was the fetch-failure count in
+  `data/pii/fetch_rosters.log`, and that report now carries an erratum. What is real
+  from it: all 7 sealed holdout meetings genuinely have no roster. **The Βήμα-3 gates
+  are unassessable, not failed:** four need a name-level adjudication never done for W,
+  and ≥300 activatable points would need 13–15 h of untouched roster-covered audio at
+  the measured 0.61–0.72 firings per window. Shadow only.
+  [`docs/reports/2026-08-17-name-repair-on-w.md`](docs/reports/2026-08-17-name-repair-on-w.md).
+- `exp-2026-08-17-majority-error-taxonomy` closed: **the 25% class is not one thing,
+  and 27.7% of it is definitely not a selection failure, with up to 39.6% not cleanly
+  attributable to one.** Of 6,645 `exact_2_of_3`
+  columns 1,719 have a wrong majority; read off the oracle DP's optimal-support set
+  rather than one backtrace, 1,038 are selection failures (the minority token *is* the
+  reference word), 318 coverage, 205 ambiguous, 158 spurious — and 719 of the 1,719
+  (41.8%) have zero marginal benefit with W's other choices frozen. The census's 1,245
+  "W differs from the oracle" is a different set (1,215 overlap, 30 tie-breaks, 504
+  wrong majorities missing), and "the oracle takes the lone dissenter 1,245/1,245" is a
+  candidate-set identity, not recoverability. Largest linguistic bucket is
+  function-word pairs (19.9%, ~28% of the measurable hindsight gain); **Greek
+  morphology does not dominate** (10.9%). The entity cross-check answers what
+  `exp-2026-08-16-error-mined-terms` left open: of 99 wrong majorities whose correct
+  word is a frozen term, **93 are in the own-city file and 83 survive the roster
+  gate**, so coverage is not the constraint — the frozen `name_repair.select()` fires
+  on 36 and the largest attrition is the minimum-length eligibility gate (21 of 33
+  `no_candidate`). But only 28 of the 83 are recoverable at all, capping this funnel at
+  0.037 WER points. Hindsight throughout; no arm, no gate.
+  [`docs/reports/2026-08-17-majority-error-taxonomy.md`](docs/reports/2026-08-17-majority-error-taxonomy.md).
 - `exp-2026-08-16-w-rt-confidence` closed: **no confidence arm met its criteria, and
   the two with the most room never fired.** The free realtime path re-transcribed all
   247 windows with per-token confidence in 34 minutes at zero cost, which forced a

@@ -1,0 +1,1045 @@
+{
+ "by_term_id": {
+  "existing:\u0391\u03bb\u03b5\u03b2\u03c5\u03b6\u03ac\u03ba\u03b7": {
+   "did-not-fire": {
+    "count": 2,
+    "denominator": 5
+   },
+   "did_not_fire_causes": {
+    "phonetic-distance": {
+     "count": 2,
+     "denominator": 2
+    }
+   },
+   "fired-and-corrected": {
+    "count": 3,
+    "denominator": 5
+   },
+   "fired-and-worse": {
+    "count": 0,
+    "denominator": 5
+   },
+   "near_miss_occurrences": {
+    "count": 5,
+    "denominator": 5
+   }
+  },
+  "existing:\u0392\u03c1\u03b9\u03bb\u03b7\u03c3\u03c3\u03af\u03c9\u03bd": {
+   "did-not-fire": {
+    "count": 6,
+    "denominator": 6
+   },
+   "did_not_fire_causes": {
+    "surface-absent": {
+     "count": 6,
+     "denominator": 6
+    }
+   },
+   "fired-and-corrected": {
+    "count": 0,
+    "denominator": 6
+   },
+   "fired-and-worse": {
+    "count": 0,
+    "denominator": 6
+   },
+   "near_miss_occurrences": {
+    "count": 6,
+    "denominator": 6
+   }
+  },
+  "existing:\u0393\u03b9\u03bf\u03c5\u03c1\u03b3\u03b9\u03ce\u03c4\u03bf\u03c5": {
+   "did-not-fire": {
+    "count": 0,
+    "denominator": 0
+   },
+   "did_not_fire_causes": {},
+   "fired-and-corrected": {
+    "count": 0,
+    "denominator": 0
+   },
+   "fired-and-worse": {
+    "count": 0,
+    "denominator": 0
+   },
+   "near_miss_occurrences": {
+    "count": 0,
+    "denominator": 0
+   }
+  },
+  "existing:\u0393\u03ba\u03b9\u03bb\u03b9\u03bb\u03bf\u03cd\u03b4\u03b7": {
+   "did-not-fire": {
+    "count": 4,
+    "denominator": 4
+   },
+   "did_not_fire_causes": {
+    "phonetic-distance": {
+     "count": 2,
+     "denominator": 4
+    },
+    "protected-agreement": {
+     "count": 2,
+     "denominator": 4
+    }
+   },
+   "fired-and-corrected": {
+    "count": 0,
+    "denominator": 4
+   },
+   "fired-and-worse": {
+    "count": 0,
+    "denominator": 4
+   },
+   "near_miss_occurrences": {
+    "count": 4,
+    "denominator": 4
+   }
+  },
+  "existing:\u0393\u03c1\u03af\u03b2\u03b1": {
+   "did-not-fire": {
+    "count": 1,
+    "denominator": 1
+   },
+   "did_not_fire_causes": {
+    "phonetic-distance": {
+     "count": 1,
+     "denominator": 1
+    }
+   },
+   "fired-and-corrected": {
+    "count": 0,
+    "denominator": 1
+   },
+   "fired-and-worse": {
+    "count": 0,
+    "denominator": 1
+   },
+   "near_miss_occurrences": {
+    "count": 1,
+    "denominator": 1
+   }
+  },
+  "existing:\u0394\u0395\u0394\u0394\u0397\u0395": {
+   "did-not-fire": {
+    "count": 1,
+    "denominator": 1
+   },
+   "did_not_fire_causes": {
+    "surface-absent": {
+     "count": 1,
+     "denominator": 1
+    }
+   },
+   "fired-and-corrected": {
+    "count": 0,
+    "denominator": 1
+   },
+   "fired-and-worse": {
+    "count": 0,
+    "denominator": 1
+   },
+   "near_miss_occurrences": {
+    "count": 1,
+    "denominator": 1
+   }
+  },
+  "existing:\u0394\u03c1\u03b1\u03ba\u03b1\u03ba\u03ac\u03ba\u03b7": {
+   "did-not-fire": {
+    "count": 0,
+    "denominator": 0
+   },
+   "did_not_fire_causes": {},
+   "fired-and-corrected": {
+    "count": 0,
+    "denominator": 0
+   },
+   "fired-and-worse": {
+    "count": 0,
+    "denominator": 0
+   },
+   "near_miss_occurrences": {
+    "count": 0,
+    "denominator": 0
+   }
+  },
+  "existing:\u0396\u03c9\u03b3\u03c1\u03ac\u03c6\u03bf\u03c5": {
+   "did-not-fire": {
+    "count": 2,
+    "denominator": 2
+   },
+   "did_not_fire_causes": {
+    "phonetic-distance": {
+     "count": 2,
+     "denominator": 2
+    }
+   },
+   "fired-and-corrected": {
+    "count": 0,
+    "denominator": 2
+   },
+   "fired-and-worse": {
+    "count": 0,
+    "denominator": 2
+   },
+   "near_miss_occurrences": {
+    "count": 2,
+    "denominator": 2
+   }
+  },
+  "existing:\u039a\u0391\u03a0": {
+   "did-not-fire": {
+    "count": 0,
+    "denominator": 0
+   },
+   "did_not_fire_causes": {},
+   "fired-and-corrected": {
+    "count": 0,
+    "denominator": 0
+   },
+   "fired-and-worse": {
+    "count": 0,
+    "denominator": 0
+   },
+   "near_miss_occurrences": {
+    "count": 0,
+    "denominator": 0
+   }
+  },
+  "existing:\u039a\u0395\u0394\u0395": {
+   "did-not-fire": {
+    "count": 4,
+    "denominator": 4
+   },
+   "did_not_fire_causes": {
+    "surface-absent": {
+     "count": 4,
+     "denominator": 4
+    }
+   },
+   "fired-and-corrected": {
+    "count": 0,
+    "denominator": 4
+   },
+   "fired-and-worse": {
+    "count": 0,
+    "denominator": 4
+   },
+   "near_miss_occurrences": {
+    "count": 4,
+    "denominator": 4
+   }
+  },
+  "existing:\u039a\u03a5\u0391": {
+   "did-not-fire": {
+    "count": 0,
+    "denominator": 0
+   },
+   "did_not_fire_causes": {},
+   "fired-and-corrected": {
+    "count": 0,
+    "denominator": 0
+   },
+   "fired-and-worse": {
+    "count": 0,
+    "denominator": 0
+   },
+   "near_miss_occurrences": {
+    "count": 0,
+    "denominator": 0
+   }
+  },
+  "existing:\u039a\u03b1\u03bb\u03bf\u03b3\u03c1\u03b9\u03b4\u03ac\u03ba\u03b7": {
+   "did-not-fire": {
+    "count": 1,
+    "denominator": 3
+   },
+   "did_not_fire_causes": {
+    "phonetic-distance": {
+     "count": 1,
+     "denominator": 1
+    }
+   },
+   "fired-and-corrected": {
+    "count": 2,
+    "denominator": 3
+   },
+   "fired-and-worse": {
+    "count": 0,
+    "denominator": 3
+   },
+   "near_miss_occurrences": {
+    "count": 3,
+    "denominator": 3
+   }
+  },
+  "existing:\u039a\u03b1\u03bb\u03bf\u03b3\u03c1\u03b9\u03b4\u03ac\u03ba\u03b7\u03c2": {
+   "did-not-fire": {
+    "count": 0,
+    "denominator": 0
+   },
+   "did_not_fire_causes": {},
+   "fired-and-corrected": {
+    "count": 0,
+    "denominator": 0
+   },
+   "fired-and-worse": {
+    "count": 0,
+    "denominator": 0
+   },
+   "near_miss_occurrences": {
+    "count": 0,
+    "denominator": 0
+   }
+  },
+  "existing:\u039a\u03b1\u03bd\u03b5\u03bb\u03bb\u03bf\u03c0\u03bf\u03cd\u03bb\u03bf\u03c5": {
+   "did-not-fire": {
+    "count": 3,
+    "denominator": 4
+   },
+   "did_not_fire_causes": {
+    "frozen-guard:abstain_margin": {
+     "count": 1,
+     "denominator": 3
+    },
+    "phonetic-distance": {
+     "count": 2,
+     "denominator": 3
+    }
+   },
+   "fired-and-corrected": {
+    "count": 0,
+    "denominator": 4
+   },
+   "fired-and-worse": {
+    "count": 1,
+    "denominator": 4
+   },
+   "near_miss_occurrences": {
+    "count": 4,
+    "denominator": 4
+   }
+  },
+  "existing:\u039a\u03bb\u03b5\u03af\u03c4\u03c3\u03b1": {
+   "did-not-fire": {
+    "count": 3,
+    "denominator": 14
+   },
+   "did_not_fire_causes": {
+    "phonetic-distance": {
+     "count": 3,
+     "denominator": 3
+    }
+   },
+   "fired-and-corrected": {
+    "count": 11,
+    "denominator": 14
+   },
+   "fired-and-worse": {
+    "count": 0,
+    "denominator": 14
+   },
+   "near_miss_occurrences": {
+    "count": 14,
+    "denominator": 14
+   }
+  },
+  "existing:\u039b\u03bf\u03c5\u03c4\u03c3\u03ad\u03c4\u03b7": {
+   "did-not-fire": {
+    "count": 0,
+    "denominator": 2
+   },
+   "did_not_fire_causes": {},
+   "fired-and-corrected": {
+    "count": 2,
+    "denominator": 2
+   },
+   "fired-and-worse": {
+    "count": 0,
+    "denominator": 2
+   },
+   "near_miss_occurrences": {
+    "count": 2,
+    "denominator": 2
+   }
+  },
+  "existing:\u039c\u0391\u039e\u0399\u0391\u0394\u0397\u0396": {
+   "did-not-fire": {
+    "count": 0,
+    "denominator": 0
+   },
+   "did_not_fire_causes": {},
+   "fired-and-corrected": {
+    "count": 0,
+    "denominator": 0
+   },
+   "fired-and-worse": {
+    "count": 0,
+    "denominator": 0
+   },
+   "near_miss_occurrences": {
+    "count": 0,
+    "denominator": 0
+   }
+  },
+  "existing:\u039c\u03b1\u03ba\u03c1\u03ad\u03b1": {
+   "did-not-fire": {
+    "count": 0,
+    "denominator": 0
+   },
+   "did_not_fire_causes": {},
+   "fired-and-corrected": {
+    "count": 0,
+    "denominator": 0
+   },
+   "fired-and-worse": {
+    "count": 0,
+    "denominator": 0
+   },
+   "near_miss_occurrences": {
+    "count": 0,
+    "denominator": 0
+   }
+  },
+  "existing:\u039f\u03a0\u0391\u039d\u0394\u0391": {
+   "did-not-fire": {
+    "count": 3,
+    "denominator": 3
+   },
+   "did_not_fire_causes": {
+    "surface-absent": {
+     "count": 3,
+     "denominator": 3
+    }
+   },
+   "fired-and-corrected": {
+    "count": 0,
+    "denominator": 3
+   },
+   "fired-and-worse": {
+    "count": 0,
+    "denominator": 3
+   },
+   "near_miss_occurrences": {
+    "count": 3,
+    "denominator": 3
+   }
+  },
+  "existing:\u03a3\u03ba\u03b1\u03c1\u03bb\u03b1\u03c4\u03af\u03b4\u03b7": {
+   "did-not-fire": {
+    "count": 2,
+    "denominator": 4
+   },
+   "did_not_fire_causes": {
+    "phonetic-distance": {
+     "count": 2,
+     "denominator": 2
+    }
+   },
+   "fired-and-corrected": {
+    "count": 2,
+    "denominator": 4
+   },
+   "fired-and-worse": {
+    "count": 0,
+    "denominator": 4
+   },
+   "near_miss_occurrences": {
+    "count": 4,
+    "denominator": 4
+   }
+  },
+  "existing:\u03a3\u03ba\u03b1\u03c1\u03bb\u03b1\u03c4\u03af\u03b4\u03b7\u03c2": {
+   "did-not-fire": {
+    "count": 1,
+    "denominator": 2
+   },
+   "did_not_fire_causes": {
+    "phonetic-distance": {
+     "count": 1,
+     "denominator": 1
+    }
+   },
+   "fired-and-corrected": {
+    "count": 1,
+    "denominator": 2
+   },
+   "fired-and-worse": {
+    "count": 0,
+    "denominator": 2
+   },
+   "near_miss_occurrences": {
+    "count": 2,
+    "denominator": 2
+   }
+  },
+  "existing:\u03a3\u03c7\u03bf\u03b9\u03bd\u03ac": {
+   "did-not-fire": {
+    "count": 3,
+    "denominator": 3
+   },
+   "did_not_fire_causes": {
+    "phonetic-distance": {
+     "count": 3,
+     "denominator": 3
+    }
+   },
+   "fired-and-corrected": {
+    "count": 0,
+    "denominator": 3
+   },
+   "fired-and-worse": {
+    "count": 0,
+    "denominator": 3
+   },
+   "near_miss_occurrences": {
+    "count": 3,
+    "denominator": 3
+   }
+  },
+  "existing:\u03a4\u03b6\u03b1\u03bd\u03b5\u03c4\u03ad\u03b1": {
+   "did-not-fire": {
+    "count": 2,
+    "denominator": 4
+   },
+   "did_not_fire_causes": {
+    "phonetic-distance": {
+     "count": 2,
+     "denominator": 2
+    }
+   },
+   "fired-and-corrected": {
+    "count": 2,
+    "denominator": 4
+   },
+   "fired-and-worse": {
+    "count": 0,
+    "denominator": 4
+   },
+   "near_miss_occurrences": {
+    "count": 4,
+    "denominator": 4
+   }
+  },
+  "existing:\u03a7\u03b1\u03bb\u03ac\u03bd\u03b4\u03c1\u03b9": {
+   "did-not-fire": {
+    "count": 1,
+    "denominator": 4
+   },
+   "did_not_fire_causes": {
+    "phonetic-distance": {
+     "count": 1,
+     "denominator": 1
+    }
+   },
+   "fired-and-corrected": {
+    "count": 3,
+    "denominator": 4
+   },
+   "fired-and-worse": {
+    "count": 0,
+    "denominator": 4
+   },
+   "near_miss_occurrences": {
+    "count": 4,
+    "denominator": 4
+   }
+  },
+  "existing:\u03a7\u03b1\u03bd\u03b9\u03ac": {
+   "did-not-fire": {
+    "count": 0,
+    "denominator": 0
+   },
+   "did_not_fire_causes": {},
+   "fired-and-corrected": {
+    "count": 0,
+    "denominator": 0
+   },
+   "fired-and-worse": {
+    "count": 0,
+    "denominator": 0
+   },
+   "near_miss_occurrences": {
+    "count": 0,
+    "denominator": 0
+   }
+  },
+  "existing:\u03a7\u03b1\u03c1\u03bb\u03b1\u03cd\u03c4\u03b7": {
+   "did-not-fire": {
+    "count": 2,
+    "denominator": 2
+   },
+   "did_not_fire_causes": {
+    "missing-roster": {
+     "count": 2,
+     "denominator": 2
+    }
+   },
+   "fired-and-corrected": {
+    "count": 0,
+    "denominator": 2
+   },
+   "fired-and-worse": {
+    "count": 0,
+    "denominator": 2
+   },
+   "near_miss_occurrences": {
+    "count": 2,
+    "denominator": 2
+   }
+  }
+ },
+ "coverage": {
+  "by_term_id": {
+   "existing:\u0391\u03bb\u03b5\u03b2\u03c5\u03b6\u03ac\u03ba\u03b7": {
+    "human_corrected_surface_forms": {
+     "count": 1,
+     "denominator": 1
+    },
+    "surface_forms_present": {
+     "count": 1,
+     "denominator": 1
+    },
+    "term_city_pairs": {
+     "count": 1,
+     "denominator": 1
+    }
+   },
+   "existing:\u0392\u03c1\u03b9\u03bb\u03b7\u03c3\u03c3\u03af\u03c9\u03bd": {
+    "human_corrected_surface_forms": {
+     "count": 1,
+     "denominator": 1
+    },
+    "surface_forms_present": {
+     "count": 0,
+     "denominator": 1
+    },
+    "term_city_pairs": {
+     "count": 0,
+     "denominator": 1
+    }
+   },
+   "existing:\u0393\u03b9\u03bf\u03c5\u03c1\u03b3\u03b9\u03ce\u03c4\u03bf\u03c5": {
+    "human_corrected_surface_forms": {
+     "count": 1,
+     "denominator": 1
+    },
+    "surface_forms_present": {
+     "count": 1,
+     "denominator": 1
+    },
+    "term_city_pairs": {
+     "count": 1,
+     "denominator": 1
+    }
+   },
+   "existing:\u0393\u03ba\u03b9\u03bb\u03b9\u03bb\u03bf\u03cd\u03b4\u03b7": {
+    "human_corrected_surface_forms": {
+     "count": 1,
+     "denominator": 1
+    },
+    "surface_forms_present": {
+     "count": 1,
+     "denominator": 1
+    },
+    "term_city_pairs": {
+     "count": 1,
+     "denominator": 1
+    }
+   },
+   "existing:\u0393\u03c1\u03af\u03b2\u03b1": {
+    "human_corrected_surface_forms": {
+     "count": 1,
+     "denominator": 1
+    },
+    "surface_forms_present": {
+     "count": 2,
+     "denominator": 2
+    },
+    "term_city_pairs": {
+     "count": 2,
+     "denominator": 2
+    }
+   },
+   "existing:\u0394\u0395\u0394\u0394\u0397\u0395": {
+    "human_corrected_surface_forms": {
+     "count": 1,
+     "denominator": 1
+    },
+    "surface_forms_present": {
+     "count": 0,
+     "denominator": 3
+    },
+    "term_city_pairs": {
+     "count": 0,
+     "denominator": 3
+    }
+   },
+   "existing:\u0394\u03c1\u03b1\u03ba\u03b1\u03ba\u03ac\u03ba\u03b7": {
+    "human_corrected_surface_forms": {
+     "count": 1,
+     "denominator": 1
+    },
+    "surface_forms_present": {
+     "count": 1,
+     "denominator": 1
+    },
+    "term_city_pairs": {
+     "count": 1,
+     "denominator": 1
+    }
+   },
+   "existing:\u0396\u03c9\u03b3\u03c1\u03ac\u03c6\u03bf\u03c5": {
+    "human_corrected_surface_forms": {
+     "count": 1,
+     "denominator": 1
+    },
+    "surface_forms_present": {
+     "count": 1,
+     "denominator": 1
+    },
+    "term_city_pairs": {
+     "count": 1,
+     "denominator": 1
+    }
+   },
+   "existing:\u039a\u0391\u03a0": {
+    "human_corrected_surface_forms": {
+     "count": 1,
+     "denominator": 1
+    },
+    "surface_forms_present": {
+     "count": 0,
+     "denominator": 1
+    },
+    "term_city_pairs": {
+     "count": 0,
+     "denominator": 1
+    }
+   },
+   "existing:\u039a\u0395\u0394\u0395": {
+    "human_corrected_surface_forms": {
+     "count": 1,
+     "denominator": 1
+    },
+    "surface_forms_present": {
+     "count": 0,
+     "denominator": 3
+    },
+    "term_city_pairs": {
+     "count": 0,
+     "denominator": 3
+    }
+   },
+   "existing:\u039a\u03a5\u0391": {
+    "human_corrected_surface_forms": {
+     "count": 1,
+     "denominator": 1
+    },
+    "surface_forms_present": {
+     "count": 0,
+     "denominator": 2
+    },
+    "term_city_pairs": {
+     "count": 0,
+     "denominator": 2
+    }
+   },
+   "existing:\u039a\u03b1\u03bb\u03bf\u03b3\u03c1\u03b9\u03b4\u03ac\u03ba\u03b7": {
+    "human_corrected_surface_forms": {
+     "count": 1,
+     "denominator": 1
+    },
+    "surface_forms_present": {
+     "count": 1,
+     "denominator": 1
+    },
+    "term_city_pairs": {
+     "count": 1,
+     "denominator": 1
+    }
+   },
+   "existing:\u039a\u03b1\u03bb\u03bf\u03b3\u03c1\u03b9\u03b4\u03ac\u03ba\u03b7\u03c2": {
+    "human_corrected_surface_forms": {
+     "count": 1,
+     "denominator": 1
+    },
+    "surface_forms_present": {
+     "count": 1,
+     "denominator": 1
+    },
+    "term_city_pairs": {
+     "count": 1,
+     "denominator": 1
+    }
+   },
+   "existing:\u039a\u03b1\u03bd\u03b5\u03bb\u03bb\u03bf\u03c0\u03bf\u03cd\u03bb\u03bf\u03c5": {
+    "human_corrected_surface_forms": {
+     "count": 1,
+     "denominator": 1
+    },
+    "surface_forms_present": {
+     "count": 1,
+     "denominator": 1
+    },
+    "term_city_pairs": {
+     "count": 1,
+     "denominator": 1
+    }
+   },
+   "existing:\u039a\u03bb\u03b5\u03af\u03c4\u03c3\u03b1": {
+    "human_corrected_surface_forms": {
+     "count": 1,
+     "denominator": 1
+    },
+    "surface_forms_present": {
+     "count": 1,
+     "denominator": 1
+    },
+    "term_city_pairs": {
+     "count": 1,
+     "denominator": 1
+    }
+   },
+   "existing:\u039b\u03bf\u03c5\u03c4\u03c3\u03ad\u03c4\u03b7": {
+    "human_corrected_surface_forms": {
+     "count": 1,
+     "denominator": 1
+    },
+    "surface_forms_present": {
+     "count": 1,
+     "denominator": 1
+    },
+    "term_city_pairs": {
+     "count": 1,
+     "denominator": 1
+    }
+   },
+   "existing:\u039c\u0391\u039e\u0399\u0391\u0394\u0397\u0396": {
+    "human_corrected_surface_forms": {
+     "count": 1,
+     "denominator": 1
+    },
+    "surface_forms_present": {
+     "count": 0,
+     "denominator": 1
+    },
+    "term_city_pairs": {
+     "count": 0,
+     "denominator": 1
+    }
+   },
+   "existing:\u039c\u03b1\u03ba\u03c1\u03ad\u03b1": {
+    "human_corrected_surface_forms": {
+     "count": 1,
+     "denominator": 1
+    },
+    "surface_forms_present": {
+     "count": 1,
+     "denominator": 1
+    },
+    "term_city_pairs": {
+     "count": 1,
+     "denominator": 1
+    }
+   },
+   "existing:\u039f\u03a0\u0391\u039d\u0394\u0391": {
+    "human_corrected_surface_forms": {
+     "count": 1,
+     "denominator": 1
+    },
+    "surface_forms_present": {
+     "count": 0,
+     "denominator": 1
+    },
+    "term_city_pairs": {
+     "count": 0,
+     "denominator": 1
+    }
+   },
+   "existing:\u03a3\u03ba\u03b1\u03c1\u03bb\u03b1\u03c4\u03af\u03b4\u03b7": {
+    "human_corrected_surface_forms": {
+     "count": 1,
+     "denominator": 1
+    },
+    "surface_forms_present": {
+     "count": 1,
+     "denominator": 1
+    },
+    "term_city_pairs": {
+     "count": 1,
+     "denominator": 1
+    }
+   },
+   "existing:\u03a3\u03ba\u03b1\u03c1\u03bb\u03b1\u03c4\u03af\u03b4\u03b7\u03c2": {
+    "human_corrected_surface_forms": {
+     "count": 1,
+     "denominator": 1
+    },
+    "surface_forms_present": {
+     "count": 1,
+     "denominator": 1
+    },
+    "term_city_pairs": {
+     "count": 1,
+     "denominator": 1
+    }
+   },
+   "existing:\u03a3\u03c7\u03bf\u03b9\u03bd\u03ac": {
+    "human_corrected_surface_forms": {
+     "count": 1,
+     "denominator": 1
+    },
+    "surface_forms_present": {
+     "count": 1,
+     "denominator": 1
+    },
+    "term_city_pairs": {
+     "count": 1,
+     "denominator": 1
+    }
+   },
+   "existing:\u03a4\u03b6\u03b1\u03bd\u03b5\u03c4\u03ad\u03b1": {
+    "human_corrected_surface_forms": {
+     "count": 1,
+     "denominator": 1
+    },
+    "surface_forms_present": {
+     "count": 1,
+     "denominator": 1
+    },
+    "term_city_pairs": {
+     "count": 1,
+     "denominator": 1
+    }
+   },
+   "existing:\u03a7\u03b1\u03bb\u03ac\u03bd\u03b4\u03c1\u03b9": {
+    "human_corrected_surface_forms": {
+     "count": 1,
+     "denominator": 1
+    },
+    "surface_forms_present": {
+     "count": 1,
+     "denominator": 1
+    },
+    "term_city_pairs": {
+     "count": 1,
+     "denominator": 1
+    }
+   },
+   "existing:\u03a7\u03b1\u03bd\u03b9\u03ac": {
+    "human_corrected_surface_forms": {
+     "count": 1,
+     "denominator": 1
+    },
+    "surface_forms_present": {
+     "count": 1,
+     "denominator": 1
+    },
+    "term_city_pairs": {
+     "count": 1,
+     "denominator": 1
+    }
+   },
+   "existing:\u03a7\u03b1\u03c1\u03bb\u03b1\u03cd\u03c4\u03b7": {
+    "human_corrected_surface_forms": {
+     "count": 1,
+     "denominator": 1
+    },
+    "surface_forms_present": {
+     "count": 1,
+     "denominator": 1
+    },
+    "term_city_pairs": {
+     "count": 1,
+     "denominator": 1
+    }
+   }
+  },
+  "human_corrected_surface_forms": {
+   "count": 32,
+   "denominator": 32
+  },
+  "surface_forms_present": {
+   "count": 20,
+   "denominator": 32
+  },
+  "term_city_pairs_present": {
+   "count": 20,
+   "denominator": 32
+  },
+  "terms_present": {
+   "count": 19,
+   "denominator": 26
+  }
+ },
+ "experiment": "exp-2026-08-17-term-utilisation",
+ "population": {
+  "human_corrections": 82,
+  "terms": 26
+ },
+ "run_id": "2026-08-10-corrected-adapter-label-prefix-fix-vs-ju",
+ "source_experiment": "exp-2026-08-16-error-mined-terms",
+ "substrate": {
+  "cities": 10,
+  "meetings": 144,
+  "sealed_holdout_read": 0,
+  "trio": [
+   "scribe-v2-clean",
+   "soniox",
+   "oc-runpod-fixed-2026-08-10"
+  ],
+  "windows": 247
+ },
+ "term_lists": {
+  "argos": "argos.v2.json",
+  "athens": "athens.json",
+  "chalandri": "chalandri.json",
+  "chania": "chania.json",
+  "orestiada": "orestiada.v2.json",
+  "samothraki": "samothraki.json",
+  "sparta": "sparta.json",
+  "vrilissia": "vrilissia.json",
+  "xylokastro": "xylokastro.json",
+  "zografou": "zografou.json"
+ },
+ "utilisation": {
+  "did-not-fire": {
+   "count": 41,
+   "denominator": 68
+  },
+  "did_not_fire_causes": {
+   "frozen-guard:abstain_margin": {
+    "count": 1,
+    "denominator": 41
+   },
+   "missing-roster": {
+    "count": 2,
+    "denominator": 41
+   },
+   "phonetic-distance": {
+    "count": 22,
+    "denominator": 41
+   },
+   "protected-agreement": {
+    "count": 2,
+    "denominator": 41
+   },
+   "surface-absent": {
+    "count": 14,
+    "denominator": 41
+   }
+  },
+  "fired-and-corrected": {
+   "count": 26,
+   "denominator": 68
+  },
+  "fired-and-worse": {
+   "count": 1,
+   "denominator": 68
+  },
+  "near_miss_occurrences": {
+   "count": 68,
+   "denominator": 68
+  }
+ }
+}
