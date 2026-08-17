@@ -230,15 +230,18 @@
       "id": "exp-2026-07-29-lexical-thesis",
       "title": "The 'lexical costume' thesis",
       "question": "Is the correction dataset a lexical signal wearing an acoustic costume?",
-      "status": "CLOSED",
+      "status": "SUPERSEDED",
       "conclusion": "Supported. The LLM post-editor reached 0.155 -> 0.119 WER on 50 corrected utterances, better than fine-tuning.",
       "decision": "Pursue post-editing and biasing over further acoustic fine-tuning.",
       "reports": [
         "docs/reports/2026-07-29-lexical-thesis-experiments.md"
       ],
-      "superseded_by": null,
+      "superseded_by": "exp-2026-08-02-asr-fusion",
       "next_action": null,
-      "updated_at": "2026-08-10T17:00:00Z"
+      "updated_at": "2026-08-10T17:00:00Z",
+      "caveats": [
+        "SUPERSEDED 2026-08-17. Its decision line ('Pursue post-editing and biasing over further acoustic fine-tuning') stayed live in the authoritative file after the project reversed it. The 0.1552 -> 0.1195 result carries reference anchoring that makes it non-transportable: the reference is final_after_text, produced BY EDITING the very hypothesis the LLM was asked to edit, on 50 utterances that are 100% error-bearing by construction (every one had been corrected by a human). On the benchmark substrate the same post-editor with the same gate measured a LOSS: operational_gated.C_edit_one 0.13379 vs Scribe 0.13189, +0.0019 [+0.0004,+0.0038], CI excludes zero on the wrong side. The 'ours' 0.1761 row used the pre-label-prefix-fix July adapter and is provenance-dead."
+      ]
     },
     {
       "id": "exp-2026-08-01-postedit-gate",
@@ -252,7 +255,10 @@
       ],
       "superseded_by": null,
       "next_action": null,
-      "updated_at": "2026-08-10T17:00:00Z"
+      "updated_at": "2026-08-10T17:00:00Z",
+      "caveats": [
+        "SCOPE NOTE 2026-08-17. 'Any post-editor ships with its gate' still holds, but no post-editor ships: exp-2026-08-02-asr-fusion measured the gated post-editor as a loss on the benchmark. What survives and is reusable is the gate itself (exp_postedit_gate.py:88-111, reference-free, unit-tested at eval/tests/test_postedit_gate.py) and the B_clean finding that the post-editor DAMAGES already-correct text: 0.0255 ungated / 0.0124 gated against an ideal 0.000, roughly 1 in 6 already-correct utterances harmed, break-even 20-24% against a 24.6% error-bearing share. That is the measured case for restricting any LLM to specific columns rather than letting it touch text."
+      ]
     },
     {
       "id": "exp-2026-08-02-fulltrain-corrected",
