@@ -1,8 +1,9 @@
 # LLM composer — plan, revision 2 after review
 
-Status: **revised draft.** Reviewed independently by Fable and by Codex (sol, high
-effort) on 2026-08-17. **Both cut it to one family.** Still not preregistered; the
-contamination audit in §0 must pass before anything is frozen.
+Status: **revised draft, exploratory only.** Reviewed independently by Fable and by
+Codex (sol, high effort) on 2026-08-17. **Both cut it to one family.** Still not
+preregistered. **The §0 contamination audit ran on 2026-08-17 and failed: F1 gets no
+confirmatory CI and spends no confirmation.** Read §0 before anything below.
 
 Substrate: 247-window fixed benchmark, `run_id
 2026-08-10-corrected-adapter-label-prefix-fix-vs-ju`, trio `scribe-v2-clean` /
@@ -12,7 +13,7 @@ agreement-with-OpenCouncil, never fidelity-to-audio.
 Revision 1 proposed four families (F1 majority override, F2 restore singleton,
 F3 drop two-agree insertion, F4 tie control). **F2 and F3 are cut. F4 is not rerun.**
 
-## 0. Blocking audit — do this before anything else
+## 0. Blocking audit — RUN 2026-08-17, and it FAILED
 
 Codex raised a failure that would void the confirmatory claim entirely: this plan was
 designed by reading benchmark-wide oracle disagreements, error taxonomies and bucket
@@ -20,21 +21,53 @@ sizes. **If any of those calculations included the confirmation partition, those
 confirmations are already spent** — the labels influenced which family was selected,
 and splitting the data now does not restore blindness.
 
-Establish, before freezing anything:
+They did. The audit is
+[`docs/reports/2026-08-17-confirmation-audit.md`](../reports/2026-08-17-confirmation-audit.md),
+ledger record `exp-2026-08-17-confirmation-audit`.
 
-- Did the oracle counts and the majority-error taxonomy exclude confirmation meetings?
-- Did earlier experiments expose confirmation outcomes?
-- Did roster and term-list construction use confirmation references?
-- Is the split by meeting, not by window?
+| question | answer |
+|---|---|
+| Did the oracle counts and the majority-error taxonomy exclude confirmation meetings? | **No — they included them.** `column_census.py:38`, `exp_majority_taxonomy.py:365`, `exp_char_homophone.py:169` and `exp_composition.py:295` all call the bare `fusion_lab.load_substrate()`, whose only filter (`fusion_lab.py:128-138`) is the 6 sealed eval-freeze windows. All four result JSONs read `n_windows 247 / n_cities 10 / ref_tokens 74917`. |
+| Did earlier experiments expose confirmation outcomes? | **Yes, as a habit** — LOO over all 10 cities in composition-over-selection, "9 of 10 cities negative" in name-repair-on-w, "5 cities better / 4 worse" in char-vote-homophones. |
+| Did roster and term-list construction use confirmation references? | **Partly.** v1 base lists are externally sourced, but 38 error-mined candidates route to confirm cities and one v2 stoplist rule reads confirm reference frequency. Contaminates entity numbers on confirm, optimistically. |
+| Is the split by meeting, not by window? | **Yes — by city**, strictly coarser than meeting (`autoresearch.py:102-103`, `:203`). The one clean answer. |
+| Has the confirmation partition been read through the harness? | **No.** Journal: 16 registered / 16 searched, all at 153 windows, zero `CONFIRM_BATCH_FROZEN`, zero `CONFIRM_RESULT`. True of the harness, not of analyst knowledge. |
 
-If any answer is bad, the only defensible options are a genuinely untouched
-meeting-level holdout, or reporting F1 as **exploratory with no confirmatory CI**.
+**Verdict (b): CONFIRM is invalid as confirmation for F1.** Not universally poisoned —
+unusable for *this* hypothesis, because F1's eligibility class, its abstention success
+condition and the elimination of F2/F3 are each traceable to specific
+reference-conditioned numbers computed with confirmation labels in the denominator.
+The project already made this exact call once, for
+`exp-2026-08-16-overlap-speaker-arms`.
 
-Related, and probably decisive: Fable reads the harness as permitting **one
-confirmation batch, ever** — five sequential batches would carry 22.6% familywise
-error. So there is one shot, not five, and it lands on a harder partition
-(W 0.11354 there against 0.09280 on search), where a failure is ambiguous between
-overfitting and city heterogeneity.
+**(c) is refused.** All 247 windows have been through at least six reference-conditioned
+passes, so carving from them restores no information independence; the only genuinely
+unread material is the 7 sealed eval-freeze temporal-holdout windows at 2,101 reference
+tokens, where the −0.0010 ship floor is **2.1 edits** against 75 on the full substrate —
+underpowered by ~36× and sealed by a rule no arm has passed a gate to release.
+
+**Therefore, binding on everything below:**
+
+- F1 may be built and run. **No confirmation batch is frozen; no confirmation is spent.**
+  The budget stays 5 of 5 and the single available batch stays available.
+- Every F1 number is **exploratory**. Intervals are labelled descriptive — never
+  confirmatory, never gate-valid, never multiplicity-controlled. F1 may not be described
+  as having passed the ship gate whatever it measures.
+- Any entity or name number carries the term-list leak caveat in the same sentence.
+- If F1 runs, run it as a prospective-design exercise: freeze composer, prompt,
+  thresholds, abstention policy and analysis before evaluating; ablate the leaky term
+  resources out; report abstentions, failures, net edits and per-city heterogeneity; use
+  the output for effect-size and power planning against a future sealed set.
+
+Related, and settled by the same audit: Fable's reading is **correct** — the harness
+permits **one confirmation batch, ever** per `PROTOCOL_VERSION`
+(`freeze_confirmation_batch` raises if any batch record exists,
+`autoresearch.py:819-825`), holding at most 5 ideas (`CONFIRM_BUDGET = 5`, `:112`). The
+harness report's "budget of 5" means five ideas inside that one batch and says so
+explicitly at `:67-73`; the five-sequential-batches / 22.6% scenario is what the code
+forbids, so there is no conflict. Moot for F1 either way: the one shot is not being
+taken, and it would have landed on a harder partition (W 0.11354 there against 0.09280
+on search) where a failure is ambiguous between overfitting and city heterogeneity.
 
 ## 1. Why F3 was cut — the plan's disqualifying flaw
 
@@ -196,8 +229,8 @@ reports call it "optimistic and leaky".
 
 Wall-clock is the binding constraint, not confirmations. Drop in this order: F3
 (already cut), F2 (already cut), all prompt and model variants, any name-weighted
-optimization, a new F4 run. **If the §0 audit fails, drop the confirmatory claim too**
-and report F1 as exploratory only.
+optimization, a new F4 run. **The §0 audit failed, so the confirmatory claim is already
+dropped** — F1 is exploratory only, whatever else survives the clock.
 
 F4's existing number (W 0.10046 → W+L 0.10024) is quoted as the control. It is not
 rerun: an improved F4 is a new arm, not a control.

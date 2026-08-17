@@ -9,6 +9,14 @@ hindsight. None of it is an achievable gain, none of it may be quoted as one, an
 nothing here went through a promotion gate — the autoresearch confirmation partition
 was not read.
 
+**Erratum, 2026-08-17.** That last clause is true only of the harness API, which this
+report never called. It is **false** as a claim about the labels: `load_substrate()` has
+no city filter, so every count here spans all 247 windows and all 10 cities, including
+the four sealed confirmation cities and their 27,665 reference tokens. Anything selected
+by reading the numbers below cannot afterwards claim a confirmatory CI on that
+partition. See [`2026-08-17-confirmation-audit.md`](2026-08-17-confirmation-audit.md)
+(`exp-2026-08-17-confirmation-audit`).
+
 `exp-2026-08-16-char-vote-homophones` found that a hindsight replay over
 `exact_2_of_3` columns closes **25.0%** of the 5.30-point gap between W (0.1005) and
 the alignment-conditional column oracle (0.0475) — twice what every unresolved column
@@ -235,7 +243,9 @@ losses are downstream of the lexicon.
   passes is not removed by a design being descriptive.
 - The 6 sealed temporal-holdout windows of `eval-freeze-2026-08` were removed by the
   same explicit filter before anything was computed, and the autoresearch confirmation
-  partition was not read.
+  **API** was not called. **Erratum 2026-08-17:** that is not the same as the partition
+  being unread. Its four cities' labels are in every count here — see the erratum at the
+  top and [`2026-08-17-confirmation-audit.md`](2026-08-17-confirmation-audit.md).
 - Agreement-with-OpenCouncil, not fidelity-to-audio. The "reference word" throughout
   is the OpenCouncil published text, and nobody listened to the audio for this report.
 - The class labels are text heuristics: closed word lists for function words, numerals

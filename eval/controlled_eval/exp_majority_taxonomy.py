@@ -9,8 +9,16 @@ unresolved columns hold. Three arms that tried to override such majorities all m
 WER worse. Nobody had ever looked at WHAT the errors are. This script looks.
 
 IT IS DESCRIPTIVE. Every outcome, gain and replay here is computed WITH the reference
-text. None of it is an achievable gain, no threshold is fitted, nothing is promoted,
-and the autoresearch confirmation partition is untouched.
+text. None of it is an achievable gain, no threshold is fitted, nothing is promoted.
+
+CORRECTED 2026-08-17 (exp-2026-08-17-confirmation-audit). This docstring used to end
+"and the autoresearch confirmation partition is untouched." That was WRONG in the sense
+that matters. `load_substrate()` below has no city filter: all 247 windows and all 10
+cities enter every count here, so 27,665 of the 74,917 reference tokens belong to the
+four sealed confirmation cities. The harness API was never called - that much is true -
+but the confirmation labels ARE in these numbers, and a hypothesis selected by reading
+them cannot afterwards be confirmed on that partition.
+See docs/reports/2026-08-17-confirmation-audit.md.
 
 `msa.py` IS NOT TOUCHED. `fusion_lab._cache_path()` keys the 9 MB alignment cache on
 the sha256 of `msa.py`, so adding an attribution helper there silently invalidates it

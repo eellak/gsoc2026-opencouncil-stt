@@ -1,6 +1,6 @@
 # Current Work
 
-Last updated: 2026-08-16
+Last updated: 2026-08-17
 
 **The endgame plan is finished.** All four workstreams of
 [`docs/specs/2026-08-11-endgame-handoff-plan.md`](docs/specs/2026-08-11-endgame-handoff-plan.md)
@@ -189,6 +189,23 @@ have released them.
 
 ## Recently changed
 
+- `exp-2026-08-17-confirmation-audit` closed: **the autoresearch confirmation partition
+  is invalid as confirmation for the LLM-composer family F1, and no confirmation is
+  spent.** F1 was selected by reading oracle counts, the majority-error taxonomy and the
+  "25% of the gap" figure — all computed by scripts that call `fusion_lab.load_substrate()`
+  bare, which has no city filter, so all four result JSONs read `n_windows 247 /
+  n_cities 10` and 27,665 confirmation tokens are in every denominator. Earlier
+  experiments quoted per-city outcomes over all 10 cities as a habit. The harness itself
+  is clean (journal: 16 registered / 16 searched, all at 153 windows, zero
+  `CONFIRM_BATCH_FROZEN`) and the split is by **city**, coarser than meeting, so nothing
+  straddles — but "never read" is true of the harness, not of analyst knowledge. A fresh
+  holdout cannot be carved: the only unread material is the 7 sealed eval-freeze windows
+  at 2,101 tokens, where the ship floor is 2.1 edits against 75. **F1 may run, reports
+  exploratory results only, no confirmatory CI, budget stays 5 of 5.** Settled beside it:
+  the harness permits **one** confirmation batch ever per `PROTOCOL_VERSION`, holding at
+  most 5 ideas — the report's "budget of 5" is the per-batch idea count and the code
+  refuses a second batch outright.
+  [`docs/reports/2026-08-17-confirmation-audit.md`](docs/reports/2026-08-17-confirmation-audit.md).
 - `exp-2026-08-11-name-repair` closed: **the project's one measured positive survives
   its substrate change, and the coverage story that would have killed it was wrong.**
   Arm E on W: 0.10046 → 0.09971, −0.00075 [−0.00109, −0.00044], preregistered
