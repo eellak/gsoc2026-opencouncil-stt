@@ -1,0 +1,224 @@
+{
+ "experiment": "exp-2026-08-17-run2-local",
+ "seed_confound_caveat": "RUN2 differs from the control in BOTH the data mixture AND the random seed - 101 against 13. The measured per-seed WER spread in this project is 2.1 points, larger than any difference this comparison can resolve. Therefore no difference found here may be attributed to the mixture. This is a hard limit, not a footnote.",
+ "summary": "RUN2 differs from the control in BOTH the data mixture AND the random seed - 101 against 13. The measured per-seed WER spread in this project is 2.1 points, larger than any difference this comparison can resolve. Therefore no difference found here may be attributed to the mixture. This is a hard limit, not a footnote. Local CPU re-measurement: RUN2 stage-2 versus artifact-adapter-fixed, with deletions reported first-class.",
+ "scope": {
+  "windows": 39,
+  "meetings": 31,
+  "holdout_windows_touched": 0,
+  "locked_evaluation_windows_touched": 0,
+  "metric": "agreement-with-OpenCouncil using the frozen scorer"
+ },
+ "artifacts": {
+  "control": {
+   "artifact_id": "artifact-adapter-fixed",
+   "adapter_path": "/home/harold/oc-asr-serve/adapter-fixed-2026-08-01",
+   "adapter_model_sha256": "ea8f03230846888fa7e4c341813efea324cf5596e689da2d48b1de365eb0a5a6",
+   "adapter_hash_verified_against": "research/ledger.json",
+   "ct2_path": "/home/harold/oc-asr-serve/ct2-fixed",
+   "ct2_model_bin_sha256": "8a1a3b257d0c1bdb71877f36db902a46c14697ff587766b91d6c47973f8fb85b",
+   "ct2_hash_verified_against": "research/ledger.json"
+  },
+  "run2_stage2": {
+   "artifact_id": "run2-stage2-adapter-seed101",
+   "adapter_path": "/home/harold/.cache/oc-public/train-screens-2026-08/run2-artifacts/stage2-adapter",
+   "adapter_model_sha256": "730121a0161aef781f6dee55903cf8f8cf4676d0574b8ec5b4244a8768547fcd",
+   "adapter_hash_verified_against": "/home/harold/.cache/oc-public/train-screens-2026-08/run2-artifacts/pod-sha256.txt",
+   "ct2_path": "/home/harold/oc-run2-stage2/ct2",
+   "ct2_model_bin_sha256": "444de4e963742227654a39bb3eabac45541279177ce59b69ff4669d7787e0cac",
+   "ct2_hash_verified_against": "docs/reports/2026-08-16-screens-eval.md",
+   "build": {
+    "status": "reused_verified_existing",
+    "path": "/home/harold/oc-run2-stage2/ct2"
+   }
+  }
+ },
+ "run2_training_identity": {
+  "seed": 101,
+  "n_train": 42204,
+  "max_steps": 10552,
+  "epochs": 2,
+  "lora_r": 32,
+  "label_semantics": "decoder_start_v2"
+ },
+ "decode_config": {
+  "language": "el",
+  "beam_size": 5,
+  "condition_on_previous_text": false,
+  "word_timestamps": false,
+  "vad_filter": false,
+  "task": "transcribe",
+  "temperature": [
+   0.0,
+   0.2,
+   0.4,
+   0.6,
+   0.8,
+   1.0
+  ],
+  "no_speech_threshold": 0.6,
+  "log_prob_threshold": -1.0,
+  "compression_ratio_threshold": 2.4
+ },
+ "threads_used": {
+  "current_process_max": 6,
+  "decoded_cache_threads": 16,
+  "decodes_concurrent": false
+ },
+ "stack": {
+  "device": "cpu",
+  "compute_type": "int8",
+  "threads_used": 6,
+  "sequential": true,
+  "cache_source": "complete verified local CPU decode caches",
+  "cached_decode_threads": 16,
+  "note": "Complete CPU caches were reused. Their producing screen report records CPU int8 with 16 threads for both arms; this process used at most 6 threads and did not run concurrent decoding."
+ },
+ "per_arm": {
+  "control_artifact-adapter-fixed": {
+   "rates": {
+    "substitutions": 938,
+    "deletions": 715,
+    "insertions": 240,
+    "ref_tokens": 11911,
+    "wer": 0.1589287213500126,
+    "deletion_rate": 0.06002854504239778,
+    "insertion_rate": 0.020149441692553102,
+    "substitution_rate": 0.07875073461506171
+   },
+   "known_cached_stack_wer": 0.1589
+  },
+  "run2-stage2": {
+   "rates": {
+    "substitutions": 801,
+    "deletions": 900,
+    "insertions": 194,
+    "ref_tokens": 11911,
+    "wer": 0.1590966333641172,
+    "deletion_rate": 0.07556040634707413,
+    "insertion_rate": 0.01628746536814709,
+    "substitution_rate": 0.06724876164889598
+   }
+  }
+ },
+ "paired_difference": {
+  "direction": "run2-stage2 minus control artifact-adapter-fixed",
+  "bootstrap": {
+   "replicates": 4000,
+   "seed": 7,
+   "clusters": "meeting_id"
+  },
+  "metrics": {
+   "wer": {
+    "delta": 0.00016791201410459866,
+    "ci95": [
+     -0.012438684622447037,
+     0.016495945509820125
+    ],
+    "excludes_zero": false,
+    "n_clusters": 31
+   },
+   "deletion_rate": {
+    "delta": 0.015531861304676348,
+    "ci95": [
+     0.0015592068141083416,
+     0.03410973267864898
+    ],
+    "excludes_zero": true,
+    "n_clusters": 31
+   },
+   "insertion_rate": {
+    "delta": -0.003861976324406012,
+    "ci95": [
+     -0.009928832971392463,
+     0.0009730415149303793
+    ],
+    "excludes_zero": false,
+    "n_clusters": 31
+   },
+   "substitution_rate": {
+    "delta": -0.01150197296616573,
+    "ci95": [
+     -0.018573390502207937,
+     -0.006166233092051588
+    ],
+    "excludes_zero": true,
+    "n_clusters": 31
+   }
+  }
+ },
+ "single_item_domination": {
+  "performed": true,
+  "method": "leave-one-window-out and net-error contribution",
+  "metrics": {
+   "wer": {
+    "full_delta": 0.00016791201410460918,
+    "largest_net_error_share": 31.5,
+    "largest_net_error_share_window": "win_argos_sep10_2025_573077",
+    "delta_without_largest_shift_window": -0.005296058343462406,
+    "largest_shift_window": "win_argos_sep10_2025_573077",
+    "sign_reversed_by": [
+     "win_argos_apr24_2026_1015557",
+     "win_argos_aug29_2025_2731295",
+     "win_argos_feb6_2026_2558764",
+     "win_argos_mar10_2026_365531",
+     "win_argos_may22_2026_1650387",
+     "win_argos_nov11_2025_2213920",
+     "win_argos_nov26_2025_2806748",
+     "win_argos_sep10_2025_573077",
+     "win_orestiada_apr27_2026_6555813",
+     "win_orestiada_apr28_3_2026_1291909",
+     "win_orestiada_apr7_2026_3737815",
+     "win_orestiada_dec11_2025_600052",
+     "win_orestiada_feb11_2026_149776"
+    ]
+   },
+   "deletion_rate": {
+    "full_delta": 0.01553186130467635,
+    "largest_net_error_share": 0.31351351351351353,
+    "largest_net_error_share_window": "win_argos_sep10_2025_573077",
+    "delta_without_largest_shift_window": 0.011026219829831568,
+    "largest_shift_window": "win_argos_sep10_2025_573077",
+    "sign_reversed_by": []
+   },
+   "insertion_rate": {
+    "full_delta": -0.003861976324406011,
+    "largest_net_error_share": 0.5,
+    "largest_net_error_share_window": "win_orestiada_mar23_2026_6383163",
+    "delta_without_largest_shift_window": -0.0019822459708696027,
+    "largest_shift_window": "win_orestiada_mar23_2026_6383163",
+    "sign_reversed_by": []
+   },
+   "substitution_rate": {
+    "full_delta": -0.01150197296616573,
+    "largest_net_error_share": 0.19708029197080293,
+    "largest_net_error_share_window": "win_argos_dec23_2025_581922",
+    "delta_without_largest_shift_window": -0.009429110234870563,
+    "largest_shift_window": "win_argos_dec23_2025_581922",
+    "sign_reversed_by": []
+   }
+  },
+  "warning": "A delta is not quoted as a model improvement when its sign or magnitude is supplied by one window."
+ },
+ "deletion_watch": {
+  "previous_screen_caveat": "RUN2 previously raised deletion rate (0.0756 against control 0.0600, with a CI excluding zero); deletions are watched explicitly because a lower WER achieved by omitting hard passages is worse.",
+  "run2_rate": 0.07556040634707413,
+  "control_rate": 0.06002854504239778
+ },
+ "known_stack_comparison": {
+  "control_local_wer": 0.1589287213500126,
+  "control_known_cached_stack_wer": 0.1589,
+  "known_cached_gpu_vs_local_symmetric_edit_rate": 0.0926,
+  "note": "0.0926 is the previously measured symmetric normalized edit rate for cached GPU versus local CPU int8 at wt=False, not a WER delta."
+ },
+ "wall_clock": {
+  "command_seconds": 5.165,
+  "cached_decode_seconds": {
+   "control": 3827.0,
+   "run2_stage2": 3348.3
+  }
+ },
+ "blockers": [
+  "The ledger has no artifact record for RUN2 stage-2; its full adapter hash was verified against the preserved pod attestation instead."
+ ]
+}

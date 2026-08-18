@@ -1502,6 +1502,76 @@
         "A subagent of this pass modified eval/controlled_eval/msa.py, whose sha256 is the alignment cache key; it was reverted and the key verified back at align_65b1c4d64618a429."
       ],
       "decision": "Use it as an index, not as evidence. Its citations are reliable; its own two measurements are not, and one was wrong by a factor of four. Do not reopen a direction it ranks without re-reading the source record. Its top-ranked item ran and confirmed (exp-2026-08-17-name-repair-on-w); its fifth ran and reshaped the picture (exp-2026-08-17-majority-error-taxonomy). No further archaeology pass is needed for this cycle."
+    },
+    {
+      "id": "exp-2026-08-18-conf-substrate",
+      "title": "A fusion substrate whose adapter row carries its own per-word confidence",
+      "question": "Every confidence this project holds came from a different decoding pass than the text inside W, so none of it can be attached to the columns the arbiter asks about. Can we stop needing a join by decoding once and keeping text and probabilities together?",
+      "status": "CLOSED",
+      "conclusion": "THE JOIN WAS MEASURED AND IT DOES NOT EXIST. Same model, same frozen config, wt=False: 0 of 133 windows reproduce the benchmark text; token agreement 92.1%, worst window 59%. This matches exp-2026-08-16-adapter-confidence from the other direction (cached RunPod GPU vs local CPU int8, 0.0926 symmetric WER, 2 of 102 windows identical). The columns the arbiter asks about are the UNSTABLE ones, so they concentrate inside the 8% that does not match: coverage would be low AND systematically biased where it matters. | THE REBUILD WORKED: 247/247 windows decoded locally on CPU int8 at the frozen CONTROL config with word_timestamps=True, per-word {w,s,e,p} persisted with segment avg_logprob, no_speech_prob and temperature. W-conf baseline WER 0.10109, deletion 0.02022, insertion 0.03788. Adapter confidence is defined on 73,560 of 80,717 columns = 91.1%. | THIS IS A SEPARATE BASELINE, NOT AN IMPROVEMENT: the re-decoded adapter row differs from the benchmark's by roughly 8%, so this is a different W and must be reported beside 0.10046, never as a delta. | The probabilities have real travel - 0.523 on a word heard badly against 0.997 on a clear one - unlike the LLM's self-reported confidence, which sits at 98-99 in 81% of answers.",
+      "decision": "Use W-conf as the substrate for any confidence-routed arm. Never compare its WER to the old W as a delta.",
+      "artifact_ids": [
+        "artifact-ct2-fixed",
+        "artifact-adapter-fixed"
+      ],
+      "capability_ids": [],
+      "reports": [
+        "docs/reports/2026-08-18-confidence-substrate.md"
+      ],
+      "specs": [
+        "docs/specs/2026-08-17-confidence-bearing-substrate.md"
+      ],
+      "superseded_by": null,
+      "next_action": null,
+      "updated_at": "2026-08-18T11:00:00Z",
+      "caveats": [
+        "Soniox stays out: its per-word confidence exists only on stt-rt-v4 text, not the stt-async-v5 text W is built on. User decision 2026-08-18: do not merge the two.",
+        "exp-2026-08-16-adapter-confidence's ceiling still applies: deletions are 41.1% of edit operations and a per-word confidence cannot attach to a word that was never emitted. Confidence is a route to substitutions, not to deletions.",
+        "Output is verbatim council speech and lives only under ~/.cache/oc-public/conf-substrate-2026-08/."
+      ]
+    },
+    {
+      "id": "exp-2026-08-18-chunking-aware-decoding",
+      "title": "Do our deletions come partly from where the audio is cut",
+      "question": "Whisper decodes in 30-second windows and our frozen config places those boundaries blind (vad_filter=false). Deletions form a U inside each window. Does cutting at silence instead recover speech?",
+      "status": "OPEN",
+      "conclusion": "ARM V (vad_filter=True), 247 windows, both arms decoded on ONE GPU in ONE session from the same lossless audio with the same model binary (sha256[:16] 8a1a3b257d0c1bdb verified on both machines), only vad_filter differing: WER 0.14233 -> 0.13905, delta -0.00328, CI [-0.00657, -0.00016], EXCLUDES ZERO. Insertions -0.00259 [-0.00464, -0.00077], also excludes zero. Deletions -0.00004, substitutions -0.00065, both include zero. | THE MECHANISM IS NOT THE HYPOTHESIS. Correct recall (1-(S+D)/N) moves 0.88167 -> 0.88236, delta -0.00069 with a CI spanning zero: no speech was recovered. Emitted tokens fall 73,199 -> 73,008. The gain is entirely LESS HALLUCINATION in non-speech regions, not less omission. | THEREFORE THE PREREGISTERED GATE FAILS: its primary metric is the deletion rate and deletions did not move. The deletion hypothesis is refuted; a different, unpreregistered effect is confirmed on 6.3x more tokens than the 39-window run. | ARM P, FIRST ATTEMPT, INVALID: the splitter cut at every reported silence and re-entered the same silence, taking the midpoint of [cursor, silence.end] so each pass advanced by half the remainder. A 148 s window produced 149 pieces of 9.38/0.51/0.26/0.13/0.064 s. Insertions went 0.02015 -> 0.07657. Its apparent deletion drop of -0.01352 is NOT recovery: (S+D)/N rose 0.13878 -> 0.14037 and the hypothesis grew from 0.96 to 1.03 words per reference word, so Levenshtein converted D+I into S. Replaced by split_accumulating (accumulate-then-cut, reviewed by gpt-5.6-sol): 5-8 pieces per window, min 5.38 s, median 22.75 s, zero pieces under 5 s, all counters zero on all 39 windows.",
+      "decision": "Arm V's WER gain is real but was not the preregistered primary, so it needs its own preregistration before it can ship. Do not quote it as a passed gate.",
+      "artifact_ids": [
+        "artifact-ct2-fixed"
+      ],
+      "capability_ids": [
+        "cap-runpod-gpu-pod"
+      ],
+      "reports": [],
+      "specs": [
+        "docs/specs/2026-08-17-chunking-aware-decoding-prereg.md"
+      ],
+      "superseded_by": null,
+      "next_action": "Score the re-run arm P, then arms PI and E, under the frozen gate. Report (S+D)/N alongside every deletion claim.",
+      "updated_at": "2026-08-18T13:00:00Z",
+      "caveats": [
+        "The 39-window and 247-window numbers come from different stacks (local CPU int8 vs pod GPU fp16) and must never be mixed; within each, both arms share one stack.",
+        "The harness measures agreement with OpenCouncil's published text. An arm that recovers speech the published text omits is scored as an insertion and punished, so a passing arm is credible while a failing arm is ambiguous.",
+        "eval/deletion_position.py froze the 2.0x tail-enrichment bar in code before looking; measured 1.60 (control) and 1.54 (RUN2), so premature EOS was refuted, not confirmed."
+      ]
+    },
+    {
+      "id": "exp-2026-08-17-served-config-and-july-adapter",
+      "status": "OPEN",
+      "opened": "2026-08-17",
+      "question": "What does the configuration we actually serve score, and does the July adapter beat the corrected one on the same stack?",
+      "conclusion": "INCOMPLETE - NO NUMBER MAY BE QUOTED FROM THIS RECORD YET. The design is frozen and four of five arms are decoded on the 39 frozen validation windows (R, S1, S2, J = 39/39), but arm RW stopped at 18/39 when it was paused for the chunking work, its process is gone, and NO SCORING HAS BEEN RUN: there is no results.json and the report's numbers section is still a placeholder. The interaction estimand (S2-S1)-(RW-R) is therefore unavailable, which is the whole point of arm RW. | WHAT IS ESTABLISHED WITHOUT SCORING, and it is not small: (1) THE MEASUREMENT BUG. notebooks/decode_ablation.py stored a window as ''.join(segment.text), and faster-whisper omits the leading space on 505 of 1,677 boundaries, so that join fuses the last word of one segment into the first of the next - at exactly the boundaries word_timestamps moves. Production does seg.text.strip() then ' '.join. Hypotheses here are built per segment, token-identical to the server. The two cached pre-existing arms stored only the fused string, cannot be repaired, and are exploratory forever. (2) PROVENANCE ANSWERS B BEFORE COMPUTE. artifact-adapter-july-broken is KNOWN_BROKEN for the label-prefix bug; both binaries were re-hashed on disk against the ledger before any decode (ct2-fixed 8a1a3b257d0c1bdb, ct2-july-broken dfffde80906f2cd5, adapter ff3ba0b334551ed3, all matching). The prior on these same 39 windows is -1.58 [-2.41,-0.85] at 90%, but off a CUDA pod with a server-side normalizer, so it is a prior and not a baseline. A guard sentence is emitted into the results JSON so it cannot be separated from the number: a July win would say only that this broken binary scored better here. (3) THE CONVERSION LADDER WAS AUDITED INSTEAD OF RUN, AND THE AUDIT IS THE FINDING. eval/controlled_eval/conversion_ladder.py named three different lineages in its defaults - rung 2 corrected, rungs 3 and 4 July-broken - so a gap at rung 3 would have read as a merge bug when it was a different adapter. Defaults corrected to merged-fixed and ct2-fixed. Three limits are documented and NOT fixed: no CT2 fp16 rung, so rung 4 moves runtime+decoder+quantization at once; 'pairs' counts two different things across rungs; the HF rungs are greedy while the CT2 rung inherits the temperature-fallback ladder. And the premise needs correcting: the 22.66-vs-28.18 asymmetry that motivates the ladder was measured on artifact-adapter-july-broken with the training gnorm, and has never been checked on the corrected adapter. | WHAT THIS IS NOT: a production emulation. Threads held at 16, not the served 8; OC_ASR_MAX_INFER_SEC=150 not emulated; no queueing. A Codex review before any decode forced all three of those disclaimers and rejected reusing the cached 2026-08-12 control as a causal baseline.",
+      "next_action": "Resume arm RW from its 18 decoded windows to 39, then score all five arms. Cheap first step for part C is instead the n=300 decomposition re-run on artifact-adapter-fixed under both harnesses (~2 h CPU): if the asymmetry is gone, the ladder is moot and its 6-10 h is not worth funding.",
+      "reports": [
+        "docs/reports/2026-08-17-served-config-and-july-adapter.md"
+      ],
+      "specs": [],
+      "artifacts": [
+        "artifact-ct2-fixed",
+        "artifact-ct2-july-broken",
+        "artifact-adapter-july-broken"
+      ]
     }
   ],
   "artifacts": [

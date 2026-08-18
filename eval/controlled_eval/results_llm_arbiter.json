@@ -1,0 +1,1057 @@
+{
+ "stamp": "EXPLORATORY_CONTAMINATED_NOT_CONFIRMATORY",
+ "failed_audit": "exp-2026-08-17-confirmation-audit",
+ "standing": "EXPLORATORY. No confirmation batch frozen, no confirmation spent, budget stays 5 of 5. Every interval below is DESCRIPTIVE - never confirmatory, never gate-valid, never multiplicity-controlled. F1 did not and could not pass a ship gate.",
+ "prereg": "docs/specs/2026-08-17-llm-f1-arbiter-prereg.md",
+ "batch_size": 999,
+ "seal": {
+  "n_questions": 6645,
+  "sha256": "9cd45839449fa24a50b79ea55d60c45475abf218a8ec8890dbae048c60e1f73f"
+ },
+ "decision_sha256": "6a8d81d0a0b4acc9057cfd32f7b2193ae2f0eb990aff6fc58cac9b273917a434",
+ "align_cache": "align_65b1c4d64618a429.json",
+ "model": {
+  "model": "gpt-5.6-luna",
+  "effort": "high",
+  "prompt_version": "f1-arbiter-2026-08-17a",
+  "seed": 17,
+  "n_jobs": 0,
+  "wall_s": 0.0,
+  "accounting": {}
+ },
+ "eligibility": {
+  "n_eligible_columns": 6645,
+  "rule": "column_class == exact_2_of_3, reference-blind by signature",
+  "split_merge_stratum": 133
+ },
+ "outcomes": {
+  "abstain_explicit": 1364,
+  "confirm": 3943,
+  "override": 1021,
+  "order_disagree": 317
+ },
+ "rates": {
+  "explicit_abstention_rate": 0.20526711813393528,
+  "order_instability_rate": 0.04770504138449962,
+  "invalid_rate": 0.0,
+  "override_rate": 0.15364936042136945,
+  "confirm_rate": 0.5933784800601957,
+  "operational_non_decision_rate": 0.25297215951843494,
+  "denominator": 6645,
+  "note": "only `confirm` and `override` are valid model decisions. An `invalid` or an `order_disagree` leaves W unchanged but is NOT evidence of knowing abstention."
+ },
+ "application_invariant": {
+  "override_decisions": 1021,
+  "overrides_applied": 1021,
+  "mapping_failures": 0,
+  "collisions": 0,
+  "ok": true
+ },
+ "primary_wer": {
+  "idea": "F1_llm_arbiter",
+  "fold": "city",
+  "fitted": false,
+  "fold_note": "out-of-fold == in-fold by construction: this idea fits no parameter",
+  "n_windows": 247,
+  "n_folds": 10,
+  "windows_changed_vs_W": 236,
+  "out_of_fold": {
+   "S": 3781,
+   "D": 1520,
+   "I": 2802,
+   "ref_tokens": 74917,
+   "wer": 0.10815969673104903,
+   "del_rate": 0.02028911995942176,
+   "ins_rate": 0.03740139087256564,
+   "sub_rate": 0.05046918589906163
+  },
+  "baseline_W": {
+   "S": 3200,
+   "D": 1522,
+   "I": 2804,
+   "ref_tokens": 74917,
+   "wer": 0.10045784000961064,
+   "del_rate": 0.020315816169894682,
+   "ins_rate": 0.03742808708303856,
+   "sub_rate": 0.04271393675667739
+  },
+  "baseline_V": {
+   "S": 3833,
+   "D": 1849,
+   "I": 3317,
+   "ref_tokens": 74917,
+   "wer": 0.1201195990229187,
+   "del_rate": 0.024680646582217653,
+   "ins_rate": 0.044275665069343405,
+   "sub_rate": 0.051163287371357634
+  },
+  "oracle_column": {
+   "S": 1397,
+   "D": 1177,
+   "I": 983,
+   "ref_tokens": 74917,
+   "wer": 0.04747921032609421,
+   "del_rate": 0.015710719863315403,
+   "ins_rate": 0.013121187447441836,
+   "sub_rate": 0.018647303015336972
+  },
+  "vs_W": {
+   "wer": {
+    "delta": 0.007701856721438388,
+    "ci95": [
+     0.006783908107282242,
+     0.00878369224569875
+    ],
+    "excludes_zero": true,
+    "n_clusters": 144
+   },
+   "sub_rate": {
+    "delta": 0.007755249142384242,
+    "ci95": [
+     0.006844476130557605,
+     0.008795132770542764
+    ],
+    "excludes_zero": true,
+    "n_clusters": 144
+   },
+   "del_rate": {
+    "delta": -2.6696210472923476e-05,
+    "ci95": [
+     -0.00011972183156070131,
+     3.974327235713632e-05
+    ],
+    "excludes_zero": false,
+    "n_clusters": 144
+   },
+   "ins_rate": {
+    "delta": -2.6696210472923476e-05,
+    "ci95": [
+     -0.00011972183156070131,
+     3.974327235713632e-05
+    ],
+    "excludes_zero": false,
+    "n_clusters": 144
+   },
+   "head2head_wer": {
+    "a_better": 19,
+    "tie": 42,
+    "b_better": 186
+   }
+  },
+  "vs_V": {
+   "wer": {
+    "delta": -0.011959902291869676,
+    "ci95": [
+     -0.01479339022624778,
+     -0.008835430477490198
+    ],
+    "excludes_zero": true,
+    "n_clusters": 144
+   },
+   "sub_rate": {
+    "delta": -0.0006941014722960034,
+    "ci95": [
+     -0.0021409448050488597,
+     0.0007339301649232295
+    ],
+    "excludes_zero": false,
+    "n_clusters": 144
+   },
+   "del_rate": {
+    "delta": -0.0043915266227958945,
+    "ci95": [
+     -0.006209996316448162,
+     -0.0028883454155974935
+    ],
+    "excludes_zero": true,
+    "n_clusters": 144
+   },
+   "ins_rate": {
+    "delta": -0.006874274196777767,
+    "ci95": [
+     -0.009345593900889758,
+     -0.00390833889098847
+    ],
+    "excludes_zero": true,
+    "n_clusters": 144
+   },
+   "head2head_wer": {
+    "a_better": 166,
+    "tie": 24,
+    "b_better": 57
+   }
+  },
+  "gates": {
+   "del_rate_gate": {
+    "W": 0.020315816169894682,
+    "arm": 0.02028911995942176,
+    "pass": true
+   },
+   "ins_rate_gate": {
+    "W": 0.03742808708303856,
+    "arm": 0.03740139087256564,
+    "pass": true
+   },
+   "wer_ci_excludes_zero": true,
+   "wer_improves": false,
+   "loo_sign_stable": true,
+   "all_pass": false
+  },
+  "loo_vs_W": {
+   "window": {
+    "full": 0.007701856721438392,
+    "min": 0.007604664551284626,
+    "min_group": "win_sparta_apr15_2026_450008",
+    "max": 0.007758378110386043,
+    "max_group": "win_athens_jan14_2026_11332020",
+    "n_groups": 247,
+    "sign_flips": 0
+   },
+   "meeting": {
+    "full": 0.007701856721438392,
+    "min": 0.007593983951828604,
+    "min_group": "apr15_2026",
+    "max": 0.007876172864872268,
+    "max_group": "feb11_2026",
+    "n_groups": 144,
+    "sign_flips": 0
+   },
+   "city": {
+    "full": 0.007701856721438392,
+    "min": 0.007333001716917251,
+    "min_group": "athens",
+    "max": 0.007920012596441506,
+    "max_group": "chania",
+    "n_groups": 10,
+    "sign_flips": 0
+   }
+  },
+  "oracle_recovery_vs_W": -0.1453766691861929,
+  "per_city": {
+   "per_city": {
+    "argos": {
+     "n_windows": 18,
+     "ref_tokens": 5149,
+     "wer_arm": 0.1495436006991649,
+     "wer_W": 0.14022140221402213,
+     "delta": 0.009322198485142746
+    },
+    "athens": {
+     "n_windows": 40,
+     "ref_tokens": 12596,
+     "wer_arm": 0.12091140044458558,
+     "wer_W": 0.11138456652905684,
+     "delta": 0.00952683391552874
+    },
+    "chalandri": {
+     "n_windows": 18,
+     "ref_tokens": 5468,
+     "wer_arm": 0.0696781272860278,
+     "wer_W": 0.06419166057059254,
+     "delta": 0.005486466715435259
+    },
+    "chania": {
+     "n_windows": 40,
+     "ref_tokens": 11407,
+     "wer_arm": 0.10625054790917858,
+     "wer_W": 0.09976330323485579,
+     "delta": 0.006487244674322784
+    },
+    "orestiada": {
+     "n_windows": 19,
+     "ref_tokens": 6142,
+     "wer_arm": 0.08677955063497232,
+     "wer_W": 0.07847606642787365,
+     "delta": 0.008303484207098664
+    },
+    "samothraki": {
+     "n_windows": 19,
+     "ref_tokens": 5737,
+     "wer_arm": 0.17901342164894543,
+     "wer_W": 0.16907791528673521,
+     "delta": 0.009935506362210215
+    },
+    "sparta": {
+     "n_windows": 38,
+     "ref_tokens": 11267,
+     "wer_arm": 0.09150616845655454,
+     "wer_W": 0.08413952249933435,
+     "delta": 0.0073666459572202005
+    },
+    "vrilissia": {
+     "n_windows": 18,
+     "ref_tokens": 6002,
+     "wer_arm": 0.09196934355214928,
+     "wer_W": 0.08497167610796401,
+     "delta": 0.006997667444185272
+    },
+    "xylokastro": {
+     "n_windows": 19,
+     "ref_tokens": 5512,
+     "wer_arm": 0.0985123367198839,
+     "wer_W": 0.09089259796806967,
+     "delta": 0.007619738751814224
+    },
+    "zografou": {
+     "n_windows": 18,
+     "ref_tokens": 5637,
+     "wer_arm": 0.09419904204364024,
+     "wer_W": 0.08887706226716338,
+     "delta": 0.005321979776476849
+    }
+   },
+   "cities_better": 0,
+   "cities_worse": 10,
+   "cities_unchanged": 0,
+   "city_unweighted_mean_delta": 0.007636776628943495
+  },
+  "fold_params": {
+   "argos": null,
+   "athens": null,
+   "chalandri": null,
+   "chania": null,
+   "orestiada": null,
+   "samothraki": null,
+   "sparta": null,
+   "vrilissia": null,
+   "xylokastro": null,
+   "zografou": null
+  }
+ },
+ "named_entity_error_rate": {
+  "F1": {
+   "S": 210,
+   "D": 24,
+   "I": 27,
+   "N": 834,
+   "errors": 261,
+   "ds_wer": 0.3129496402877698
+  },
+  "W": {
+   "S": 195,
+   "D": 23,
+   "I": 26,
+   "N": 834,
+   "errors": 244,
+   "ds_wer": 0.29256594724220625
+  },
+  "cities_covered": [
+   "argos",
+   "athens",
+   "chalandri",
+   "chania",
+   "orestiada",
+   "samothraki",
+   "sparta",
+   "vrilissia",
+   "xylokastro",
+   "zografou"
+  ],
+  "caveat": "term lists mined from material overlapping this benchmark; the source reports call them optimistic and leaky (docs/reports/2026-08-17-majority-error-taxonomy.md:229)"
+ },
+ "buckets": {
+  "eligible": {
+   "morphology": 1012,
+   "function_word": 1128,
+   "other_content": 3107,
+   "numeric": 1156,
+   "name_entity": 242
+  },
+  "override": {
+   "other_content": 474,
+   "numeric": 179,
+   "morphology": 167,
+   "name_entity": 31,
+   "function_word": 170
+  },
+  "confirm": {
+   "other_content": 1856,
+   "morphology": 591,
+   "function_word": 666,
+   "numeric": 682,
+   "name_entity": 148
+  },
+  "abstain_explicit": {
+   "morphology": 213,
+   "function_word": 234,
+   "other_content": 623,
+   "numeric": 244,
+   "name_entity": 50
+  },
+  "order_disagree": {
+   "other_content": 154,
+   "numeric": 51,
+   "name_entity": 13,
+   "morphology": 41,
+   "function_word": 58
+  },
+  "invalid": {}
+ },
+ "bucket_precedence": [
+  "name_entity",
+  "numeric",
+  "morphology",
+  "function_word",
+  "other_content"
+ ],
+ "domination": {
+  "total_abs_edit_movement": 617,
+  "largest_meeting_share": 0.024311183144246355,
+  "n_meetings_moved": 134,
+  "largest_window_share": 0.01620745542949757
+ },
+ "partition_descriptive_only": {
+  "note": "reported for heterogeneity description ONLY. This is not a search/confirm inference and the confirm side is not a held-out test here; no confirmation is spent.",
+  "search": {
+   "n_windows": 153,
+   "ref_tokens": 47252,
+   "wer_F1": 0.10014390925251841,
+   "wer_W": 0.09280030474900533,
+   "delta": 0.0073436045035130786
+  },
+  "confirm": {
+   "n_windows": 94,
+   "ref_tokens": 27665,
+   "wer_F1": 0.12185071389842761,
+   "wer_W": 0.11353696005783481,
+   "delta": 0.008313753840592807
+  }
+ },
+ "planning": {
+  "note": "planning arithmetic for a HYPOTHETICAL future sealed evaluation. Not a test. No p-value, no significance claim, no gate result.",
+  "sign_convention": "negative delta = F1 better than W",
+  "M_meetings": 144,
+  "N_ref_tokens": 74917,
+  "net_edits_D": 577,
+  "delta_hat": 0.007701856721438392,
+  "residual_sum_squares": 1345.8673160135875,
+  "SE": 0.000491398665313983,
+  "margin_delta0": -0.001,
+  "margin_gap_delta0_minus_delta": -0.008701856721438393,
+  "z_alpha_one_sided_0.05": 1.6448536269514722,
+  "z_power_0.80": 0.8416212335729143,
+  "meetings_required_at_observed_effect": null,
+  "ref_tokens_required_at_observed_effect": null,
+  "mean_tokens_per_meeting": 520.2569444444445,
+  "mde_at_available_mass_wer": -0.0022218504277984556,
+  "mde_at_available_mass_edits": -166.4543684993769,
+  "rounding": "ceil on all cluster and token requirements",
+  "sensitivity_grid_assumed_true_effect": {
+   "-0.0015": {
+    "meetings_required": 860,
+    "ref_tokens_required": 447421
+   },
+   "-0.0020": {
+    "meetings_required": 215,
+    "ref_tokens_required": 111856
+   },
+   "-0.0030": {
+    "meetings_required": 54,
+    "ref_tokens_required": 28094
+   },
+   "-0.0040": {
+    "meetings_required": 24,
+    "ref_tokens_required": 12487
+   },
+   "-0.0050": {
+    "meetings_required": 14,
+    "ref_tokens_required": 7284
+   },
+   "-0.0075": {
+    "meetings_required": 6,
+    "ref_tokens_required": 3122
+   },
+   "-0.0100": {
+    "meetings_required": 3,
+    "ref_tokens_required": 1561
+   }
+  },
+  "per_meeting": {
+   "apr15_2026": {
+    "n_m": 516,
+    "d_m": 12
+   },
+   "apr16_2025": {
+    "n_m": 218,
+    "d_m": 2
+   },
+   "apr1_2026": {
+    "n_m": 616,
+    "d_m": 6
+   },
+   "apr1_2_2026": {
+    "n_m": 818,
+    "d_m": 7
+   },
+   "apr20_2026": {
+    "n_m": 617,
+    "d_m": 4
+   },
+   "apr20_3_2026": {
+    "n_m": 600,
+    "d_m": -1
+   },
+   "apr21_2026": {
+    "n_m": 322,
+    "d_m": 3
+   },
+   "apr22_2026": {
+    "n_m": 384,
+    "d_m": 8
+   },
+   "apr24_2026": {
+    "n_m": 635,
+    "d_m": 3
+   },
+   "apr27_2026": {
+    "n_m": 982,
+    "d_m": 14
+   },
+   "apr28_2025_2": {
+    "n_m": 207,
+    "d_m": -1
+   },
+   "apr28_2026": {
+    "n_m": 627,
+    "d_m": 3
+   },
+   "apr28_3_2026": {
+    "n_m": 315,
+    "d_m": 1
+   },
+   "apr29_2026": {
+    "n_m": 885,
+    "d_m": 5
+   },
+   "apr29_2_2026": {
+    "n_m": 920,
+    "d_m": 6
+   },
+   "apr2_2025": {
+    "n_m": 325,
+    "d_m": 3
+   },
+   "apr30_2026": {
+    "n_m": 762,
+    "d_m": 7
+   },
+   "apr30_2_2026": {
+    "n_m": 255,
+    "d_m": 0
+   },
+   "apr6_2026": {
+    "n_m": 359,
+    "d_m": 0
+   },
+   "apr7_2026": {
+    "n_m": 1567,
+    "d_m": 14
+   },
+   "aug14_2025": {
+    "n_m": 248,
+    "d_m": 4
+   },
+   "aug18_2025": {
+    "n_m": 318,
+    "d_m": 0
+   },
+   "aug27_2024": {
+    "n_m": 276,
+    "d_m": 2
+   },
+   "aug27_2025": {
+    "n_m": 392,
+    "d_m": 1
+   },
+   "aug29_2025": {
+    "n_m": 250,
+    "d_m": 4
+   },
+   "dec10_2025": {
+    "n_m": 1037,
+    "d_m": 10
+   },
+   "dec11_2025": {
+    "n_m": 309,
+    "d_m": 0
+   },
+   "dec11_2025_2": {
+    "n_m": 357,
+    "d_m": 2
+   },
+   "dec15_2025": {
+    "n_m": 610,
+    "d_m": 11
+   },
+   "dec17_2025": {
+    "n_m": 246,
+    "d_m": 3
+   },
+   "dec19_2024": {
+    "n_m": 272,
+    "d_m": 2
+   },
+   "dec22_2025": {
+    "n_m": 1385,
+    "d_m": 6
+   },
+   "dec23_2025": {
+    "n_m": 245,
+    "d_m": 2
+   },
+   "dec29_2025": {
+    "n_m": 420,
+    "d_m": 3
+   },
+   "dec2_2025": {
+    "n_m": 325,
+    "d_m": 2
+   },
+   "dec3_2025": {
+    "n_m": 932,
+    "d_m": 1
+   },
+   "dec5_2025": {
+    "n_m": 289,
+    "d_m": 7
+   },
+   "dec8_2025": {
+    "n_m": 819,
+    "d_m": 2
+   },
+   "feb11_2026": {
+    "n_m": 1912,
+    "d_m": 2
+   },
+   "feb12_2025": {
+    "n_m": 282,
+    "d_m": 2
+   },
+   "feb16_2026": {
+    "n_m": 474,
+    "d_m": 6
+   },
+   "feb17_2026": {
+    "n_m": 925,
+    "d_m": 6
+   },
+   "feb18_2_2026": {
+    "n_m": 294,
+    "d_m": 6
+   },
+   "feb19_2026": {
+    "n_m": 582,
+    "d_m": 4
+   },
+   "feb19_3_2026": {
+    "n_m": 340,
+    "d_m": 4
+   },
+   "feb24_2025": {
+    "n_m": 283,
+    "d_m": 4
+   },
+   "feb24_2026": {
+    "n_m": 622,
+    "d_m": 8
+   },
+   "feb25_2026": {
+    "n_m": 566,
+    "d_m": 7
+   },
+   "feb26_2026": {
+    "n_m": 961,
+    "d_m": 6
+   },
+   "feb26_2_2026": {
+    "n_m": 541,
+    "d_m": 2
+   },
+   "feb27_2026": {
+    "n_m": 736,
+    "d_m": 3
+   },
+   "feb27_2_2026": {
+    "n_m": 296,
+    "d_m": 2
+   },
+   "feb3_2025": {
+    "n_m": 334,
+    "d_m": 5
+   },
+   "feb4_2026": {
+    "n_m": 633,
+    "d_m": 0
+   },
+   "feb5_2025": {
+    "n_m": 331,
+    "d_m": 3
+   },
+   "feb6_2026": {
+    "n_m": 384,
+    "d_m": 3
+   },
+   "feb9_2_2026": {
+    "n_m": 271,
+    "d_m": 7
+   },
+   "jan14_2026": {
+    "n_m": 1566,
+    "d_m": 3
+   },
+   "jan19_2026": {
+    "n_m": 580,
+    "d_m": -1
+   },
+   "jan19_2_2026": {
+    "n_m": 220,
+    "d_m": 4
+   },
+   "jan20_2026": {
+    "n_m": 534,
+    "d_m": 4
+   },
+   "jan21_2026": {
+    "n_m": 1480,
+    "d_m": 12
+   },
+   "jan22_2026": {
+    "n_m": 302,
+    "d_m": 0
+   },
+   "jan26_2026": {
+    "n_m": 343,
+    "d_m": -1
+   },
+   "jan26_2_2026": {
+    "n_m": 309,
+    "d_m": 4
+   },
+   "jan27_2025_2": {
+    "n_m": 267,
+    "d_m": -1
+   },
+   "jan28_2026": {
+    "n_m": 762,
+    "d_m": 1
+   },
+   "jan29_2026": {
+    "n_m": 516,
+    "d_m": 3
+   },
+   "jan29_2_2026": {
+    "n_m": 627,
+    "d_m": 4
+   },
+   "jan30_2026": {
+    "n_m": 287,
+    "d_m": 1
+   },
+   "jan8_2026_3": {
+    "n_m": 271,
+    "d_m": 0
+   },
+   "jul28_2025": {
+    "n_m": 285,
+    "d_m": 4
+   },
+   "jul9_2025": {
+    "n_m": 370,
+    "d_m": 4
+   },
+   "jun10_2025": {
+    "n_m": 191,
+    "d_m": 1
+   },
+   "jun11_2025": {
+    "n_m": 350,
+    "d_m": 3
+   },
+   "jun23_2025": {
+    "n_m": 171,
+    "d_m": 6
+   },
+   "jun25_2025": {
+    "n_m": 258,
+    "d_m": 1
+   },
+   "mar10_2026": {
+    "n_m": 1178,
+    "d_m": 7
+   },
+   "mar11_2026": {
+    "n_m": 422,
+    "d_m": 4
+   },
+   "mar12_2025": {
+    "n_m": 239,
+    "d_m": 0
+   },
+   "mar12_2026": {
+    "n_m": 574,
+    "d_m": 2
+   },
+   "mar18_2026": {
+    "n_m": 2160,
+    "d_m": 13
+   },
+   "mar18_2_2026": {
+    "n_m": 332,
+    "d_m": 4
+   },
+   "mar19_2026": {
+    "n_m": 388,
+    "d_m": 10
+   },
+   "mar23_2026": {
+    "n_m": 877,
+    "d_m": 8
+   },
+   "mar24_2026": {
+    "n_m": 626,
+    "d_m": 8
+   },
+   "mar26_2025": {
+    "n_m": 494,
+    "d_m": 5
+   },
+   "mar26_2026": {
+    "n_m": 751,
+    "d_m": 7
+   },
+   "mar30_2026": {
+    "n_m": 920,
+    "d_m": 7
+   },
+   "mar30_2_2026": {
+    "n_m": 258,
+    "d_m": 3
+   },
+   "mar3_2026": {
+    "n_m": 583,
+    "d_m": 2
+   },
+   "mar3_2_2026": {
+    "n_m": 316,
+    "d_m": 1
+   },
+   "mar4_2026": {
+    "n_m": 866,
+    "d_m": 13
+   },
+   "mar9_1_2026": {
+    "n_m": 293,
+    "d_m": 3
+   },
+   "mar9_2026": {
+    "n_m": 351,
+    "d_m": 3
+   },
+   "mar9_2_2026": {
+    "n_m": 262,
+    "d_m": 4
+   },
+   "may13_2026": {
+    "n_m": 949,
+    "d_m": 10
+   },
+   "may13_2_2026": {
+    "n_m": 576,
+    "d_m": 6
+   },
+   "may15_2026": {
+    "n_m": 567,
+    "d_m": 5
+   },
+   "may18_2026": {
+    "n_m": 579,
+    "d_m": 6
+   },
+   "may18_3_2026": {
+    "n_m": 320,
+    "d_m": 1
+   },
+   "may19_2025": {
+    "n_m": 239,
+    "d_m": -1
+   },
+   "may19_2026": {
+    "n_m": 626,
+    "d_m": 7
+   },
+   "may20_2026": {
+    "n_m": 615,
+    "d_m": 3
+   },
+   "may20_2_2026": {
+    "n_m": 403,
+    "d_m": 8
+   },
+   "may21_2_2026": {
+    "n_m": 371,
+    "d_m": 1
+   },
+   "may22_2026": {
+    "n_m": 242,
+    "d_m": 2
+   },
+   "may25_2026": {
+    "n_m": 1094,
+    "d_m": 12
+   },
+   "may25_3_2026": {
+    "n_m": 340,
+    "d_m": 3
+   },
+   "may27_2_2026": {
+    "n_m": 250,
+    "d_m": 4
+   },
+   "may28_2025": {
+    "n_m": 545,
+    "d_m": 0
+   },
+   "may28_2_2026": {
+    "n_m": 332,
+    "d_m": 4
+   },
+   "may29_2026": {
+    "n_m": 383,
+    "d_m": 2
+   },
+   "may4_2026": {
+    "n_m": 335,
+    "d_m": 2
+   },
+   "may5_2025": {
+    "n_m": 262,
+    "d_m": 1
+   },
+   "may6_2026": {
+    "n_m": 649,
+    "d_m": 7
+   },
+   "may6_2_2026": {
+    "n_m": 547,
+    "d_m": 3
+   },
+   "may7_2025": {
+    "n_m": 361,
+    "d_m": 3
+   },
+   "may7_2026": {
+    "n_m": 404,
+    "d_m": 7
+   },
+   "may7_2_2026": {
+    "n_m": 272,
+    "d_m": 7
+   },
+   "may9_2026": {
+    "n_m": 532,
+    "d_m": 6
+   },
+   "nov11_2025": {
+    "n_m": 313,
+    "d_m": 9
+   },
+   "nov12_2025": {
+    "n_m": 371,
+    "d_m": 0
+   },
+   "nov13_2025": {
+    "n_m": 223,
+    "d_m": 4
+   },
+   "nov17_2025": {
+    "n_m": 138,
+    "d_m": 6
+   },
+   "nov19_2025": {
+    "n_m": 867,
+    "d_m": 10
+   },
+   "nov24_2025": {
+    "n_m": 306,
+    "d_m": 2
+   },
+   "nov26_2025": {
+    "n_m": 592,
+    "d_m": -1
+   },
+   "oct13_2025": {
+    "n_m": 269,
+    "d_m": 2
+   },
+   "oct15_2025": {
+    "n_m": 331,
+    "d_m": 3
+   },
+   "oct15_2_2025": {
+    "n_m": 331,
+    "d_m": 1
+   },
+   "oct22_2_2025": {
+    "n_m": 629,
+    "d_m": 3
+   },
+   "oct27_2025": {
+    "n_m": 313,
+    "d_m": 0
+   },
+   "oct29_2025": {
+    "n_m": 686,
+    "d_m": 2
+   },
+   "oct30_2025": {
+    "n_m": 374,
+    "d_m": 1
+   },
+   "oct30_2_2025": {
+    "n_m": 625,
+    "d_m": 3
+   },
+   "oct31__2_2025": {
+    "n_m": 244,
+    "d_m": 3
+   },
+   "oct8_2025": {
+    "n_m": 509,
+    "d_m": 3
+   },
+   "sep10_2025": {
+    "n_m": 652,
+    "d_m": 8
+   },
+   "sep15_2025": {
+    "n_m": 475,
+    "d_m": 5
+   },
+   "sep1_2025": {
+    "n_m": 624,
+    "d_m": 1
+   },
+   "sep22_2025": {
+    "n_m": 350,
+    "d_m": -1
+   },
+   "sep24_2025": {
+    "n_m": 568,
+    "d_m": 6
+   },
+   "sep29_2025_2": {
+    "n_m": 328,
+    "d_m": 4
+   }
+  }
+ },
+ "floor_arithmetic": {
+  "margin": -0.001,
+  "net_edits_for_margin": 74.917,
+  "named_entity_perfect_play_edits": 41,
+  "roster_funnel_cap_edits": 28,
+  "function_word_edits": 276,
+  "note": "a name-targeted result cannot clear the margin even played perfectly; names are descriptive only. A function-word gain is largely OpenCouncil house orthographic style normalisation and may never be headlined as ASR improvement."
+ },
+ "scope": "One fixed trio, one benchmark, one realization. Seventh reference-conditioned pass over the same 247 windows. Per-seed WER spread on training is 2.1 points, larger than the effect sought. Nothing here establishes anything about ASR systems generally."
+}

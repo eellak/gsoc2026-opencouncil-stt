@@ -21,6 +21,18 @@ Reading it: a gap already at rung 2 is learned behaviour and the finding stands.
 appears at 3 is a merge bug. A gap that appears at 4 is the conversion. Nothing here needs
 new audio, new listening, or a GPU.
 
+Known limits, audited 2026-08-17 and NOT fixed - read them before trusting a rung gap:
+
+  * There is no CT2 **fp16** rung, so rung 4 moves runtime, decoder and quantization in
+    one step. A gap there cannot be attributed to int8 rather than to CTranslate2.
+  * "pairs" is not one quantity. Rungs 1-3 count `<|t|>` marks // 2 in the decoded
+    string; rung 4 counts faster-whisper `Segment` objects. They are close but not the
+    same estimator, so small cross-rung differences are not interpretable.
+  * The HF rungs are plain greedy `generate`; the CT2 rung inherits faster-whisper's
+    temperature-fallback ladder, which is stochastic. Rung 4 is not a greedy control.
+  * `chunks()` returns `min(n, per*len(manifest))` items, so a `--chunks` value that is
+    not a multiple of the manifest length silently yields fewer chunks than requested.
+
   .venv-eval/bin/python -m eval.controlled_eval.conversion_ladder --chunks 40
 Env: SET ADAPTER MERGED CT2
 """
@@ -35,9 +47,15 @@ from pathlib import Path
 
 SET = Path(os.environ.get("SET", Path.home() / "oc-longform")).expanduser()
 BASE_ID = os.environ.get("BASE_ID", "openai/whisper-large-v3")
+# LINEAGE, corrected 2026-08-17 (exp-2026-08-17-served-config-and-july-adapter).
+# These three defaults used to name three different models: the live-LoRA rung took
+# `artifact-adapter-fixed` while `merged` (2026-07-23) and `ct2` (2026-07-23) are both
+# built from `artifact-adapter-july-broken`. A gap appearing at rung 3 would then have
+# read as a merge fault when it was a different adapter - the exact confound the ladder
+# exists to rule out. All three now name the corrected lineage.
 ADAPTER = os.environ.get("ADAPTER", "/home/harold/oc-asr-serve/adapter-fixed-2026-08-01")
-MERGED = os.environ.get("MERGED", "/home/harold/oc-asr-serve/merged")
-CT2 = os.environ.get("CT2", "/home/harold/oc-asr-serve/ct2")
+MERGED = os.environ.get("MERGED", "/home/harold/oc-asr-serve/merged-fixed")
+CT2 = os.environ.get("CT2", "/home/harold/oc-asr-serve/ct2-fixed")
 CHUNK_SEC = 30.0
 TS = re.compile(r"<\|(\d+\.\d+)\|>")
 
