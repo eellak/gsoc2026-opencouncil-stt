@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-17T21:00:00Z",
+  "updated_at": "2026-08-18T20:00:00Z",
   "note": "Authoritative state. Reports under docs/reports/ are immutable evidence; this file says whether their conclusions still stand. When a doc disagrees with this file, this file wins and the doc gets fixed in the same change.",
   "experiments": [
     {
@@ -1576,6 +1576,55 @@
       "closed": "2026-08-18",
       "follow_up": "Confirm beam 5 + word_timestamps on the 247-window substrate before changing the served configuration, and re-measure the n=300 decomposition asymmetry on artifact-adapter-fixed (~2 h CPU) before funding any conversion ladder.",
       "decision": "Do NOT change the served configuration on this evidence alone: 39 windows, agreement-with-OpenCouncil, CPU at 16 threads instead of the served 8. The candidate is beam 5 with word_timestamps=True, and the gate for adopting it is confirmation on the 247-window substrate. What IS settled here and does not need repeating: the benchmark route's beam 2 is worse than beam 5 with an interval clear of zero, so no future work should treat beam 2 as a neutral serving choice; word timestamps are a deletion lever rather than a cosmetic timing feature, which retires the assumption that they only cost time; and the July adapter question is answered and closed for good, in the direction provenance already implied. The conversion ladder is NOT funded: re-measure the asymmetry on the corrected adapter first, because if it has vanished the ladder is moot and its 6-10 hours buy nothing."
+    },
+    {
+      "id": "exp-2026-08-18-anchored-realignment",
+      "title": "Anchored re-alignment and the drift-zone occupancy guard",
+      "question": "The 3-way MSA drifts where the three systems disagree over a run of columns, so correct words are charged as errors because they were aligned against the wrong reference position. Does re-anchoring the alignment on time, rather than on text alone, recover them?",
+      "status": "OPEN",
+      "conclusion": null,
+      "decision": null,
+      "artifact_ids": [
+        "artifact-ct2-fixed"
+      ],
+      "capability_ids": [],
+      "reports": [],
+      "specs": [
+        "docs/specs/2026-08-18-anchored-realignment-prereg.md"
+      ],
+      "superseded_by": null,
+      "next_action": "Implement the two arms of the frozen preregistration and score them. eval/controlled_eval/anchored.py and anchor_timings.py exist but have never been run end to end.",
+      "updated_at": "2026-08-18T20:00:00Z",
+      "caveats": [
+        "The preregistration is frozen but NO arm has been implemented or scored. Nothing here is a result.",
+        "Agreement-with-OpenCouncil, as everywhere on this substrate."
+      ]
+    },
+    {
+      "id": "exp-2026-08-18-timestamp-diagnostic",
+      "title": "A single page carrying 299 seconds of audio, three ASR systems, diarization and the reference side by side",
+      "question": "Every number in this project is an aggregate over 247 windows. Do errors that no aggregate can show become visible if one slice is laid out token by token, with the audio, the diarization and all three systems on one page?",
+      "status": "CLOSED",
+      "conclusion": "YES, AND IT FOUND TWO THINGS NO AGGREGATE SHOWED. (1) ALIGNMENT DRIFT: rows positioned by the midpoint of their uncertainty interval run backwards where the three systems conflict, which is the visible surface of the MSA drift that exp-2026-08-18-anchored-realignment now preregisters. (2) REFERENCE CONVENTIONS: an audit of all 21 errors W is charged on this slice found roughly 7 that are impossible conventions of the published text and 10 that are reference omissions, leaving 4 possibly genuine. | THE PAGE'S OWN WARNINGS WERE MOSTLY NOISE, AND THAT IS ALSO A FINDING: overlap was painted on 40 columns where the 0.30 s AND 30%-of-word rule confirms 3; overlap_fraction is the share of the word covered by the ASSIGNED speaker, not an overlap measure, and marked 79 rows for nothing; and turn cards were grouped by speaker_state rather than speaker, shattering one handover into 11 cards of 1-4 words each labelled as overlap. | ERROR LEDGER, 818 published tokens on this slice: W 37 errors (S 10, D 16, I 11, WER 0.0452), Soniox 48 (0.0587), Scribe v2 55 (0.0672), our adapter 78 (0.0954). 16 of W's 37 errors were correct in some other system. | CLOCKS: Soniox stt-rt-v4 covers 96.8% of columns and explains turn edges better (median turn-edge to nearest word edge 0.058 s vs 0.165 s); our word_timestamps decode has cleaner boundaries (5.8% vs 7.5% of words straddling a turn edge, 0 of 8 speaker changes inside a word vs 3). On 740 doubly-timed columns, 15.8% disagree by more than 0.30 s. Indicative on one slice, not a decision.",
+      "decision": "Use the page to audit before quoting any aggregate delta on a new mechanism. Do NOT use its clock comparison to justify merging Soniox stt-rt-v4 timings into W: that is a different model from the stt-async-v5 text W votes on.",
+      "artifact_ids": [
+        "artifact-soniox-rt-tokens-2026-08-16",
+        "artifact-ct2-fixed"
+      ],
+      "capability_ids": [],
+      "reports": [
+        "docs/reports/2026-08-18-timestamp-diagnostic.md"
+      ],
+      "specs": [],
+      "superseded_by": null,
+      "next_action": null,
+      "updated_at": "2026-08-18T20:00:00Z",
+      "caveats": [
+        "ONE slice of 299 seconds, 835 columns, 62 diarization turns, 8 speaker changes. Every number here is indicative and none carries a confidence interval or a gate.",
+        "The bundle contains verbatim council speech and audio and lives only under ~/.cache/oc-public/tsfusion-2026-08/. Only the code is in git.",
+        "The Soniox row's timestamps come from stt-rt-v4, NOT the stt-async-v5 text the benchmark W is built on.",
+        "The ref_omission_suspect rule (occupancy >= 2) flags 11 of 11 insertions on this slice. A filter that selects the whole population does not discriminate; it is reported beside the primary figure, never inside it."
+      ]
     }
   ],
   "artifacts": [

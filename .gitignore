@@ -113,3 +113,4 @@ data/next-batch/calib/
 # diagnostic hypothesis dumps carry utterance text (PII)
 eval/diagnose/ctx_hyps.json
 eval/diagnose/*_hyps.json
+.pytest_cache/
