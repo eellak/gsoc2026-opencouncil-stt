@@ -16,7 +16,64 @@ Two questions and one audit:
 - **C.** The conversion ladder that was supposed to explain the 2026-07-29 decoder
   asymmetry. Audited rather than run, and the audit is the finding.
 
-<!-- NUMBERS -->
+## The numbers
+
+Scored 2026-08-18 14:52, after arm RW was resumed from 18 windows to 39. All five primary
+arms on the same 39 windows, same CPU stack, same scorer.
+
+| arm | change from the frozen research config | WER | deletions |
+|---|---|---|---|
+| `R` | none, the control | 0.15481 | 0.05734 |
+| `S1` | beam 2, the served **benchmark** route | 0.16430 | 0.06112 |
+| `S2` | beam 2 + word timestamps, the served **product** route | 0.15549 | 0.05608 |
+| `RW` | beam 5 + word timestamps | **0.14474** | **0.04727** |
+| `J` | the July adapter, `artifact-ct2-july-broken` | 0.17110 | 0.08144 |
+
+Contrasts against the control, paired meeting-clustered bootstrap, 4,000 replicates, seed 7:
+
+| contrast | dWER | ddeletions |
+|---|---|---|
+| `RW` − `R`, word timestamps on at beam 5 | **−0.01007 [−0.01726, −0.00265]** | **−0.01007 [−0.01557, −0.00423]** |
+| `S1` − `R`, beam 5 → beam 2 | **+0.00949 [+0.00211, +0.01871]** | +0.00378 [−0.00261, +0.01163] |
+| `S2` − `S1`, word timestamps on at beam 2 | −0.00882 [−0.01912, +0.00059] | −0.00504 [−0.01389, +0.00285] |
+| `S2` − `R`, research → served product | +0.00067 [−0.00932, +0.01099] | −0.00126 [−0.00872, +0.00674] |
+| `J` − `R`, the July adapter | **+0.01629 [+0.00507, +0.02924]** | **+0.02410 [+0.01071, +0.03966]** |
+
+Interaction `(S2−S1) − (RW−R)` = +0.00126 [−0.01018, +0.01186]. It contains zero, so this
+design does not resolve a difference between the two beam widths in what word timestamps
+cost. It is underpowered by construction and that null is not equivalence.
+
+### A, answered: word timestamps move deletions
+
+`RW` is the finding. Both endpoints move together and both intervals clear zero, which has
+not happened before in this project for the **deletion rate** specifically. The safety
+endpoint is not being traded away for the primary one; they agree.
+
+It survives the domination checks the project requires. 27 windows better, 9 worse, 3 tied.
+Deletions fall in 29 of 39. The largest single window carries 20.8% of the net change, and
+the largest leave-one-out shift is 0.0019 against an effect of −0.0101, so no window
+reverses the sign.
+
+The mechanism is not mysterious and it is not new information about Whisper. Requesting
+word timestamps runs attention-based alignment, and that **moves segment boundaries**.
+[The chunking experiment](2026-08-18-window-position.md) measured what those boundaries
+cost: the deletion rate in the first 5 seconds of a 30-second window is 1.94× the middle,
+and 1.44× in the last 5. Two roads, same place.
+
+### The route we serve for benchmarking is the worst arm here
+
+`S1` is beam 2 with no word timestamps, and it loses to the research config by 0.95 points
+with an interval clear of zero. Nothing in this project had ever checked that.
+
+`S2`, the product route, lands statistically level with the research config. That null is
+**fragile and must not be quoted as equivalence**: one window carries 325% of the net
+change, meaning the remainder cancels out around it.
+
+### B, answered by the numbers as well as by provenance
+
+The July adapter is worse on both endpoints, and worse by more on deletions than on WER.
+The guard sentence above still applies in full: this does not isolate the label-prefix fix,
+and both July artifacts stay `KNOWN_BROKEN`.
 
 ## What was frozen, and when
 
