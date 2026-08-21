@@ -1,6 +1,6 @@
 # Current Work
 
-Last updated: 2026-08-17
+Last updated: 2026-08-21
 
 **The endgame plan is finished.** All four workstreams of
 [`docs/specs/2026-08-11-endgame-handoff-plan.md`](docs/specs/2026-08-11-endgame-handoff-plan.md)
@@ -15,12 +15,105 @@ carried out on 2026-08-16. The adapter-confidence screen closed on 2026-08-17.
 Canonical research state: [`research/ledger.json`](research/ledger.json).
 Agent protocol: [`CLAUDE.md`](CLAUDE.md).
 
+## Active 2026-08-21
+
+- `exp-2026-08-18-chunking-aware-decoding`: **arm P is now a served decoder and the
+  contiguous-audio gap is closed.** `serve/decode_p.py`
+  (`artifact-decode-policy-p`, policy `5ae98472227696e0`, capability
+  `cap-decode-p-local`) reproduces the measured arm byte-for-byte on three pinned
+  conformance windows, and a whole 12.69-minute meeting decodes end to end with no
+  tiny pieces and no dropped speech.
+  **P is the best measured arm by WER (0.14751 vs the control's 0.15893, CI
+  [−0.02025, −0.00195]); it FAILED that experiment's preregistered gate, which was
+  on deletions.** Three new whole-meeting limits — a forced-cut rate that runs from
+  5% to 41% depending on the meeting, subtitle-credit hallucinations at the true
+  start and end, and segment timestamps that overshoot their own piece at a third
+  of the segments.
+  Next: the 247-window GPU run on one stack, which is the last thing between P and
+  "production policy".
+  [Report](docs/reports/2026-08-21-decode-p-served.md),
+  [runbook](docs/runbooks/decode-p-policy.md).
+
+- `exp-2026-08-21-fusion-production` is **OPEN, spec written, nothing measured**.
+  Production fusion with **two** ASR systems and no LLM:
+  [`docs/specs/2026-08-21-fusion-production.md`](docs/specs/2026-08-21-fusion-production.md).
+  The pair is `artifact-ct2-fixed` + Soniox `stt-async-v5`, named in the spec as the
+  **cost-constrained** pair, not the accuracy-optimal one — Scribe v2 beats our
+  adapter on WER, deletions and substitutions, and is excluded because no ElevenLabs
+  credential exists here and because confidence must come from the same decode pass
+  as the text (0 of 133 windows text-joinable). The merge rule is **one base
+  transcript plus conservative patches over disagreement islands**, occupancy
+  default **DROP** with a frozen restore gate, identity by phonetic closed-list
+  repair then frozen priority; calibrated confidence is an arm, never an assumption.
+  Two Codex reviews shaped it (`8dbcf232` rewrote the merge rule away from
+  per-column tiers; `e2771f4c` supplied the LLM/confusion-network and extra-speaker
+  future work).
+  Next: the free Stage 0 screen on the cached 247 windows, and one cheap probe of
+  what per-word fields `stt-async-v5` actually returns — every Soniox timestamp and
+  confidence number this project holds is `stt-rt-v4` and the two must not be mixed.
+
+## Active 2026-08-20
+
+- `exp-2026-08-20-seam-repair` is **OPEN, mechanism pilot done, 39-window run not
+  run**. Three arms on top of arm P — **F** (cut at the lowest-mean Silero
+  probability valley in the last 2 s instead of cutting blind), **C** (64-*token*
+  `initial_prompt` carried across the seam), **W** (overlapping windows with
+  word-level ownership) — all **PASS** their mechanism checks on the 5 windows where
+  P cuts blind. F turns 7 of P's forced cuts into 4 valley cuts and 3 remaining
+  blind ones. Nothing is adopted: the 5-window rates are description, not evidence.
+  The one structural result is that **word-level ownership, not word timestamps, is
+  what arm E was missing** (E 0.33969 → E-WT 0.30338 → W 0.17538).
+  A fourth arm **X** runs all three mechanisms in one decode: it posts the best WER
+  of any arm (0.16062, (S+D)/N 0.14585) but **fails** its mechanism check — its 25.5 s
+  ceiling manufactures blind boundaries faster than the valley search repairs them,
+  so its win is not coming from the mechanism it advertises.
+  Next: the 39-window decode, `eval/seam_repair.py decode --arm F|C|W|X` then `score`.
+  [Spec](docs/specs/2026-08-20-seam-repair-prereg.md).
+
+## Active 2026-08-19
+
+- `exp-2026-08-19-dense-reference-repair` is **CLOSED, stopped in use**. Both page
+  designs were tried and rejected by the reviewer: the two windows are continuous
+  interruption and simultaneous speech, so every interval needed additions and the
+  resulting reference would not be trustworthy. No repaired reference exists and the
+  dense arm's insertion evidence stays unresolved. The finding is redirected: select
+  training data by overlap-freedom instead of auditing references after the fact.
+  [Spec](docs/specs/2026-08-19-dense-reference-repair.md).
+- `exp-2026-08-19-training-residual-audit` is **CLOSED**. All 38 blind items were
+  reviewed: 7/36 selected training clips were jointly label-faithful and
+  boundary-usable, one was a definite boundary failure and 28 remain unresolved.
+  Both insertion-heavy validation references have material omissions. Next:
+  audio-faithfully re-reference those two windows, then freeze the hybrid clean-core
+  plus protected lane. [Report](docs/reports/2026-08-19-training-listening-audit.md).
+- The dense 300-step paired-seed screen is **CLOSED: `SCREEN — STOP`**. Dense B
+  improved mean validation WER 15.31%→14.76% and deletions in all three seeds, but
+  failed the insertion and dominance guards. One window explains 75.8% of net extra
+  insertions, yet excluding it post hoc is forbidden and does not fully repair the
+  gate. No medium/full stage is authorized. The recovery pod is terminated; network
+  volume `qzw88vdwv2` remains retained.
+  [Report](docs/reports/2026-08-19-dense-screen-300.md).
+- The post-screen decisions are frozen in
+  [`training-evidence.md`](docs/decisions/training-evidence.md#2026-08-19--agreed-decision-tree-for-the-remaining-training-work)
+  and [`data.md`](docs/decisions/data.md#2026-08-19---strict-validation-and-hybrid-data-contract):
+  boundary audit, strict audio-faithful validation, then one hybrid-data screen;
+  no automatic GPU escalation.
+
+Agent taking over the 18–23 August project/training push reads
+[`2026-08-19-handoff-claude.md`](docs/runbooks/2026-08-19-handoff-claude.md) first.
+
 **Η σειρά εκτέλεσης μέχρι τις 23/8 ζει πλέον στον χάρτη**
 [«Το καλύτερο δυνατό μοντέλο + serving harness μέχρι 23/8»](https://github.com/eellak/gsoc2026-opencouncil-stt/issues/3)
 (GitHub Issues, label `wayfinder:map`). Το queue παρακάτω μένει ως περιγραφή
 κατάστασης· ο χάρτης είναι αυτός που λέει τι πιάνεται μετά και με ποια σειρά.
 Το `exp-2026-08-14-hparl-probe` βγήκε **εκτός scope** για αυτόν τον κύκλο (ανοιχτό
 νομικό ζήτημα CLARIN 1602)· το record μένει OPEN στο ledger για μετά το GSoC.
+
+Δεύτερος χάρτης, με ορίζοντα **πέρα** από τις 23/8:
+[«Αρχιτεκτονική μετά-το-ASR: fusion ως provider, διαφωνίες ως δεδομένα»](https://github.com/eellak/gsoc2026-opencouncil-stt/issues/50).
+Σχέδιο: [`docs/specs/2026-08-21-postasr-architecture.md`](docs/specs/2026-08-21-postasr-architecture.md),
+από τον ακατέργαστο κατάλογο ιδεών
+[`docs/specs/2026-08-21-postasr-architecture-braindump.md`](docs/specs/2026-08-21-postasr-architecture-braindump.md).
+Μέρος του ανήκει στο προϊόν OpenCouncil και δηλώνεται `PRODUCT`.
 
 The long narrative that used to live here is at
 [`archive/current/2026-08-10-CURRENT.md`](archive/current/2026-08-10-CURRENT.md).
@@ -56,8 +149,9 @@ trained through the label-prefix bug and cannot answer it.
    rate (0.0600 → 0.0788 per reference token, CI excludes zero) while lowering
    substitutions, with WER flat, and the external-pack stage-1 of
    `exp-2026-08-14-external-packs` (RUN 2) changed nothing detectable on top of
-   it (every paired CI includes zero). Both are single-seed screens against a
-   2.1-point per-seed spread. `artifact-adapter-fixed` keeps the candidate slot;
+   it (every paired CI includes zero). Both are single-seed screens without a
+   matched paired-seed confirmation; the later control calibration cannot turn
+   either into a result. `artifact-adapter-fixed` keeps the candidate slot;
    the frozen tree's branch is **no blind retry, error analysis of the
    deletion-hard supply first**.
    [`docs/reports/2026-08-16-screens-eval.md`](docs/reports/2026-08-16-screens-eval.md).
@@ -185,7 +279,8 @@ Each cost real time this cycle and each is answered in the ledger:
   **zero** times on the 39 windows, so it cannot be causing our deletions; removing
   the temperature fallback makes every metric worse.
 - **Label purity** (`exp-2026-08-13-correction-only`). Dropping all `no_edit` rows
-  moves WER by +0.0015, against a known 2.1-point per-seed spread.
+  moves WER by +0.0015 in a single-seed arm whose interval crosses zero and whose
+  sign reverses when one window is removed.
 - **Data scale** (`exp-2026-08-11-wer-levers-research`). The dominant residual error
   is homophone orthography the audio cannot decide; ~1300h buys ~0.5 points.
 

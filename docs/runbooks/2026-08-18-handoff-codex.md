@@ -1,5 +1,9 @@
 # Handoff: πού είμαστε και τι πιάνεις μετά
 
+> **Superseded for the current 18–23 August project scope on 2026-08-19.** Read
+> [`2026-08-19-handoff-claude.md`](2026-08-19-handoff-claude.md) first. This file is
+> historical context for the state before the training experiments.
+
 2026-08-18, μετά το commit `0d686b15`. Προθεσμία GSoC **23/8**.
 
 ## Διάβασε πρώτα, με αυτή τη σειρά
@@ -21,9 +25,11 @@
 
 ## Ο ένας περιορισμός που ορίζει κάθε training απόφαση
 
-Η διασπορά ανά seed είναι **2,1 μονάδες WER**, μεγαλύτερη από κάθε effect που
-κυνηγάμε. Μια εκπαίδευση με έναν seed **δεν μπορεί να απαντήσει τίποτα**. Αν γράψεις
-συμπέρασμα από μονο-seed arm, γράψε τη λέξη «screen» μέσα στο ίδιο το συμπέρασμα.
+Το παλιό **2,1** ήταν range τριών treatment effects, όχι seed variance. Η σημερινή
+CPU calibration των τριών control replicas δίνει range **0,285 μονάδες WER** και
+sample SD **0,158**, αλλά αυτό δεν είναι ακόμη paired-effect SD. Μια εκπαίδευση με
+έναν seed παραμένει μόνο screen· confirmation χρειάζεται paired pilot, power 80% και
+two-sided 95% CI σύμφωνα με `docs/decisions/training-evidence.md`.
 
 ## Τι πιάνεις, με σειρά
 

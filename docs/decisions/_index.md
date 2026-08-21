@@ -11,11 +11,15 @@ Accepted decisions and open questions, one file per theme. Keep entries short �
 - [matching.md](matching.md) — meeting JSON usage, `utterance.text` semantics, open matching/taxonomy questions
 - [metric-hir.md](metric-hir.md) — Human Intervention Rate metric; **likely NOT adopted** (mentor pushback 2026-06-23), WER (+CER) stays standard
 - [modeling.md](modeling.md) — what we actually run: contextual biasing adopted, LoRA adapter not deployed
+- [training-evidence.md](training-evidence.md) — evidence tiers, successive-halving budget and promotion gates for training arms
 
 ## Index
 
 ### Accepted
 
+- [Remaining training decision tree](training-evidence.md#2026-08-19--agreed-decision-tree-for-the-remaining-training-work) — 2026-08-19
+- [Strict validation and hybrid-data contract](data.md#2026-08-19---strict-validation-and-hybrid-data-contract) — 2026-08-19
+- [Training arms advance through an evidence ladder](training-evidence.md) — 2026-08-18
 - [Never compare two models across two decoding stacks](modeling.md#2026-08-08--never-compare-two-models-across-two-decoding-stacks) — 2026-08-08
   - reopened 2026-08-09 as a **scoped, unmeasured** question about training clip shape — [preregistration](../specs/window-shape-preregistration.md)
 - [The corrections-to-clean-speech ratio is not the lever](modeling.md#2026-08-08--the-corrections-to-clean-speech-ratio-is-not-the-lever) — 2026-08-08

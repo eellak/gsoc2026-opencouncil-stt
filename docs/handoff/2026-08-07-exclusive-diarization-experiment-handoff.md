@@ -1,5 +1,12 @@
 # Handoff: validate pyannoteAI `exclusive` diarization before proposing it to production
 
+> **ΞΕΠΕΡΑΣΜΕΝΟ 2026-08-21.** Το `exclusive: true` βρίσκεται **ήδη** στο σώμα
+> του αιτήματος `/identify` στο `opencouncil-tasks/src/lib/PyannoteDiarize.ts`
+> upstream, με σχόλιο που παραπέμπει στη σύσταση της pyannote για συμφιλίωση με
+> την έξοδο STT. Το issue και το PR που προτείνει αυτό το έγγραφο **δεν
+> χρειάζονται**. Το `model` εξακολουθεί να μην περνιέται (άρα precision-2 by
+> default). Επαληθεύτηκε απευθείας στην πηγή, όχι μόνο μέσω ευρετηρίου.
+
 For an agent executing the full plan end-to-end. Written 2026-08-07.
 
 **Objective.** Measure, offline, whether `exclusive: true` on the pyannoteAI API

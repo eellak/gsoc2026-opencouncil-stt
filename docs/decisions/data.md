@@ -4,6 +4,43 @@ CSV ingest, content categorisation, stable IDs, task version, dataset split.
 
 ## Accepted
 
+### 2026-08-19 - Strict validation and hybrid-data contract
+
+**Status: accepted by the user after a grilling session.** Fast iteration keeps the
+existing 39-window freeze as a screening set; those numbers remain useful and are not
+relabelled as confirmation.
+
+Before a medium/full confirmation claim, validation is drawn from the whole-city
+`argos` + `orestiada` pool and must be disjoint from training by both meeting and
+known `person_id`. The immediately auditable pool after removing null-speaker rows is
+4,016 rows / 3.094 h / 30,236 normalized tokens / 55 known speakers / 45 meetings.
+The guarantee is stated honestly as **meeting-disjoint and known-person-ID-disjoint**,
+not biometric proof that no unidentified physical person occurs elsewhere.
+
+The confirmation subset is frozen before candidate output is inspected. Only windows
+whose reference has been checked against the audio can support the audio-faithful WER
+claim; the exact number of audited windows is an implementation detail to preregister
+before scoring. OpenCouncil-agreement WER may continue as a screen metric but is not
+silently treated as fidelity to what was spoken.
+
+The next data-quality arm is not wholesale strict filtering. It is a **clean core +
+protected audited lane** containing names, genuinely hard/fast speech and verified
+boundary examples. The frozen 36-item listening audit decides whether suspect
+boundary rows are corrected/excluded as defective or retained as faithful hard
+examples. Baseline and hybrid arms use equal hours per source, the same training
+recipe and the same compute budget so that data composition is the intended change.
+
+The seven temporal holdout windows stay sealed and require a separate user decision
+to open.
+
+**Audit outcome, 2026-08-19.** The frozen review completed 36/36 selected training
+clips: 7 were jointly label-faithful and boundary-usable, one had a definite unusable
+boundary, and 28 remained unresolved. Only the seven jointly confirmed rows may enter
+an audited-hard lane as-is; the failure routes to correction and unresolved rows need
+repair or re-review. This selected sample cannot justify whole-stratum removal. Both
+insertion-heavy validation references have material omissions and require
+audio-faithful re-referencing. The dense screen remains `SCREEN — STOP`.
+
 ### 2026-08-16 - Correction terms MAY come from meeting transcripts; the guarantee was a category error
 
 **Status: accepted, by user decision.** The `research/ds_wer/terms/*.json` lists were

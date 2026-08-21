@@ -42,6 +42,9 @@ Use the `isIpPublic: true` / `type: tcp` entry: `ssh -p <publicPort> root@<ip>`.
 
 ## Set up
 
+For reusable input data, checksummed/resumable upload, and a network-volume mount,
+follow [pod-training-bundle](pod-training-bundle.md) before the setup below.
+
 ```bash
 apt-get update -qq && apt-get install -y -qq ffmpeg
 pip install --break-system-packages -U "numpy<3" \

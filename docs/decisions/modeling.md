@@ -55,8 +55,10 @@ corrections is cheaper in human review hours.
 **Evidence:** seven preregistered runs, three seed pairs, $24.
 C − A = **−0.24 points, 90% [−0.89, +0.36]**; the deletion guardrail passes at +0.08
 against a 0.5 limit. Gate 1 was not met, so this is inconclusive by the frozen rule, not
-by interpretation. Per-seed differences span **2.1 points** — an order of magnitude above
-the mean effect, which is the number worth remembering.
+by interpretation. The three paired treatment effects span **2.1 points**. A later
+calibration established that this is not a seed variance estimate: current control
+replicas span 0.285 points, and confirmation must estimate paired-effect SD from its own
+pilot.
 [Report](../reports/2026-08-08-mixture-ratio.md) ·
 [preregistration](../specs/mixture-ratio-preregistration.md).
 
