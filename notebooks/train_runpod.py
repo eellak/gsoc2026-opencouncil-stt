@@ -49,7 +49,10 @@ TRAIN_MANIFEST = os.environ.get("TRAIN_MANIFEST", "")
 INIT_ADAPTER = os.environ.get("INIT_ADAPTER", "")
 EVAL_STRATEGY = os.environ.get("EVAL_STRATEGY", "epoch")   # "no" to skip
 LORA_R, LORA_ALPHA, LORA_DROPOUT = 32, 64, 0.05  # sweep pick
-LR, TRAIN_BS, GRAD_ACC, EVAL_BS = 1e-4, 2, 4, 4
+LR = 1e-4
+TRAIN_BS = int(os.environ.get("TRAIN_BS", "2"))
+GRAD_ACC = int(os.environ.get("GRAD_ACC", "4"))
+EVAL_BS = int(os.environ.get("EVAL_BS", "4"))
 EPOCHS = 1 if SMOKE else 2  # sweep: epoch 4 overfit
 WORK = pathlib.Path(os.environ.get("WORK_DIR", "/workspace/whisper-run"))
 OUT_DIR = str(WORK / "adapter")
@@ -67,11 +70,67 @@ FINGERPRINT_FILE = "run_fingerprint.json"
 RUN_FINGERPRINT = json.dumps({"label_semantics": LABEL_SEMANTICS, "smoke": SMOKE,
                               "model": MODEL_ID, "epochs": EPOCHS,
                               "lora": [LORA_R, LORA_ALPHA, LORA_DROPOUT],
-                              "init_adapter": INIT_ADAPTER},
+                              "init_adapter": INIT_ADAPTER, "seed": SEED,
+                              "train_bs": TRAIN_BS, "grad_acc": GRAD_ACC,
+                              "max_steps": MAX_STEPS, "lr": LR},
                              sort_keys=True)
 
 
 def log(m): print(f"[train {time.strftime('%H:%M:%S')}] {m}", flush=True)
+
+
+def resolve_pack_audio_paths(rows, manifest_path):
+    """Resolve portable relative pack paths while preserving legacy absolutes."""
+    pack_root = pathlib.Path(manifest_path).resolve().parent
+    resolved = []
+    for source in rows:
+        row = dict(source)
+        audio = pathlib.Path(row["audio"])
+        if not audio.is_absolute():
+            row["audio"] = str(pack_root / audio)
+        resolved.append(row)
+    return resolved
+
+
+def file_sha256(path):
+    digest = hashlib.sha256()
+    with open(path, "rb") as source:
+        for chunk in iter(lambda: source.read(1 << 20), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def data_dir_source_identity(data_dir):
+    """Content identity for the parquets that produce the reusable clip manifest."""
+    root = pathlib.Path(data_dir)
+    return {
+        name: {"bytes": path.stat().st_size, "sha256": file_sha256(path)}
+        for name in ("train.parquet", "validation.parquet")
+        if (path := root / name).is_file()
+    }
+
+
+def feature_cache_signature(records, split_name, preprocessing_config=None):
+    """Identify features by actual audio/labels and preprocessing configuration."""
+    digest = hashlib.sha256()
+    config = preprocessing_config or {
+        "model": MODEL_ID, "language": LANGUAGE, "task": TASK,
+        "sample_rate": SR, "label_semantics": LABEL_SEMANTICS,
+    }
+    digest.update(b"feature-v2\n")
+    digest.update(json.dumps(config, sort_keys=True, default=str).encode())
+    digest.update(b"\n")
+    digest.update(split_name.encode())
+    digest.update(b"\n")
+    for row in records:
+        audio = pathlib.Path(row["audio"])
+        digest.update(str(audio.resolve()).encode())
+        digest.update(b"\0")
+        digest.update(bytes.fromhex(file_sha256(audio)))
+        digest.update(b"\0")
+        digest.update(hashlib.sha256(row["text"].encode()).digest())
+        digest.update(b"\n")
+    return digest.hexdigest()[:16]
 
 
 @dataclass
@@ -147,10 +206,14 @@ def main():
     rows = fetch_jsonl(EXPORT_URL)
     log(f"included rows: {len(rows)} | per city: "
         f"{dict(collections.Counter(r['city_id'] for r in rows).most_common(6))}")
+    _denylist_sha256 = "unavailable"
     try:
-        _exj = requests.get("https://raw.githubusercontent.com/eellak/gsoc2026-"
+        _exr = requests.get("https://raw.githubusercontent.com/eellak/gsoc2026-"
                             "opencouncil-stt/main/data/exclusions/unreviewed_meetings.json",
-                            timeout=60).json()
+                            timeout=60)
+        _exr.raise_for_status()
+        _denylist_sha256 = hashlib.sha256(_exr.content).hexdigest()
+        _exj = _exr.json()
         _excl = {(m["city_id"], m["meeting_id"]) for m in _exj.get("meetings", [])}
         _b = len(rows)
         rows = [r for r in rows if (r["city_id"], r["meeting_id"]) not in _excl]
@@ -186,24 +249,31 @@ def main():
         d = (e or 0) - (s or 0); return MIN_DUR <= d <= MAX_DUR
 
     # --- build clips + manifest with cache guard (restart doesn't re-decode) ---
-    CLIPS = WORK / "clips"; CLIPS.mkdir(parents=True, exist_ok=True)
-    MAN_PATH = WORK / "manifest.json"
+    # A paired-seed screen should preprocess each arm once, not rebuild ~44 GB of
+    # large-v3 features inside every output directory.  Point PREP_CACHE_DIR at a
+    # persistent volume; WORK remains run-specific for checkpoints and adapters.
+    PREP = pathlib.Path(os.environ.get("PREP_CACHE_DIR", str(WORK)))
+    CLIPS = PREP / "clips"; CLIPS.mkdir(parents=True, exist_ok=True)
+    MAN_PATH = PREP / "manifest.json"
     # DATA_DIR set -> train on the pre-built COMBINED parquet manifest (28.6h:
     # corrections + no-edit backbone), the curated set. Else self-fetch corrections.
     DATA_DIR = os.environ.get("DATA_DIR")
     if DATA_DIR:
-        _pq = {f: (pathlib.Path(DATA_DIR) / f).stat().st_size
-               for f in ("train.parquet", "validation.parquet")
-               if (pathlib.Path(DATA_DIR) / f).exists()}
-        _sig_str = json.dumps({"ver": 3, "sr": SR, "data_dir": DATA_DIR, "smoke": SMOKE,
+        _pq = data_dir_source_identity(DATA_DIR)
+        _sig_str = json.dumps({"ver": 4, "sr": SR, "smoke": SMOKE,
                                "pad": PAD_S, "dur": [MIN_DUR, MAX_DUR], "parquet": _pq},
                               sort_keys=True)
     else:
+        _rows_sha256 = hashlib.sha256(json.dumps(
+            rows, sort_keys=True, ensure_ascii=False, separators=(",", ":")
+        ).encode()).hexdigest()
         _sig_str = json.dumps({"ver": 2, "sr": SR, "val_cities": sorted(VAL_CITIES),
                                "smoke_train": SMOKE_TRAIN_MEETINGS,
                                "smoke_val": SMOKE_VAL_MEETINGS, "sample_n": SAMPLE_N,
                                "val_reg_per_mtg": VAL_REG_PER_MEETING,
-                               "n_included": len(rows)}, sort_keys=True, ensure_ascii=False)
+                               "rows_sha256": _rows_sha256,
+                               "denylist_sha256": _denylist_sha256},
+                              sort_keys=True, ensure_ascii=False)
 
     # Packs bring their own audio and their own targets, so none of the clip-building
     # below applies: without this the run downloads hours of meeting mp3s and cuts 29k
@@ -215,8 +285,10 @@ def main():
         man = {"train": [], "valc": [], "valr": []}
     if man is None and MAN_PATH.exists():
         _c = json.load(open(MAN_PATH))
-        _spot = [c["audio"] for s in ("train", "valc", "valr") for c in _c.get(s, [])[:5]]
-        if _c.get("_sig") == _sig_str and all(pathlib.Path(a).exists() for a in _spot):
+        _cached_audio = [c["audio"] for s in ("train", "valc", "valr")
+                         for c in _c.get(s, [])]
+        if (_c.get("_sig") == _sig_str and _cached_audio
+                and all(pathlib.Path(a).is_file() for a in _cached_audio)):
             man = {k: _c[k] for k in ("train", "valc", "valr")}
             log(f"CACHE HIT -> train={len(man['train'])} valc={len(man['valc'])} "
                 f"valr={len(man['valr'])}")
@@ -282,7 +354,16 @@ def main():
         arm = os.environ.get("PACK_ARM", "p").lower()
         if arm not in ("p", "pn"):
             sys.exit(f"[train FATAL] PACK_ARM={arm!r}, expected p or pn")
-        packs = [json.loads(l) for l in open(PACK_MANIFEST) if l.strip()]
+        packs = resolve_pack_audio_paths(
+            [json.loads(l) for l in open(PACK_MANIFEST) if l.strip()], PACK_MANIFEST)
+        # Every key this branch reads, asserted up front. A missing key used only in a
+        # log line still aborts the run, and it aborts it AFTER the clip build and the
+        # feature map -- i.e. after the expensive part. Fail on row 0 instead.
+        required = {"audio", "dur_sec", "n_utterances", "text_p", "text_pn"}
+        absent = required - set(packs[0])
+        if absent:
+            sys.exit(f"[train FATAL] pack manifest is missing {sorted(absent)}; "
+                     f"row 0 has {sorted(packs[0])}")
         missing = [r["audio"] for r in packs if not pathlib.Path(r["audio"]).exists()]
         if missing:
             sys.exit(f"[train FATAL] {len(missing)} pack audio files missing, "
@@ -294,6 +375,24 @@ def main():
         # target carries timestamp tokens. That trains a contradiction and nothing warns.
         processor.tokenizer.set_prefix_tokens(language=LANGUAGE, task=TASK,
                                               predict_timestamps=(arm == "p"))
+        # Whisper's decoder is hard-capped at max_target_positions (448). A pack of
+        # 20-25s of dense Greek speech can tokenize past that, and the collator raises
+        # mid-training rather than at load: on 2026-08-20 a single 485-token pack killed
+        # arm B at step 200 of 300, after 15 minutes of paid GPU. Drop them up front and
+        # say how many, because silently training on a subset is the worse failure.
+        _cap = 448  # whisper-large-v3 config.max_target_positions
+        _kept, _dropped = [], []
+        for _row in man["train"]:
+            if len(processor.tokenizer(_row["text"]).input_ids) > _cap:
+                _dropped.append(_row["audio"])
+            else:
+                _kept.append(_row)
+        if _dropped:
+            log(f"PACKS: dropped {len(_dropped)} of {len(man['train'])} packs whose "
+                f"labels exceed {_cap} tokens, e.g. {_dropped[:2]}")
+        man["train"] = _kept
+        if not man["train"]:
+            sys.exit(f"[train FATAL] every pack exceeds {_cap} label tokens")
         probe = processor.tokenizer(man["train"][0]["text"]).input_ids
         ts0 = processor.tokenizer.convert_tokens_to_ids("<|0.00|>")
         nots = processor.tokenizer.convert_tokens_to_ids("<|notimestamps|>")
@@ -306,7 +405,7 @@ def main():
                      "<|notimestamps|>; the tokenizer is in the wrong mode")
         log(f"PACKS arm={arm}: {len(man['train'])} examples, "
             f"{sum(r['dur_sec'] for r in packs)/3600:.2f} h, "
-            f"mean {sum(r['n_utt'] for r in packs)/len(packs):.1f} utterances/example, "
+            f"mean {sum(r['n_utterances'] for r in packs)/len(packs):.1f} utterances/example, "
             f"probe label {len(probe)} tokens")
 
 
@@ -317,8 +416,22 @@ def main():
     # (no traceback) — that was the repeated "freeze". Force keep_in_memory=False
     # with an explicit on-disk cache_file_name and a small writer buffer so the
     # arrow is streamed to disk (75 GB free) instead of accumulating in RAM.
-    feat_cache = WORK / "featcache"
+    feat_cache = pathlib.Path(os.environ.get("FEATURE_CACHE_DIR", str(PREP / "featcache")))
     feat_cache.mkdir(parents=True, exist_ok=True)
+    _preprocessing_config = {
+        "model": MODEL_ID,
+        "language": LANGUAGE,
+        "task": TASK,
+        "sample_rate": SR,
+        "label_semantics": LABEL_SEMANTICS,
+        "feature_extractor": processor.feature_extractor.to_dict(),
+        "tokenizer_name": getattr(processor.tokenizer, "name_or_path", None),
+        "tokenizer_init": getattr(processor.tokenizer, "init_kwargs", {}),
+        "tokenizer_special_tokens": processor.tokenizer.special_tokens_map,
+        "tokenizer_vocab_sha256": hashlib.sha256(json.dumps(
+            processor.tokenizer.get_vocab(), sort_keys=True, ensure_ascii=False
+        ).encode()).hexdigest(),
+    }
 
     def to_ds(recs, name):
         if not recs:
@@ -336,9 +449,10 @@ def main():
                 arr, sampling_rate=sr).input_features[0]
             b["labels"] = processor.tokenizer(b["text"]).input_ids
             return b
+        cache_tag = feature_cache_signature(recs, name, _preprocessing_config)
         return d.map(prep, remove_columns=["audio", "text"],
                      keep_in_memory=False, writer_batch_size=200,
-                     cache_file_name=str(feat_cache / f"{name}.arrow"))
+                     cache_file_name=str(feat_cache / f"{name}-{cache_tag}.arrow"))
 
     ds_train, ds_valc, ds_valr = (to_ds(man["train"], "train"),
                                   to_ds(man["valc"], "valc"),
@@ -460,9 +574,29 @@ def main():
             f"{n_nonzero_b} nonzero lora_B; fresh optimizer/scheduler over "
             f"max_steps={MAX_STEPS or 'epochs'})")
     else:
+        # LORA_SCOPE=decoder freezes the encoder completely: no adapter, and therefore no
+        # backward pass through it. The regex catches decoder self-attention AND cross-
+        # attention (encoder_attn lives inside the decoder stack), which is what "train the
+        # decoder only" means for Whisper. Default stays "all" so every existing recipe is
+        # byte-identical.
+        _scope = os.environ.get("LORA_SCOPE", "all").lower()
+        if _scope not in ("all", "decoder"):
+            sys.exit(f"[train FATAL] LORA_SCOPE={_scope!r}, expected all or decoder")
+        _targets = (r".*decoder.*\.(q_proj|v_proj)$" if _scope == "decoder"
+                    else ["q_proj", "v_proj"])
         model = get_peft_model(model, LoraConfig(r=LORA_R, lora_alpha=LORA_ALPHA,
                                                  lora_dropout=LORA_DROPOUT,
-                                                 target_modules=["q_proj", "v_proj"]))
+                                                 target_modules=_targets))
+        _lora_mods = {n.rsplit(".lora_", 1)[0] for n, q in model.named_parameters()
+                      if ".lora_" in n and q.requires_grad}
+        _enc = sorted(n for n in _lora_mods if ".encoder." in n)
+        if _scope == "decoder" and _enc:
+            sys.exit(f"[train FATAL] LORA_SCOPE=decoder but {len(_enc)} encoder modules "
+                     f"carry adapters, e.g. {_enc[:2]}")
+        if _scope == "all" and not _enc:
+            sys.exit("[train FATAL] LORA_SCOPE=all but no encoder module carries an adapter")
+        log(f"LoRA scope={_scope}: {len(_lora_mods)} adapted modules "
+            f"({len(_enc)} encoder, {len(_lora_mods) - len(_enc)} decoder)")
     model.print_trainable_parameters()
     # NB: freezing the encoder above does NOT keep LoRA out of it — PEFT injects
     # fresh trainable adapters into every module matching q_proj/v_proj, encoder
@@ -549,6 +683,7 @@ def main():
     processor.tokenizer.clean_up_tokenization_spaces = False
     model.save_pretrained(OUT_DIR); processor.save_pretrained(OUT_DIR)
     json.dump({"model": MODEL_ID, "lora_r": LORA_R, "lr": LR, "epochs": EPOCHS,
+               "lora_scope": os.environ.get("LORA_SCOPE", "all"),
                "label_semantics": LABEL_SEMANTICS,
                "seed": SEED, "smoke": SMOKE, "n_train": ds_train.num_rows,
                # None when a packs run builds no validation on purpose. This line cost a
@@ -559,6 +694,8 @@ def main():
                "packs": bool(os.environ.get("PACK_MANIFEST")),
                "pack_arm": os.environ.get("PACK_ARM", ""),
                "max_steps": MAX_STEPS,
+               "train_batch_size": TRAIN_BS,
+               "gradient_accumulation_steps": GRAD_ACC,
                "val_cities": sorted(VAL_CITIES)},
               open(OUT_DIR + "/run_meta.json", "w"), ensure_ascii=False, indent=2)
     log(f"ACCEPTANCE OK — adapter saved -> {OUT_DIR}")
@@ -675,6 +812,29 @@ def build_from_parquet(data_dir, dl, ok_span, CLIPS, MAN_PATH, sig_str, librosa,
             n_mtg += 1
             if not au or (isinstance(au, float) and np.isnan(au)):
                 log(f"skip {city}/{mtg}: null audio_url"); continue
+            # Every clip of this meeting may already sit on the volume from an earlier
+            # attempt. librosa.load decodes AND resamples the whole meeting in memory
+            # before one clip is cut, so re-deriving byte-identical wavs costs the entire
+            # download and decode again. On 2026-08-20 one such decode wedged the process
+            # at 100% system time with zero I/O for an hour, with all 36,846 clips
+            # already present. Skip the meeting when every clip it would write is there.
+            d = CLIPS / tag / city / mtg
+            expected = []
+            for r in items:
+                s, e = span(r)
+                if not ok_span(s, e):
+                    continue
+                a = max(0, int((s - PAD_S) * SR))
+                if int((e + PAD_S) * SR) - a < int(MIN_DUR * SR):
+                    continue
+                expected.append((d / f"{r['utterance_id']}.wav", r["text"]))
+            # A clip clamped by the end of the audio can be shorter than predicted and so
+            # absent; that meeting simply rebuilds. Never accept a partial set.
+            if expected and all(q.is_file() and q.stat().st_size > 44 for q, _ in expected):
+                out.extend({"audio": str(q), "text": t} for q, t in expected)
+                if n_mtg % 20 == 0:
+                    log(f"  {tag}: {n_mtg}/{len(by_mtg)} meetings, {len(out)} clips (cached)")
+                continue
             try:
                 mp3 = dl(au)
                 y = librosa.load(mp3, sr=SR, mono=True)[0]

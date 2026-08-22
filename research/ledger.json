@@ -1,8 +1,163 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-18T20:00:00Z",
+  "updated_at": "2026-08-21T00:00:00Z",
   "note": "Authoritative state. Reports under docs/reports/ are immutable evidence; this file says whether their conclusions still stand. When a doc disagrees with this file, this file wins and the doc gets fixed in the same change.",
   "experiments": [
+    {
+      "id": "exp-2026-08-21-fusion-production",
+      "title": "Production fusion with two ASR systems and no LLM",
+      "question": "Can the per-column composition win be delivered in production with TWO ASR systems instead of three, given that whole-window selection with two was measured at 0.1349 and lost, and that with N=2 no 2-of-3 majority exists to break identity disagreements?",
+      "status": "OPEN",
+      "conclusion": null,
+      "decision": null,
+      "artifact_ids": [
+        "artifact-ct2-fixed",
+        "artifact-adapter-fixed",
+        "artifact-decode-policy-x",
+        "artifact-soniox-rt-tokens-2026-08-16"
+      ],
+      "capability_ids": [
+        "cap-self-hosted-asr",
+        "cap-decode-x-local"
+      ],
+      "reports": [],
+      "specs": [
+        "docs/specs/2026-08-21-fusion-production.md"
+      ],
+      "superseded_by": null,
+      "next_action": "Stage 0 of the spec, which costs nothing: score 3 pairs x 2 bases x 3 arms (P0/P1/P2) on the already-cached 247-window substrate, leave-one-city-out with every threshold fitted out-of-fold, plus the per-pair diagnostics (correct-token union coverage, both-wrong rate, exclusive-correct by producer, pairwise alignment-conditional oracle, KEEP-minus-DROP edit cost per singleton direction, conditional accuracy on identity disagreements, stability by city and meeting). Before any of that, one cheap probe: call Soniox stt-async-v5 on a single window and record which per-word fields it actually returns, since every timestamp and confidence figure this project holds for Soniox is stt-rt-v4 and the two must not be mixed.",
+      "updated_at": "2026-08-21T00:00:00Z",
+      "caveats": [
+        "NOTHING HERE IS MEASURED FOR N=2. Two-system per-column composition has never been run in this project or quoted from outside it. The design extrapolates from the three-system result of exp-2026-08-16-composition-over-selection (0.1201 -> 0.1005). The only measured two-system number is whole-window SELECTION at 0.1349, which lost to the best single system.",
+        "The chosen pair (artifact-ct2-fixed + Soniox stt-async-v5) is the COST-CONSTRAINED pair, not the accuracy-optimal pair. Scribe v2 dominates our adapter on WER, deletions and substitutions and loses only on insertions; it is excluded because no ElevenLabs credential exists in this environment (established by exp-2026-08-16-gold-set) and because confidence must come from the same decode pass as the text (exp-2026-08-18-conf-substrate, 0 of 133 windows text-joinable). Marginal error rates do not demonstrate complementary errors; only the Stage 0 pairwise diagnostics can.",
+        "Every Soniox timestamp and confidence figure the project holds is stt-rt-v4 (artifact-soniox-rt-tokens-2026-08-16): 96.8% column coverage, 0.058 s median turn-edge distance, AUROC 0.8167. Production runs stt-async-v5 and the caveat on that artifact forbids mixing them. None of those numbers may be assumed for the production input.",
+        "The occupancy default is DROP with a restore gate, which optimises agreement-with-OpenCouncil. It is probably the WRONG default for fidelity-to-audio: 40.8% of Soniox insertions and 23.7% of ours are real speech the published reference omits (exp-2026-08-17-insertion-fidelity). The spec keeps the two metrics separate and keeps every dropped span in the output rather than resolving the disagreement.",
+        "A calibrated-confidence identity tie-break is an arm, not an assumption. The nearest measurement is arm A of exp-2026-08-16-w-rt-confidence: 750 firings, dWER -0.00035, CI [-0.00105,+0.00027] includes zero, both rate gates fail narrowly; two sibling arms never fired in any of ten folds. Raw cross-vendor confidence comparison is forbidden.",
+        "Stage 0 is the seventh pass over the same 247 windows. Cross-fitting does not undo repeated analyst exposure, so it selects a configuration and can never supply the shipping claim. Stage 1 requires audio this project has never scored; the 16 locked evaluation windows stay sealed and the gold set has spent its one confirmatory pass.",
+        "The structural ceiling of exp-2026-08-17-majority-error-taxonomy applies at least as hard here: 27.7% of wrong majorities are definitely not a selection problem and 39.6% are not cleanly attributable to selection.",
+        "Speaker-attribution accuracy of the emitted schema is UNMEASURED. There is no ground truth outside the gold set, where the number that means something is 0.714 recall inside overlap.",
+        "Section 6 (confusion network for an LLM, extra-speaker detection) is explicitly future work and nothing in it is implemented or measured. Shaped by codex job e2771f4c; the merge rule was rewritten from per-column tiers to base-plus-disagreement-islands by codex job 8dbcf232."
+      ]
+    },
+    {
+      "id": "exp-2026-08-18-training-wer",
+      "title": "Training-set WER for the corrected adapter",
+      "question": "What WER does artifact-ct2-fixed achieve on the labels it trained on, and does the correction/no_edit split distinguish failure to fit from validation generalization?",
+      "status": "CLOSED",
+      "conclusion": "On an outcome-blind frozen simple-random sample of 300 rows from the exact 28,967-row control training parquet (136 meetings, 9 cities, 861 s audio, 2,368 normalized reference tokens), artifact-ct2-fixed scores training WER 0.1313 [0.1056,0.1619 meeting-clustered 95%], versus 0.2728 for artifact-ct2-base-large-v3 on the exact same sample and stack. The paired base-minus-fixed delta is +0.1415 [0.1138,0.1725]: adaptation cuts substitutions, deletions and insertions, with no leave-one-row sign reversal and the largest row carrying 3.0% of net gain. It learns corrections strongly: correction WER falls 0.4471 -> 0.2261 (-0.2210 point estimate); no_edit falls 0.1020 -> 0.0385 (-0.0635). Therefore failure to learn corrections is ruled out on this sample, although residual correction WER remains high. Against the matched fixed validation decode at 0.1548, train-minus-validation is -0.0235 descriptively; short training clips versus long validation windows confound that gap.",
+      "decision": "Every future training run reports this frozen 300-row training sample and the 39-window validation set at comparable checkpoints, including S/D/I and correction/no_edit slices. Training WER is diagnostic and never selects an arm. The next CPU audit targets residual correction errors by boundary status, duration, overlap and category, with blind listening in high-loss strata. Since the paired base contrast shows strong learning on both slices, the first new training mechanism remains dense-30s packing; the audit decides whether it also needs a protected label/boundary lane. The optional July-broken decode remains skipped.",
+      "artifact_ids": [
+        "artifact-ct2-fixed",
+        "artifact-ct2-base-large-v3",
+        "artifact-adapter-fixed"
+      ],
+      "capability_ids": [],
+      "reports": [
+        "docs/reports/2026-08-18-training-wer.md"
+      ],
+      "specs": [],
+      "superseded_by": null,
+      "next_action": null,
+      "updated_at": "2026-08-18T21:11:47Z",
+      "caveats": [
+        "Agreement with training labels, not fidelity to audio. A low number can mean memorisation of flawed labels; the 22.6% correction-row result does not prove those labels are wrong.",
+        "The paired base contrast proves the adapter learned its training labels, not that the learning generalises. The validation set remains the arm-selection endpoint.",
+        "The frozen sample is 300 of 28,967 rows. Its interval covers sampling and between-meeting variation, not training-run or decoder nondeterminism.",
+        "The direct validation reference is the exact representation-matched served-config arm R at 0.1548. The old 0.1589 raw segment-string join and the 0.1556-0.1584 A_s13/A_s29/A_s47 artifact range are deliberately not used for the gap.",
+        "Training rows are short isolated clips while validation rows are long windows, so the -0.0235 gap does not isolate in-sample generalization.",
+        "Transcript, audio and hypotheses remain under ~/.cache/oc-public/training-wer-2026-08-n300/. Aggregates only entered git; zero GPU, zero paid API and zero sealed holdout access."
+      ]
+    },
+    {
+      "id": "exp-2026-08-18-clean-data-filter-census",
+      "title": "Clean-data filter ladder CPU census",
+      "question": "Can the current external-pack supply be filtered into a demonstrably cleaner equal-hours training arm without removing the names, fast speech and hard examples the model needs to learn?",
+      "status": "CLOSED",
+      "conclusion": "CAPACITY PASSES; WHOLESALE STRICT FILTERING FAILS THE REPRESENTATION PREFLIGHT. Across the current hparl2-v2, stoma-v2, cv-v2 and eurospeech-v2 packs, L0/L1 contain 50,848 rows / 111.027 h and are identical because every packed row already has a Soniox witness. Frozen L2 (alignment >=0.95, 1.5-30 s, >=3 normalized tokens, no clipped edge) retains 30,044 rows / 60.069 h: 59.1% of rows and 54.1% of hours. It retains only 51.5% of the known-roster-name proxy rows, 48.9% of the broader capitalization proxy, 43.8% of fast-speech rows and zero hard examples by construction. L3 is measurable only for EuroSpeech through its existing Whisper-Turbo ds_wer and retains 1,063 rows / 4.146 h; it is an easy-for-Whisper proxy, not guaranteed-clean data.",
+      "decision": "SCREEN - STOP for the raw L0-versus-L2-wholesale arm: do not spend GPU on it. The next defensible variant is a new treatment, not a threshold tweak: blind retained/rejected audio audit by source and frozen name/fast/hard strata, followed by an L2 clean core plus a protected audited hard/name lane. Any later training comparison must be equal-hours within source, with identical optimizer updates, recipe, decode and paired seeds 13/29/47. The in-domain OpenCouncil backbone remains outside this witness ladder because independent-witness coverage is selective and would confound label quality with selection.",
+      "artifact_ids": [
+        "artifact-pack-hparl2-v2",
+        "artifact-pack-stoma-v2",
+        "artifact-pack-cv-v2",
+        "artifact-pack-eurospeech-v2"
+      ],
+      "capability_ids": [],
+      "reports": [
+        "docs/reports/2026-08-18-clean-data-filter-census.md"
+      ],
+      "specs": [
+        "docs/specs/2026-08-18-clean-data-filter-ladder.md"
+      ],
+      "superseded_by": null,
+      "next_action": null,
+      "updated_at": "2026-08-18T19:32:21Z",
+      "caveats": [
+        "This is a CPU census and representation preflight, not a model result. It can veto the measured arm but cannot establish that any retained row is audio-faithful or that filtering improves validation WER.",
+        "Name, fast-speech and hard-example labels are frozen metadata proxies, not ground truth. The roster proxy misses external and inflected names; capitalization is noisy and may reflect generated casing.",
+        "HParl and EuroSpeech overlap in source domain and must not be silently combined without deduplication. All retention and equal-hours targets remain source-specific.",
+        "L3 has a second witness only for EuroSpeech, and that witness is Whisper-Turbo. Its 4.146 h preferentially select examples already easy for the model family being adapted.",
+        "No validation, test or sealed holdout data were read. Aggregates only entered git; zero GPU and zero paid API."
+      ]
+    },
+    {
+      "id": "exp-2026-08-18-training-window-density",
+      "title": "Training versus inference 30-second occupancy audit",
+      "question": "Are the single-utterance clips used by the control training recipe distributionally mismatched to the nearly full 30-second windows seen at inference, and can the same rows be repacked densely without loss?",
+      "status": "CLOSED",
+      "conclusion": "YES: THE AUDIO-SUPPORT MISMATCH IS LARGE AND A DENSE ARM IS CONSTRUCTION-FEASIBLE. The exact control-A training parquet has 28,967 rows / 22.4725 raw annotation-span hours. Its intended clips average 3.553 s, or 11.84% encoder occupancy, with 88.16% mean digital padding and 90.40% median padding; 87.6% of raw-span time lies in the first five seconds and no clip reaches 25-30 s. Replaying the existing 247-window inference cache yields 1,148 encoder windows at 91.19% mean source-audio occupancy, 100% median, with 82.6% full 30-second windows. The mean inference-minus-training occupancy gap is 79.34 percentage points. The existing greedy packer forms 3,877 packs with 26.15/27.54 s mean/median duration, 93.27% in 20-30 s, 87.16% mean occupancy and zero dropped utterances or accounting failures.",
+      "decision": "SCREEN - ADVANCE at the CPU feasibility stage only. If the user separately authorizes GPU, compare A (current single-utterance clips) against B (the same rows in dense packs, without timestamp tokens), holding base checkpoint, optimizer budget, sampler exposure and paired seeds fixed under docs/decisions/training-evidence.md. Do not retest inference segmentation unless B passes the training screen. No WER or deletion improvement is claimed from construction feasibility.",
+      "artifact_ids": [
+        "artifact-pod-bundle-dense-screen-v1"
+      ],
+      "capability_ids": [],
+      "reports": [
+        "docs/reports/2026-08-18-training-window-density.md"
+      ],
+      "specs": [
+        "docs/specs/2026-08-18-training-window-density-audit.md"
+      ],
+      "superseded_by": null,
+      "next_action": null,
+      "updated_at": "2026-08-18T19:32:21Z",
+      "caveats": [
+        "The 2.793-second inherited value is an annotation-span proxy, not frame-level VAD speech. The intended 3.553-second clip estimate follows the trainer boundaries and padding but precedes the final clamp to source-recording end because the pod-built WAV cache is unavailable locally.",
+        "Inference audio occupancy measures available source audio. Its emitted-word positions are model outputs and are descriptive only; they are not ground-truth speech occupancy.",
+        "The inference side reuses an already-read 247-window benchmark cache, not the frozen 39-window validation set and not either sealed holdout. It establishes a deployment-shape mismatch, not transport to a new population.",
+        "The dense simulation proves construction and accounting only. It does not isolate whether dense audio, silence layout or timestamp supervision changes model quality until a controlled training arm runs.",
+        "Aggregates only entered git; zero training, zero GPU, zero paid API and zero sealed holdout access."
+      ]
+    },
+    {
+      "id": "exp-2026-08-18-training-measurement-rule",
+      "title": "How a training arm earns more budget or a claim of improvement",
+      "question": "How should training arms be screened, promoted and confirmed when the inherited 2.1-WER-point number was never a variance estimate for the current evaluation harness?",
+      "status": "CLOSED",
+      "conclusion": "THE 2.1-POINT NUMBER WAS MISNAMED: it is the range of three old paired treatment effects, not a seed variance or standard deviation. Re-scoring the three existing full-recipe controls A_s13/A_s29/A_s47 on the current 39-window frozen validation set gives WER 0.15557/0.15582/0.15842, a range of 0.285 points and sample SD 0.158 points. A second seed-13 run differs from artifact-adapter-fixed by -0.336 points, descriptively. One window supplies 23 of the 34 net errors between the best and worst seed, 67.6% of the range. Control-only SD cannot size a paired treatment confirmation: the paired-effect SD must come from the 300-step matched pilot.",
+      "decision": "Adopt the successive-halving evidence ladder in docs/decisions/training-evidence.md. Three paired seeds are mandatory for a 300-step large-v3 SCREEN; use their paired deltas to calculate the seed count for 80% power and a two-sided 95% interval. Underpowered arms are labelled SCREEN - ADVANCE or SCREEN - STOP, never wins or negative findings. Primary endpoint is frozen-validation WER; any higher mean deletion rate fails; insertion delta must stay below +0.0005; leave-one-window-out may not reverse the sign and no window may carry over 25% of net gain. Every new GPU stage requires explicit user approval. Fresh external research, when needed, runs through ssh laptop and the Grok Research skill on the MacBook.",
+      "artifact_ids": [
+        "artifact-adapter-fixed",
+        "artifact-adapter-mix-A-s13",
+        "artifact-adapter-mix-A-s29",
+        "artifact-adapter-mix-A-s47"
+      ],
+      "capability_ids": [],
+      "reports": [
+        "docs/reports/2026-08-18-training-measurement-calibration.md"
+      ],
+      "specs": [
+        "docs/decisions/training-evidence.md"
+      ],
+      "superseded_by": null,
+      "next_action": null,
+      "updated_at": "2026-08-18T19:04:06Z",
+      "caveats": [
+        "Only three seed outcomes. The 0.158-point SD is imprecise and is raw-control variation, not paired treatment-effect variation.",
+        "The same-seed comparison has matching run_meta fields and different weight hashes but no batch-order or hardware attestation, so it is descriptive total run nondeterminism only.",
+        "A single window carries 67.6% of the net best-to-worst seed range. No general seed-effect magnitude is claimed without the dominance caveat.",
+        "Agreement-with-OpenCouncil on 39 validation windows / 31 meetings / 11,911 tokens, common local CPU int8 stack and common per-window decoder seeds. The seven temporal holdouts remained sealed.",
+        "Hypothesis text and CT2 calibration builds stay under ~/.cache/oc-public/seed-calibration-2026-08/. Aggregates only entered git. Zero GPU and zero paid API."
+      ]
+    },
     {
       "id": "exp-2026-08-17-insertion-fidelity",
       "title": "How much of a scored insertion is speech our own published reference omits",
@@ -1535,27 +1690,31 @@
       "title": "Do our deletions come partly from where the audio is cut",
       "question": "Whisper decodes in 30-second windows and our frozen config places those boundaries blind (vad_filter=false). Deletions form a U inside each window. Does cutting at silence instead recover speech?",
       "status": "OPEN",
-      "conclusion": "ARM V (vad_filter=True), 247 windows, both arms decoded on ONE GPU in ONE session from the same lossless audio with the same model binary (sha256[:16] 8a1a3b257d0c1bdb verified on both machines), only vad_filter differing: WER 0.14233 -> 0.13905, delta -0.00328, CI [-0.00657, -0.00016], EXCLUDES ZERO. Insertions -0.00259 [-0.00464, -0.00077], also excludes zero. Deletions -0.00004, substitutions -0.00065, both include zero. | THE MECHANISM IS NOT THE HYPOTHESIS. Correct recall (1-(S+D)/N) moves 0.88167 -> 0.88236, delta -0.00069 with a CI spanning zero: no speech was recovered. Emitted tokens fall 73,199 -> 73,008. The gain is entirely LESS HALLUCINATION in non-speech regions, not less omission. | THEREFORE THE PREREGISTERED GATE FAILS: its primary metric is the deletion rate and deletions did not move. The deletion hypothesis is refuted; a different, unpreregistered effect is confirmed on 6.3x more tokens than the 39-window run. | ARM P, FIRST ATTEMPT, INVALID: the splitter cut at every reported silence and re-entered the same silence, taking the midpoint of [cursor, silence.end] so each pass advanced by half the remainder. A 148 s window produced 149 pieces of 9.38/0.51/0.26/0.13/0.064 s. Insertions went 0.02015 -> 0.07657. Its apparent deletion drop of -0.01352 is NOT recovery: (S+D)/N rose 0.13878 -> 0.14037 and the hypothesis grew from 0.96 to 1.03 words per reference word, so Levenshtein converted D+I into S. Replaced by split_accumulating (accumulate-then-cut, reviewed by gpt-5.6-sol): 5-8 pieces per window, min 5.38 s, median 22.75 s, zero pieces under 5 s, all counters zero on all 39 windows.",
-      "decision": "Arm V's WER gain is real but was not the preregistered primary, so it needs its own preregistration before it can ship. Do not quote it as a passed gate.",
+      "conclusion": "ARM V (vad_filter=True), 247 windows, both arms decoded on ONE GPU in ONE session from the same lossless audio with the same model binary (sha256[:16] 8a1a3b257d0c1bdb verified on both machines), only vad_filter differing: WER 0.14233 -> 0.13905, delta -0.00328, CI [-0.00657, -0.00016], EXCLUDES ZERO. Insertions -0.00259 [-0.00464, -0.00077], also excludes zero. Deletions -0.00004, substitutions -0.00065, both include zero. | THE MECHANISM IS NOT THE HYPOTHESIS. Correct recall (1-(S+D)/N) moves 0.88167 -> 0.88236, delta -0.00069 with a CI spanning zero: no speech was recovered. Emitted tokens fall 73,199 -> 73,008. The gain is entirely LESS HALLUCINATION in non-speech regions, not less omission. | THEREFORE THE PREREGISTERED GATE FAILS: its primary metric is the deletion rate and deletions did not move. The deletion hypothesis is refuted; a different, unpreregistered effect is confirmed on 6.3x more tokens than the 39-window run. | ARM P, FIRST ATTEMPT, INVALID: the splitter cut at every reported silence and re-entered the same silence, taking the midpoint of [cursor, silence.end] so each pass advanced by half the remainder. A 148 s window produced 149 pieces of 9.38/0.51/0.26/0.13/0.064 s. Insertions went 0.02015 -> 0.07657. Its apparent deletion drop of -0.01352 is NOT recovery: (S+D)/N rose 0.13878 -> 0.14037 and the hypothesis grew from 0.96 to 1.03 words per reference word, so Levenshtein converted D+I into S. Replaced by split_accumulating (accumulate-then-cut, reviewed by gpt-5.6-sol): 5-8 pieces per window, min 5.38 s, median 22.75 s, zero pieces under 5 s, all counters zero on all 39 windows. | ARM P, RE-RUN AFTER THE SPLITTER FIX, SCORED 2026-08-18: on the 39 frozen windows (artifact-ct2-fixed, local CPU int8) WER 0.15893 -> 0.14751, delta -0.01142, meeting-clustered CI [-0.02025, -0.00195], EXCLUDES ZERO. Unlike arm V this is not less hallucination: (S+D)/N falls 0.13878 -> 0.12795 and substitutions fall 938 -> 860, so speech is genuinely recovered. Deletions -0.00428, insertions -0.00059 (CI spans zero). | ARM E, SCORED 2026-08-20: FAILS BADLY AND IS REFUTED. WER 0.15893 -> 0.31081 (+0.15188 [+0.11796, +0.18655]), insertions 0.02015 -> 0.13425, deletions and substitutions both up, (S+D)/N up to 0.17656, emitted tokens 11,436 -> 12,464. The seam merge dropped 764 exact-duplicate tokens and still admitted +1,359 insertions. Cause: with word_timestamps=false the smallest timed unit is a whole segment, so two neighbouring windows transcribe the same speech with different wording and different segment midpoints, and centre-ownership keeps both. Leave-one-window-out never reverses the sign. | ARM P PACKAGED AND CONFIRMED ON CONTIGUOUS AUDIO, 2026-08-21: serve/decode_p.py (artifact-decode-policy-p, policy 5ae98472227696e0) reproduces the measured arm BYTE-FOR-BYTE on all three pinned conformance windows, including one where P is worse than the control (+0.0576). A whole 12.69-minute meeting decodes end to end -- 32 pieces, zero under 5 s, zero speech dropped, monotonic segment timestamps, byte-identical across two seeded runs -- so the contiguous-audio gap in the decision is closed. THREE NEW LIMITS, none visible on pre-cut windows: (1) the forced-cut rate is a property of the meeting, 5-6% on two sampled meetings but 41% on argithea__jun25_2_2026, against 7.7% on the 39 evaluation windows, and a forced cut is the case P's mechanism does not address; (2) the true start and end of a meeting produce Whisper subtitle-credit hallucinations ('Υπότιτλοι AUTHORWAVE', 3 occurrences in 12 minutes) because CONTROL has vad_filter=False; (3) 31 of 93 segments end AFTER the boundary of the piece that produced them, worst overshoot 29.98 s, because CONTROL has word_timestamps=False -- the text is unaffected but the segment timestamps are not usable for alignment at the seams. Separately: the arm A control cache records NO environment, and one of the three control windows did not reproduce byte-for-byte (0.1910 cached vs 0.1857 fresh) on a window that reaches the temperature fallback.",
+      "decision": "Arm P is the decoding candidate: adopt it as the production decode policy subject to one end-to-end check on contiguous whole-meeting audio, since it was measured on pre-cut 30 s windows. Arm V is not adopted (its preregistered deletion gate failed; the gain was less hallucination). Arm E is refuted and must not be retried without word-level timestamps; exp-2026-08-20-seam-repair has since shown, on 5 windows, that the missing ingredient is the word-level OWNERSHIP RULE and not the timestamps themselves (E 0.33969 -> E-WT 0.30338 with timestamps on but the old segment merge, -> 0.17538 with word ownership). Arm PI remains undecoded.",
       "artifact_ids": [
-        "artifact-ct2-fixed"
+        "artifact-ct2-fixed",
+        "artifact-decode-policy-p"
       ],
       "capability_ids": [
+        "cap-decode-p-local",
         "cap-runpod-gpu-pod"
       ],
       "reports": [
-        "docs/reports/2026-08-18-window-position.md"
+        "docs/reports/2026-08-18-window-position.md",
+        "docs/reports/2026-08-21-decode-p-served.md"
       ],
       "specs": [
         "docs/specs/2026-08-17-chunking-aware-decoding-prereg.md"
       ],
       "superseded_by": null,
-      "next_action": "Score the re-run arm P, then arms PI and E, under the frozen gate. Report (S+D)/N alongside every deletion claim.",
-      "updated_at": "2026-08-18T13:00:00Z",
+      "next_action": "Decode and score arm PI, the last unscored arm. For arm P the contiguous-audio confirmation is done (2026-08-21); what remains before calling it production policy is the 247-window GPU run on one stack. Consider arm V's non-speech hallucination suppression as a complement to P on whole meetings -- untested. The seam arms built on P are tracked in exp-2026-08-20-seam-repair.",
+      "updated_at": "2026-08-21T00:00:00Z",
       "caveats": [
         "The 39-window and 247-window numbers come from different stacks (local CPU int8 vs pod GPU fp16) and must never be mixed; within each, both arms share one stack.",
         "The harness measures agreement with OpenCouncil's published text. An arm that recovers speech the published text omits is scored as an insertion and punished, so a passing arm is credible while a failing arm is ambiguous.",
-        "eval/deletion_position.py froze the 2.0x tail-enrichment bar in code before looking; measured 1.60 (control) and 1.54 (RUN2), so premature EOS was refuted, not confirmed."
+        "eval/deletion_position.py froze the 2.0x tail-enrichment bar in code before looking; measured 1.60 (control) and 1.54 (RUN2), so premature EOS was refuted, not confirmed.",
+        "The harness constant eval/chunking_decode.py::EXPERIMENT is the string 'exp-2026-08-17-chunking-aware-decoding', a day earlier than this record's id. It is written into every cached state on disk and is deliberately left alone; this ledger id is the authoritative one."
       ]
     },
     {
@@ -1625,9 +1784,237 @@
         "The Soniox row's timestamps come from stt-rt-v4, NOT the stt-async-v5 text the benchmark W is built on.",
         "The ref_omission_suspect rule (occupancy >= 2) flags 11 of 11 insertions on this slice. A filter that selects the whole population does not discriminate; it is reported beside the primary figure, never inside it."
       ]
+    },
+    {
+      "id": "exp-2026-08-19-dense-screen-300",
+      "title": "Dense 30-second packing paired 300-step screen",
+      "question": "Under a fixed 300-update large-v3 recipe, does packing the same original rows into dense 30-second examples improve frozen-validation WER without worsening deletions, insertions or dominance?",
+      "status": "CLOSED",
+      "conclusion": "SCREEN - STOP. Across three paired seeds, dense B reduced mean validation WER from 0.15311 to 0.14759 (delta -0.00551) and deletion rate by 0.00568; all three seeds improved. It failed the frozen promotion gate because insertion rate rose by 0.00369 and per-window dominance exceeded 25%. Post-hoc deterministic diagnosis found 100 of 132 net extra insertions in one approximately 150-second window that is also insertion-heavy across nearly every cached external ASR system. Excluding it post hoc is forbidden and still leaves insertion delta about +0.00091. Alignment tie-break variants do not explain the failure.",
+      "decision": "Do not advance this dense recipe to 1,800 steps. Blind review is complete and found material omissions in both insertion-heavy validation references; repair them audio-faithfully before insertion adjudication. Then construct the accepted clean-core plus protected hard/name/boundary arm. Do not retry timestamps or extra synthetic silence: the former previously underperformed and the latter is already 0.4 seconds in the packer. Any future dense mixture requires a new preregistration and explicit GPU approval.",
+      "artifact_ids": [
+        "artifact-pod-bundle-dense-screen-v1"
+      ],
+      "capability_ids": [
+        "cap-runpod-gpu-pod"
+      ],
+      "reports": [
+        "docs/reports/2026-08-19-dense-screen-300.md"
+      ],
+      "specs": [
+        "docs/specs/2026-08-19-dense-screen-prereg.md",
+        "docs/decisions/training-evidence.md"
+      ],
+      "superseded_by": null,
+      "next_action": "Audio-faithfully re-reference the two diagnosed validation windows, then freeze the hybrid-data screen; do not spend on another dense arm.",
+      "updated_at": "2026-08-19T15:30:00+03:00",
+      "caveats": [
+        "The recovery pod was terminated after artifacts were retrieved. Network volume qzw88vdwv2 remains retained and bills separately until deletion. The initial $0.740/h 4090 pod m9v6o9cy2zhl3f was stopped before training at the user's request.",
+        "At fixed optimizer steps, dense packs expose more labelled speech per step than isolated clips. The result tests packing plus useful-token density under a fixed update/example budget, not context shape alone.",
+        "Validation A/B comparisons share one CUDA float16 stack. Their levels must not be compared directly with historical CPU int8 validation levels.",
+        "The frozen promotion decision remains STOP even though one window explains 75.8% of net extra insertions; post-hoc exclusion cannot change a preregistered gate.",
+        "Training-sample WER is diagnostic only: mean A 0.20946 versus B 0.21650 on the frozen 300-row sample.",
+        "Blind listening later judged both insertion-heavy validation references to have material omissions. Re-reference them before insertion adjudication; this explains the concentration but does not change SCREEN - STOP."
+      ]
+    },
+    {
+      "id": "exp-2026-08-19-training-residual-audit",
+      "title": "Residual correction error audit on the frozen training sample",
+      "question": "Are the corrected adapter's remaining training-label errors concentrated in boundary, duration, overlap or correction-category strata, and which rows need blind fidelity review before changing the data recipe?",
+      "status": "CLOSED",
+      "conclusion": "The CPU residual concentration was confirmed as a review problem but not converted into a corpus defect rate. All 36 frozen training items were reviewed: label faithful 10 yes / 0 no / 26 unsure; boundaries usable 8 yes / 1 no / 27 unsure. Jointly 7 were yes/yes, one was a definite boundary failure and 28 remained unresolved. Both insertion-heavy validation windows were judged material_omission in the published reference.",
+      "decision": "Admit only the 7 yes/yes rows to an audited-hard lane as-is, route the definite failure to correction, and keep 28 unresolved rows out of clean/audited-good lanes until repaired or re-reviewed. Re-reference both validation windows against audio before classifying model insertions. Do not infer dataset prevalence or filter a whole stratum from this outcome-enriched audit. No GPU follows automatically.",
+      "artifact_ids": [
+        "artifact-ct2-fixed",
+        "artifact-ct2-base-large-v3"
+      ],
+      "capability_ids": [],
+      "reports": [
+        "docs/reports/2026-08-19-training-residual-audit.md",
+        "docs/reports/2026-08-19-training-listening-audit.md"
+      ],
+      "specs": [
+        "docs/specs/2026-08-19-training-residual-audit.md",
+        "docs/specs/2026-08-19-training-listening-audit.md"
+      ],
+      "superseded_by": null,
+      "next_action": "Audio-faithfully re-reference the two validation windows, then freeze the hybrid clean-core plus protected audited lane manifest and equal-source-hours control before requesting GPU approval.",
+      "updated_at": "2026-08-19T15:30:00+03:00",
+      "caveats": [
+        "Agreement with training labels is not fidelity to audio; the headline boundary association cannot distinguish bad labels from genuinely hard boundary-adjacent speech.",
+        "Only 151 sampled correction rows. Strata overlap, small eligible strata remain descriptive, and no overlap-positive row was sampled.",
+        "Review audio, labels and hidden selection metadata stay under ~/.cache/oc-public/training-residual-audit-2026-08/. Only aggregates enter git.",
+        "Under the frozen rule unsure is unresolved, not a defect. Free-text notes guide correction but do not alter scored fields.",
+        "Private answers SHA-256: 0a49fdc66fc6979e448aa4076828535e0da2c7da0d402fd8589d9bc5c9c0523c."
+      ]
+    },
+    {
+      "id": "exp-2026-08-19-dense-reference-repair",
+      "title": "Audio-faithful repair of the two insertion-heavy validation references",
+      "question": "After the blind audit judged both insertion-heavy validation windows materially incomplete, what do those windows actually contain, and how much of the dense arm's extra text was recovered speech rather than insertion?",
+      "status": "CLOSED",
+      "conclusion": "STOPPED BY THE REVIEWER AFTER TRIAL, WITH NO REPAIRED REFERENCE PRODUCED. Two page designs were built and rejected in use: a hidden-reference audio-first pass, which asks a listener to name what is absent from a text they cannot see, and an interval page showing the forced-aligned published words while listening. On the second design the reviewer found something to add in every interval of both windows - the audio is continuous interruption and simultaneous speech - and judged the resulting reference unreliable and too expensive per minute to be worth producing.",
+      "decision": "Do not repair these two references. The dense arm's insertion evidence on them stays unresolved and SCREEN - STOP stands unchanged. The insight is kept as evidence about the corpus rather than the metric: council audio with heavy overlap cannot be cheaply given an audio-faithful reference, which is an argument for selecting training data by overlap-freedom rather than for auditing references after the fact. Harness (interval page, forced alignment of a published reference, scorer) is retained and reusable.",
+      "artifact_ids": [],
+      "capability_ids": [],
+      "reports": [
+        "docs/reports/2026-08-19-dense-reference-repair-stopped.md"
+      ],
+      "specs": [
+        "docs/specs/2026-08-19-dense-reference-repair.md"
+      ],
+      "superseded_by": null,
+      "next_action": null,
+      "updated_at": "2026-08-19T00:00:00Z",
+      "caveats": [
+        "Reference-assisted repair, not independently transcribed gold: the published words are shown time-placed by forced alignment while the reviewer listens, so the repair can inherit the published reference's omissions.",
+        "Two outcome-selected windows. Not the strict validation set and not a population estimate.",
+        "A hybrid 39-window WER mixing repaired and published references is forbidden; the two metrics stay separate.",
+        "No outcome here can revise the dense screen's SCREEN - STOP decision.",
+        "No repaired reference exists; eval/results_dense_reference_repair.json records the incomplete state only."
+      ]
+    },
+    {
+      "id": "exp-2026-08-19-overlap-clean-selection",
+      "title": "Select training clips by overlap-freedom instead of repairing references",
+      "question": "If the training clips that survive a diarization-based single-speaker/overlap-free filter are packed to 20-25 s of speech, does that arm beat a density-matched control on validation WER without regressing on overlap-heavy windows?",
+      "status": "CLOSED",
+      "conclusion": "SCREEN - STOP. Six adapters, three paired seeds (13/29/47), 300 frozen steps, all on one RTX 4090 float16 faster-whisper stack. Arm B (2,476 contiguous single-speaker packs, 18.59 h, 20-25 s each) beats arm A (28,967 clips, 3.55 s mean) on paired validation WER in all three seeds: mean delta -0.00982, per-seed -0.01268 / -0.00688 / -0.00991, with seed 13's meeting-clustered 95% CI [-0.02093,-0.00520] excluding zero. Deletions and insertions both fall (mean -0.00151 and -0.00551), which the dense screen never achieved. Five of six promotion gates pass; gate 6, single-window domination, fails at 0.622 (seed 29) and 0.280 (seed 47) against a 0.25 threshold, so the frozen gate stops the spend. Post-verdict per-window analysis, which does not and cannot change the verdict: the dominating window differs in every seed; seed 29's flag fires on a window that COSTS arm B +51 errors, and removing it moves that seed's net from -82 to -133; 26-27 of 39 windows improve in every seed; and pooled across seeds the largest window share is 23.1%, under threshold. Training WER is diagnostic only and arm B is worse there (0.258 vs 0.207), on 3.55 s clips it never trained on.",
+      "decision": "No medium or full stage. The prereg states that no later rung follows automatically even from a passing screen, and this screen did not pass. The evidence is strong enough that a confirmatory rung is worth proposing to the user, but that is an explicit user decision, not an automatic promotion. Two concrete follow-ups: window argos_oct31__2_2025_2353650 costs arm B +81 errors pooled and is the one window that consistently pays, so it is the specific lead this screen produced; and gate 6 as implemented uses max(abs(contribution)), which counts a window that HURTS the arm as domination - that defect was found after seeing results and must not be applied retroactively to this verdict.",
+      "artifact_ids": [],
+      "capability_ids": [],
+      "reports": [
+        "docs/reports/2026-08-21-clean-pack-screen.md"
+      ],
+      "specs": [
+        "docs/specs/2026-08-19-overlap-clean-selection.md",
+        "docs/specs/2026-08-20-clean-pack-screen-prereg.md"
+      ],
+      "superseded_by": null,
+      "updated_at": "2026-08-19T00:00:00Z",
+      "caveats": [
+        "Criteria frozen before the first diarization job; thresholds are not tuned to the surviving fraction.",
+        "The one-meeting pilot is an engineering smoke test; 72% accepted there estimates nothing about the corpus.",
+        "Diarization is not ground truth and boundary safety is measured, not enforced.",
+        "Any screen needs a density-matched control and an overlap non-inferiority slice; otherwise it re-measures the stopped dense-packing effect.",
+        "Coverage is 73/265 meetings, taken in download order rather than stratified by city; the surviving fraction is not a corpus estimate and city balance must be reported.",
+        "pyannoteAI credits are exhausted as of 2026-08-19; no further diarization without a top-up.",
+        "pyannote credits ran out mid-supply: 73 of 265 meetings, in download order, not stratified by city.",
+        "The overlap non-inferiority slice covers 21 of 39 windows and is diagnostic only.",
+        "Prereg deviation: 1 pack of 2,476 was dropped before training because its label exceeds the decoder's 448-token cap (0.04% of examples, 0.0% of hours).",
+        "WER levels here are not comparable to historical CPU int8 numbers; only paired deltas within this one GPU stack are valid."
+      ]
+    },
+    {
+      "id": "exp-2026-08-20-seam-repair",
+      "title": "Can the seam arm P cuts blind be repaired, and does word-level ownership rescue the overlap merge",
+      "question": "Arm P is the best decoding result but takes 16 FORCED (blind) cuts across 14 of the 39 frozen windows, where speech runs past the 29.5 s deadline and no VAD silence exists. Three arms on top of P: F cuts at the lowest-mean Silero probability valley in the last 2 s instead of cutting blind; C passes the previous pieces' tail as a 64-TOKEN initial_prompt across the seam; W decodes overlapping windows with word_timestamps=True and assigns each WORD by its own timestamp. E-WT is derived free from W's decodes with the OLD segment-level merge, so the finer merge can be separated from merely having word timestamps on.",
+      "status": "OPEN",
+      "conclusion": "MECHANISM PILOT ONLY, 5 windows, 2026-08-20. The 39-window run was NOT performed (the user capped the work at the small test), so there are NO confirmatory numbers and no arm is adopted. | ALL THREE ARMS PASS THEIR MECHANISM CHECK. F: on the 5 pilot windows P's 7 forced cuts become 3 blind + 4 probability-valley cuts, with zero pieces under 5 s, zero over 29.5 s, exact integer-sample tiling, and every repaired cut inside a recorded valley of >=100 ms with mean speech probability <0.35. The mechanism fires but does not eliminate blind cuts: 3 of 7 seams had no qualifying valley in the 2 s slack. C: instrumented model.get_prompt confirms the prompt reaches the decoder on 31/31 pieces -- the first call of each piece k>=2 receives exactly the recorded 59-64 token ids preceded by sot_prev and followed by sot_sequence, and every later call receives []. Codex's warning was borne out: a <=29.5 s piece is NOT always one decoder iteration (several pieces made 2 get_prompt calls), so the original one-window justification was too strong; the oracle covers it. W: word ownership is an exact two-way partition -- 2,894 candidates, 1,511 kept, 1,381 non-owner, 2 outside audio, kept iff the emitting window owns the tile of the word's own midpoint. The residual risk is measured rather than assumed away: mean seam disagreement 12.97% of tokens in the +/-1 s band around a tile edge. | DESCRIPTIVE 5-WINDOW RATES (NOT INFERENTIAL, NOT A GATE, chosen because P cuts blind in them; N=1,625 reference tokens, 5 meetings): A WER 0.18831 / (S+D)/N 0.17908; P 0.18154 / 0.17108; F 0.17108 / 0.16123; C 0.17477 / 0.16431; W 0.17538 / 0.16677; E 0.33969 / 0.22646; E-WT 0.30338 / 0.20185. | THE ONE STRUCTURAL FINDING THAT DOES NOT DEPEND ON THE SAMPLE SIZE: W - E-WT is -0.12800 on WER. Turning word timestamps on barely helped the old merge (E 0.33969 -> E-WT 0.30338); it is the WORD-LEVEL OWNERSHIP RULE, not the timestamps, that removes arm E's insertion catastrophe (insertion rate 0.11323 -> 0.10154 under the old merge, but 0.00862 under word ownership). That is exactly the confound E-WT was derived to expose, and it is answered. | REPRODUCIBILITY: the review fixes forced a full re-decode, and F, C and W each produced byte-identical text on all 5 windows across two independent runs. The arm C prompt-join defect CodeRabbit found was latent, not active: prompt token counts were unchanged (42-64 per piece). | ARM X (all three mechanisms in one decode, added on request and decoded on the same 5 windows) FAILS its mechanism check while posting the BEST WER of any arm here: WER 0.16062 and (S+D)/N 0.14585, against P's 0.18154 / 0.17108. The check that failed is F's: X takes 7 blind cuts on the pilot windows, exactly as many as P's 7 forced cuts, and the valley repair fired ONCE. The cause is structural, not a bug. X has to fit a core piece plus a 2 s margin on each side inside one 30 s Whisper window, so it cuts at 25.5 s instead of 29.5 s; the shorter ceiling manufactures new boundaries (7-8 pieces per window against F's 6-7) faster than the valley search repairs them, and it is worse per boundary too (21% blind vs F's 12.5%). SO X'S WINNING NUMBER IS NOT COMING FROM THE MECHANISM IT ADVERTISES: whatever X gains, it gains from the overlap margin, the word-level ownership and the prompt, while its F component performs WORSE than F standalone. The criterion was frozen before X was decoded and is not being relaxed to let the best number through.",
+      "decision": "Nothing is adopted. Arm P remains the decoding candidate. F is the cleanest successor -- it is the only arm that removes blind cuts rather than working around them, it passed every mechanism check, and it changes P's behaviour only in the 14 windows where P cuts blind. X is the most interesting and the least understood: best WER, failed mechanism, and a known confound between its three ingredients. W is no longer refuted the way arm E was: word-level ownership is now known to be the missing ingredient. None of this can be settled on 5 windows chosen because P cuts blind in them.",
+      "artifact_ids": [
+        "artifact-ct2-fixed",
+        "artifact-decode-policy-x"
+      ],
+      "capability_ids": [
+        "cap-decode-x-local"
+      ],
+      "reports": [],
+      "specs": [
+        "docs/specs/2026-08-20-seam-repair-prereg.md"
+      ],
+      "superseded_by": null,
+      "next_action": "Decode and score F, C, W and X on all 39 frozen windows (roughly 6 h local CPU; code and caches are in place: `eval/seam_repair.py decode --arm F|C|W|X` then `score`), so the arms sit in the same table as V, P and E. If X still leads there, the follow-up that separates its ingredients is an arm with X's 25.5 s ceiling and margin but WITHOUT the valley repair, which would price the margin on its own. Even the 39-window run stays exploratory -- these windows generated the forced-cut hypothesis -- so adoption needs the 247-window benchmark afterwards.",
+      "updated_at": "2026-08-20T00:00:00Z",
+      "caveats": [
+        "EXPLORATORY BY CONSTRUCTION. The 39 frozen windows generated the forced-cut hypothesis that arm F attacks, so re-running on them is not independent confirmation however many bootstrap replicates are used. The 5 pilot windows are worse: they were selected BECAUSE P cuts blind in them, so their rates are not a small version of the 39-window answer.",
+        "The 5-window intervals are quoted only to show their width. With 5 windows over 5 meetings and a meeting-clustered bootstrap, every arm's WER interval against control A spans zero.",
+        "F and C keep arm P's exact seeding (one ctranslate2.set_random_seed per window, before the piece loop) so they stay comparable to the cached P. With temperature fallback, arms with different piece counts consume different random streams, so 'common random numbers' is weaker than the phrase suggests.",
+        "Decoder nondeterminism was measured incidentally and is nil here: the CodeRabbit fixes forced a full re-decode, and all three arms produced byte-identical text on all 5 windows across two independent runs from fresh model processes. That is 5 windows on one machine, not a general determinism guarantee. The bootstrap still covers window/meeting sampling only.",
+        "KNOWN DEFECT, NOT FIXED HERE: chunking_decode.combine_piece_transcripts joins segment strings with no separator. Codex found that per-segment strip plus space-join changes tokenization in 7 of 39 windows on the cached P decode, recovering seven fused tokens. Fixing it would make every number incomparable with the published V/P/E table, so it is recorded as its own question. Arm W assembles from words instead; a test asserts a segment's words rejoin to that segment's own text under ftoks, so W is not advantaged by the difference.",
+        "W's word-level merge gives exactly one owner per CANDIDATE, not per spoken WORD. Two decodes of the same boundary word can land on opposite sides of a tile edge, producing a duplicate or a hole. Measured, not solved: 12.97% mean seam disagreement.",
+        "The freeze manifest holds 39 eval windows and 7 temporal-holdout windows; the project's 16 locked benchmark windows are a separate sealed set. Neither sealed set was touched.",
+        "Arm X's segmentation is NOT arm P's or F's: the 25.5 s ceiling it needs to fit its margins changes every boundary, so X is not a strict superset of F and no difference between them is attributable to the margin alone."
+      ]
+    },
+    {
+      "id": "exp-2026-08-22-clean-pack-medium",
+      "title": "Does the clean-pack advantage survive six times more training",
+      "question": "At 1,800 frozen steps instead of 300, does the overlap-free contiguous-pack arm still beat the incumbent short-clip arm on paired validation WER, and does the effect grow?",
+      "status": "CLOSED",
+      "conclusion": "SCREEN - STOP, and the effect did not grow - it dissolved. Six adapters, three paired seeds (13/29/47), 1,800 frozen steps, one GPU float16 stack, 39 validation windows. Mean delta WER -0.00252 (per seed -0.01108 / -0.00730 / +0.01083); all three meeting-clustered CIs cross zero and seed 47 reverses sign while worsening BOTH deletions (+0.00571) and insertions (+0.00563). Against the 300-step rung the point estimate shrank ~4x (-0.00982 -> -0.00252) while the across-seed standard deviation grew ~4x (0.00290 -> 0.01171); t(2) goes from -5.87 to -0.37 (post-hoc, not preregistered). Mechanism, measured: with effective batch 8 the two arms were never trained at comparable points on their curves. Arm A holds 28,967 rows and completed 0.08 epochs at 300 steps and 0.50 at 1,800 - it has never finished one epoch. Arm B holds 2,475 packs and completed 0.97 and 5.82. The crossing is the expected shape of arm B peaking near one pass and overfitting by six while arm A is still learning. The three arm-B runs ended at training losses 0.698/0.696/0.682, so no run is technically broken and the scatter is genuine generalization variance. Gate 6 fired at ~0.32 on all three seeds, but with a net effect of 0.0025 any window carries a large share: near zero net the domination gate measures effect size, not domination. Two previously unrecorded confounds are now quantified: arm A trains on a curated 'corrections + no-edit backbone' parquet while arm B has no correction enrichment at all - only 2.5% of pack utterances are corrections and only 16.5% of packs contain one, diluting the signal roughly 1:8; and the hypothesis that corrections live in overlapping audio is FALSE, they survive the overlap-free filter at 66.4% against 74.8% for all utterances.",
+      "decision": "Do not promote arm B and do not replace artifact-adapter-fixed; no measurement here justifies it. Do not rerun this comparison at a step budget: any future arm comparison must be matched on epochs or on optimizer updates with the dataset size declared, per #49. Every future training run saves intermediate checkpoints and scores them with the EXTERNAL scorer rather than in-training eval, which uses a different normalization (it folds final sigma; the official scorer does not). Gate 6 is not fixed retroactively - the STOP stands - but #48 now has its exact diagnosis: the statistic is degenerate when the net effect approaches zero. Record that the 39 validation windows have now driven two screens, the stopping behaviour and a budget choice; ordinary confidence intervals no longer describe an untouched evaluation set, and any further claim must either say so or use untouched material.",
+      "artifact_ids": [],
+      "capability_ids": [
+        "cap-runpod-gpu-pod"
+      ],
+      "reports": [
+        "docs/reports/2026-08-22-clean-pack-medium.md"
+      ],
+      "specs": [
+        "docs/specs/2026-08-21-clean-pack-medium-prereg.md"
+      ],
+      "superseded_by": null,
+      "updated_at": "2026-08-22T07:00:00Z",
+      "caveats": [
+        "Levels are not comparable to historical CPU int8 validation numbers; only the paired A/B contrast within this one GPU float16 stack is valid (the results file carries this guard).",
+        "The t-statistics across seeds are post-hoc description, not preregistered inference, and n=3 makes them fragile.",
+        "Arm A never completed one epoch at either rung, so this experiment does not establish how arm A behaves when trained to convergence."
+      ]
     }
   ],
   "artifacts": [
+    {
+      "id": "artifact-pod-bundle-dense-screen-v1",
+      "kind": "training_bundle",
+      "description": "Portable content-addressed input bundle for the dense-30s training screen: 3,877 dense packs, exact control train/validation parquets, trainer code and pinned pod requirements. Pack audio paths are relative to the manifest.",
+      "status": "MISSING",
+      "locations": [
+        {
+          "host": "minipc",
+          "path": "/home/harold/.cache/oc-public/pod-bundles/dense-screen-e649e91d5dbf2c67.tar.zst"
+        }
+      ],
+      "hash": {
+        "algorithm": "sha256-file-v1",
+        "file": "dense-screen-e649e91d5dbf2c67.tar.zst",
+        "value": "8e2ca2ce657e9e2e",
+        "value_full": "8e2ca2ce657e9e2ef8084925323f4482a4d61fc7ef154cd3309bac982ea52673",
+        "verified_at": "2026-08-19"
+      },
+      "caveats": [
+        "Contains council audio and transcript text; stays outside git under ~/.cache/oc-public/ and must not be published.",
+        "This is an input/staging artifact, not approval to create a billable network volume or GPU pod.",
+        "The bundle contains raw control parquets, not precomputed control-arm Whisper features; the first attached pod still needs CPU preprocessing unless that cache is added later.",
+        "DELETED 2026-08-20 from the minipc cache to free disk for the clean-pack bundle rebuild (/home was at 100%). The dense screen it fed is CLOSED and its results live on network volume qzw88vdwv2 under runs/dense-screen/. Rebuildable from the same inputs with scripts/pod_bundle.py; the recorded sha256 identifies what to reproduce."
+      ],
+      "replaced_by": null,
+      "verified_at": "2026-08-19T00:48:17+03:00"
+    },
+    {
+      "id": "artifact-ct2-base-large-v3",
+      "kind": "ct2_model",
+      "description": "Systran faster-whisper conversion of base openai/whisper-large-v3, used for the paired training-WER contrast.",
+      "status": "ACTIVE",
+      "locations": [
+        {
+          "host": "minipc",
+          "path": "/home/harold/.cache/huggingface/hub/models--Systran--faster-whisper-large-v3/snapshots/edaa852ec7e145841d8ffdb056a99866b5f0a478"
+        }
+      ],
+      "hash": {
+        "algorithm": "sha256-file-v1",
+        "file": "model.bin",
+        "value": "69f74147e3334731",
+        "value_full": "69f74147e3334731bc3a76048724833325d2ec74642fb52620eda87352e3d4f1",
+        "verified_at": "2026-08-18"
+      },
+      "caveats": [
+        "Local HuggingFace cache location; may be garbage-collected and must then be restored from the pinned Systran snapshot edaa852ec7e145841d8ffdb056a99866b5f0a478."
+      ],
+      "replaced_by": null,
+      "verified_at": "2026-08-18T21:11:47Z"
+    },
     {
       "id": "artifact-adapter-july-broken",
       "kind": "lora_adapter",
@@ -1784,9 +2171,51 @@
         "value": "307429b47cbd328d"
       },
       "caveats": [
-        "Never measured as a standalone model; only the paired A-vs-C contrast was scored."
+        "Measured standalone on the current 39-window validation harness by exp-2026-08-18-training-measurement-rule."
       ],
-      "verified_at": "2026-08-10T17:00:00Z"
+      "verified_at": "2026-08-18T19:04:06Z"
+    },
+    {
+      "id": "artifact-adapter-mix-A-s29",
+      "kind": "lora_adapter",
+      "description": "Mixture control arm, 50/50, seed 29; full corrected recipe and 7,242 steps.",
+      "status": "HISTORICAL",
+      "locations": [
+        {
+          "host": "minipc",
+          "path": "/home/harold/oc-mix-adapters/adapter_A_s29"
+        }
+      ],
+      "hash": {
+        "algorithm": "sha256-file-v1",
+        "file": "adapter_model.safetensors",
+        "value": "6a63aa13a8a1a8a70d9e8d155b8c385641f40c1fd498eb51ba21b0c8e53ccb7f"
+      },
+      "caveats": [
+        "Measured standalone on the current 39-window validation harness by exp-2026-08-18-training-measurement-rule."
+      ],
+      "verified_at": "2026-08-18T19:04:06Z"
+    },
+    {
+      "id": "artifact-adapter-mix-A-s47",
+      "kind": "lora_adapter",
+      "description": "Mixture control arm, 50/50, seed 47; full corrected recipe and 7,242 steps.",
+      "status": "HISTORICAL",
+      "locations": [
+        {
+          "host": "minipc",
+          "path": "/home/harold/oc-mix-adapters/adapter_A_s47"
+        }
+      ],
+      "hash": {
+        "algorithm": "sha256-file-v1",
+        "file": "adapter_model.safetensors",
+        "value": "a3d1d26071b15740b062ec873b03d658d5bbcbdf923728bab69c1cb15e19ef67"
+      },
+      "caveats": [
+        "Measured standalone on the current 39-window validation harness by exp-2026-08-18-training-measurement-rule."
+      ],
+      "verified_at": "2026-08-18T19:04:06Z"
     },
     {
       "id": "artifact-adapter-mix-C-s13",
@@ -2179,6 +2608,78 @@
         "Zero cost: free Perplexity temp key on the realtime WebSocket path."
       ],
       "verified_at": "2026-08-16T17:00:00Z"
+    },
+    {
+      "id": "artifact-decode-policy-x",
+      "kind": "decode_policy",
+      "description": "Arm X, the seam-repairing decode policy, packaged as a runnable configuration rather than an experiment script. Cores of at most 27.0 s; boundary chosen by a three-step ladder (VAD silence >=0.5 s, else the lowest-mean Silero probability valley of >=128 ms below 0.35 within the last 3.0 s, else blind); each core decoded from [core_start-0.5 s, core_end+2.0 s] so every seam is heard from both sides while still fitting one 30 s Whisper window (27.0+0.5+2.0=29.5); the previous cores' text carried as a 64-TOKEN initial_prompt; every word owned by the core containing its own midpoint, margins being context only. Everything else is the frozen CONTROL decode config with word_timestamps=True.",
+      "status": "ACTIVE",
+      "locations": [
+        {
+          "host": "minipc",
+          "path": "serve/decode_x.py"
+        }
+      ],
+      "hash": {
+        "algorithm": "sha256-json-v1",
+        "file": "serve/decode_x.py::POLICY",
+        "value": "3af821c64bfb179c",
+        "value_full": "3af821c64bfb179cda8a6a57d0a7decf290d2c2c1e8e106b4ce6b89af235cdfc",
+        "verified_at": "2026-08-20T00:00:00Z"
+      },
+      "entry_points": [
+        "python -m serve.decode_x config",
+        "python -m serve.decode_x transcribe AUDIO [--json]",
+        "from serve.decode_x import DecodeX; DecodeX.load().transcribe(path)"
+      ],
+      "model_artifact_id": "artifact-ct2-fixed",
+      "produced_by": "exp-2026-08-20-seam-repair",
+      "caveats": [
+        "STATUS IS 'ACTIVE' IN THE SCHEMA SENSE ONLY -- the file exists, is runnable and hashes as recorded. The EVIDENCE behind it is exploratory; see exp-2026-08-20-seam-repair before quoting any number from it.",
+        "EXPLORATORY. Packaged so it CAN be run over a benchmark, not because a benchmark has endorsed it. The mechanism checks pass; the quality evidence is 5 windows chosen because arm P fails on them, plus a 39-window exploratory run on windows that generated the hypothesis.",
+        "Not validated on contiguous whole-meeting audio. Every measurement so far is on pre-cut ~150 s evaluation windows, so the policy has never chosen a boundary near a real meeting's start or end.",
+        "eval/tests/test_decode_x_policy.py asserts the served POLICY constants equal the experiment constants and that the policy reproduces the measured arm's boundaries on a cached window. If that test fails, the served policy has drifted from the measured one and no number attached to it is valid.",
+        "The policy hash covers the config only, not the model. Always record artifact-ct2-fixed alongside it."
+      ],
+      "updated_at": "2026-08-20T00:00:00Z"
+    },
+    {
+      "id": "artifact-decode-policy-p",
+      "kind": "decode_policy",
+      "description": "Arm P, the silence-cutting decode policy, packaged as a runnable configuration rather than an experiment script. Silero VAD marks silences (>=0.5 s, no speech padding); audio accumulates to at most 29.5 s and is then cut at the LATEST silence midpoint that leaves a piece of at least 5.0 s containing at least 2.5 s of voiced audio, falling back to the latest in-range candidate and then to a blind cut at the ceiling; a final piece under 5.0 s is merged into its predecessor or the shared boundary is moved. Each piece is decoded independently with the frozen CONTROL config and the piece texts are concatenated with segment timestamps offset. No context margins, no initial_prompt, no seam de-duplication -- those are arm X.",
+      "status": "ACTIVE",
+      "locations": [
+        {
+          "host": "minipc",
+          "path": "serve/decode_p.py"
+        }
+      ],
+      "hash": {
+        "algorithm": "sha256-json-v1",
+        "file": "serve/decode_p.py::POLICY",
+        "value": "5ae98472227696e0",
+        "value_full": "5ae98472227696e0976eeb80390d392106e80ea6485fa96e13b78f3ec010186b",
+        "verified_at": "2026-08-21T00:00:00Z"
+      },
+      "entry_points": [
+        "python -m serve.decode_p config",
+        "python -m serve.decode_p plan AUDIO",
+        "python -m serve.decode_p transcribe AUDIO [--json] [--seed N]",
+        "from serve.decode_p import DecodeP; DecodeP.load().transcribe(path)"
+      ],
+      "model_artifact_id": "artifact-ct2-fixed",
+      "produced_by": "exp-2026-08-18-chunking-aware-decoding",
+      "replaced_by": null,
+      "caveats": [
+        "P IS THE BEST MEASURED ARM BY WER, NOT AN ARM THAT PASSED A GATE. WER 0.15893 -> 0.14751, delta -0.01142, CI [-0.02025, -0.00195] excluding zero -- but the preregistered gate of its experiment was on DELETIONS, and the deletion delta -0.00428 has a CI containing zero. The win comes from substitutions. Every text about this policy must say so.",
+        "The policy hash covers the config only, not the model. Always record artifact-ct2-fixed alongside it.",
+        "The efficacy evidence is the 39 local-CPU windows only. The 247-window GPU run has never been done for P, and the two stacks must never be mixed.",
+        "eval/tests/test_decode_p_policy.py asserts the served POLICY constants equal the experiment constants, that the digest is the pinned one, and that the policy reproduces the measured arm's boundaries on a cached window. If it fails, the served policy has drifted from the measured one and no number attached to it is valid.",
+        "The served module imports eval/chunking_decode.py rather than copying it, so the splitter itself could change without changing the policy hash. The frozen planner fixture in the test file is what catches that.",
+        "The model hash covers model.bin only, which is what the ledger records; the tokenizer and config files beside it are not covered.",
+        "boundary kind is a description of WHERE the boundary landed, recomputed from the silence list, not provenance of why the splitter cut there. The splitter's own cut_silence_duration field is carried over unchanged when the short-tail repair moves a boundary and can name a silence seconds away."
+      ],
+      "updated_at": "2026-08-21T00:00:00Z"
     }
   ],
   "capabilities": [
@@ -2219,9 +2720,12 @@
         "Bills continuously from creation, not per GPU-second. Arm a watchdog with a hard deadline BEFORE uploading anything.",
         "Expose 8000/http at CREATE time if the pod must serve. Ports cannot be assumed; a pod with only 22/tcp is unreachable by the benchmark.",
         "The RunPod HTTP proxy cuts a request at ~100s. On GPU a 120s council window decodes in ~11s, so this is a CPU-only problem. Measured: mini-PC CPU 128.1s mean, 22 timeouts; RunPod GPU 11.3s mean, 260/260 clean.",
-        "4090 / 3090 / A5000 community capacity is frequently unavailable. RTX A4000 at $0.17/hr has been the reliable fallback for inference."
+        "4090 / 3090 / A5000 community capacity is frequently unavailable. RTX A4000 at $0.17/hr has been the reliable fallback for inference.",
+        "Persistent volume qzw88vdwv2 (oc-dense-screen-vfm-20260819), 100 GB standard storage in EUR-IS-1, created 2026-08-19 for the dense screen. Official rate checked that day: $0.07/GB/month while idle ($7/month ceiling). Delete it after the GPU screen. The earlier empty EU-RO-1 volume lyaqmog1jy was deleted.",
+        "The volume can be pre-seeded without a pod through https://s3api-eu-ro-1.runpod.io using a separate RunPod S3 access/secret key. Those credentials are not present locally; RUNPOD_API_KEY is not an S3 key.",
+        "Active dense-screen pod 2n3uqipjgr4tl6 is a Secure RTX A4000 in EUR-IS-1 at $0.250/h. Detached launcher PID 3374174 handles readiness, direct resumable upload, setup and handoff; watchdog PID 3374176 enforces the 18-hour hard stop."
       ],
-      "last_verified_at": "2026-08-10T17:00:00Z"
+      "last_verified_at": "2026-08-19T01:02:40+03:00"
     },
     {
       "id": "cap-self-hosted-asr",
@@ -2236,6 +2740,55 @@
         "Serves artifact-ct2-fixed since 2026-08-10; before that it served the broken build."
       ],
       "last_verified_at": "2026-08-10T17:00:00Z"
+    },
+    {
+      "id": "cap-decode-x-local",
+      "title": "Run the arm X seam-repair decode policy over arbitrary audio",
+      "status": "AVAILABLE",
+      "purpose": "Decode any audio -- a file, a meeting, a whole benchmark -- under the frozen arm X policy, without going through the experiment harness. This is the difference between a result and something that can be run again.",
+      "runbook": "docs/runbooks/decode-x-policy.md",
+      "artifact_ids": [
+        "artifact-decode-policy-x",
+        "artifact-ct2-fixed"
+      ],
+      "operations": [
+        "config",
+        "transcribe",
+        "plan"
+      ],
+      "smoke_check": "SC=~/.cache/oc-public .venv-eval/bin/python -m serve.decode_x config",
+      "notes": [
+        "Local CPU int8, roughly 145 s of wall time per 150 s window on the minipc at 16 threads. No GPU, no money, no external API.",
+        "verify=True on DecodeX.load() refuses to run unless the CT2 model hashes to artifact-ct2-fixed; an output whose producing model is unknown is not evidence.",
+        "The policy returns word timestamps and the list of boundaries with the reason each was chosen (vad_silence / probability_valley / blind), so a bad transcript can be traced back to its segmentation."
+      ],
+      "updated_at": "2026-08-20T00:00:00Z",
+      "last_verified_at": "2026-08-20T00:00:00Z"
+    },
+    {
+      "id": "cap-decode-p-local",
+      "title": "Run the arm P silence-cutting decode policy over arbitrary audio",
+      "status": "AVAILABLE",
+      "purpose": "Decode any audio -- a file, a whole meeting, a benchmark -- under the frozen arm P policy, without going through the experiment harness. P is the best measured decode arm by WER on the 39 frozen windows.",
+      "runbook": "docs/runbooks/decode-p-policy.md",
+      "artifact_ids": [
+        "artifact-decode-policy-p",
+        "artifact-ct2-fixed"
+      ],
+      "operations": [
+        "config",
+        "plan",
+        "transcribe"
+      ],
+      "smoke_check": "SC=~/.cache/oc-public .venv-eval/bin/python -m serve.decode_p config",
+      "notes": [
+        "Local CPU int8, 16 threads on the minipc: measured 0.46-0.79x real time on the three conformance windows once the model is loaded, plus a fixed minute or two per process to load the model and hash its 1.5 GB model.bin. No GPU, no money, no external API.",
+        "verify=True on DecodeP.load() hashes model.bin in the directory it is about to load and refuses anything that is not artifact-ct2-fixed; overriding model_dir does not bypass it.",
+        "`plan` does the segmentation without decoding, so a 64-minute meeting is planned in about 9 s and the forced-cut rate can be inspected before paying for the transcription.",
+        "Every internal boundary is returned with its kind (vad_silence / forced), so a bad stretch of transcript can be traced back to its cut."
+      ],
+      "updated_at": "2026-08-21T00:00:00Z",
+      "last_verified_at": "2026-08-21T00:00:00Z"
     }
   ]
 }
