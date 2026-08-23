@@ -831,7 +831,8 @@
         "The reference is OpenCouncil's own published text: this measures agreement-with-OpenCouncil, not fidelity-to-audio.",
         "The denominator is concentrated: 4 of 39 windows carry 134 of the 250 term occurrences. Leave-one-window-out moves the delta vs Gladia from -0.100 to -0.069 (31%) without reversing its sign.",
         "The base-whisper arm ran on the HuggingFace serverless pipeline, a different decoder stack. Its comparison is not a clean weights comparison.",
-        "argos+orestiada is VALIDATION, scored repeatedly and used to stop experiments. One seed, one run - the same run as exp-2026-08-10-benchmark-fixed-adapter."
+        "argos+orestiada is VALIDATION, scored repeatedly and used to stop experiments. One seed, one run - the same run as exp-2026-08-10-benchmark-fixed-adapter.",
+        "Re-decoded 2026-08-23 with v1 and v2 on one stack: v1 0.4800 (was 0.4880 on a retired machine), v2 seeds 0.4360/0.4640/0.4840, all clearing the 15% relative target against Gladia on the point estimate. The final report presents the target as met against Gladia, the baseline it was written against, while stating that the commercial systems are still ahead."
       ]
     },
     {

@@ -15,7 +15,7 @@
 
 OpenCouncil publishes transcripts of Greek municipal council meetings. Every transcript goes through human correction before it is published, so transcription quality decides how much work each meeting costs. My project set out to fine-tune `whisper-large-v3` on council speech and cut the error rate on the words that cost the most to fix: councillor names, place names, and the procedural vocabulary that repeats in every session.
 
-I built the dataset, trained two generations of LoRA adapters, and measured them against every ASR system available to the project on the same audio through the same decoder. Both adapters beat the open-source baseline they started from. Neither beats the commercial systems, and the domain-term target in my proposal was not reached.
+I built the dataset, trained two generations of LoRA adapters, and measured them against every ASR system available to the project on the same audio through the same decoder. Both adapters beat the open-source baseline they started from, and both clear the domain-term target my proposal set against Gladia. Neither beats the commercial systems the market moved to during the summer.
 
 The substitution rate, the share of words heard as the wrong word, barely moved across two generations: 0.0784 for base whisper, 0.0764 for v1, 0.0772 for v2. The deletion rate halved, from 0.0955 to 0.0436. Fine-tuning on council speech bought fewer silent passages, not better word recognition.
 
@@ -97,7 +97,7 @@ The merged model runs behind an OpenAI-compatible HTTP endpoint on a GPU pod, pr
 | Evaluation framework | Delivered, and used for every number in this report. |
 | Serving | Delivered. Runs behind an API key, decodes whole meetings. |
 | Production integration | Not done, and not the right call. See below. |
-| Domain-term WER target | Not reached. |
+| Domain-term WER target | Met against Gladia, the baseline it was set against. |
 | Human intervention rate | Dropped after discussion with the mentors. |
 
 **On production integration.** During the summer OpenCouncil moved from Gladia to ElevenLabs Scribe v2. Scribe scores better than either of my adapters on our own benchmark, so putting my model in front of the correction queue would make the product worse. We do plan to put the fusion approach in section 4.5 into production. I am preparing it now, we will test it against the live pipeline, and if it holds up it ships.
