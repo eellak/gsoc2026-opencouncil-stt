@@ -147,7 +147,7 @@ windows.
 **On production integration.** During the summer OpenCouncil moved from Gladia to
 ElevenLabs Scribe v2. Scribe scores better than either of my adapters on our own
 benchmark, so putting my model in front of the correction queue would make the product
-worse. We do plan to put the fusion approach in section 4.3 into production. I am preparing it
+worse. We do plan to put the fusion approach in section 4.5 into production. I am preparing it
 now, we will test it against the live pipeline, and if it holds up it ships.
 
 **On the human intervention rate.** I proposed it as the operational metric and we let
@@ -183,7 +183,76 @@ of [-0.0218, -0.0114]. It also beats Gladia, which is what OpenCouncil used when
 project began, and gpt-4o-transcribe. It loses to Scribe v2 and Soniox by margins whose
 intervals exclude zero.
 
-### 4.2 Why we did not catch the commercial systems
+### 4.2 Domain terms, the target I set myself
+
+The proposal promised at least 15% relative improvement on the words that cost reviewers
+the most time. I measured that on 250 occurrences of councillor surnames and place names
+across the 39 validation windows.
+
+| system | DS-WER |
+|---|---|
+| Soniox | 0.3280 |
+| ElevenLabs Scribe v2 | 0.3720 |
+| **our adapter v1** | **0.4880** |
+| `whisper-large-v3`, not fine-tuned | 0.5400 |
+| Gladia, the baseline the target was set against | 0.5880 |
+
+Against Gladia that is 17.0% relative, so on the point estimate the target is met. I do
+not think it should be read that way. The 95% meeting-block interval on the absolute
+difference runs [-0.1869, +0.0040] and includes zero. Two of the 39 windows are roll
+calls, which are dense with surnames; drop those two and our 0.4751 sits alongside base
+whisper's 0.4696. Against Soniox we make about half again as many domain-term errors.
+
+The useful part of the failure is the shape of it. Our name errors are 90 substitutions
+against 28 deletions, so the model hears that a name is there and writes the wrong one.
+That is what sent me to look at spelling in section 4.3.
+
+### 4.3 How the error rate moves from training to test
+
+Three sets, in order of how much the model has seen them:
+
+| | what it is | v1 | base whisper |
+|---|---|---|---|
+| **Training** | 300 rows drawn from the 28,967 v1 trained on | **0.1313** [0.1056, 0.1619] | 0.2728 [0.2311, 0.3211] |
+| **Validation** | 39 windows, two councils absent from training | **0.1548** | |
+| **Test** | 391 windows, 117 meetings, none in training | **0.1867** | 0.1988 |
+
+The rise from 0.1313 to 0.1867 is what generalisation costs. The model fits its training
+data well without memorising it, and it holds most of that gain on councils and meetings
+it has never heard.
+
+Splitting the training rows by whether a human edited them is the more interesting cut.
+On rows a reviewer corrected, v1 scores 0.2261 where base whisper scores 0.4471. On rows
+the reviewer left alone, v1 scores 0.0385 against 0.1020. The adapter learns the
+corrections rather than only the acoustics.
+
+On validation, the two adapter generations separate:
+
+| | validation, 39 windows | test, 391 windows |
+|---|---|---|
+| our adapter v1 | 0.1600 | 0.1867 |
+| our adapter v2, seed 47 | **0.1390** | **0.1795** |
+| our adapter v2, seed 29 | 0.1400 | |
+| our adapter v2, seed 13 | 0.1457 | |
+
+v2 wins on validation in all three random seeds, which is why we trained it in the first
+place. On the test set the difference shrinks to -0.0040 with an interval that crosses
+zero. The validation gain is real and it does not survive at full size on unseen
+meetings.
+
+**Read down the columns, not across them.** Each of the three sets was scored on its own
+decoding stack and against its own kind of reference: the training rows against the
+corrected labels the model was shown, validation against a frozen reference for two
+councils, test against OpenCouncil's published transcripts. Comparing two models inside
+one column is valid. Subtracting one column from another gives a direction, not a
+distance. An earlier version of this project reported a false win by ignoring exactly
+that, which is why the caveat is here rather than in a footnote.
+
+I did not measure training WER for v2. Its packs are a different corpus, so the v1 sample
+is not v2's training data, and a fair version needs a training sample drawn from the v2
+packs and another GPU run.
+
+### 4.4 Why we did not catch the commercial systems
 
 I took the 4.18-point gap to Scribe apart word by word across all 110,694 reference
 tokens. The result surprised me:
@@ -198,10 +267,9 @@ tokens. The result surprised me:
 - The gap does not depend on where a word sits in the 30-second window. Chunking is not
   the cause.
 
-I would rather record this than a vaguer version of it. Anyone continuing this work now
-knows which three directions are dead and why.
+Anyone continuing this work now knows which three directions are dead and why.
 
-### 4.3 Combining several systems
+### 4.5 Combining several systems
 
 While measuring providers against each other I noticed they fail on different words. I
 aligned three transcripts word by word and let each position be decided by a vote,
