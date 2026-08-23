@@ -239,7 +239,7 @@ Three sets, in order of how much the model has seen them:
 | | what it is | v1 | base whisper |
 |---|---|---|---|
 | **Training** | 300 rows drawn from the 28,967 v1 trained on | **0.1313** [0.1056, 0.1619] | 0.2728 [0.2311, 0.3211] |
-| **Validation** | 39 windows, two councils absent from training | **0.1548** | |
+| **Validation** | 39 windows, two councils absent from training | **0.1561** | 0.1857 |
 | **Test** | 391 windows, 117 meetings, none in training | **0.1867** | 0.1988 |
 
 The rise from 0.1313 to 0.1867 is what generalisation costs. The model fits its training
@@ -251,19 +251,42 @@ On rows a reviewer corrected, v1 scores 0.2261 where base whisper scores 0.4471.
 the reviewer left alone, v1 scores 0.0385 against 0.1020. The adapter learns the
 corrections rather than only the acoustics.
 
-On validation, the two adapter generations separate:
+On validation, all three models were decoded on one machine, and that machine is the
+one the evaluation set was frozen against: this laptop, CPU, int8, 16 threads. The
+manifest states plainly that a CUDA number may never be compared with these, so the
+comparison below is the only one of its kind in this report where every row shares a
+decoder.
 
-| | validation, 39 windows | test, 391 windows |
+| 39 validation windows | WER | deletions | insertions | substitutions |
+|---|---|---|---|---|
+| `whisper-large-v3`, not fine-tuned | 0.18571 | 0.09546 | 0.01184 | 0.07841 |
+| our adapter v1 | 0.15607 | 0.05869 | 0.02099 | 0.07640 |
+| **our adapter v2** | **0.14365** | **0.04357** | 0.02284 | 0.07724 |
+
+Paired meeting-clustered bootstrap over the 32 meetings, 10,000 resamples:
+
+| contrast | WER | deletions |
 |---|---|---|
-| our adapter v1 | 0.1600 | 0.1867 |
-| our adapter v2, seed 47 | **0.1390** | **0.1795** |
-| our adapter v2, seed 29 | 0.1400 | |
-| our adapter v2, seed 13 | 0.1457 | |
+| v1 against base | −0.02964 [−0.06617, −0.00092] | −0.03677 [−0.08301, −0.00074] |
+| v2 against base | −0.04206 [−0.07123, −0.01863] | −0.05188 [−0.09438, −0.01885] |
+| v2 against v1 | −0.01243 [−0.02479, **+0.00084**] | −0.01511 [−0.02349, −0.00508] |
 
-v2 wins on validation in all three random seeds, which is why we trained it in the first
-place. On the test set the difference shrinks to -0.0040 with an interval that crosses
-zero. The validation gain is real and it does not survive at full size on unseen
-meetings.
+Read the substitution column. Base 0.07841, v1 0.07640, v2 0.07724. Fine-tuning moved it
+by less than a fifth of a point across two generations, and the v2-against-v1 contrast is
++0.00084 with an interval straddling zero.
+
+Almost everything the adapters gained came from deletions: 0.09546 down to 0.04357, a
+drop of more than half, confirmed against base and confirmed again between the two
+generations. The models did not learn to hear the words better. They learned to stop
+going silent.
+
+That reframes what this project produced. A fine-tune of `whisper-large-v3` on council
+speech buys coverage, not recognition. Anyone hoping a LoRA will fix which words come out
+wrong should read this table before spending GPU money on it.
+
+The v2-against-v1 WER contrast crosses zero here as it did on the test set, and its net
+gain of 148 error tokens has 56.1% of it in three windows. Its deletion contrast is the
+one that holds up.
 
 **Read down the columns, not across them.** Each of the three sets was scored on its own
 decoding stack and against its own kind of reference: the training rows against the
