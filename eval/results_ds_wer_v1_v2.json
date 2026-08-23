@@ -1,0 +1,52 @@
+{
+ "primary": {
+  "Soniox": {
+   "primary": 0.328,
+   "no_rollcall": 0.34806629834254144
+  },
+  "Scribe v2": {
+   "primary": 0.372,
+   "no_rollcall": 0.40331491712707185
+  },
+  "v1 (incumbent)": {
+   "primary": 0.48,
+   "no_rollcall": 0.46408839779005523
+  },
+  "v2 seed 13": {
+   "primary": 0.484,
+   "no_rollcall": 0.47513812154696133
+  },
+  "v2 seed 29": {
+   "primary": 0.464,
+   "no_rollcall": 0.4585635359116022
+  },
+  "v2 seed 47": {
+   "primary": 0.436,
+   "no_rollcall": 0.4143646408839779
+  },
+  "v1 as decoded 2026-08-12": {
+   "primary": 0.488,
+   "no_rollcall": 0.47513812154696133
+  },
+  "base whisper-large-v3": {
+   "primary": 0.54,
+   "no_rollcall": 0.4696132596685083
+  },
+  "Gladia": {
+   "primary": 0.588,
+   "no_rollcall": 0.585635359116022
+  }
+ },
+ "delta_v2s47_minus_v1": {
+  "point": -0.044,
+  "ci95": [
+   -0.1206896551724138,
+   0.014970059880239521
+  ]
+ },
+ "rollcall_excluded": [
+  "win_argos_dec23_2025_581922",
+  "win_argos_dec5_2025_996850"
+ ],
+ "term_occurrences": 250
+}
