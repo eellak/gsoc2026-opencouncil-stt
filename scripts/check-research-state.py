@@ -114,7 +114,7 @@ def main() -> int:
             bad.append(f"{i}: KNOWN_BROKEN with no caveats saying why")
         for loc in a.get("locations", []):
             p = loc.get("path")
-            if loc.get("host") == "minipc" and p and not Path(p).exists():
+            if st != "MISSING" and loc.get("host") == "minipc" and p and not Path(p).exists():
                 bad.append(f"{i}: recorded path is gone: {p} (mark it MISSING or fix it)")
 
     # ---- capabilities

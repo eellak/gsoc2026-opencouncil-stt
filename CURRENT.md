@@ -1,6 +1,6 @@
 # Current Work
 
-Last updated: 2026-08-21
+Last updated: 2026-08-23
 
 **The endgame plan is finished.** All four workstreams of
 [`docs/specs/2026-08-11-endgame-handoff-plan.md`](docs/specs/2026-08-11-endgame-handoff-plan.md)
@@ -14,6 +14,23 @@ carried out on 2026-08-16. The adapter-confidence screen closed on 2026-08-17.
 
 Canonical research state: [`research/ledger.json`](research/ledger.json).
 Agent protocol: [`CLAUDE.md`](CLAUDE.md).
+
+## Closed 2026-08-23 — the held-out benchmark, both adapters
+
+`exp-2026-08-23-post-june-held-out` is **CLOSED**. 391 held-out post-June windows,
+117 meetings, both adapters served from one pod through one decoder stack with the
+weights hash-checked before each arm.
+
+The clean-pack contiguous adapter reaches 0.1827 against the incumbent's 0.1867 —
+**−0.0040, 95% CI [−0.0078, +0.0002]**. The interval crosses zero, so the
+pre-declared rule is not met and the adapter is **not promoted**. What it does buy
+is a deletion rate of 0.0313 against 0.0525, CI [−0.0251, −0.0174]: roughly 40%
+less of the meeting silently dropped, paid for in insertions and substitutions.
+
+Caveat that travels with the WER number: the five largest windows carry 44.2% of
+the net difference. The deletion rate does not share that weakness.
+
+The GPU pod is terminated and the watchdog stood down.
 
 ## Active 2026-08-21
 

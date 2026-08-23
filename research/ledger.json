@@ -918,7 +918,8 @@
         "cap-runpod-gpu-pod"
       ],
       "reports": [
-        "docs/reports/2026-08-20-final-report.md"
+        "docs/reports/2026-08-20-final-report.md",
+        "docs/reports/2026-08-23-project-timeline.md"
       ],
       "specs": [
         "docs/specs/2026-08-11-endgame-handoff-plan.md"
@@ -1960,6 +1961,180 @@
         "Levels are not comparable to historical CPU int8 validation numbers; only the paired A/B contrast within this one GPU float16 stack is valid (the results file carries this guard).",
         "The t-statistics across seeds are post-hoc description, not preregistered inference, and n=3 makes them fragile.",
         "Arm A never completed one epoch at either rung, so this experiment does not establish how arm A behaves when trained to convergence."
+      ]
+    },
+    {
+      "id": "exp-2026-08-22-epoch-matched-armb",
+      "title": "Epoch-matched clean-pack rerun: contiguous vs contiguous+spliced, 3 seeds",
+      "question": "At a budget matched in epochs rather than steps, does the clean-pack recipe beat artifact-adapter-fixed on the 39 frozen validation windows, and does adding jitter-spliced packs help?",
+      "status": "CLOSED",
+      "conclusion": "The contiguous arm wins in all three seeds; the spliced arm does not. 619 steps (~2 pack epochs), one RTX A4000, every adapter scored by the same external scorer on the same 39 windows with the frozen CONTROL decode config and per-window seed. The incumbent was RE-SCORED on this stack (0.16002); its older 0.1542 came from a different stack and is not comparable. Pre-declared gate (upper bound of the paired meeting-clustered bootstrap CI vs incumbent below zero, Bonferroni 98.33% across three arms, seed 13 pre-declared as shipping seed): cont s13 0.14566 (upper -0.00171 PASS), s29 0.13995 (-0.00595 PASS), s47 0.13895 (-0.00736 PASS); comb s13 0.15255 (+0.01173 FAIL), s29 0.15028 (+0.00752 FAIL), s47 0.14524 (-0.00060 marginal). The combined arm is inconsistent across seeds and does not pass. Head-to-head against its own contiguous twin it is WORSE: +0.00688 [-0.00212,+0.01587] for s13 and +0.01033 [+0.00168,+0.01919] for s29. Insertions rise from 2.3% to 3.0-3.4% while deletions stay flat, but NO cause is established: only the contiguous arm was epoch-matched. Both arms got 619 steps at effective batch 8 = 4,952 samples, which is 2.00 epochs over the 2,475-row contiguous pack but only 0.71 epochs over the 6,984-row combined pack. The combined arm is undertrained relative to its own data, so undertraining and splicing are confounded. The supported claim is only: at an equal number of optimizer updates, adding spliced packs did not help. The contiguous gain runs the other way and is the direction that matters: deletions fall from 0.06196 to 0.03971-0.04450, roughly a third fewer omitted reference tokens, with substitutions flat. 29 of 39 windows improve; the largest single window contributes 24-28% of the effect, clear of the 67% domination seen previously.",
+      "decision": "Promote the contiguous clean-pack recipe from validation to testing. Do NOT ship on this evidence alone: these 39 windows are the validation set and have been scored repeatedly. Do not build on the spliced packs without first running them epoch-matched.",
+      "artifact_ids": [],
+      "capability_ids": [
+        "cap-runpod-gpu-pod"
+      ],
+      "reports": [
+        "docs/reports/2026-08-22-epoch-matched-armb.md"
+      ],
+      "specs": [
+        "docs/specs/2026-08-20-clean-pack-screen-prereg.md"
+      ],
+      "superseded_by": null,
+      "next_action": null,
+      "updated_at": "2026-08-22",
+      "caveats": [
+        "Validation, not test. argos+orestiada have been scored many times across this project; a validation win justifies promotion to testing, not a product claim.",
+        "Only 2.5% of pack utterances are corrections, so the packs dilute the correction signal ~1:8 relative to the incumbent's training set. Unresolved.",
+        "The incumbent's own recipe was never re-run epoch-matched on its own data, so part of the gap could be the epoch budget rather than the data. Unresolved.",
+        "comb_s47 passes the gate marginally (upper -0.00060) while comb_s13 and comb_s29 fail. Quoting comb_s47 alone would be seed selection.",
+        "The combined arm was matched in STEPS, not epochs (0.71 vs 2.00) - the same design error this experiment was built to fix, caught by external review after the fact. Whether jitter-splicing helps at a matched epoch budget (~1,746 steps) is UNMEASURED."
+      ]
+    },
+    {
+      "id": "exp-2026-08-22-fleurs-out-of-domain",
+      "title": "Does the fine-tuning transfer to Greek speech outside our domain? (FLEURS el_gr)",
+      "question": "On a public Greek ASR benchmark of read speech, does either adapter differ from base whisper-large-v3?",
+      "status": "SUPERSEDED",
+      "conclusion": "INVALID - DO NOT USE THESE NUMBERS. The FLEURS `id` field is the SENTENCE id, not the recording id: the 650-row test split carries only 333 distinct values because several speakers read the same sentence. The fetcher named wav files by that id, so ~317 recordings were overwritten by a later row, and the evaluator keyed per-utterance results by it, collapsing 650 rows to 333 records. The aggregate counters summed all 650 rows, many scoring a reference against the wrong audio. Every number in the first version of this record (base 0.10478, fixed 0.10201, cont_s13 0.10122 and all three paired intervals) is void. Found by external review, not by the design.",
+      "decision": "Drop any claim that these adapters are 'the best free Greek model'. It is unsupported. Claims are restricted to Greek council speech.",
+      "artifact_ids": [
+        "artifact-adapter-fixed"
+      ],
+      "capability_ids": [
+        "cap-runpod-gpu-pod"
+      ],
+      "reports": [
+        "docs/reports/2026-08-22-fleurs-out-of-domain.md"
+      ],
+      "specs": [],
+      "superseded_by": "exp-2026-08-22-fleurs-out-of-domain-rerun",
+      "next_action": "Rerun on a GPU pod with the fixed scripts.",
+      "updated_at": "2026-08-22",
+      "caveats": [
+        "Both scripts now key by row index and refuse to emit a result unless len(per_utt)==len(rows) and the wav count matches the manifest.",
+        "Even after a correct rerun, intervals containing zero support 'no detectable difference under this configuration', NOT 'neither helps nor hurts' - that is an equivalence claim and needs a pre-set margin."
+      ]
+    },
+    {
+      "id": "exp-2026-08-22-fleurs-out-of-domain-rerun",
+      "title": "FLEURS el_gr, rerun with unique keys",
+      "question": "On a public Greek ASR benchmark of read speech, does either adapter differ from base whisper-large-v3?",
+      "status": "OPEN",
+      "conclusion": null,
+      "decision": null,
+      "artifact_ids": [
+        "artifact-adapter-fixed"
+      ],
+      "capability_ids": [
+        "cap-runpod-gpu-pod"
+      ],
+      "reports": [],
+      "specs": [],
+      "superseded_by": null,
+      "next_action": "Rerun eval/controlled_eval/fleurs_el_eval.py on a GPU pod with the fixed fetcher. Both scripts now key by row index and abort unless every row produces a result. Blocked only on GPU availability.",
+      "updated_at": "2026-08-22",
+      "caveats": [
+        "Supersedes exp-2026-08-22-fleurs-out-of-domain, whose numbers are void (sentence-id key collision).",
+        "Intervals containing zero will support 'no detectable difference under this configuration', not an equivalence claim; an equivalence claim needs a pre-set margin.",
+        "CONTROL is frozen for ~25 s council windows, so absolute WERs are not comparable to published FLEURS numbers - only the arms to each other."
+      ]
+    },
+    {
+      "id": "exp-2026-08-23-post-june-held-out",
+      "title": "Both adapters on the held-out post-June benchmark, one stack",
+      "question": "On 391 held-out post-June windows scored inside OpenCouncil's own benchmark, does the clean-pack contiguous adapter beat artifact-adapter-fixed?",
+      "status": "CLOSED",
+      "conclusion": "No on overall WER, yes on deletions. New 0.1827 vs incumbent 0.1867; paired meeting-clustered bootstrap (117 meetings, 10,000 resamples) gives -0.0040 with 95% CI [-0.0078, +0.0002], which crosses zero and fails the pre-declared rule. The deletion rate falls 0.0525 -> 0.0313, CI [-0.0251, -0.0174], roughly 40% relative, paid for in insertions (+0.0097) and substitutions (+0.0075). Both adapters beat base whisper-large-v3 (0.1988) and Gladia (0.2085); both lose to Scribe v2 (0.1339) and Soniox (0.1455).",
+      "decision": "Do not promote the clean-pack adapter on this evidence alone. The deletion result is the reason to keep the recipe; the WER result is the reason not to ship it. Next evidence that would decide it is fidelity-to-audio, not another agreement-WER run.",
+      "artifact_ids": [],
+      "capability_ids": [
+        "cap-bench-http-api"
+      ],
+      "reports": [
+        "docs/reports/2026-08-23-gsoc-final-report-DRAFT.md"
+      ],
+      "specs": [],
+      "superseded_by": null,
+      "next_action": null,
+      "updated_at": "2026-08-23",
+      "caveats": [
+        "Single-window domination: the net difference is -441 tokens of 110,610, and the five largest windows carry 44.2% of it. The overall WER delta is not broadly distributed; the deletion rate is not affected.",
+        "Agreement-with-OpenCouncil only. This records product compatibility and decides nothing about fidelity to audio.",
+        "The served endpoint does not seed ctranslate2 per window, unlike the offline screens; windows that reach the temperature ladder are not bit-reproducible. Affects both arms identically.",
+        "Provider oc-cleanpack-cont-s47-2026-08-22 in the same run is a dead-pod partial (175/391, 216 errors) and must not be compared against the 391-window rows."
+      ]
+    },
+    {
+      "id": "exp-2026-08-23-fusion-postjune",
+      "title": "Three-system composition on the held-out post-June windows",
+      "question": "Does per-column composition of three ASR hypotheses still beat the best single system on 391 windows from meetings no adapter trained on, with the current adapter as the third voter?",
+      "status": "CLOSED",
+      "conclusion": "Yes, and it has reached the ceiling of selection. W = 0.1202 against Scribe v2 at 0.1377, paired meeting-clustered bootstrap over 117 meetings: -0.0175, 95% CI [-0.0215, -0.0134]. W vs the whole-window oracle is +0.0004, CI [-0.0029, +0.0030] - no method that picks whole hypotheses can do better. The per-column oracle on the same alignment is 0.0611, roughly half of W, so composition is far from its own ceiling. Robust: top 5 windows carry 15.5% of the gain, W wins 98 of 117 meetings, leave-one-meeting-out keeps the delta in [-0.0186, -0.0167].",
+      "decision": "Composition, not the adapter, is the deliverable that beats what OpenCouncil runs today. The remaining accuracy in this project is the W-to-column-oracle gap, not more fine-tuning. Next: whether any of this survives with TWO systems, which is what production can afford (exp-2026-08-21-fusion-production).",
+      "artifact_ids": [],
+      "capability_ids": [
+        "cap-bench-http-api"
+      ],
+      "reports": [
+        "docs/reports/2026-08-23-gsoc-final-report-DRAFT.md"
+      ],
+      "specs": [],
+      "superseded_by": null,
+      "next_action": null,
+      "updated_at": "2026-08-23",
+      "caveats": [
+        "oracle_msa is the best path through ONE alignment lattice, and that lattice minimises sum-of-pairs edit cost rather than oracle WER. It bounds this substrate, not the information three transcripts carry. Flagged by Codex review of the plan.",
+        "Agreement-with-OpenCouncil only; decides nothing about fidelity to audio.",
+        "Five alternative trios were declared before scoring and are exploratory. The trio carrying the PREVIOUS adapter scores 0.1183, marginally better than the trio with the new one; no winner among them is claimed.",
+        "Reference-leakage test is asserted in eval/controlled_eval/exp_composition_postjune.py: shuffling every reference leaves W's text and V's pick identical."
+      ]
+    },
+    {
+      "id": "exp-2026-08-23-decoder-only-screen",
+      "title": "Free screen of the decoder-only training proposal",
+      "question": "Are our adapter's substitutions decoder-shaped (homophone misspellings a language model could fix) or acoustic, and how much WER is a decoder-only arm bounded by?",
+      "status": "CLOSED",
+      "conclusion": "Decoder-shaped, and bounded. 44.6% of our long-word substitutions are within two characters of the right word - but Scribe (41.1%) and Soniox (38.8%) are the same shape, so the distinguishing feature is volume, not shape. The decoder-only-fixable subset is homophone misspellings, where the two spellings sound identical in Greek: 855 of 11,708 substitutions (7.3%), against Scribe's 2.9% and Soniox's 4.5%. Fixing every one of ours is worth -0.0077 WER, about 15% of the 4.18-point gap to Scribe. Most frequent are council vocabulary: απών->απόν and παρών->παρόν 46 times, πίστωσης->πίστοσης, Αργιθέας->Αργυθέας.",
+      "decision": "Do not buy GPU for a decoder-only arm on this evidence. Screen the free variant first: post-hoc spelling repair against the short closed list of council vocabulary, which has the same ceiling and costs nothing. If the repair cannot capture the 0.0077, retraining the decoder to capture it is not a good bet. For scale, the composition-to-column-oracle gap on the same windows is 0.0591, nearly eight times this ceiling.",
+      "artifact_ids": [],
+      "capability_ids": [],
+      "reports": [
+        "docs/reports/2026-08-23-decoder-only-screen.md"
+      ],
+      "specs": [],
+      "superseded_by": null,
+      "next_action": "Screen the roster/vocabulary spelling repair against the 855 homophone substitutions; no GPU.",
+      "updated_at": "2026-08-23",
+      "caveats": [
+        "The phonetic folding is a hand-written Greek approximation (ω/ο, η/ι/υ/ει/οι, αι/ε, ς/σ, ντ/δ, μπ/β), not a validated grapheme-to-phoneme model. It will both miss real homophones and merge a few non-homophones, so 7.3% is an estimate with unmeasured error bars.",
+        "Agreement-with-OpenCouncil references, so a 'misspelling' here can also be the published transcript's own spelling choice rather than a true error.",
+        "The 0.0077 is an oracle: it assumes every homophone substitution is repaired and none is broken."
+      ]
+    },
+    {
+      "id": "exp-2026-08-23-gap-to-scribe",
+      "title": "Token-level decomposition of the adapter's gap to Scribe v2",
+      "question": "Where exactly are the 4.18 WER points between our clean-pack adapter and Scribe v2 on the held-out post-June windows, and what is each route to closing them worth?",
+      "status": "CLOSED",
+      "conclusion": "The gap is substitutions (+0.0533) and deletions (+0.0221); we beat Scribe on insertions (-0.0337). Per reference token: 84.1% both correct, 9.7% only Scribe, 2.2% only ours, 4.0% neither - so the ceiling for catching Scribe by fixing our own errors is 0.0824, but against the full trio our unique contribution is only 0.4% (491 function-word tokens), so the 2.2% is a two-system artefact and is withdrawn. Ranked by recoverable WER: far substitutions 0.0386, near-misses 0.0302, deletions 0.0217, homophones 0.0066. 36% of our deleted tokens disappear in runs of 5+ consecutive words, against Scribe's 19%. The gap is flat across window position, so chunking is not the cause. Samothraki holds 8% of tokens and 24.5% of the gap.",
+      "decision": "Do not pursue decoder-only training or chunking-aware decoding as the route to Scribe: the first is bounded at 0.0066 and the second shows no positional signal. The largest recoverable bucket is far substitutions, which needs better listening rather than better spelling. Fusion is the only measured route that already beats Scribe. Next free screens: the cause of the long deletion runs, and why Samothraki costs a quarter of the gap.",
+      "artifact_ids": [],
+      "capability_ids": [],
+      "reports": [
+        "docs/reports/2026-08-23-gap-to-scribe.md"
+      ],
+      "specs": [],
+      "superseded_by": null,
+      "next_action": "Screen the 128 long deletion runs and the Samothraki concentration; both are free on the cached substrate.",
+      "updated_at": "2026-08-23",
+      "caveats": [
+        "Error attribution comes from one Levenshtein backtrace per window; where several alignments cost the same, the substitution/deletion split is arbitrary. Totals are stable, bucket boundaries are not exact.",
+        "The 0.0824 'catch Scribe' bound is not a clean oracle: it is 0.0404 (tokens neither system gets) plus 0.0421 (our own insertions, carried over untouched). An oracle free to discard insertions goes lower - the trio's per-column oracle is 0.0611.",
+        "Our adapter's unique contribution is 0.4% inside the trio, not 2.2%. The apparent numeral advantage was a formatting convention: Scribe writes number words, Soniox writes digits, the reference uses both. The numeral claim is withdrawn.",
+        "Trios carrying the previous adapter (0.1183) or gpt-4o (0.1197) score at least as well as the trio carrying the new one (0.1202). Our adapter's case as third voter is cost, not accuracy.",
+        "Agreement-with-OpenCouncil references, so a substitution can be the published transcript's own choice.",
+        "Samothraki's 24.5% share is descriptive; no cause is established."
       ]
     }
   ],
