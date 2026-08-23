@@ -17,9 +17,9 @@ OpenCouncil publishes transcripts of Greek municipal council meetings. Every tra
 
 I built the dataset, trained two generations of LoRA adapters, and measured them against every ASR system available to the project on the same audio through the same decoder. Both adapters beat the open-source baseline they started from, and both clear the domain-term target my proposal set against Gladia. Neither beats the commercial systems the market moved to during the summer.
 
-The substitution rate, the share of words heard as the wrong word, barely moved across two generations: 0.0784 for base whisper, 0.0764 for v1, 0.0772 for v2. The deletion rate halved, from 0.0955 to 0.0436. Fine-tuning on council speech bought fewer silent passages, not better word recognition.
+The substitution rate, the share of words heard as the wrong word, barely moved across two generations: 0.0784 for base whisper, 0.0764 for v1, 0.0772 for v2. The deletion rate halved, from 0.0955 to 0.0436. Fine-tuning on council speech brought fewer silent passages, not better word recognition.
 
-Most of my summer went into finding out why, and into building the measuring equipment that could tell a real improvement from an artifact of how I ran the test. That equipment produced the other useful result of the project: combining the word-level output of several ASR systems scores better than any of them alone. We plan to test that in production.
+Most of my summer went into finding out why and into building the measuring equipment that could tell a real improvement from an artifact of how I ran the test. That equipment produced the other useful result of the project: combining the word-level output of several ASR systems scores better than any of them alone. We plan to test that in production.
 
 ![WER results](docs/images/wer-results.svg)
 
@@ -27,7 +27,7 @@ Most of my summer went into finding out why, and into building the measuring equ
 
 ## 1. Before
 
-OpenCouncil sent meeting audio to a commercial ASR provider, Gladia, and reviewers corrected the output by hand. Those correction pairs were the only supervision that existed for Greek council speech.
+OpenCouncil sent meeting audio to a commercial ASR provider, Gladia; then an LLM corrected the transcript text, and reviewers corrected the output by hand. Those correction pairs were the only supervision that existed for Greek council speech.
 
 Three things were missing:
 
@@ -70,7 +70,7 @@ Building v1 I treated each corrected utterance as one training example, which is
 
 For v2 I dropped every clip where two people talk at once, then packed continuous spans of a single speaker until each window held about 22 seconds of speech. The training window started to look like the audio the model meets in production.
 
-The change works, in a specific way. v2 deletes 40% less of the meeting than v1 (0.0313 against 0.0525), so far fewer passages go missing. Overall WER moves by -0.0040 with a 95% confidence interval of [-0.0078, +0.0002], which crosses zero. Under the rule I fixed before running the comparison, that does not count as an improvement in WER, and I have not claimed one.
+The change works in a specific way. v2 deletes 40% less of the meeting than v1 (0.0313 against 0.0525), so far fewer passages go missing. Overall WER moves by -0.0040 with a 95% confidence interval of [-0.0078, +0.0002]. Under the rule I fixed before running the comparison, that does not count as an improvement in WER, and I have not claimed one.
 
 Two things changed at once between v1 and v2, overlap filtering and window occupancy, so I cannot say which of them did the work. Separating them needs another training run.
 
@@ -80,7 +80,7 @@ I built an evaluation harness because I could not trust the numbers I was gettin
 
 The harness also talks to OpenCouncil's own benchmark API, so a self-hosted endpoint and a commercial provider can be scored on the same windows through the same decoder stack. Comparing two models across two different stacks produced a false result early in the project, and this is what stopped it happening again.
 
-I record every experiment in `research/ledger.json` with its question, its conclusion, its caveats, and a link to the report behind it. A script checks the ledger for internal consistency. 83 records are in it.
+I recorded every experiment in `research/ledger.json` with its question, its conclusion, its caveats, and a link to the report behind it. A script checks the ledger for internal consistency. 83 records are in it.
 
 ### 2.4 Serving
 
@@ -100,9 +100,9 @@ The merged model runs behind an OpenAI-compatible HTTP endpoint on a GPU pod, pr
 | Domain-term WER target | Met against Gladia, the baseline it was set against. |
 | Human intervention rate | Dropped after discussion with the mentors. |
 
-**On production integration.** During the summer OpenCouncil moved from Gladia to ElevenLabs Scribe v2. Scribe scores better than either of my adapters on our own benchmark, so putting my model in front of the correction queue would make the product worse. We do plan to put the fusion approach in section 4.5 into production. I am preparing it now, we will test it against the live pipeline, and if it holds up it ships.
+**On production integration.** During the summer OpenCouncil moved from Gladia to ElevenLabs Scribe v2. Scribe scores better than either of my adapters on our own benchmark, so putting my model in front of the correction queue would make the product worse. We do plan to put the fusion approach in section 4.5 into production. I am preparing it now, we will test it against the live pipeline, and if it holds up, it ships.
 
-**On the human intervention rate.** I proposed it as the operational metric and we let it go. A single intervention rate does not tell you which errors cost a reviewer time, and by the time our model could have sat in front of the queue the product had already moved to a better provider. The mentors and I agreed it was not worth chasing.
+**On the human intervention rate.** I proposed it as the operational metric and we let it go. A single intervention rate does not tell you which errors cost a reviewer time, and by the time our model could have sat in front of the queue, the product had already moved to a better provider. The mentors and I agreed it was not worth chasing.
 
 **Upstream contributions.** None. No pull request was opened against the OpenCouncil product repository. This work is a research repository, a published model, and a serving endpoint.
 
@@ -123,7 +123,7 @@ All numbers below come from 391 held-out windows across 117 meetings. No meeting
 | gpt-4o-transcribe | 0.1937 |
 | `whisper-large-v3`, no fine-tuning | 0.1988 |
 | Gladia, the baseline this project started from | 0.2085 |
-
+,
 v2 beats the base model it was fine-tuned from by 0.0161, with a 95% confidence interval of [-0.0218, -0.0114]. It also beats Gladia, which is what OpenCouncil used when the project began, and gpt-4o-transcribe. It loses to Scribe v2 and Soniox by margins whose intervals exclude zero.
 
 ### 4.2 Domain terms
@@ -149,7 +149,7 @@ All four Whisper-family rows come from one decoding run on one GPU. An earlier v
 
 ### 4.3 Training to test
 
-Three sets, in order of how much the model has seen them:
+Here we have three sets, in order of how much the model has seen them:
 
 | | what it is | v1 | base whisper |
 |---|---|---|---|
