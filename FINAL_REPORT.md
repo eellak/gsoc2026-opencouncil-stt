@@ -21,8 +21,14 @@ names, place names, and the procedural vocabulary that repeats in every session.
 
 I built the dataset, trained two generations of LoRA adapters, and measured them against
 every ASR system available to the project on the same audio through the same decoder.
-The second adapter beats the open-source baseline it started from. Neither adapter beats
-the commercial systems, and the domain-term target in my proposal was not reached.
+Both adapters beat the open-source baseline they started from. Neither beats the
+commercial systems, and the domain-term target in my proposal was not reached.
+
+The clearest thing I learned is what the fine-tuning actually bought. Substitution rate,
+the share of words heard as the wrong word, barely moved across two generations: 0.0784
+for base whisper, 0.0764 for v1, 0.0772 for v2. The deletion rate halved, from 0.0955 to
+0.0436. Fine-tuning on council speech taught the model to stop going silent on hard
+passages. It did not teach it to hear the words better.
 
 Most of my summer went into finding out why, and into building the measuring equipment
 that could tell a real improvement from an artifact of how I ran the test. That

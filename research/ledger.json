@@ -2136,6 +2136,30 @@
         "Agreement-with-OpenCouncil references, so a substitution can be the published transcript's own choice.",
         "Samothraki's 24.5% share is descriptive; no cause is established."
       ]
+    },
+    {
+      "id": "exp-2026-08-23-validation-canonical-stack",
+      "title": "Base, v1 and v2 on the frozen validation set, all on the canonical CPU stack",
+      "question": "On the 39 frozen validation windows decoded on the stack the freeze names as canonical, how do base whisper-large-v3, artifact-adapter-fixed and the clean-pack v2 adapter compare, and where does the fine-tuning gain actually come from?",
+      "status": "CLOSED",
+      "conclusion": "The gain is deletions, not recognition. base 0.18571, v1 0.15607, v2 0.14365; deletion rate 0.09546 / 0.05869 / 0.04357; substitution rate 0.07841 / 0.07640 / 0.07724. Paired meeting-clustered bootstrap over 32 meetings: v1-base WER -0.02964 [-0.06617,-0.00092], v2-base -0.04206 [-0.07123,-0.01863], v2-v1 -0.01243 [-0.02479,+0.00084] which crosses zero. On deletions every contrast is confirmed, including v2-v1 at -0.01511 [-0.02349,-0.00508]. The substitution contrast v2-v1 is +0.00084 with an interval straddling zero: two generations of fine-tuning moved which words come out wrong by less than a fifth of a point.",
+      "decision": "State in the final report that a LoRA on whisper-large-v3 for this domain buys coverage rather than recognition. Do not fund further fine-tuning aimed at substitution errors without evidence that a different intervention reaches them.",
+      "artifact_ids": [
+        "artifact-ct2-fixed"
+      ],
+      "capability_ids": [],
+      "reports": [
+        "FINAL_REPORT.md"
+      ],
+      "specs": [],
+      "superseded_by": null,
+      "next_action": null,
+      "updated_at": "2026-08-23",
+      "caveats": [
+        "CPU int8 16 threads, the stack the eval-freeze manifest names as canonical. The manifest states that no number here may be compared with a GPU-produced one; the GPU validation figures reported elsewhere (v1 0.16002, v2 0.13895) are a separate stack and are not interchangeable with these.",
+        "The v2-minus-v1 WER contrast crosses zero and its net gain of 148 error tokens has 56.1% in three windows. Only the deletion contrast survives both checks.",
+        "v1 was re-decoded here because the stored arm R kept only totals, so no paired interval was possible against it before."
+      ]
     }
   ],
   "artifacts": [
