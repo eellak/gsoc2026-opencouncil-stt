@@ -1,0 +1,1527 @@
+{
+ "experiment": "train-wer-v2-2026-08-23",
+ "frozen_before": "any GPU rental or decode",
+ "population": {
+  "file": "packs.jsonl",
+  "rows": 2476,
+  "manifest_sha256": "59a63b7d0870598108ced9f3f066ad854da19711f4255164b32356bffac1467e"
+ },
+ "rule": {
+  "salt": "gsoc-2026-v2-trainwer-2026-08-23-v1",
+  "n": 300,
+  "rank": "sha256(salt \\0 manifest_sha256 \\0 pack_id \\0 audio_sha256 \\0 reference_sha256), ascending",
+  "tie_break": "canonical pack id"
+ },
+ "scoring": {
+  "metric": "micro WER, total edits over total reference tokens",
+  "arms": [
+   "v2 (cont_s47)",
+   "base whisper-large-v3"
+  ],
+  "clustering": "source meeting, not pack",
+  "failed_decode": "two clean retries, then the row stays with an empty hypothesis and the failure is disclosed"
+ },
+ "not_comparable_to": "the v1 training-WER number 0.1313. Different corpus, different row length, different reference construction. This is a within-v2 diagnostic against base on the same rows.",
+ "sample": [
+  {
+   "pack_id": "b17f80444d1d0285",
+   "audio_sha256": "2509d36969ac367c37644274457f30044edc3a2902e09828341e14342c05dab7",
+   "reference_sha256": "e38c47c4250837ca6fac17ce1764b19cfcf16ed7e4da998373534bfe89999710"
+  },
+  {
+   "pack_id": "d87dfd455adb2d04",
+   "audio_sha256": "1a255da8582e00f399e548358b4e7529a50a9f78b65693426bcfd932e1955268",
+   "reference_sha256": "a5d9f2583673e202440277fd36e356f1566837d529930d7258ef2423f83487ec"
+  },
+  {
+   "pack_id": "43b4c918f90c125d",
+   "audio_sha256": "c790e2eb99a7cf53ebd43c0fa196132696e68e1c5a4c39b0e7b36da9442cce78",
+   "reference_sha256": "d37775b5265615f36e3893a99a5c63e9c2d1bd1bb3d3cf1323ca6338f48553a3"
+  },
+  {
+   "pack_id": "a339cbef1f7c2497",
+   "audio_sha256": "98c97721d287b33c979203ee0c78384efad822dc9d7bc9a10d903e23e5b57d08",
+   "reference_sha256": "212207b4ceda3dc54be0006fc1be2c1b3494eefd3517402f6bb40277defea07a"
+  },
+  {
+   "pack_id": "859c8674245aafed",
+   "audio_sha256": "bd3778da875e9460d53bfd2b486559676db83b355a50c6bc8c9099972b898e34",
+   "reference_sha256": "ed3323b97213d1813956ae2ba450a23552c65344e5bdfee3803722d959f39f02"
+  },
+  {
+   "pack_id": "2b2fedaf23e1cc4b",
+   "audio_sha256": "dcf889aecab1d5f47f5c0a26412ea02bf02af5319109677b1cdd93f990428492",
+   "reference_sha256": "f53143211fa9d554be1609a2c9f1b5bc1f939eba9c060e1f5e3429b0d7785594"
+  },
+  {
+   "pack_id": "e929b7b2bc925fa6",
+   "audio_sha256": "2c21fbcda0de3c6371ce59705d318445a2f387ed3f1ec345bb02d379cb64bc03",
+   "reference_sha256": "68a55963e77ef7b7bdcff4da1ae740bb85e9d463c7b2f95d841d97259bfdc062"
+  },
+  {
+   "pack_id": "a54e989ab8a469d0",
+   "audio_sha256": "06f0a29cdf954ff0d4c776bb1bb758d5a3865d664e99f14326d20b29b613ccfd",
+   "reference_sha256": "a23fb59986c15d18b5f98bd9aeb8d2f2ac625185ccbd0566c336e26eac956305"
+  },
+  {
+   "pack_id": "6571ff11d6d9e701",
+   "audio_sha256": "00be43d5896085f5608f51789e3a8ab4163d1ceac66bd33c33dbd8732cb38aa1",
+   "reference_sha256": "10666c78aedc5026dfcc8a7c6c3d8b228076b5319e9d24a6dcf15829e5af2147"
+  },
+  {
+   "pack_id": "c609439c8d849643",
+   "audio_sha256": "9f40f7edf0d7168ce59cc0495eccc6cd37e35e9e2052c5fc09a90a66d8f932ba",
+   "reference_sha256": "4cecaba0ea26ee1cd9d2e8184a0e462dadfb7ba4cc3420c0fdb3a9c415989cab"
+  },
+  {
+   "pack_id": "23d5d27837072530",
+   "audio_sha256": "6f12a60367e5428284aff75a40a163f877e498304cfa22b0aab768ff4f353974",
+   "reference_sha256": "31986044b1d49c9722d8b84b92cbe6518dc74269a171a2ef856e2f5885556721"
+  },
+  {
+   "pack_id": "a6c854121b53e22c",
+   "audio_sha256": "53ee77c65375b503b2bb5914221e8a5e5d96e57f559d5b2f71f1e9ef20f24427",
+   "reference_sha256": "ac988a837dbfe693ace047f3847407865458131cc63abc5d3bee21c87a50d692"
+  },
+  {
+   "pack_id": "8164bff3307bced6",
+   "audio_sha256": "e95a20a30b6a85c6d84194a6b297d55301f2f38555a3bffae646e6338cb1c58d",
+   "reference_sha256": "933e0ae6697d091b9b9ce331b64c91285250d88a2751af2537db26c8b4da38bd"
+  },
+  {
+   "pack_id": "8e39e81081591e53",
+   "audio_sha256": "7ea0a65e94e3ab3cbc4e1fe54ef66e0dff09bb13961317f132a97f12a5a4ff96",
+   "reference_sha256": "dcf84c2bda535285727dfbe558124a6d669951093b5ac42ff61b4b27adc0827b"
+  },
+  {
+   "pack_id": "367065086216f136",
+   "audio_sha256": "9fe46882fe53be8d377c9b68276d73caaf9e249cc8997b86e33d0b919338a733",
+   "reference_sha256": "19819f20826236aff37681d28386678bf09aef5d7178d8475133e7cd944f206a"
+  },
+  {
+   "pack_id": "5bf97832cc73c1fa",
+   "audio_sha256": "a93af0a95ee315baf85900b276944e584af9c82fff860a729a684cdbc1aaa2de",
+   "reference_sha256": "d0225fcae8e448c9c6b69c768d6b659614d956a205451830eee27225733155d5"
+  },
+  {
+   "pack_id": "9c34d59d1bc7d76d",
+   "audio_sha256": "e9eb19094699835bc41d9a78028efe7f58b8a04f03191a6daae159793ea40cff",
+   "reference_sha256": "f4823db08f368c04032eed12ac87bc6e700cba98fd918b81528089a0b4c270c0"
+  },
+  {
+   "pack_id": "89a2d7a22c67496a",
+   "audio_sha256": "1b9daf205c9194e7f990124d454b7a219a8a37f86c5a98fe999d80c5a78c7538",
+   "reference_sha256": "aed5b29143e2fec41bc231f70bd8bf5b9a5da9eeb81862a7559e2a728eeff786"
+  },
+  {
+   "pack_id": "81f8f13b9ea81904",
+   "audio_sha256": "3ac3522cbf6b8de452f6fe3874aea8d22f01c000654b7c75bdaedaf450fe1b4e",
+   "reference_sha256": "4f5f3f91e4fe67f1d24e04498d1e6c8a716bc25ef94568cf2103a386d5123387"
+  },
+  {
+   "pack_id": "16c94fdada86886e",
+   "audio_sha256": "f4cb8e8c09a9f5e561403acc3fda4a673a8191c8cf8501712bd6673c48da5e40",
+   "reference_sha256": "cebd91849eeeb8ba9782a391e7b915d278f80f63b65aad743354419f6e11570e"
+  },
+  {
+   "pack_id": "431f7babe04a8a95",
+   "audio_sha256": "600251788f147d6d6fd75d56d0d82e7e929baded1a23329e58b9e8854689572d",
+   "reference_sha256": "f3b7d1e2a3446cc7fd1342781bea05deef52fe346f7b805596b1244c5065018a"
+  },
+  {
+   "pack_id": "741665e59f95c99f",
+   "audio_sha256": "9b22690d5a8567b678b5ccae70eeb7d43ef7415893e85c7903704f28e766936d",
+   "reference_sha256": "a87bbd05e72a3b1de9092c38f9e9cbf74f0ece751811de5eef8bde80a2acddb3"
+  },
+  {
+   "pack_id": "79cc9d85cb349dab",
+   "audio_sha256": "15c617af67687aae84938493e0ac23423e063951d57542935911fb5231493739",
+   "reference_sha256": "a36743557b423b39caa87a110efae783acf9432862b91c1bd1cd68f0eac57bb5"
+  },
+  {
+   "pack_id": "8ab8214f5eda74a5",
+   "audio_sha256": "b4c7badac8334aa966ec985f0255e7695ced0e9a40ed5582db4ab941adb7b28e",
+   "reference_sha256": "054612c7d3d0ae7672948aa347530d6e5d8ef5fb1c45c0cae4615b17362d634c"
+  },
+  {
+   "pack_id": "bc58abdab03c5c44",
+   "audio_sha256": "087595f6fd2997420a007bfaa5111203cc92fc938c90365d5ed67f762b1cb1cb",
+   "reference_sha256": "696e35e87dcd30ccafef317ec1ae827f563e49c95ae0ed64824fc06ca3a77273"
+  },
+  {
+   "pack_id": "acb0f559b24f6e24",
+   "audio_sha256": "89c5764b5348f57c821240e825407e0823fd98c1a0d3a7ff2412c2aaab5c207c",
+   "reference_sha256": "84b4a370a4a09eeacc446825c8802011095fef3c3f5c128d2593a1fb45d8bba3"
+  },
+  {
+   "pack_id": "a4c31440d2fc2d99",
+   "audio_sha256": "2cdd32949168f1978f46a2cbc3ba9920199e3d4c5864461d0b52080d50c30edb",
+   "reference_sha256": "77c028637a234f431f888c3a9ec402efa9b17eb9733f1d8f7c78e9becc7ae901"
+  },
+  {
+   "pack_id": "ae72b53f81735432",
+   "audio_sha256": "0793d0c766617dc4610b3da90a953acf36ca5972fecc07cb6cca4536eb7fae55",
+   "reference_sha256": "56ef99a775a3f02e707cedf7d0b51c2bac67d0e0786b0b204f7d6e95dabefb61"
+  },
+  {
+   "pack_id": "b6cc710243dee808",
+   "audio_sha256": "f7e004213df8fda46b78a2941337bcb2f9c8fdfa148e432f6edce172f980dbc4",
+   "reference_sha256": "27b84d0988283f76a096d66007ee1acb3affda89bebff5584fc0adc68ea9e18d"
+  },
+  {
+   "pack_id": "48a50137ffbc61dc",
+   "audio_sha256": "056ad579178211653783ad79dca0fce8907b6d0637c6cc28959d65b58bdfd1d3",
+   "reference_sha256": "76ecef9df13b87a903afbd3f6e96d444982a0b2d2d89bf7a31f1149bc6821e45"
+  },
+  {
+   "pack_id": "e17216f1b43984ae",
+   "audio_sha256": "1b09945c2c842712bf4e46b8e63317a61a4e90f189b97763c289555f32672114",
+   "reference_sha256": "113e10a4c3827029a942126cb3b77dbf04ccab7e2f55b46cc2c46d28370e51f4"
+  },
+  {
+   "pack_id": "468acff5d26d320a",
+   "audio_sha256": "2475f5665495a388fddbcf1af5b0e4bc6f4c4853899f42592b81d33a57bb2efe",
+   "reference_sha256": "cc4d0b3d8eee4b6bd23614f99ed06dfed01c5c8a0126007e5e58d9bb4b549379"
+  },
+  {
+   "pack_id": "bda5d5dc13179c67",
+   "audio_sha256": "fcf2fbd7ad224c03981297d0988642ce7f3e0607761ddcb3be8eaeda489471da",
+   "reference_sha256": "c066fdb3c17155556375a5e3642ba610001a8707a569831393acfc84212991b6"
+  },
+  {
+   "pack_id": "a144d243879f6cac",
+   "audio_sha256": "dd15d7e66d6b42bc34367fcb05f96b6b97eb43dcf1498aed37a31d5e361b68dd",
+   "reference_sha256": "0600eada2bb26fcf4237b5c60ffe209bbb3b74bfc0e7aa94187b667cb5de87ac"
+  },
+  {
+   "pack_id": "77830c2f3cad0ed3",
+   "audio_sha256": "a748b9cb70a8b140871098d6fd0ccd8ea3fcf6f57fbf995824047c9c39414643",
+   "reference_sha256": "971ef686e5526d91fb3fd208a9c2dae8eeddba68ebc67ac01268d557e91010ce"
+  },
+  {
+   "pack_id": "cadde16fd7046514",
+   "audio_sha256": "e54a55787376fa182ab3d20565431f670760e62afb4bebd3215d2a38f04a490f",
+   "reference_sha256": "f33f96510eb6908e42ea5cbd9d24aea2007361b5c64cb0f5e08c20f06a75307d"
+  },
+  {
+   "pack_id": "923f3a550e21a159",
+   "audio_sha256": "2e39af3a79f593a255d2c3aa177b6c5d261e23bbf57d22a735117eb61630850d",
+   "reference_sha256": "558056ce87596863bf5e0718cd40cadaffca9262c884fe9cdd8f49627627be97"
+  },
+  {
+   "pack_id": "070e6e3826f6b334",
+   "audio_sha256": "8e30707a9125e1a788b144d3740cf87b70ea93fcb787b09099fdf1ccd747af32",
+   "reference_sha256": "56602f412b21eb46b457792fc7bcd81e8a32910f175598553167256343a81047"
+  },
+  {
+   "pack_id": "957b3ec09e56372d",
+   "audio_sha256": "43b49e969619818ead57c3ad92976337c27e9a7e5168a94f249d328e8dd98517",
+   "reference_sha256": "ee7d4ad57567e8ac3141349757e3926b3d6ac4f1eb1f9c590f1f704315f549f8"
+  },
+  {
+   "pack_id": "90270738bc338983",
+   "audio_sha256": "5afa2eb619d7863fec8315b0906fd51ab92641a7f71be6de04f10aaf6ade8a9b",
+   "reference_sha256": "e00a1effc0793cc566c47358249f8f5e4d5a71cee731b384de24d13bcdc271f3"
+  },
+  {
+   "pack_id": "ab931f8bc3f54f2f",
+   "audio_sha256": "d6cb98edcb4ff9707bbc5cce3f526627424e777b2ebae22f0f60fcd2aef560b9",
+   "reference_sha256": "7683d3ac780d8518ba714336d0f29a6962f729d923b03c7e3901a95987957d53"
+  },
+  {
+   "pack_id": "80ce95440ac1188d",
+   "audio_sha256": "8372d0e2c44fdda07f31886b4c80aaf552725ae6a8f4b81befa4179750f146ae",
+   "reference_sha256": "b4659e396f554cb2062e327399d6576decdb247bec0cf38b413d71fe6d2a8336"
+  },
+  {
+   "pack_id": "67451e6a788dc96c",
+   "audio_sha256": "fb3f26ce0039a7ef1d59263e011692edd81b72fb59b51a9046e3c63b3c1c13dd",
+   "reference_sha256": "01a23616fc6ce86d0e29053ce0643bb2d5be52ac332b8343e0908944aca4c4b5"
+  },
+  {
+   "pack_id": "95d0659e4b960bd7",
+   "audio_sha256": "31127622071bfff43650c584f7876eea61fccbfd55b2125f43c4ca92fe93da3f",
+   "reference_sha256": "558730da20367a0331fda98ab6cbf8b1a23694156aa05307d3facfd80d876f26"
+  },
+  {
+   "pack_id": "e6e9368bed4d6ab0",
+   "audio_sha256": "ff26830d197a320092b3c4ed772fde82eef1c2c479b3dbcfad2790897e108064",
+   "reference_sha256": "9fed03ed809a8c0bf30df9d7f4547f7243684df490109e4ff55bd58bc498b245"
+  },
+  {
+   "pack_id": "8a425f194d2521fb",
+   "audio_sha256": "ec6667666a84cb9dad5e083100136ca438836c7cd616966347bc555fdda72f54",
+   "reference_sha256": "2eb9fdfa811b7b685c9f7b33cbf8e0febcf3a9d50f01b20ab046ed93de87d9d5"
+  },
+  {
+   "pack_id": "30893decbd387cfa",
+   "audio_sha256": "74ada70397594cee24f2917d521b847a07475951ce6c3b80103c47d87a1e0f68",
+   "reference_sha256": "f51dc798a483fe219bc2b02c25f16d02f89dc8f333a37d7db7c20a1c0c945cb4"
+  },
+  {
+   "pack_id": "944095f14e21f1ca",
+   "audio_sha256": "fe0caad49db0aa74b784370435fdea443ff1fcae4348be7f6449fd03b75ac031",
+   "reference_sha256": "c4bf4087f3035ae1da6f1bbcc02bb8dc22d0bf5ec3d658cd0a181a3259dfde72"
+  },
+  {
+   "pack_id": "9bb0db4ec3568f95",
+   "audio_sha256": "f51e93f32f15f7a7dfadedadb5a864e495c4813baa3f23f60190f5d26ddc9c2f",
+   "reference_sha256": "e7067467880803b9d5dec5802469b5e31c7ea938e112eb86007d84d8675eff53"
+  },
+  {
+   "pack_id": "7e2941d46603d8d3",
+   "audio_sha256": "1ebf6e51b9ee3239ad0c649ef4cfb0e51b276662be8e3711a1323b16734dccad",
+   "reference_sha256": "decb0e9d62f9b87051b14732a748851ea30a6284a174dc39a3b43bdbb9e50370"
+  },
+  {
+   "pack_id": "8abc415472f7bf64",
+   "audio_sha256": "21c8929ffe8eb86294105295b70b2bb09daddb7c89a09f4b99dd0bbdd25f0ac8",
+   "reference_sha256": "b867d5a1be91085c531715f7d8c5c5044faf13bd89b468722e5624017f3120ac"
+  },
+  {
+   "pack_id": "21a8ed40db3c3c86",
+   "audio_sha256": "605802ae9e36642ccfd135fe28a08eb96b3ee2b8b68f3de43e06433ca4b5bd41",
+   "reference_sha256": "1fc601697011e63ddc3b698a0806e61f0051f6fe6d4f998f584040a1cbe9db8c"
+  },
+  {
+   "pack_id": "d21e5802ad392f46",
+   "audio_sha256": "68509113cc1bcfacb133a6caa72bae23606ded72add520434ff59863d6e2370a",
+   "reference_sha256": "20b084432ba2e4c6c4192f6aabd56f906e923e81038ecd5f467698f9c843f799"
+  },
+  {
+   "pack_id": "9f30e183130a1857",
+   "audio_sha256": "c453775cb257c548a572c794c565181a1b3c41f7f855670f5e92cc9938e34226",
+   "reference_sha256": "be3ba4bd99ec7777fc54d6d1666d50c24e7d7ea34d5884d7937427161d69b0b0"
+  },
+  {
+   "pack_id": "11eadc19fe49b05b",
+   "audio_sha256": "bfbe0cb466cc0ebb170765da5bbbf93ec644e38e7e244fcb9213be068c4c3f66",
+   "reference_sha256": "c96837c0232206e6214882dcd49dbd6b0ac6d7bbff6dc58bf8da8ab0cde6756c"
+  },
+  {
+   "pack_id": "1ad8f371de91d13b",
+   "audio_sha256": "2889a4b0a5555c8312ebc3cd2d38829bcfaf278e252ae74dbff3de3138c9e9af",
+   "reference_sha256": "1a6ed0270f5e6b656dd162d6688a4d7897d7a18b8ed5b57c8c11880dee886771"
+  },
+  {
+   "pack_id": "fe69c52bd1a14d1a",
+   "audio_sha256": "2bc78c9adbd8854944d71e2b75a31e91604da392c3a8c2497c952a723bdecb9f",
+   "reference_sha256": "7a4343845d8965a0f84529a7a055dbe5d65275241121a67fe0736e0ad81128d8"
+  },
+  {
+   "pack_id": "df06f294fabaa5cb",
+   "audio_sha256": "f96c12cdb8bb2190878268e9227b4dae4b057b088a3f3e9f40294c80e643bc23",
+   "reference_sha256": "49cc5d563057ad9163eb114600da833aba868c3b2b74f832576b5a1453d34d5e"
+  },
+  {
+   "pack_id": "5311d57c2d9792d4",
+   "audio_sha256": "3871c5b35c4c2d8ebc804772b429763c0914ed23a05cb6bfda0316833006b3af",
+   "reference_sha256": "9b99ef36f0a00037c9903bbe0bb02b3be4c061abcf344c1c19fb580c118a0e88"
+  },
+  {
+   "pack_id": "8409d2a6701b0857",
+   "audio_sha256": "924226096c1b3cabd44683720d8c726f2712e4b72178d27c105c2b72a3e524c5",
+   "reference_sha256": "1b9c6a0f571778522040741af67613c631fd483a2f0a34915e66a3dc022165a3"
+  },
+  {
+   "pack_id": "e142f11846653262",
+   "audio_sha256": "4663a3fdca8906795a40e25d0e0ee41465a22c407b823ca30c2776bb7296e543",
+   "reference_sha256": "467b9bbc2766336b9c3a1de07b72f7cf08950d116f9aa9ebdf4e307bdfb9dfac"
+  },
+  {
+   "pack_id": "4ac2445b0fd84cbe",
+   "audio_sha256": "aac0a7d1d36341de492022d77c67ef3e9bcbe4d72b72a8123af76828a098830f",
+   "reference_sha256": "562508e1c6422eae5bf889709601e7fe5b6244148ccef6e9b54830bc2eb0d977"
+  },
+  {
+   "pack_id": "9a40c840b9186c08",
+   "audio_sha256": "831083b669a9777a54898e34da0361a7ed6c36963e4e3a0ecd82952d689df4a8",
+   "reference_sha256": "38854ce10f048941161c3fb6d50e9c17f7d1f890991be2952f56901faf4e0ca0"
+  },
+  {
+   "pack_id": "1fdd2914eae0702e",
+   "audio_sha256": "0d259de2929098f60a7e4cd67a34ea9ccb9921f4b76e0d51ea5596ecb46d511c",
+   "reference_sha256": "218ae966af09ceb46cae4a3c2eaa64fa7fc11150d4228f754792a539a6414aab"
+  },
+  {
+   "pack_id": "d4f3ecb471a58f89",
+   "audio_sha256": "828d81610dbdcfc30f77a83829a5e7b9a1a6d4634a166a94619eae754ff6b10d",
+   "reference_sha256": "e9d90eb00ae040e5130903f4e869d9305de98aebaac6126ac8c7dfbe74b80fb3"
+  },
+  {
+   "pack_id": "01d4fe820e5d03c9",
+   "audio_sha256": "a1bf994c9a92717e32165bf4ed2300d878d235817abd9fb79572f0b52cd90375",
+   "reference_sha256": "03896a9bc3222f8145bc0416dfee3532b4bca21644ef5538dab8f74988c71712"
+  },
+  {
+   "pack_id": "f9197882fae0b8da",
+   "audio_sha256": "daa630e859c441891a8e7b2f2d08f61a0a9bd8e2a43024043851c1024076bb1b",
+   "reference_sha256": "b68fd0b53ef092b8915ed380282a79215065d7d06d788dfd803ff32dc37bcda6"
+  },
+  {
+   "pack_id": "7139d6b5ce1530fe",
+   "audio_sha256": "4003126cbfec4517900adf64156120c3ecc2eed9763a8f6b304a9308e86763b1",
+   "reference_sha256": "d6e510b626fdc94916b1ea1117be9502e6d73238559147d3b847fa99e66f23e8"
+  },
+  {
+   "pack_id": "d8639b3f8cc8d81c",
+   "audio_sha256": "1c34bb1f4093c0e097dccf3683e3549c5885e18a2b8f5db6621b62a5680ee7aa",
+   "reference_sha256": "56f45f7899e2d9b4402cf60660c62c8d1f95658005ff2c48ff7ddf2eb9ba8b90"
+  },
+  {
+   "pack_id": "f7aed3f8a7eef161",
+   "audio_sha256": "359fcc3bca280d4ce85994b9c81dbbe5264fbadd00b14eda3a81a241924f25e4",
+   "reference_sha256": "f0fc2b8a4a8dbe17b8842c1eeca76a3e791ebde4e9e2a2638d22b2e0b63ffa0e"
+  },
+  {
+   "pack_id": "937a022d6b39d87b",
+   "audio_sha256": "e52f9c3727e150614f44c74f462d7d36db82a58153731a719880bb267a200285",
+   "reference_sha256": "e380737f452058a361fd8a2ba2fd2bdba50bb729216082be1e5404a9f932df7b"
+  },
+  {
+   "pack_id": "b00fdc1d84044e37",
+   "audio_sha256": "c71c155248064ad3f1fc81524e994cc9246a55e1fa2d826544309944b0fa75f2",
+   "reference_sha256": "722e4678173cc5f31c0e7b097f34dfd58dda79ddb27b92d7ef71e7391c3ee06a"
+  },
+  {
+   "pack_id": "d7cec67e19b60b79",
+   "audio_sha256": "e806cef4b6f29172e524abe6621cd0cd2ef0ef9138d678703dad977d42a689bc",
+   "reference_sha256": "26bbe67a07a11d7ae8fee7e7bed11d59f938c1b9dd014d810954525de658937c"
+  },
+  {
+   "pack_id": "50dcb969b65ef92c",
+   "audio_sha256": "89ddd267cd57bce2b45841ce2f554efbbbae6cec44c70b509702e4a0eb84d05c",
+   "reference_sha256": "18e08ef9ac4a3b821d561920aaa27e154841b98b98869434f2080359b532b598"
+  },
+  {
+   "pack_id": "1dbc89c4c248affe",
+   "audio_sha256": "1bcc3c6aa9b5697ec59c5693e4444f300cbe57a0e1e8ec35fe1b7d255b75b128",
+   "reference_sha256": "8847c9f1edaf25e428427eb6ce15e3cac3619fff0e9c111f82e66ba3ae1b9554"
+  },
+  {
+   "pack_id": "ab5c2c32f60712fe",
+   "audio_sha256": "f86a2fa3a5a60956d54531a3cca1c77ed8b1726d41e5db2901e33ae8b2b017f6",
+   "reference_sha256": "33ba87f4c8633a59ead1864da37875897754b856b9447532a75db7df679c6016"
+  },
+  {
+   "pack_id": "8a0adcd6690e5ee9",
+   "audio_sha256": "82c28fee783c577c9d830013f05ea0dfe312ad0e892cc5095315128fd00b8997",
+   "reference_sha256": "1d21a42b0782013685319ef5ca7534b5888f2cbcac1bf5db14452b245aa0f0df"
+  },
+  {
+   "pack_id": "069f7e290dbda3dd",
+   "audio_sha256": "8ac518e6ae8e43e616583ddc3aa5b10859fcd6fbad9910c32970818a885f1559",
+   "reference_sha256": "91b3d99d74372974008b7268c13aa54dbba657ffea73555e0723f3890d885131"
+  },
+  {
+   "pack_id": "03fa7d028b3a7f67",
+   "audio_sha256": "63457134d2244d607269f747c53a4b5dc70e89eb37dab999d6fdd5322f59d04b",
+   "reference_sha256": "087342ce77b7a8f2bf0d2790650a7aacdd1bdab439769e0dc992e63cb82f5f62"
+  },
+  {
+   "pack_id": "1c692b9d38579a1f",
+   "audio_sha256": "cf2d91ccf485125dcc4ebef57ce358efce0818ce23d933b6230f9f2ebaf3402d",
+   "reference_sha256": "8ebef54571baddab7745cd9f8175d41c749859bd7f6085dc7fd34d20a3de0abb"
+  },
+  {
+   "pack_id": "bb3d4b529e634f1a",
+   "audio_sha256": "36c061df0c1c289663c75ea9355ef4ec7fe51a7f1955c3efaedba9305b9ea1bc",
+   "reference_sha256": "87475a5160b3b86aa6672f9fdbd14fe0ff22c1df53361c765837893b7dd8bcb5"
+  },
+  {
+   "pack_id": "c5a9d69ba03ad0e7",
+   "audio_sha256": "10d7ea13ff245578d63257b4c9b0346599499e1666b3bac09c0e6b358567c1ee",
+   "reference_sha256": "e99effd04297b334094220f502eee3120daeb78f92dd63cc230276dfa4c7daaf"
+  },
+  {
+   "pack_id": "323d78682a06bbc2",
+   "audio_sha256": "357e9b459f189124611b1eb5156e6d4b6227e096fc15802e6dbb86c31c1ab590",
+   "reference_sha256": "4d964e3b9c93038c0e23d066e15c481ae90f3a2868d499a7123435fd5a843f12"
+  },
+  {
+   "pack_id": "832e0004c72c815f",
+   "audio_sha256": "b6d0e7034f6cd6755df073e35cfec8492acd3507a18964a49a45666d5645b54a",
+   "reference_sha256": "9cfb87623c654d2ae09d82378ff588b0a43e7874e1f3be071a618fe7fa9f7866"
+  },
+  {
+   "pack_id": "242b2608323ccb7e",
+   "audio_sha256": "b32d99a281e01d116de76201afe594fd8cbb368895caccb9b779d927328fc47e",
+   "reference_sha256": "83b0dc0d082581e3de80679dbf69c315c97f3c553a1c38ef387c9eb84bf72bc1"
+  },
+  {
+   "pack_id": "e3c584d3f9ef83c5",
+   "audio_sha256": "3f0d184fcbd50e7db2736e01b5a829c21a1d197a6c56e827a84a2a6b21682761",
+   "reference_sha256": "4d556666c6fa842bcec9130b90016f5bc8d27e171a690dddb72b2444cdf011ef"
+  },
+  {
+   "pack_id": "3f196d73c10b2284",
+   "audio_sha256": "846cfba86f408810f64cce61ebc7d3edf8dd0d7eba3a27af347214e878dc1d93",
+   "reference_sha256": "d89ee7372973afc5a0dd88d52d3325c3060ef15b2d3754dc5432d9b060e0f437"
+  },
+  {
+   "pack_id": "c2efd989b4da0b8a",
+   "audio_sha256": "d2fa91b990390dc640e74e0a52ee559c100aa0111af5714d0528959ad04d2c56",
+   "reference_sha256": "270ecb9ab1144b32f2ef27c78036d4935bc3fb57ee271c79fadb423e3046bd9e"
+  },
+  {
+   "pack_id": "496e002998f8e33e",
+   "audio_sha256": "393e1ab0f77adacd87b9f83aa272aa13d8655e0276cafaf072ba8c03d3578e18",
+   "reference_sha256": "19991bd776a41b53e32124e95156ced9777c38a91cea635ebb99e41763281004"
+  },
+  {
+   "pack_id": "e1575226357ae915",
+   "audio_sha256": "78f62c3a4021ce5d3041b124d8f89321e80eecd56a07d45ea4a7d4cddbe65e30",
+   "reference_sha256": "1c74d211db9809fa443894c443984e7cba6684afe8f21c98a76a2158976f0a32"
+  },
+  {
+   "pack_id": "00f60d83f3250af2",
+   "audio_sha256": "ce68d43d6e49921f1e1da6796ea9677b6e7a0f3eb0d1ab07024f2635fe3f44f2",
+   "reference_sha256": "6e2c9b2e9d02a256a3d08c650104e81ce8f44ea7562cacdd40309a077ef0b230"
+  },
+  {
+   "pack_id": "549bc9b3d6829f6a",
+   "audio_sha256": "6a8a20355063846ff5ac62135ae712e2adcb81f732b60bccd3ece297d516f0bd",
+   "reference_sha256": "f24e5fca210461939ee393b5553f1d0d023d758cd63ebf0fd7562a05ad1715c7"
+  },
+  {
+   "pack_id": "47e91fbbc6f23316",
+   "audio_sha256": "eb41ffa3726f176a3c913a33147c117d955b5078f4f2e915615a34d7c7047734",
+   "reference_sha256": "de129701aa7bd1b4accc9bd64acf183aa415f774177bc8ca438aaa9d202579b3"
+  },
+  {
+   "pack_id": "f9cfa6b82060fdee",
+   "audio_sha256": "bf7a7bb28cf6ebcea585d578ec0bb84e31e9e102ef13378b2b0eb97ad8980eb4",
+   "reference_sha256": "280530a3fa3229871c90b3be971ad949d45f8017c5a4fd9a1af3e482078cee99"
+  },
+  {
+   "pack_id": "10ebd54b988716ef",
+   "audio_sha256": "fa2b78876fe5a46b45cf821a9add3de22403ce22893ebdc8a34a3bd1aba1b09e",
+   "reference_sha256": "e159260c6280d9933040f2a868580887b882f86c8d3355c5f704ddc1e2b4dd92"
+  },
+  {
+   "pack_id": "fa1257cbdd419921",
+   "audio_sha256": "d1a2932396226bf3ca1dd717a4b9ea8d48d248fb6ec50df66a4af3161a572609",
+   "reference_sha256": "2662c4b4ede0685638cd59483b4a3048ecc6cdd00021419f33b5ef52de2173c7"
+  },
+  {
+   "pack_id": "5f49f8bb3578ab22",
+   "audio_sha256": "f802fb9fb3e6783ca832b21a1f4bf274bcaea4c6ab527dcd783ae379ee6976ea",
+   "reference_sha256": "69046adfd0f98c76aad36d941272eb62690283b35a01e7dc804c3314e22a4b91"
+  },
+  {
+   "pack_id": "1289c53c3bbbc0f7",
+   "audio_sha256": "8716c68faa1c7c6a06b78e274b571ee11a079dbad87b26e75093d1721134d28f",
+   "reference_sha256": "24b5bcd9996e2fb224e8669e662ecf43c3b56b3d2d70874e6961afe264485cd0"
+  },
+  {
+   "pack_id": "ffcff4deeed01eac",
+   "audio_sha256": "8ba16036faf6f79523d2f76859a50fccf833d9721550eaee9896b4722dcd4ebb",
+   "reference_sha256": "4c0bbbb90159a9587ea1f71f88e8d8bf3c8a54640a1c5e582c1c3436dd2d44d3"
+  },
+  {
+   "pack_id": "1e83f6f34ba5cf1c",
+   "audio_sha256": "4c8e2f987ed5a8a27d80484f8cf3ed100ac937b42b4151b491c7eb32429c4c79",
+   "reference_sha256": "08a46b6570e39d53fd024dfaaabea4c2e4b45833324bf8a50b4143b62dbcfbaa"
+  },
+  {
+   "pack_id": "6623fabe4846343f",
+   "audio_sha256": "234163d1388237adb8f34370a89e1f66b37770fa7f1c1a6312152c99cea6429b",
+   "reference_sha256": "be30d9e58667520271af8dbdef334cc49e3936088d348dbe726fafbd21c215a1"
+  },
+  {
+   "pack_id": "5633db21c8ef0d42",
+   "audio_sha256": "072ef265d0317a35c129bacde7c76663bae8c5cf78658fabdefd7292a9711d26",
+   "reference_sha256": "86460a148cb63b2ae57663d6066a712bcfe9fed5c0771bd3bd25e4368d8ca90e"
+  },
+  {
+   "pack_id": "eef214881cef560a",
+   "audio_sha256": "f571e59938a8a910c706d7be39d5cecc09b6aafe9690fe7eea91a0d602517e6e",
+   "reference_sha256": "1a84de4f4c4456b541f11550f23efc792980052c28346eb3c1a421a72aeefc6d"
+  },
+  {
+   "pack_id": "a94bba871c18e24b",
+   "audio_sha256": "91657bbb1c662de95462e306f6e0f8884fcdd6f308109ed6d0d64b29e5feb429",
+   "reference_sha256": "eb16069a7868af206013ae53e47ed6a9bac46427ba3fe132995c9b5284a1a66a"
+  },
+  {
+   "pack_id": "f9a39938fafb1d69",
+   "audio_sha256": "982849c9e6b86363443599a111e1cee949609243daec004f31fd4fead15c08c4",
+   "reference_sha256": "0db93e21f51a98705617d9da72246d1a5aa49158b7ec6de342b38ea2480eb4cc"
+  },
+  {
+   "pack_id": "e0c8881c61c289e3",
+   "audio_sha256": "ff2502a44b6a30aa394fb6a58373f89ac9386905ca7d0ca91d36f2d97947cf9f",
+   "reference_sha256": "2b677919d26ebfe5ebe0b331f54b344cce81e0ebd2bf9fad5e2baa16036c8f11"
+  },
+  {
+   "pack_id": "a20735a91e5bd1bd",
+   "audio_sha256": "c4635dcdd3aa81bd37cacb9bc2ff170094e7a2be9e35f239c8769b034096b3ce",
+   "reference_sha256": "2b50a4e7a117675a03bfee09fef2f90a197dd4552e608e03e69059fdfc79f708"
+  },
+  {
+   "pack_id": "359ad8e52923b97f",
+   "audio_sha256": "f4ea6edba684f3dd35bb6fadf6acba86656aad043f5c041c14cbb437171c4736",
+   "reference_sha256": "b1f802254604e48a6e418e78e1b6fcb12be8a90a092032ed0b12f0e4e8f4fa7b"
+  },
+  {
+   "pack_id": "9a80cc8dc7f6227e",
+   "audio_sha256": "a6d5b5768854ec3e7e2be4a5147d77c15a38695677782b6455cea2f5d5e788c4",
+   "reference_sha256": "e709178a435cccd903852804acdfacc3ef4e504ac0cde2cebcffd4aee8f9d67e"
+  },
+  {
+   "pack_id": "73fa179cfb9bbea8",
+   "audio_sha256": "d488897efa9e130b579e2e758c7cb9ca8a89c39d7602965dbd11b45df5d135d5",
+   "reference_sha256": "055b8d59c1489460caee21cdf6405b97e240bf24b16777298fdc3bbb39dfa584"
+  },
+  {
+   "pack_id": "2089e227d2d2c85e",
+   "audio_sha256": "97533f1a2be9359e888a08ea335befa882d77cd000ae8d074dfa8834adfc1212",
+   "reference_sha256": "f8e5e560c7931ffbf52d0e155e966532060164356f9e1b21f484cbc92c14ba1d"
+  },
+  {
+   "pack_id": "3253437c9620b647",
+   "audio_sha256": "2a5a3d73970b9ab97c9b70f1b37f95c94eef2102591250bff88bca393e02fb78",
+   "reference_sha256": "aae7691a6346d83e2e68967ca3835d15d8ec2d50482ee876bbf8bcc1b8f5f00f"
+  },
+  {
+   "pack_id": "37c605738009d994",
+   "audio_sha256": "c102894678e8534e69d64b4611de277629a732e95533f1b1de44c802e531c919",
+   "reference_sha256": "d52722337c8c08d6d7c10837ee4c5be4db5db49598a3e0bd1a3888e6ccfbb025"
+  },
+  {
+   "pack_id": "aa74d72d34c15d03",
+   "audio_sha256": "36ed23147c40b6756f18faf112dbdb0f525cc33341b10cece3aafd01b6acbf5a",
+   "reference_sha256": "28073ac70b731f65a9bb4bc1036e3995a8636d87a32f48139fc708db86414eb2"
+  },
+  {
+   "pack_id": "59507cc9f53c1ef8",
+   "audio_sha256": "a1a62eadfdc4272e60e27d83972c2aaf4189162daab656028b3f891ac2fc088d",
+   "reference_sha256": "d7b7afea152b44bb51dd2f4a4aa27139d051bb005c357e95b9ec28989f25fe38"
+  },
+  {
+   "pack_id": "6969484c8eb805c6",
+   "audio_sha256": "78b8369c230fe240ed0bcbf79299bf5a95dc1252b525a338b500c6f03768813a",
+   "reference_sha256": "ead190190e8e778e625138ad2e210ca4092da86ccccd39f2b8577f282a5a0045"
+  },
+  {
+   "pack_id": "fe833e54f9499613",
+   "audio_sha256": "8c512c06a737ea068a56fd48e74a4f34169dd0984d1f7ac1ab5a1044f333844d",
+   "reference_sha256": "47fdcfc32781d0b8e3aa0818dfeecc46134117cde46925e8df0586024563f538"
+  },
+  {
+   "pack_id": "b53ca7e9e911cc4b",
+   "audio_sha256": "cf9c53de73af85acbbfb4374b905ee9756b2903160e0dc99cc21ce8250d966ae",
+   "reference_sha256": "d0d77b9fa8384ea8b95d3329f42267c17766026f9add9b0e5b79cd18421244b1"
+  },
+  {
+   "pack_id": "b5754fb735e50154",
+   "audio_sha256": "38c056ab5919fed1d1a01b0bc7a26aced99268bf0a68824524f09530ccf2af99",
+   "reference_sha256": "cbb8ca0e70957f67ac788d69e37832563c53ec8534be84e80d26b53c83357be3"
+  },
+  {
+   "pack_id": "c23aab3a0b27a861",
+   "audio_sha256": "1151f1d811072090a3b9faf7834df481e2c2270a6a5068563373a5e34464763f",
+   "reference_sha256": "bcdc3fc1a85bb01e370c7a9e190ffaf98ceeb62cc586b6cbdee34b5c5c8c0fbd"
+  },
+  {
+   "pack_id": "51417bb1c15609ed",
+   "audio_sha256": "4e1e70855309c1dccc9a1b7e673219b1c51f03554632fed51f4c87e00170ad1b",
+   "reference_sha256": "349454b5654e0acad68e533364a2ced84d6b1c3bb04930d572a669c83313b88c"
+  },
+  {
+   "pack_id": "c895c3698d8c6cdd",
+   "audio_sha256": "3cde70146c0a6c79597f1dd6fd63278a0eda378db51eb647c66390eb4c4e76bb",
+   "reference_sha256": "5bbce06d1bc050a309025cd19d1df9b8d8a25e97c940a44109f80c0296431e27"
+  },
+  {
+   "pack_id": "07c970eec5a6c5f7",
+   "audio_sha256": "b4f10aee917a035949fc6c76f44f2c170d278df513cf4d3447213a8e2732db7a",
+   "reference_sha256": "a129154b4ba627b32944d63fc43b5fce77d3230acd443cd92af7ca5872256a1e"
+  },
+  {
+   "pack_id": "bea81f333bee5ac3",
+   "audio_sha256": "558f88f18e7fffde9ae2e574a7d2408b4a58f4f0c3973dca8f9a2e86dd25652c",
+   "reference_sha256": "c64aa8baad4f6a3d7834bfdb823d8e04b597c773292c778fe0cc07d2d4ab38a3"
+  },
+  {
+   "pack_id": "be46cb9c70d57361",
+   "audio_sha256": "8287bad5261419bf0129da49ef79f6915299d87833bab452b782885e0e6b168d",
+   "reference_sha256": "ab2bb72c726c7034253173d5ab7384c701472cf592a916405651d6818d1c0a81"
+  },
+  {
+   "pack_id": "e17775e4ec802d97",
+   "audio_sha256": "6604fca1638da964dfe2befbde8eac957d27d03404f5f3192d4e70b42c061363",
+   "reference_sha256": "93e724b79cb4416918d9aec8a56c3e05747da42ffc16e968b20fa73e7deeac27"
+  },
+  {
+   "pack_id": "442d28c754dd0b94",
+   "audio_sha256": "08b474bac65c4ac2b32e70d051cf3bdf52c3e6b80f44dbc1b96e6aebcfe190c7",
+   "reference_sha256": "a02a492fdb3637cc94d03cd9f37518092d8b2faf610907dd93259f00f2673590"
+  },
+  {
+   "pack_id": "3c48d6f71bde1195",
+   "audio_sha256": "e587768fc1ddb3e34060f82b7f3c275336ca8ac83494a5b2c7048bd0a71e2302",
+   "reference_sha256": "5e0a87899afa1de3896c36617f7c743bbbfadcb461723d125878d630aded296b"
+  },
+  {
+   "pack_id": "0d7567202b92f696",
+   "audio_sha256": "27bae567c7b49ca01fa606aaa3a0012b64b7383ff928930069fa8fa35a5ad840",
+   "reference_sha256": "a36fd39103822615bc945e33c9ef997498c0ec2c26876dee5762c13c7a11d37e"
+  },
+  {
+   "pack_id": "bd4dd3689575925c",
+   "audio_sha256": "bdc3d97c481ab9713b037bd5feeec9b4e23d71534601b8bfc746affe2e8a5827",
+   "reference_sha256": "4d8a20fe6f51ea91a547a1f2ea5c15c7dd5ac187d0c32c129f9da1137eb48558"
+  },
+  {
+   "pack_id": "fad195736642c187",
+   "audio_sha256": "97592060e5a248c5cbc71fd487516ebe9a0cf55c647917b12cd4ad9c808488e4",
+   "reference_sha256": "4ebbfa4180271967c2f3070b9bdba66260c5816a3b99e84ff3abede0d92b5b7e"
+  },
+  {
+   "pack_id": "20ef0d5860110fdb",
+   "audio_sha256": "b8ff0508285268aa632e6557bd8cc907a35e6bee0506d2ed63021d2d8411cf10",
+   "reference_sha256": "39022d9f7bbe432116ca6db73f9ad5e521fd40fcb6067a050792e3b57bd833a9"
+  },
+  {
+   "pack_id": "72b38b355f854b79",
+   "audio_sha256": "853e42fa70771d80048b4fe98b5b1e31a71eaf09f0c0a804044f032d1e6b8806",
+   "reference_sha256": "382218831c1194ddc4b6e0609931f00a6edfd186dc8237d85d176ef1464d5283"
+  },
+  {
+   "pack_id": "415f5be591802ba9",
+   "audio_sha256": "90f05ea7b243fe36f2e81d706b10a26f55597218bb74d0fdfb8ce6273e7c7855",
+   "reference_sha256": "3bb761590c4a28838c7bfbfe404ca4db8aae7155fceca7e071babfa76417c09e"
+  },
+  {
+   "pack_id": "d7189d64ea87bd86",
+   "audio_sha256": "d50dbaca989cd0ee6c15b7f3cd0f175d7103d5c252e28c71a2036a5d249caa0a",
+   "reference_sha256": "91a4bcdf4109b19b6542dffd70b75efa8dadae96f0ad40a89033ba6c8743401c"
+  },
+  {
+   "pack_id": "e1ccc76bbf7f2dd0",
+   "audio_sha256": "2ad116c017d270be9e9fd62f8cfa140f9bd193a2a47ab0ef85c6758eacd48fcf",
+   "reference_sha256": "cc0a8e7649dd4fa018cb73c8e341a440e476fbc03285309208905c96d2b3c410"
+  },
+  {
+   "pack_id": "484865bca4e28c9d",
+   "audio_sha256": "558eccc7084d12acc76a5b3ce8ab53548b084a94d4efb0153f7c8638624c22c9",
+   "reference_sha256": "9110fcd39ba7f5e15a670a1d45bdf93cdf51a8754d7e324e57ef0f137c0888e5"
+  },
+  {
+   "pack_id": "245458228c914235",
+   "audio_sha256": "958a4d7611e4b7af9b5a98e72576cc61ba265b42caac6404106f00a81fd7774e",
+   "reference_sha256": "30c40cccdd8f602604661e120029feb22450a6aad8ea109cc6f1e9c98f19f202"
+  },
+  {
+   "pack_id": "1ff5bdf06ead0d4a",
+   "audio_sha256": "dcb12b369c7d567157460876bb644325f4051ba91f969c1caebe15c2d399ca84",
+   "reference_sha256": "da2ca09455e4048e620e682dc3f2d31a50191be8c66d85f849054780dea4226e"
+  },
+  {
+   "pack_id": "e2163e147d3e6a9c",
+   "audio_sha256": "5ee1d1d51cd8ebe6a9603a4e2e8767f121487ff1e49a244717a81e9163013dcf",
+   "reference_sha256": "bde7c7487b92262432f19901beeff3c308b72b98834875ca6ae36b85a4c55b52"
+  },
+  {
+   "pack_id": "02cf90008f506170",
+   "audio_sha256": "9f150b4e0ea1dbb9441e81056d1606cb35e244255d44c874ce328e47abb0baee",
+   "reference_sha256": "d43a1002fdbf642a3a33baae000479ca87731ecc7854f683afa27367b4dd8da5"
+  },
+  {
+   "pack_id": "84579e46633aa33b",
+   "audio_sha256": "32160b05fd4af1d239aa0bed8e55333a4f79650d7b4b18dc941ba959fad6292f",
+   "reference_sha256": "e2621a1d5bcef08d5d362ea2f3299a8651ca5b45d86c2ca65addf7edc52e579b"
+  },
+  {
+   "pack_id": "6a77a43190a9cfa5",
+   "audio_sha256": "a8db3595ef61ffde2ade6704902d17424e82d053458b5faa5e16e9871d63362c",
+   "reference_sha256": "d91a473afaabab58356bc453a60e30f91003e3a1d2762e1098eab454fff74e3e"
+  },
+  {
+   "pack_id": "d44487de4b70ee90",
+   "audio_sha256": "ddb70d04365df115b24a294cd5058f71b090fc33fec0271108c274a4df57d28c",
+   "reference_sha256": "d26ebfd2bc61800fb7881d41fae48f26fef03ed153765d6f7970e67d5cd156d0"
+  },
+  {
+   "pack_id": "3f8396833e14361c",
+   "audio_sha256": "bf32711d47a4e97995fa2417e1c4520ce8aa9893084c7f833c8cbce15437f226",
+   "reference_sha256": "ab91d1f2907e1916b537561ac5ccbf39b6cf8952efb82ef0e7714dc6c9b2984d"
+  },
+  {
+   "pack_id": "a529758665b2d2bf",
+   "audio_sha256": "1e062ae06b243a0fda844847ed4643fb3b0ca17ca4d1816c16058f72d83a88c6",
+   "reference_sha256": "dc8f3432c53e841a3ea012be640ac5477db4d733a373de203aaa1f301fe31a63"
+  },
+  {
+   "pack_id": "58d4f9a22e7f1de1",
+   "audio_sha256": "d72e766409e1fa6b7d3e1851b60ed0cd6890f1b2035f4109168a12b19794023d",
+   "reference_sha256": "11aaf4838cceedf1314b44440920758be3ffc327fbd7dd25ee8b24ddc5916096"
+  },
+  {
+   "pack_id": "54b5579e9a46277f",
+   "audio_sha256": "c3b48643ba55a2f59f61275576cce8a61de4a36316457d67732935f7fb9e4fcf",
+   "reference_sha256": "01ee706d7ea6522f0c7c465b9776005c026026aa31d545c76b823ff00bd5d26f"
+  },
+  {
+   "pack_id": "c517c5ee6bc24a1d",
+   "audio_sha256": "f85cae24f85fc1f993335ac450f37cf5c60ee2c21800f090524979910683bd8a",
+   "reference_sha256": "e54b73852c4d7d03d8ad1fffcad4c1db106b1e7b07f96b4b461f2f64d6a1a28f"
+  },
+  {
+   "pack_id": "dbba582a2529e3e0",
+   "audio_sha256": "cb7e36a56211444bdb6e0ba6196dad07321ccf92c38229a108828ffafb62de18",
+   "reference_sha256": "2550c4c768df1439003114e5ec0ce82599f124f517827b40c6ffcf57cc4e54db"
+  },
+  {
+   "pack_id": "15098030079a2399",
+   "audio_sha256": "6a6e902ba33cbadad6e09dc411d8edadba7d75b679834b6b73260e99df79e128",
+   "reference_sha256": "abdda15e79ee622cc3ec1393305a6248610f143f3ad86a242ee5de12fb99964f"
+  },
+  {
+   "pack_id": "544fec82641a11c4",
+   "audio_sha256": "5b405d52d427030e53d8fc581d16dd356f160ef80f52bf7391f9005a21fec4da",
+   "reference_sha256": "3bdb02aabc98b4ffd9f7a3baca955c9522d941c9ab766a1b01af961f1b308a0c"
+  },
+  {
+   "pack_id": "16d48254bbd38864",
+   "audio_sha256": "e075b96421ade85f4c2df5752177e0d3e7b33b685931baa0956ff032cbe00f25",
+   "reference_sha256": "3a49987cba21001426220ce83d7ed487a11af903aee3883f3e5cb64f0531d61c"
+  },
+  {
+   "pack_id": "4d3c17b590449a62",
+   "audio_sha256": "62ffaa591e04a65b9cac6a290c5d203c5ee408daf357b510bc0443b5796dc106",
+   "reference_sha256": "9b676337c1e960cca6def03ae36ffd8cb5624569438f96e53eb368b93ae0e469"
+  },
+  {
+   "pack_id": "0b6ac0c9219d5264",
+   "audio_sha256": "f38273484f5dcf0f3ed2b07bdefc3a9f375d14740cf5c231d2794dd754115443",
+   "reference_sha256": "572b43790b66b96204b2f44e890d732811f910344f7e7283e09329da494828af"
+  },
+  {
+   "pack_id": "2f6acbdaae5e479d",
+   "audio_sha256": "05182420e64efe2dddc4f579e61359c22acc0d640f5041a19d639655c08fc68e",
+   "reference_sha256": "cd887592add88d84e5d86a8af55e0d576a6868bfe9201bfcfeaf275d73aa7247"
+  },
+  {
+   "pack_id": "050c204ae5e52a15",
+   "audio_sha256": "bb39386bb433c1ee23a4d4c1de10bd56755fd263a93b02d70ac95578ef14f85f",
+   "reference_sha256": "8347edcd4033ca8c3f636cf6c2165d126df90a6b8a063fb09cf5355257403ca0"
+  },
+  {
+   "pack_id": "26bd7ccb2ab4fa58",
+   "audio_sha256": "50509bc83161b4bd4afdba0d72f10a24e329d99b60e8ffe0f61da390014c5c82",
+   "reference_sha256": "6e676d95f9e308b195446217f5012f00e0b9d08b909d976120c8cfc70550ad87"
+  },
+  {
+   "pack_id": "b8a06365b132af22",
+   "audio_sha256": "fbfe36491d4c46bf17ae735c794d118732d87a1d6a01926704d985349b1ba211",
+   "reference_sha256": "9eabdfe029bbcc2d0c6fa849e20bdb90bd339856767c3482d585b760ecf8cfec"
+  },
+  {
+   "pack_id": "cc1cc70d4d317d26",
+   "audio_sha256": "9b83f35f302c26c0765f9d6303b9e3d5b29c32fed356c5ab3884ae4ccdc36e84",
+   "reference_sha256": "15571b928326c3ffacbfd840b8a40f8e3470667cd92e0b1b7e0ee0d89ceef76e"
+  },
+  {
+   "pack_id": "a0bee9a550a349e1",
+   "audio_sha256": "d78c00b901499b24ee1ab5af8c4fb2f40d549a31435d61b3bf8f1e9913834520",
+   "reference_sha256": "13f0f517a3a28dae64631079c834da8340f007a9481e68175e22d30985e543c5"
+  },
+  {
+   "pack_id": "8acba12bed84a663",
+   "audio_sha256": "8153179fbe86502d9cae0028dad97e5f6c46085843b315354df2f916e15c0549",
+   "reference_sha256": "09d9dfce4540750bc7cb1b14bf6aab1745e2b13499bba6861df29a3e0509a976"
+  },
+  {
+   "pack_id": "5602174e68c85395",
+   "audio_sha256": "fa95811de58088a9024d45c1d0c9b8d9192e5cf14c20a7750ba1ff6bdc668d0c",
+   "reference_sha256": "1b0811fc304280c16a5e9be7a872a57df5372f52cd6c48169cd13642be56282e"
+  },
+  {
+   "pack_id": "36b532636f6f6e64",
+   "audio_sha256": "83ac8fa801c71e5f9cc34ed5d77f08734c8f380b54c4fd4fe2cfa5314a7de80d",
+   "reference_sha256": "ce97376f2ba412aa24d65ec0e6e9c67c8b557a98c54265b60d9152d78d90d114"
+  },
+  {
+   "pack_id": "6df8edd6a0bdfbd1",
+   "audio_sha256": "2e863a925cda0edb2d7c93c2d08a6d87e62aec5a52f335ba8218c9f7561b2b68",
+   "reference_sha256": "6e721c7282b5294a265991e33ca50e5ff6a854f369dff946c6ce3d60a11408e3"
+  },
+  {
+   "pack_id": "9c756e9758534b79",
+   "audio_sha256": "3bcacc03d303c6d9823205155b20a7b1b36eb76a3da077b56ffc566b1a55e1fa",
+   "reference_sha256": "b55a1a962a05b9026b18d38177cc7c388a14008a5c5f9e21bf49dab0a5e8407e"
+  },
+  {
+   "pack_id": "2e531f0e6727c0f2",
+   "audio_sha256": "d5a2e8a1a87b19bbf3202acdc3e510ce38c9dbcf28e1ecdd3ecfc96865a63a0a",
+   "reference_sha256": "299f58b17d0019e98027a22cddcd49ced2905f7571e221113dc07bd10951e95d"
+  },
+  {
+   "pack_id": "729cd47f8ecaced2",
+   "audio_sha256": "c9d46e634947effd7020bf1368bc848dd9b09899325f2be1ba82cbb81aebb7ab",
+   "reference_sha256": "e5ea1cbbf978e77b3b14503eae4f49b365e309fa4113aaca6673a6c9a35894ff"
+  },
+  {
+   "pack_id": "18e93d709b1e7e51",
+   "audio_sha256": "842f3dacc2ff86343c39ed06f1ca03c281f71b7ab80fd49d7d225fd856a27e66",
+   "reference_sha256": "876b6cb09656df8c8b7acf4eee6f27072d6640d698cd11f4260c9f6cee014d73"
+  },
+  {
+   "pack_id": "3a228ab5ed2aa0f1",
+   "audio_sha256": "3042050287cd8f8197f31a26bc6c940cee9e8caa888dc5e92d5b5c2725cdc367",
+   "reference_sha256": "079e44003b1f583e63d9638f44f75d9a98a68be7cce3f41c55e0749fdd782eb9"
+  },
+  {
+   "pack_id": "86a9be0491afd100",
+   "audio_sha256": "947b99ea7498e88686651c27417afde91334a23b7fd5c7f715a3512ce9ef56de",
+   "reference_sha256": "66790028ba48d0d94be0dc338610479f6a44b0146abd98a8aa0ff224624854c9"
+  },
+  {
+   "pack_id": "b67f97c77f3dd37b",
+   "audio_sha256": "03647f10f6d13f4bc71a2acf98235872e923f5f2e8336b67b83472882f4bb2ee",
+   "reference_sha256": "5a813cde9f7ef78c9d22bcc515fd557153ffea0e1020bfab1e5f8faf8267c3ba"
+  },
+  {
+   "pack_id": "5e353affc47b173b",
+   "audio_sha256": "f5e9d05cc45f1437f8360be86da63785507e9cb35bd75ab7cc1186b8c276c053",
+   "reference_sha256": "a81572ee3869872c0a31a31961dba71625f22cac5e737ccb9f130e0e1e03c0fc"
+  },
+  {
+   "pack_id": "2521ce5407e527e8",
+   "audio_sha256": "9fb90e7253ccb58e2622e4d69b970849d205878e7f2b1b9da736df8e45cf2005",
+   "reference_sha256": "f32c9033d08ac6468eaa80c631363ae51a6940cade619ef98adc4fbc15c3c837"
+  },
+  {
+   "pack_id": "df4ddd9646ff0c12",
+   "audio_sha256": "68594ac7c565d9dd0f8b2eb277ff97fee93aad6ec13f8d2d68515420c1d5ae4e",
+   "reference_sha256": "3a5520f6ab9f579b708fb61304c9fc9b32bc0e3e5e719e354e4aa767436c8310"
+  },
+  {
+   "pack_id": "777bde1d8f846dbd",
+   "audio_sha256": "32e88603f03395f033c331a7a5e170035caa05cd48276f3a1cb6b23bc2300c3e",
+   "reference_sha256": "73931979fb194be58b5133fcabfffb6935a782ae55abb76899f02ece7a2ab117"
+  },
+  {
+   "pack_id": "13ca3d72e8548d49",
+   "audio_sha256": "0563e1f8926b734c1eb1ad1ae45720c3582c9d337a506a23e8f35dc1c0fc288e",
+   "reference_sha256": "ff0260bc8e0ddc297289c7ed0c35ae1d46efdb7e7335d7fd33f0e257475a7d89"
+  },
+  {
+   "pack_id": "ec38bd8ba73c9d93",
+   "audio_sha256": "a9bb3cacd584baa5c45dacda47c6a0daf6f35d176d55d5c86e1e4526f506e1b0",
+   "reference_sha256": "98e214871022d2557c7f5c913b6908a1df33759690c39c3bd40dbaa273a12f01"
+  },
+  {
+   "pack_id": "f0e90c667daa3d52",
+   "audio_sha256": "221a1e4f72a7c9ca686b777df78f78bd0b679672bcf9847f6c47ee1bbdfd4cf4",
+   "reference_sha256": "aab100d145a5e9bacbc451910808d90dc581569f9b967ed901e0fdabff78dd1c"
+  },
+  {
+   "pack_id": "2b65b832156075cd",
+   "audio_sha256": "0664345b2e4b8e3653bbd7f8db2a3c226ed0b89f3d65b5b51ce94da6d1491df0",
+   "reference_sha256": "f1d5e01c6a20b0859d60dd254c24cbca0b1f5602977378b314d1bfe668ea7b28"
+  },
+  {
+   "pack_id": "f21fd14f4bdd4ef1",
+   "audio_sha256": "1639ab5d5d13f089c2a5ec9b8e28835be72883f6a2cac167487f765a5cfb0f77",
+   "reference_sha256": "dbd6103ee073d59455451a262dd91be64d0711f28fde224da88cdd61f84ef77e"
+  },
+  {
+   "pack_id": "f456a248715ad123",
+   "audio_sha256": "35ecd9f133f1f40e06f89be03056b93de0d2ffa3f5ac04cece42ae3a1e14385a",
+   "reference_sha256": "964941df97614e32be0b9ba4fb2421b0ba1d030dadacfb2758ad48827901b2c9"
+  },
+  {
+   "pack_id": "998439bc775a87bd",
+   "audio_sha256": "86019afaadde8a43fdfcc0726a6de9f3ff4f0285073506b238b215585ce3bad9",
+   "reference_sha256": "469fd6fddedb292b734c2bf88018674cd65c3846a0f646b0e0b9997881ca3970"
+  },
+  {
+   "pack_id": "5a534418c3345e89",
+   "audio_sha256": "6c584a0a8eaea4184ddca56b40998b050c4f12cd8b3c83a3b5a7621fdd543b1e",
+   "reference_sha256": "7c03c97c162f4349baeded8b93b6e1a2760bc53cf305bae3de0742004a35797b"
+  },
+  {
+   "pack_id": "caedcd9e595ae121",
+   "audio_sha256": "69b6d5184da5849d479feeacc3a5cb16432ce35748cb89ab0dbe43519a7d1112",
+   "reference_sha256": "e7e9afad6cf33a6eb065798a145ab49698161fc82f87342ed20e80f7f14eff4c"
+  },
+  {
+   "pack_id": "264b3e7e10740ca7",
+   "audio_sha256": "be546c086fa4ad907318773e1d478ced9cd4b796c481601045754d031f9ad7f5",
+   "reference_sha256": "271ac92b91401ecf864d503c46326043f218013d6511bb893898f1332f94a514"
+  },
+  {
+   "pack_id": "28fbc9c47bc33c3b",
+   "audio_sha256": "67c04ecfba5b2daf735d4fd8e423ba391dfcab9b912f907aca3c829195165e38",
+   "reference_sha256": "52f4ad6195fdd9f9804b78daa78b6e2e0a85f3da07b9717cf5638c2eb7cafbcb"
+  },
+  {
+   "pack_id": "381d8e53f00bf9bd",
+   "audio_sha256": "4da5b7cf83e808898cff4f9c1b7122ff79d60e8e6500849074e0c9b8ea630742",
+   "reference_sha256": "53deff7d10ead9d5c4638303372a1049ff94971d83e2631529530c811e45d647"
+  },
+  {
+   "pack_id": "aa55f1586e2c3766",
+   "audio_sha256": "0e5e04eb3d5b01071cbce34d43245a2df11eb39b4ab1356eb3dba8aad66bc9d1",
+   "reference_sha256": "38b96e64a7b9cbdfa72099115773b3313bb93f3a782daedaac6d7fa9194167a6"
+  },
+  {
+   "pack_id": "ceacae671dd368c0",
+   "audio_sha256": "88f4fbde0fb9074e62cebbb74b0b8ce83b215049cfa90ae59b21ca52f9d49d7f",
+   "reference_sha256": "191ee586788560688e2e1dd78a0f81035272b4d23211015b503850afe70bacca"
+  },
+  {
+   "pack_id": "5c44b914b577851e",
+   "audio_sha256": "c1beb2c556de040d08d1d8a646dfc18c2b37b7fe935828aaa39cf20514bf9918",
+   "reference_sha256": "183f81fd4b2bd822094c4a0fd748b537e489ce60497a692557aeee6b1ceb976b"
+  },
+  {
+   "pack_id": "6e575a4ad349713b",
+   "audio_sha256": "28759a7664019b0fa119dde013fba7ab5249d0e6d068db00cfdc57bd8a9ee8ed",
+   "reference_sha256": "bc9f1c7c4d110895099cc169d7fd601950be26c2e4cb85e36dbfd0e3af9f000a"
+  },
+  {
+   "pack_id": "5bf08d5791f4e130",
+   "audio_sha256": "489cfdaec0e12b1d5eeb604f4544a3b726be851c5dbfccb5c08989619a6c1602",
+   "reference_sha256": "86c25474e450bc204dba838db752830a9820bcd0e2271115d8af268b3d02e90c"
+  },
+  {
+   "pack_id": "e2190b0f3b076bf9",
+   "audio_sha256": "f27116ae71a531511361e8d9133bd2e92ac56a7f03432ec9aeef985ce026251f",
+   "reference_sha256": "42373588945ecd53c7ea454a64944cefb6a0e92b4e712197cf4d2b91e6a9f4be"
+  },
+  {
+   "pack_id": "8f20682dfd0a3e16",
+   "audio_sha256": "28774d6569c1db2715cb127ffe9cf4e54cb963da1a31ae5b47b03b4f3e9894d6",
+   "reference_sha256": "8c99a0068f2d3d609ca8837a6eee7010f29c3da46e1975c8bbdda92a1395a5da"
+  },
+  {
+   "pack_id": "3ccd581a6678eafd",
+   "audio_sha256": "3fcb5ebca3975f8a31e3bb396b26fa3ea76dbfc4ef107c78cea0b75241dc1565",
+   "reference_sha256": "ffd114b71945a36214cd2029155777497b3f0e5cdb7f4e75c8f35ccd0811b5f9"
+  },
+  {
+   "pack_id": "a3fe1bb2daafb3ae",
+   "audio_sha256": "90d7980c4e23befddc4f9a48d302198680bd48cdd59fa1ccb03220a457863417",
+   "reference_sha256": "97e949ad7c572a36d58a4c43c4c67d802ab9c3ab743d4cbfabd9bb43ba292a42"
+  },
+  {
+   "pack_id": "cb9a998e8f3f71ad",
+   "audio_sha256": "8e38aaeeee9847e0a36c0abbeff3e6d0d8940906c6ceb70793c5edb8cb0f1246",
+   "reference_sha256": "0ab15b59bf33b270bf37fa4463a9897114f560c41efb599aaec8c2f6bdbd2b38"
+  },
+  {
+   "pack_id": "7add5ddd7263600b",
+   "audio_sha256": "c5ad0968602c94523c6046f940b9327bdc47c349ab046dc58cbf54e38846fd33",
+   "reference_sha256": "c22c47be97fa655e0471977012f2ed7e52787e341bcd1c62b2d2726ee48997d2"
+  },
+  {
+   "pack_id": "dff0f3fe4ef8cf8c",
+   "audio_sha256": "d89a055291a8c28fae424eb1e20422408c62eaa993928d9d165753f67ee15527",
+   "reference_sha256": "9bcde5d5ddf1f1666bbe65bea3e45f80d4e77efd9c2c248602e3eea38a76e51b"
+  },
+  {
+   "pack_id": "2a4d322603a3db27",
+   "audio_sha256": "57f27804cd40280c05055f57646881938ff1a9c606d6cafec229264ebb169177",
+   "reference_sha256": "4d1494a70944ebf03d3d733e15919deab093359f17d0921770d52a1982e05f64"
+  },
+  {
+   "pack_id": "49ff3bdb4873c831",
+   "audio_sha256": "2ea938148c59b5beb8cac4e34258e9ec836f4c35a3dc4851e00ac02db322c6cf",
+   "reference_sha256": "96ce587446391be658d9bcf966049245d0a2c2bbea6fa91cfdc2cb0213b2b836"
+  },
+  {
+   "pack_id": "350943642cdb3d2c",
+   "audio_sha256": "be69ac744672781045ec12c0aa063580673bef85d27c72ca3a749a1ec112249a",
+   "reference_sha256": "9e8a787c189a4d21d8871f1e59fe418f2796528270a911bf9f68ad0ab584c6ce"
+  },
+  {
+   "pack_id": "1fc26935c223740c",
+   "audio_sha256": "547630a966c1519dafc650ec531414e43897d19d90dcec9cf8aebb8ae82f3755",
+   "reference_sha256": "78bf558f6957503056b67bdd6a3ce2e6c72f62b83a7f04705312b659284ee312"
+  },
+  {
+   "pack_id": "7ce64567c5354b5e",
+   "audio_sha256": "58da0e0c762f298c6c8b4e91e1e3c8d0facf71697bb6573894c1ef457e9c0a71",
+   "reference_sha256": "511774462458fcd64bc0742fbd3c89e23f618049a23a649ae7267a0fa3f6990f"
+  },
+  {
+   "pack_id": "c96c56498b221647",
+   "audio_sha256": "70803892ef9524ab126d540d0c6b4caae93bfcb34f4ec7ab0ee8ac508d294136",
+   "reference_sha256": "4b0aa998e2a428a54cfe9b34190d6b355be9f8e8a07b40976be87cd190d4fe4d"
+  },
+  {
+   "pack_id": "dc3039652769a69f",
+   "audio_sha256": "4d315f9f2c4a094985bcd297c36f96650b878f5034ef2f6229c13d93a42df779",
+   "reference_sha256": "fa798a80a3fa8f5f753c0c86300e819ab166324a5a66a71a70e6b4cb1a419585"
+  },
+  {
+   "pack_id": "457e236508dbe2ef",
+   "audio_sha256": "7026a490ad72cd9ea8566a9b769b54c8a79b097172ed08c6a172d162fca6d757",
+   "reference_sha256": "6c0a575bc8e60d4658010ea67a79c2b29602c1357b7f22f12417f1f41c1ab4b3"
+  },
+  {
+   "pack_id": "1c8e5f57f8a5293c",
+   "audio_sha256": "8c066df58895645641bf96fa4a31d36f37b1ae10937d55d0a5e6068acc931782",
+   "reference_sha256": "db7021a656580d8452e2f5c56aa8f4f3a0882287f903ad53b116b0e0dea994ee"
+  },
+  {
+   "pack_id": "b67182eebceb8fda",
+   "audio_sha256": "80366a933b072b7bee0dd87b76451b4cf694f9f7d809b3520d22c79633df0abb",
+   "reference_sha256": "9a8ae058c38fe366e1af7ecb422cd5d33397cdf2a49c07aa0206842dc4e1c680"
+  },
+  {
+   "pack_id": "76b84fb3df2cdc38",
+   "audio_sha256": "0acc114b5dbe4631d9cb1ba927a617192ac0f4fe812d81e561752730652268b6",
+   "reference_sha256": "f3fb1999a9deef74198413824240a0f9ea8d59a76328029344a569c555df3be8"
+  },
+  {
+   "pack_id": "d338d59f2172362c",
+   "audio_sha256": "f438b936eb521282cc952a45c436c30050845d93ac94b34851a4b22d893b1a32",
+   "reference_sha256": "5f946751e2e0bc65bbde01b76129d9734c0f95ce4cf4d44dd37852fbfde981b4"
+  },
+  {
+   "pack_id": "175804079d5ade0c",
+   "audio_sha256": "515514a130d1e035ad60ffee2a9a5d9d19f33b99578e5855122c92505a8e2f18",
+   "reference_sha256": "f1aada493a9b340e9157682f4ec3d6d049de3d542ee2a0f8f3d8a8bcdd8b2644"
+  },
+  {
+   "pack_id": "455e5378ecaa71eb",
+   "audio_sha256": "38a7114ceded9f612788fe7d0e590037c4f4d4f42ab098243cd685e9a6dbc273",
+   "reference_sha256": "733f8738431dbf1b559f846c00377d7b188a04bfa2e16c4fd4bbe87f19e72a17"
+  },
+  {
+   "pack_id": "9506e34904ac4d58",
+   "audio_sha256": "e4924a264ecb9912ad0679617370166fd0ff391c4cc6f91dadd034c6cacf5200",
+   "reference_sha256": "5a804a389db07798fc226155f42118a71802198b78598bdc383cc7a9be0c4402"
+  },
+  {
+   "pack_id": "cfd46ef8461af75a",
+   "audio_sha256": "f74c967909c92726f6e1281086b2371f0d9f76ee8173f9f54e387b655598b6b2",
+   "reference_sha256": "c83b4c6cba4264f134434c74df820e98cc111406b08d2682a2210bc54ef9d179"
+  },
+  {
+   "pack_id": "79d704bd4de27298",
+   "audio_sha256": "7ca6ccee2fdfa4869f3e01126277f3657d223223d35e1300a79661be36ff4d71",
+   "reference_sha256": "3d43c141c22f8e3f45e77a8f172695103e0e1fbd8a5ec47d7ce6f0a62bc15e1b"
+  },
+  {
+   "pack_id": "f425ba2ae15d615b",
+   "audio_sha256": "2e3e2a6e39d909a9a3c780305e9107e524a2639195012355c0d0624d36111ba3",
+   "reference_sha256": "205ea4274925b97680f28402ab6024af5f7df407ca526fc8a4a35c0e1375c02e"
+  },
+  {
+   "pack_id": "321432bdfb9d8e5f",
+   "audio_sha256": "0ca18e64536d659e426d6ac8df29b6c4df1255f53d7702b0cbd969c426210fc7",
+   "reference_sha256": "5a411c075ce29614adfa268b064c6d15808ffefd5bb067de922694c14dd75734"
+  },
+  {
+   "pack_id": "5a611cb41741599d",
+   "audio_sha256": "c88ac530668c75a366a9860805f147052fe47b0336eb5eb585171fa932e447ad",
+   "reference_sha256": "5373eabb55ec098db694a46bfee94b563336e0fbcccf3d19790dc9c1469d19cb"
+  },
+  {
+   "pack_id": "b7775aa2d75c73d9",
+   "audio_sha256": "957640a86eb8b9bb378238ec7d4bde09e2638b1f7b742fff2cc45a6bf0abdb94",
+   "reference_sha256": "105181e01800a50e49f5db816ab547d444bbf4de6b53d33519642ee9f9e8778a"
+  },
+  {
+   "pack_id": "8bba4cdd6869b78b",
+   "audio_sha256": "e262d44ff80a1edeb56641af55bc1e5dd0834b0cc85c41ff7336990b7f13a71c",
+   "reference_sha256": "74c5c48a1a183b39098db018e9638132fee935301bf649ff02b970250b146067"
+  },
+  {
+   "pack_id": "ddf7f5f8cb928c60",
+   "audio_sha256": "82723d158ed75aec931bb1d38b2aa68a01c686d3815b6344352e1ef1ee7cf2c2",
+   "reference_sha256": "6b30b3f7d348bbae8d4aea733eb5acc99268c96136875239f90ec77e82079702"
+  },
+  {
+   "pack_id": "fc723ba40c9a52f8",
+   "audio_sha256": "de52a61f0111da5d237c46f936d1a01cd08213ce8310e32165237f4524294cd3",
+   "reference_sha256": "f26e09b7b5e221428f2e856a58cf2c972355c6229df5584be5dc90c28b179809"
+  },
+  {
+   "pack_id": "24d43451dcd1122d",
+   "audio_sha256": "b5c0e3bc1d2dea8e03d1b75e128130cb1c88e217d0519d9e3f605efff747ac1d",
+   "reference_sha256": "a6d3f6a4bb1af1a7163d3e6836a8a9e1ec18eb5780f8b0252a6bbe5caf106568"
+  },
+  {
+   "pack_id": "3e500562448c6d27",
+   "audio_sha256": "aca6cc60ec368185749e1c25bbe5f57b7a4f9dec121981fff35fbdf7573d3263",
+   "reference_sha256": "ad2c31c95ff0b01f34c654d40b90946aac67a4259100c1fd3db0a225a80afc98"
+  },
+  {
+   "pack_id": "f69e7ffac1bbe369",
+   "audio_sha256": "d3c9612466f2267a9ddc20dea123c58cd8e86ecc8592411fbe0cb0886f690506",
+   "reference_sha256": "90c71a6001fd419befff324540606e99b04e545704ec9a283fe22f28aca02728"
+  },
+  {
+   "pack_id": "e7a207200018e610",
+   "audio_sha256": "6fb108af2a90f5704368d9e7aecb7838e2713342fc9f6f5c34bb162e30971b84",
+   "reference_sha256": "356f9190ce368b1dc07c98dd66b4fb84b11f4b493941c9bdcbe645f39124fbcf"
+  },
+  {
+   "pack_id": "f1ee9dabf999be8f",
+   "audio_sha256": "01b504e7b135b6548523b228730340eb50af8f9f36b0af2b4bc3557947b4eef1",
+   "reference_sha256": "af62bc9ba3bc7004a08ed97ee34b914735238b9e06f203ec68a4ca2d2adbd90c"
+  },
+  {
+   "pack_id": "93885e46c41bd232",
+   "audio_sha256": "bf20091074dea6e428777650813e5faa399bbef712ef38bcd8367d6264087364",
+   "reference_sha256": "270487999fc74a9d431577c27d34a3bfbc1e3e229b6181cc5ebf284deffe6fc5"
+  },
+  {
+   "pack_id": "18e54db106fa4799",
+   "audio_sha256": "e0c510e0a232dcb2725b287236c932110995939b1d49f185adf6a2c877ef9e16",
+   "reference_sha256": "d21914cc15986c0095a7a1ce877e9b81a40353d1887d7391d34170efce095615"
+  },
+  {
+   "pack_id": "e2e0e36f4de88cb3",
+   "audio_sha256": "ce52e6a4c050e3be825dbeec09bc274c877db9bfc10f22601b840fff26a6e2fa",
+   "reference_sha256": "c3df6d0ce26e89b5782c881d2ec1c92573dc5a8eec5a92ba1ee8325826aabcff"
+  },
+  {
+   "pack_id": "4d721a2e182e5d0b",
+   "audio_sha256": "c5e31e2c2569f3353da186041cd950934514e2f88730e91f3a121ec0b2f35146",
+   "reference_sha256": "7c37bc3f647dcbdbcd3961ac53889098305c5d4f02d3da49074eeaaf9422372c"
+  },
+  {
+   "pack_id": "f5357e6d0e5143bb",
+   "audio_sha256": "0781698133735004804ec66677ae460e001979e57f1c5bfd077f145c7f023788",
+   "reference_sha256": "22d33d0f39c70aa1c678a90bbbe58a8887c33fd2cd61a154c2a1624fa90ac6c0"
+  },
+  {
+   "pack_id": "81a9d5330f2ca55a",
+   "audio_sha256": "8b1de709d1f8014bfc009d2499108e59fa743c818ae5fd212f4c07c82af60045",
+   "reference_sha256": "0ee9c2a4943b87dc3651b2e7638abdedd14cb727af90cea197a62f56e6bc2673"
+  },
+  {
+   "pack_id": "10d277c1166d3daa",
+   "audio_sha256": "bac94f5a0ee5b6e41a55bb69814dcf47d60c5826e6d372a22323628711b0c4d4",
+   "reference_sha256": "1ebf0f092bd9faacf725a192c56d98529a12f2e3170223fa4bb089ff1534684f"
+  },
+  {
+   "pack_id": "e42415274eb96fdd",
+   "audio_sha256": "463c1d511f86cb58cd99de3b7b04f558ca7205119bf90fb7d0dd02f06fea9c2b",
+   "reference_sha256": "66c81ebfb296472c633e118aff9cc5f54013274b0d8693087339739fd2dc164f"
+  },
+  {
+   "pack_id": "bb6e2990264b2848",
+   "audio_sha256": "6cbac4af9e956d9a930c79380069c723eb558a4f78fc5266909b3a071406c116",
+   "reference_sha256": "8aa565a688e1bb025cceab7e0dc04566280d922d615fcd9c489bf97f63711cf6"
+  },
+  {
+   "pack_id": "661efce9b65ab497",
+   "audio_sha256": "ad58549999a4d9a1a8d609114c94d475bab16f1dc5e2eacbfbfe12b383b2a6a1",
+   "reference_sha256": "aa1ce81a8a417be2bb47448a9eff8524d86796eca631e6d602a664201ddb9a69"
+  },
+  {
+   "pack_id": "87711c5c29f704f3",
+   "audio_sha256": "799e59b18365c3a69d934236d4f78c867e42f86c435cf27deb375838df02c954",
+   "reference_sha256": "3f3d6060a8edf975fae6eae707f4ca062b792717952b22f7c1b07d93f627a290"
+  },
+  {
+   "pack_id": "bda619191b199c9b",
+   "audio_sha256": "869193010f47808b3b68a432f5de5c15b9ac87af56a13dbcf5360e485099e01a",
+   "reference_sha256": "0bfad9f4fe6c2d3a426ddb853551cd0028f56f306be1ed9e02faef140752d6a8"
+  },
+  {
+   "pack_id": "59a681bafa66a933",
+   "audio_sha256": "37aac4e35080ac90e0259280aad1f1fe82f350204d4fd67935349f340f576d7e",
+   "reference_sha256": "a1b1cf9748dd63740dab120ceed7232890e9d3b6bd6236fc21134d4f0464dfd6"
+  },
+  {
+   "pack_id": "951b14567fa9f719",
+   "audio_sha256": "a9f2363ad2abb2a098edaee73b87096a6858d3d25364473a650c0e30662f876f",
+   "reference_sha256": "dbb81eaa0bd80486ac211bcc5536e398736df72eb318a5c506e26af2cde02ecf"
+  },
+  {
+   "pack_id": "960f457413aafa98",
+   "audio_sha256": "16120010bd8fe8d4713fe9c0da7e5ee7188c220401f20a1b07bbaa221970aba3",
+   "reference_sha256": "b1188ea127b6126e3dc861b3c6dcbd427b3893c23a0f70245fd4288b0f1e5aa4"
+  },
+  {
+   "pack_id": "aa26f46ae7c72457",
+   "audio_sha256": "b93f5347b15360976152d4a614c7c07c71cfcf4f029df9344afb8c14355332f4",
+   "reference_sha256": "021502b2e11102f830bc0e6efb9447a68d8a49c371811ee75bd7b7ee583ba530"
+  },
+  {
+   "pack_id": "aa89da521a7452e2",
+   "audio_sha256": "c2bb58e721155685daf5fb0f0bd56b0bb6a533188f2ef72fac63c82243dc088e",
+   "reference_sha256": "6b28abd7b34d02dd508898da1b44fa110af52519ecdef8ed3d6768afda6ae767"
+  },
+  {
+   "pack_id": "8adcca9e19c827ab",
+   "audio_sha256": "30ec4f0e2d3d75589e6be51495d920ee5da51f129aeb957bfa2acb0e0fe2efaa",
+   "reference_sha256": "e797cd7d6e4627b7357537260af190c1b73e8d8c0298cc532bd6f7e90774ae23"
+  },
+  {
+   "pack_id": "d234050475b43e10",
+   "audio_sha256": "77e7842ff8ded3f42b7c14c9ccf9731a2709e4e4b34acef72a1af9fc83ef7bef",
+   "reference_sha256": "b31649beda9cff4abad998071244e700a621af0fee8a14e5f57bc6ec6b859d5e"
+  },
+  {
+   "pack_id": "d1f367e9bc3cef1f",
+   "audio_sha256": "c701a645737a148c5a04ad2e597819ed8f28860a97586a921d03e8a94e5c1788",
+   "reference_sha256": "60cafc92018824cf062d49b8dafce20b164e05961636c7d698ee672cd95c3602"
+  },
+  {
+   "pack_id": "fb52869d29eb8cfc",
+   "audio_sha256": "03ab7b2b9f618a6155e5f1c91796b2193674bf840639db0664750668eb5ad237",
+   "reference_sha256": "247ae4c20405f4c71c4d60f78de649930363fa1589c3bf1c9dd36aa4e8caa4ea"
+  },
+  {
+   "pack_id": "801cc99eda5dce7a",
+   "audio_sha256": "b1563a4a8f2f0c55e40b50067fa35786fc846c9b29bda3ea9c52c98976a44aa3",
+   "reference_sha256": "9212488fb7fc1d059b489b3ff5222cc0f6690ae76d151a3bc1f4391073e6feb3"
+  },
+  {
+   "pack_id": "8820ab1a0f9da80f",
+   "audio_sha256": "210496e20160cb84c2287e2beaf19b1775d83bc209d0fc328ed6844aab04ad6b",
+   "reference_sha256": "5b7e3dcc1eacb09ef4c5edddfc34b31799df6d35bfdd53f26d806cac3e05eae5"
+  },
+  {
+   "pack_id": "1a2e4b7ffdf7386e",
+   "audio_sha256": "393620ae5aadc220ed0d270298f9da2d4567988cb2502614358b7f8e90563974",
+   "reference_sha256": "906a11d0a313fc3ac3f4c8f8a3cb5477d52cef98e12475c5a57918314d3d1350"
+  },
+  {
+   "pack_id": "82b9c5fef917a260",
+   "audio_sha256": "947454c1f28a574e4935d7dab6c77265339b4c780769075e1ef1aef3b0f3ce51",
+   "reference_sha256": "75c5c51a7efd0b93286f6106c869d25113c7094ff2300a08434fdc0c3cc37ab3"
+  },
+  {
+   "pack_id": "f966c13a9c6ac05b",
+   "audio_sha256": "36a99ba19a5a25bcc4df885e631708d82a1d0f775240ab22dab5a25004820b51",
+   "reference_sha256": "9e9be6f900e7b7de8bdb82d24828291353d3cd8d67cabaa599a8b3312c3e2ed4"
+  },
+  {
+   "pack_id": "d47c3c1fcbcc9825",
+   "audio_sha256": "10d54ff829060c72daee0e6f4e099b13a4fd83346f9c04669901ce239e41d246",
+   "reference_sha256": "c59e128a4b690b767a1098681bb31554115c2224a076fe7b7d3f034e9d882099"
+  },
+  {
+   "pack_id": "f911a514b5466076",
+   "audio_sha256": "f989b275e86ebda108c6ed8aab613363fe164d1234a579684b7ef9b5c3f3cdcf",
+   "reference_sha256": "ef1c0d4637e2c2e43669ce30724701b6bcab9ef1cf4c1eb3e624376e22192ffd"
+  },
+  {
+   "pack_id": "ee5659abbd6a336a",
+   "audio_sha256": "18650ed617460a66402e7e2e45dfc719f5fb34bd246d837e593b37a845e729fe",
+   "reference_sha256": "28e07c202c562377cb9d780aba5c9089c0eacacfb85ef602f7999514cebdd58a"
+  },
+  {
+   "pack_id": "d8a69589cedfea79",
+   "audio_sha256": "75b2ff53788f8ac1a23593ac8ea0acd5b31d9af60d2881fad332677b35f43916",
+   "reference_sha256": "d38686bbabb67fe26f1a29909b38ebd0f9849f89f14d674349ee7d3b3141c290"
+  },
+  {
+   "pack_id": "3b07a96a63269991",
+   "audio_sha256": "cacf26fee8838f598615378c7f3b1b3fdc1dd97b940300b9db2982ab6f01f640",
+   "reference_sha256": "9fd3c0dc6461b4c1b2793a7551409d887d18cc5054929e70f708ed30d7f5978d"
+  },
+  {
+   "pack_id": "1a67d2d717c63bff",
+   "audio_sha256": "4319b30f65d8cc6d1d9d5484fd07b543c59a07ad4123195c42e4f03ef215696e",
+   "reference_sha256": "94017132eebf9e3a0918eb306846f34f06955392be3c666c68ef47c21820f86f"
+  },
+  {
+   "pack_id": "04c51ab16d35877f",
+   "audio_sha256": "18e6c25cabd9e7278f7310c41779c368e0efdbb9860375d29dd599c6c58998aa",
+   "reference_sha256": "7d2694ca54654d4425d7580461ce61f2b56674ef145d3f266d6e4cd54c57bef0"
+  },
+  {
+   "pack_id": "c178e5e1a14f271a",
+   "audio_sha256": "26b19aa97ed12eb5839becbc98ba2871ba16953cfe93a2bca389b58c67867965",
+   "reference_sha256": "c07d2d4e370911f511627a89fde820b2f702e0fd71dd6fb26633ad39c011a998"
+  },
+  {
+   "pack_id": "a08f139c87bf3137",
+   "audio_sha256": "f46705017026400060af5f0e779f6a2137faa0573c4c4e35e5d6dab6e8a6f242",
+   "reference_sha256": "f97a83a80c013380d89211ab886d12cebf093f83ca7cada9e1b51faa069ec216"
+  },
+  {
+   "pack_id": "04a61224fcc07e2f",
+   "audio_sha256": "c934e18efc8892a2c2e6c19a2ae82867f5cd8c228bf73e56f5b42453c3f3cf6f",
+   "reference_sha256": "d5b1ffcf8c42d61509937fe31441f57806fe8dcfb5ca6c3cbaf8939c1b013414"
+  },
+  {
+   "pack_id": "c3d57c422c7e3e02",
+   "audio_sha256": "b85825de18828929af30de6063a7f6bbe40a08d6ad7bedd03573fb6a91f1e8f5",
+   "reference_sha256": "0ec520a4b733ad58ce474df959ddfeee2da7c01eaa2951621faba3d0d8087dbf"
+  },
+  {
+   "pack_id": "aff86ad0496a4dad",
+   "audio_sha256": "475a72c151a27686531d1b9ca8183c1b470ac9e5e0e26d5b8a42ffe30748b25f",
+   "reference_sha256": "4773d0fe3a6da73a5e56f620886a431cb4d812c03df1cd13dffd882208d42308"
+  },
+  {
+   "pack_id": "ee841adf55798ca8",
+   "audio_sha256": "76229bf573855dc61fc98f233be39f7a1d11feeb6059d3e4a3761de8d1c2aee6",
+   "reference_sha256": "adbc037fb3b55bae6a693f9b0fe13947fbff66e5253e45b8b3ba8a592a030842"
+  },
+  {
+   "pack_id": "8c278a306a1db2ab",
+   "audio_sha256": "18b77d7963f6cbe1de6b165647966cafd0889786bc83b8a518826fe6ab2c32b7",
+   "reference_sha256": "fded96b6859e8976e4019fa1869679e14bbe5feacd100f7b1f86dee3064d2028"
+  },
+  {
+   "pack_id": "2ff26843175b1a7e",
+   "audio_sha256": "3685d6e0e898c7f3144c2aac16f36616247ceb7380b3fae599925e8762f261d3",
+   "reference_sha256": "247f7963f72abb4c739f5537377bc9eb73427db58d2b37fa464d562522536b1b"
+  },
+  {
+   "pack_id": "b77db85928c0615b",
+   "audio_sha256": "1913fc4b1b883a27fbdccd2445ef8c9a8c5225a705cb9b56324567c5df0322b5",
+   "reference_sha256": "b609f3e4322d75f5d83b337a0dee194c06e74e8a17ea865fdd0398acd5f65c32"
+  },
+  {
+   "pack_id": "2c44486f01cc0f2e",
+   "audio_sha256": "4c4e07405895b57b13dbd99ab0087bbd1faa8205a83b7dc0992912a73f400435",
+   "reference_sha256": "d8010390b3378af7238d76c9a87910dc5d4d209b2ccb89ccdedde870c5a7ba35"
+  },
+  {
+   "pack_id": "df12cd4df48eb56f",
+   "audio_sha256": "473198dae9fb37c628de7c0b268e1aa66ca1ab18abc7fdf303cecb38d2a9344c",
+   "reference_sha256": "ec9e743decc19a6e2acb3b5735d2c7c3bdf5f6b50fb3611fd07f3450ac672cfe"
+  },
+  {
+   "pack_id": "15940bebd5e0253d",
+   "audio_sha256": "b517f322bb186e2ee09ded8db0c14bfdcf9c5cdc7369dc4df2c7188f73dbcfa7",
+   "reference_sha256": "7a6f1965036f55a1b0ebf44c46907814d5f3603d3f459c18a53d7dda8f2dba35"
+  },
+  {
+   "pack_id": "1f3f4ac4ac936df1",
+   "audio_sha256": "adf5dd50b93a80257020d46a436cb032d017576570ed3af70a5f6ce0490c7d5f",
+   "reference_sha256": "b0623d22b0ee01072579b679fafdbf6f515ac44ff75d6fb85cb23439984614e9"
+  },
+  {
+   "pack_id": "a065aea302fe3368",
+   "audio_sha256": "66f84401248d81f52a047b388f57e203ac1860a1a0e4690fedda796be92a8ac8",
+   "reference_sha256": "682d906eb89ccd25cf3388942c4143b1bafcc9558e5c7345f1716a4e1b6aff04"
+  },
+  {
+   "pack_id": "39dc6764b74c8733",
+   "audio_sha256": "eeda76dc252d27ce8a6d10f9de0721a3decf4fd0df20de200fd8cd6732112a80",
+   "reference_sha256": "76eb2fbf34be02027a6965436f64fb2ac15cb091aa9185511cba2b6d9bdf4bcb"
+  },
+  {
+   "pack_id": "942185f9e7f2adcc",
+   "audio_sha256": "073a778741c515cad2901c1391309f2cd4fcfff4e6b80efa4fe7981e398c60dc",
+   "reference_sha256": "012c9095445c0aa21d49dd1dfa2f56e2c56855638ebbab9c5dd0bd74f1a05310"
+  },
+  {
+   "pack_id": "e0e424a4024b41e4",
+   "audio_sha256": "9b4d8a9304b75ab928e827727cc8f4e942013147a81ba52ab83b7b221efef11e",
+   "reference_sha256": "22d88b8d6887c9e7ebf1fdf34c6142e44cff8971ef278c4fc8397c016884af6c"
+  },
+  {
+   "pack_id": "d9fba5949b086e7a",
+   "audio_sha256": "7bcd6c5cb71aeab7a8378efd32b80bf65e2bc242f42db2451ae7f42da84b8efd",
+   "reference_sha256": "f9b18d644da2e26dad4a30c3a856de2d941ef3d7417aa44529ffaaf6f533ce31"
+  },
+  {
+   "pack_id": "844d75dbf5205ff7",
+   "audio_sha256": "10f3b3e8463ed056130cb59c4dc6d2b14ddfd1828f5c52f317546129e503ca02",
+   "reference_sha256": "71171e1f399589009f0a97b7ac91bc19da4d877805a42f1374e80dece5db9cbf"
+  },
+  {
+   "pack_id": "8cbad7ca20c9645b",
+   "audio_sha256": "0777a78e11c4837455e21cba36a849b3a324dacdda44c20552d4008095104e28",
+   "reference_sha256": "178a66806bc8d6a0975e4ba120ced61623d084d082160b5a415c1b75abc0c140"
+  },
+  {
+   "pack_id": "9efaba85ec0869d4",
+   "audio_sha256": "5592500f2a10a07f161c287af133e18061a8ba0539ae1912582d67f8dc42c907",
+   "reference_sha256": "5bf1914544beb13a6c61de464aa6ee81f429bb613d9df01c05fc56d7194cd3cf"
+  },
+  {
+   "pack_id": "58342ac7ada45aad",
+   "audio_sha256": "b1992a5f7dbbd9ae92edd1f989abed602ddb2fcfb4861746de65063ea9b7e407",
+   "reference_sha256": "2f966f3fde13ccf0d16093cccb1452f479a0b9c28a8f4aa1eaec98b7cf6ca529"
+  },
+  {
+   "pack_id": "07daa7541f6765a3",
+   "audio_sha256": "46e5f9d584bd746a80abb6c8447d10548fe260a0e98ee7871cafe82a17e62cca",
+   "reference_sha256": "22abcce91a2e12c570135c5091fde18e596d3374cb2f27d8c784daca74241b9a"
+  },
+  {
+   "pack_id": "b8c4a2699e9f285f",
+   "audio_sha256": "21d80cf7d8f04798c872d6594ed90c585597efdcc486d65a29735c05bb73275c",
+   "reference_sha256": "ed44f95df3612e9c0e9e0887116f9da9bd8b5d7f13ede50d6377cabd2e9b744f"
+  },
+  {
+   "pack_id": "fc5d982082e496f4",
+   "audio_sha256": "1a997c8bbad3a18d14ed337f3f77a3142d9643d89c3edf470a5410d0e3111df6",
+   "reference_sha256": "5f69ff0425c68f4ea0cd77cdac20731642a5952fa7736da0d014e2dd85bab9ba"
+  },
+  {
+   "pack_id": "c4e2d0baf3f827b2",
+   "audio_sha256": "309c8235eb39e72d75c1b55f8718ca2e7775abc1a7f1b83c78c1bf93dab83b07",
+   "reference_sha256": "521519d6ba1aac71efefdf69afe6d2e88ad7fbfbbd6448d9647ce02962c901fc"
+  },
+  {
+   "pack_id": "c3f1397f191eeaaf",
+   "audio_sha256": "db44a21b3b9ea6bb9afd5e0d288609810c72603f5c4fb6036b74951a4c7ef78c",
+   "reference_sha256": "4df3aa6d98e61dda21a0dd41a4e65391c58510366d0fde87515c8f8c171f5a9c"
+  },
+  {
+   "pack_id": "6c99554448f2e5ba",
+   "audio_sha256": "560d1b75215d60fdb98408b30c83b07b87c73e35a479274f298b2c4c6658d78e",
+   "reference_sha256": "d0f176a2c9984943b95a0ef5a58dd7e8a941d4cbe8f37d429f909874dbee0757"
+  },
+  {
+   "pack_id": "61c43bd861ffb42f",
+   "audio_sha256": "836c16e42b3a263df073ce65096ae977e15c51f845bd73751e30916abb2630a9",
+   "reference_sha256": "4b70a1d860820ce6b3f4900ad6206402d4453e86edefde37587ef2f8ebde9da4"
+  },
+  {
+   "pack_id": "266416f90405dd37",
+   "audio_sha256": "578cf872dd469452d8117b91c019f2e8a31a205a2b36949c3994d43ea6e9f3d5",
+   "reference_sha256": "32d13d1f6d5c9ea56580229da25999258ec7eda2ff8b8100efe9b6238afd9c7f"
+  },
+  {
+   "pack_id": "c8d98be7f40f29c5",
+   "audio_sha256": "ab77bdea926b1f12ef132f5d69f159cf721482e002f458d3827d191917564914",
+   "reference_sha256": "61f358ca8583feed433f450e5bf6ffbb5f54eb0017b17adcd678c6b99f54fc8a"
+  },
+  {
+   "pack_id": "433614eeab0cc287",
+   "audio_sha256": "729c08727da33dab31ba6263a93677c8a102d658260f7a36ceb7975f5bd25d4d",
+   "reference_sha256": "96568b963c7813cd7f7c4103b566aa0184064b14cbf9b022c1f286fe52039c3b"
+  },
+  {
+   "pack_id": "daaf161fcd565a69",
+   "audio_sha256": "dbb13271eb21903456459405a9f5f8cbe25fbf4b3ef4168c1af022b3644d0426",
+   "reference_sha256": "985a98b9e0edd5e091d76f0f7a3a3b2a943f096233a479c925cee62e85b08c5e"
+  },
+  {
+   "pack_id": "f54df4a4d3e85553",
+   "audio_sha256": "e667b25b512ddfe2f99c2669f6ed33e3068800d95748084dd87290299526cfb7",
+   "reference_sha256": "d104443b091b3e6696a3cd3bad79bfd6267c4e4d2d7dead67e07b1dd72c282dd"
+  },
+  {
+   "pack_id": "9612ed587c4bdff1",
+   "audio_sha256": "d134e1a28015c705cda56986d51914aadba3c93098c194b319b28efc0de8b43f",
+   "reference_sha256": "cbf0e3862396c71718f5c1339c61ada33396adf5bbf786e19f328a4e8bdcf52f"
+  },
+  {
+   "pack_id": "991292893c78d8c6",
+   "audio_sha256": "576640195bfb08ab8bce85077084797de2450dfe367ed1e2754f2bd0fb9cc542",
+   "reference_sha256": "6652be3c3509d2634dcc74b09422450a132396ba92e0fc399ad588e9b041857b"
+  },
+  {
+   "pack_id": "541ac3b7d0d6384b",
+   "audio_sha256": "7e8b77470896011d79efaedc50decf8b055cf14b812298defc692adc1e60f555",
+   "reference_sha256": "90f527a16bac5ea9cf6bfb9110227777704f135bd5e98e9e16f5342d26d9f52a"
+  },
+  {
+   "pack_id": "7ee0faa7c44e6125",
+   "audio_sha256": "689941ed1be3b5556ce7196f7c18fe7977b4e9258669c9e90742198b3450047e",
+   "reference_sha256": "5c6482e22c1add6b93d0c7fb420824ad29015948790d62b03a24b2938f12a7e6"
+  }
+ ]
+}
