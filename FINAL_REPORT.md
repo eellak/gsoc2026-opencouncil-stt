@@ -1,4 +1,4 @@
-# GSoC 2026 Fine-tuning AI Transcription for Greek Municipal Councils
+# GSoC 2026: fine-tuning AI transcription for Greek municipal councils
 
 | | |
 |---|---|
@@ -13,50 +13,29 @@
 
 ## Abstract
 
-OpenCouncil publishes transcripts of Greek municipal council meetings. Every transcript
-goes through human correction before it is published, so transcription quality decides
-how much work each meeting costs. My project set out to fine-tune `whisper-large-v3` on
-council speech and cut the error rate on the words that cost the most to fix: councillor
-names, place names, and the procedural vocabulary that repeats in every session.
+OpenCouncil publishes transcripts of Greek municipal council meetings. Every transcript goes through human correction before it is published, so transcription quality decides how much work each meeting costs. My project set out to fine-tune `whisper-large-v3` on council speech and cut the error rate on the words that cost the most to fix: councillor names, place names, and the procedural vocabulary that repeats in every session.
 
-I built the dataset, trained two generations of LoRA adapters, and measured them against
-every ASR system available to the project on the same audio through the same decoder.
-Both adapters beat the open-source baseline they started from. Neither beats the
-commercial systems, and the domain-term target in my proposal was not reached.
+I built the dataset, trained two generations of LoRA adapters, and measured them against every ASR system available to the project on the same audio through the same decoder. Both adapters beat the open-source baseline they started from. Neither beats the commercial systems, and the domain-term target in my proposal was not reached.
 
-The clearest thing I learned is what the fine-tuning actually bought. Substitution rate,
-the share of words heard as the wrong word, barely moved across two generations: 0.0784
-for base whisper, 0.0764 for v1, 0.0772 for v2. The deletion rate halved, from 0.0955 to
-0.0436. Fine-tuning on council speech taught the model to stop going silent on hard
-passages. It did not teach it to hear the words better.
+The substitution rate, the share of words heard as the wrong word, barely moved across two generations: 0.0784 for base whisper, 0.0764 for v1, 0.0772 for v2. The deletion rate halved, from 0.0955 to 0.0436. Fine-tuning on council speech bought fewer silent passages, not better word recognition.
 
-Most of my summer went into finding out why, and into building the measuring equipment
-that could tell a real improvement from an artifact of how I ran the test. That
-equipment produced the other useful result of the project: combining the word-level
-output of several ASR systems scores better than any of them alone. We plan to test that
-in production.
+Most of my summer went into finding out why, and into building the measuring equipment that could tell a real improvement from an artifact of how I ran the test. That equipment produced the other useful result of the project: combining the word-level output of several ASR systems scores better than any of them alone. We plan to test that in production.
 
 ![WER results](docs/images/wer-results.svg)
 
 ---
 
-## 1. Where things stood before GSoC
+## 1. Before
 
-OpenCouncil sent meeting audio to a commercial ASR provider, Gladia, and reviewers
-corrected the output by hand. Those correction pairs were the only supervision that
-existed for Greek council speech.
+OpenCouncil sent meeting audio to a commercial ASR provider, Gladia, and reviewers corrected the output by hand. Those correction pairs were the only supervision that existed for Greek council speech.
 
 Three things were missing:
 
-- No fixed way to measure quality. WER was not computed on a frozen set with a fixed
-  Greek normalizer, so nobody could say whether a change helped.
-- No domain-adapted model. No public fine-tune of any open ASR model existed for Greek
-  municipal speech, and no dataset of this domain was available.
+- No fixed way to measure quality. WER was not computed on a frozen set with a fixed Greek normalizer, so nobody could say whether a change helped.
+- No domain-adapted model. No public fine-tune of any open ASR model existed for Greek municipal speech, and no dataset of this domain was available.
 - No way to compare providers. Choosing between ASR vendors was a judgement call.
 
-My proposal targeted a reproducible dataset, a LoRA adapter with at least 15% relative
-improvement in domain-term WER over Gladia, a pipeline ready for production, and a drop
-in how much reviewers had to intervene.
+My proposal targeted a reproducible dataset, a LoRA adapter with at least 15% relative improvement in domain-term WER over Gladia, a pipeline ready for production, and a drop in how much reviewers had to intervene.
 
 ---
 
@@ -64,19 +43,13 @@ in how much reviewers had to intervene.
 
 ### 2.1 The dataset
 
-The training data comes from OpenCouncil's human-correction pairs. I aligned audio to
-the corrected reference text, filtered on reference quality and speaker overlap, and cut
-the result into clips that fit the 30-second window Whisper expects.
+The training data comes from OpenCouncil's human-correction pairs. I aligned audio to the corrected reference text, filtered on reference quality and speaker overlap, and cut the result into clips that fit the 30-second window Whisper expects.
 
-The dataset is built and in use. We are working out how to release it publicly without
-running into licensing questions, GDPR, or the rights attached to the recordings. The
-extraction and packing code is in the repository and runs today.
+The dataset is built and in use. We are working out how to release it publicly without running into licensing questions, GDPR, or the rights attached to the recordings. The extraction and packing code is in the repository and runs today.
 
-### 2.2 Two adapters, and what changed between them
+### 2.2 Two adapters
 
-Both are LoRA rank 32 on the `q_proj` and `v_proj` projections of `whisper-large-v3`,
-trained on rented GPUs, merged and converted to CTranslate2 for serving. What changed is
-the data I fed them.
+Both are LoRA rank 32 on the `q_proj` and `v_proj` projections of `whisper-large-v3`, trained on rented GPUs, merged and converted to CTranslate2 for serving. What changed is the data I fed them.
 
 ```
 v1  (early August)         28,967 clips, one utterance each, 3.55 s on average
@@ -84,7 +57,6 @@ v1  (early August)         28,967 clips, one utterance each, 3.55 s on average
     |<---------------- 30-second Whisper window ---------------->|
     [ utterance ]..................................................
       3.5 s of speech, the rest padding
-
 
 v2  (late August)          2,476 packs, one speaker, ~22 s of speech each
 
@@ -94,51 +66,29 @@ v2  (late August)          2,476 packs, one speaker, ~22 s of speech each
       utterances in order
 ```
 
-Building v1 I treated each corrected utterance as one training example, which is the
-obvious thing to do and is what the correction data looks like. Whisper always sees a
-30-second window, so a 3.5-second clip meant the model spent most of every example
-looking at padding it would never see at inference. An audit of window occupancy in
-August is what sent me back to the data.
+Building v1 I treated each corrected utterance as one training example, which is the obvious thing to do and is what the correction data looks like. Whisper always sees a 30-second window, so a 3.5-second clip meant the model spent most of every example looking at padding it would never see at inference. An audit of window occupancy in August is what sent me back to the data.
 
-For v2 I dropped every clip where two people talk at once, then packed continuous spans
-of a single speaker until each window held about 22 seconds of speech. The training
-window started to look like the audio the model meets in production.
+For v2 I dropped every clip where two people talk at once, then packed continuous spans of a single speaker until each window held about 22 seconds of speech. The training window started to look like the audio the model meets in production.
 
-The change works, in a specific way. v2 deletes 40% less of the meeting than v1 (0.0313
-against 0.0525), so far fewer passages go missing. Overall WER moves by -0.0040 with a
-95% confidence interval of [-0.0078, +0.0002], which crosses zero. Under the rule I
-fixed before running the comparison, that does not count as an improvement in WER, and I
-have not claimed one.
+The change works, in a specific way. v2 deletes 40% less of the meeting than v1 (0.0313 against 0.0525), so far fewer passages go missing. Overall WER moves by -0.0040 with a 95% confidence interval of [-0.0078, +0.0002], which crosses zero. Under the rule I fixed before running the comparison, that does not count as an improvement in WER, and I have not claimed one.
 
-Two things changed at once between v1 and v2, overlap filtering and window occupancy, so
-I cannot say which of them did the work. Separating them needs another training run.
+Two things changed at once between v1 and v2, overlap filtering and window occupancy, so I cannot say which of them did the work. Separating them needs another training run.
 
 ### 2.3 Measurement
 
-I built an evaluation harness because I could not trust the numbers I was getting
-without one. It has a frozen evaluation set of 39 windows from two councils that appear
-in no training data, a frozen Greek normalizer, and an external scorer that reports
-meeting-clustered bootstrap confidence intervals rather than a single number.
+I built an evaluation harness because I could not trust the numbers I was getting without one. It has a frozen evaluation set of 39 windows from two councils that appear in no training data, a frozen Greek normalizer, and an external scorer that reports meeting-clustered bootstrap confidence intervals rather than a single number.
 
-The harness also talks to OpenCouncil's own benchmark API, so a self-hosted endpoint and
-a commercial provider can be scored on the same windows through the same decoder stack.
-Comparing two models across two different stacks produced a false result early in the
-project, and this is what stopped it happening again.
+The harness also talks to OpenCouncil's own benchmark API, so a self-hosted endpoint and a commercial provider can be scored on the same windows through the same decoder stack. Comparing two models across two different stacks produced a false result early in the project, and this is what stopped it happening again.
 
-I record every experiment in `research/ledger.json` with its question, its conclusion,
-its caveats, and a link to the report behind it. A script checks the ledger
-for internal consistency. 83 records are in it.
+I record every experiment in `research/ledger.json` with its question, its conclusion, its caveats, and a link to the report behind it. A script checks the ledger for internal consistency. 83 records are in it.
 
 ### 2.4 Serving
 
-The merged model runs behind an OpenAI-compatible HTTP endpoint on a GPU pod, protected
-by an API key, with a decode policy for whole meetings rather than short clips. The
-policy reproduces the measured experimental arm byte for byte on pinned conformance
-windows.
+The merged model runs behind an OpenAI-compatible HTTP endpoint on a GPU pod, protected by an API key, with a decode policy for whole meetings rather than short clips. The policy reproduces the measured experimental arm byte for byte on pinned conformance windows.
 
 ---
 
-## 3. Where the project stands
+## 3. Where it stands
 
 | Deliverable | State |
 |---|---|
@@ -150,27 +100,17 @@ windows.
 | Domain-term WER target | Not reached. |
 | Human intervention rate | Dropped after discussion with the mentors. |
 
-**On production integration.** During the summer OpenCouncil moved from Gladia to
-ElevenLabs Scribe v2. Scribe scores better than either of my adapters on our own
-benchmark, so putting my model in front of the correction queue would make the product
-worse. We do plan to put the fusion approach in section 4.5 into production. I am preparing it
-now, we will test it against the live pipeline, and if it holds up it ships.
+**On production integration.** During the summer OpenCouncil moved from Gladia to ElevenLabs Scribe v2. Scribe scores better than either of my adapters on our own benchmark, so putting my model in front of the correction queue would make the product worse. We do plan to put the fusion approach in section 4.5 into production. I am preparing it now, we will test it against the live pipeline, and if it holds up it ships.
 
-**On the human intervention rate.** I proposed it as the operational metric and we let
-it go. A single intervention rate does not tell you which errors cost a reviewer time,
-and by the time our model could have sat in front of the queue the product had already
-moved to a better provider. The mentors and I agreed it was not worth chasing.
+**On the human intervention rate.** I proposed it as the operational metric and we let it go. A single intervention rate does not tell you which errors cost a reviewer time, and by the time our model could have sat in front of the queue the product had already moved to a better provider. The mentors and I agreed it was not worth chasing.
 
-**Upstream contributions.** None. No pull request was opened against the OpenCouncil
-product repository. This work is a research repository, a published model, and a serving
-endpoint.
+**Upstream contributions.** None. No pull request was opened against the OpenCouncil product repository. This work is a research repository, a published model, and a serving endpoint.
 
 ---
 
 ## 4. Results
 
-All numbers below come from 391 held-out windows across 117 meetings. No meeting in that
-set appears in any training data.
+All numbers below come from 391 held-out windows across 117 meetings. No meeting in that set appears in any training data.
 
 ### 4.1 The models
 
@@ -184,21 +124,13 @@ set appears in any training data.
 | `whisper-large-v3`, no fine-tuning | 0.1988 |
 | Gladia, the baseline this project started from | 0.2085 |
 
-v2 beats the base model it was fine-tuned from by 0.0161, with a 95% confidence interval
-of [-0.0218, -0.0114]. It also beats Gladia, which is what OpenCouncil used when the
-project began, and gpt-4o-transcribe. It loses to Scribe v2 and Soniox by margins whose
-intervals exclude zero.
+v2 beats the base model it was fine-tuned from by 0.0161, with a 95% confidence interval of [-0.0218, -0.0114]. It also beats Gladia, which is what OpenCouncil used when the project began, and gpt-4o-transcribe. It loses to Scribe v2 and Soniox by margins whose intervals exclude zero.
 
-### 4.2 Domain terms, the target I set myself
+### 4.2 Domain terms
 
-The proposal promised at least 15% relative improvement on the words that cost reviewers
-the most time. I measured that on 250 occurrences of councillor surnames and place names
-across the 39 validation windows, using term lists committed before the metric first ran.
+The proposal promised at least 15% relative improvement on the words that cost reviewers the most time. I measured that on 250 occurrences of councillor surnames and place names across the 39 validation windows, using term lists committed before the metric first ran.
 
-All four Whisper-family rows below come from one decoding run on one GPU with the same
-frozen configuration. The three commercial rows are scored from their stored output with
-the same references, term lists and scorer. Only the Whisper rows depend on my hardware,
-and they no longer depend on more than one machine.
+All four Whisper-family rows below come from one decoding run on one GPU with the same frozen configuration. The three commercial rows are scored from their stored output with the same references, term lists and scorer. Only the Whisper rows depend on my hardware, and they no longer depend on more than one machine.
 
 | system | DS-WER | excluding two roll-call windows | relative to Gladia |
 |---|---|---|---|
@@ -211,34 +143,19 @@ and they no longer depend on more than one machine.
 | `whisper-large-v3`, not fine-tuned | 0.5400 | 0.4696 | +8.2% |
 | Gladia, the baseline the target was set against | 0.5880 | 0.5856 | |
 
-Read the three v2 rows before reading anything else. They are the same recipe and the
-same data, differing only in the random seed, and they span 0.4360 to 0.4840. That
-spread of 0.0480 is more than twice the 0.0187 that separates the v2 seed average from
-v1. Seed 13, which I named as the shipping seed before any of these numbers existed,
-lands at 0.4840 and sits **behind** v1.
+The three v2 rows are the same recipe and the same data, differing only in the random seed, and they span 0.4360 to 0.4840. That spread of 0.0480 is more than twice the 0.0187 that separates the v2 seed average from v1. Seed 13, which I named as the shipping seed before any of these numbers existed, lands at 0.4840 and sits **behind** v1.
 
-The paired comparison between the best v2 seed and v1, bootstrapped over the 32 meetings,
-gives -0.0440 with a 95% interval of [-0.1207, +0.0150]. It crosses zero.
+The paired comparison between the best v2 seed and v1, bootstrapped over the 32 meetings, gives -0.0440 with a 95% interval of [-0.1207, +0.0150]. It crosses zero.
 
-**I am not claiming a domain-term improvement from v1 to v2.** Both clear 15% relative
-against Gladia on the point estimate, and I do not think either should be read as
-meeting the target. The interval on the v1-against-Gladia difference includes zero, and
-two of the 39 windows are roll calls, dense with surnames. Remove those two and base
-whisper's 0.4696 sits inside the range our own adapters occupy.
+**I am not claiming a domain-term improvement from v1 to v2.** Both clear 15% relative against Gladia on the point estimate, and I do not think either should be read as meeting the target. The interval on the v1-against-Gladia difference includes zero, and two of the 39 windows are roll calls, dense with surnames. Remove those two and base whisper's 0.4696 sits inside the range our own adapters occupy.
 
-Against the systems that matter today we make roughly half again as many domain-term
-errors as Soniox.
+Against the systems that matter today we make roughly half again as many domain-term errors as Soniox.
 
-The useful part of the failure is the shape of it. Our name errors run 90 substitutions
-to 28 deletions, so the model hears that a name is there and writes the wrong one. That
-is what sent me to look at spelling in section 4.4.
+Our name errors run 90 substitutions to 28 deletions, so the model hears that a name is there and writes the wrong one. That is what sent me to look at spelling in section 4.4.
 
-A note on one number. An earlier version of this report gave v1 a DS-WER of 0.4880,
-measured on a machine I no longer have. Re-decoding v1 alongside v2 on one pinned stack
-gives 0.4800. The controlled figure is the one in the table; the older one is superseded
-rather than contradicted.
+A note on one number. An earlier version of this report gave v1 a DS-WER of 0.4880, measured on a machine I no longer have. Re-decoding v1 alongside v2 on one pinned stack gives 0.4800. The controlled figure is the one in the table; the older one is superseded rather than contradicted.
 
-### 4.3 How the error rate moves from training to test
+### 4.3 Training to test
 
 Three sets, in order of how much the model has seen them:
 
@@ -248,20 +165,11 @@ Three sets, in order of how much the model has seen them:
 | **Validation** | 39 windows, two councils absent from training | **0.1561** | 0.1857 |
 | **Test** | 391 windows, 117 meetings, none in training | **0.1867** | 0.1988 |
 
-The rise from 0.1313 to 0.1867 is what generalisation costs. The model fits its training
-data well without memorising it, and it holds most of that gain on councils and meetings
-it has never heard.
+The rise from 0.1313 to 0.1867 is what generalisation costs. The model fits its training data well without memorising it, and it holds most of that gain on councils and meetings it has never heard.
 
-Splitting the training rows by whether a human edited them is the more interesting cut.
-On rows a reviewer corrected, v1 scores 0.2261 where base whisper scores 0.4471. On rows
-the reviewer left alone, v1 scores 0.0385 against 0.1020. The adapter learns the
-corrections rather than only the acoustics.
+Splitting the training rows by whether a human edited them is the more interesting cut. On rows a reviewer corrected, v1 scores 0.2261 where base whisper scores 0.4471. On rows the reviewer left alone, v1 scores 0.0385 against 0.1020. The adapter learns the corrections rather than only the acoustics.
 
-On validation, all three models were decoded on one machine, and that machine is the
-one the evaluation set was frozen against: this laptop, CPU, int8, 16 threads. The
-manifest states plainly that a CUDA number may never be compared with these, so the
-comparison below is the only one of its kind in this report where every row shares a
-decoder.
+On validation, all three models were decoded on one machine, and that machine is the one the evaluation set was frozen against: this laptop, CPU, int8, 16 threads. The manifest states that a CUDA number may never be compared with these, so the comparison below is the only one of its kind in this report where every row shares a decoder.
 
 | 39 validation windows | WER | deletions | insertions | substitutions |
 |---|---|---|---|---|
@@ -277,58 +185,32 @@ Paired meeting-clustered bootstrap over the 32 meetings, 10,000 resamples:
 | v2 against base | −0.04206 [−0.07123, −0.01863] | −0.05188 [−0.09438, −0.01885] |
 | v2 against v1 | −0.01243 [−0.02479, **+0.00084**] | −0.01511 [−0.02349, −0.00508] |
 
-Read the substitution column. Base 0.07841, v1 0.07640, v2 0.07724. Fine-tuning moved it
-by less than a fifth of a point across two generations, and the v2-against-v1 contrast is
-+0.00084 with an interval straddling zero.
+Read the substitution column. Base 0.07841, v1 0.07640, v2 0.07724. Fine-tuning moved it by less than a fifth of a point across two generations, and the v2-against-v1 contrast is +0.00084 with an interval straddling zero.
 
-Almost everything the adapters gained came from deletions: 0.09546 down to 0.04357, a
-drop of more than half, confirmed against base and confirmed again between the two
-generations. The models did not learn to hear the words better. They learned to stop
-going silent.
+Almost everything the adapters gained came from deletions: 0.09546 down to 0.04357, a drop of more than half, confirmed against base and confirmed again between the two generations. Two generations of fine-tuning cut the silence and left the misheard words where they were.
 
-That reframes what this project produced. A fine-tune of `whisper-large-v3` on council
-speech buys coverage, not recognition. Anyone hoping a LoRA will fix which words come out
-wrong should read this table before spending GPU money on it.
+A LoRA on `whisper-large-v3` for this domain buys coverage rather than recognition. I would want this table in front of me before funding another fine-tune aimed at substitution errors.
 
-The v2-against-v1 WER contrast crosses zero here as it did on the test set, and its net
-gain of 148 error tokens has 56.1% of it in three windows. Its deletion contrast is the
-one that holds up.
+The v2-against-v1 WER contrast crosses zero here as it did on the test set, and its net gain of 148 error tokens has 56.1% of it in three windows. Its deletion contrast is the one that holds up.
 
-**Read down the columns, not across them.** Each of the three sets was scored on its own
-decoding stack and against its own kind of reference: the training rows against the
-corrected labels the model was shown, validation against a frozen reference for two
-councils, test against OpenCouncil's published transcripts. Comparing two models inside
-one column is valid. Subtracting one column from another gives a direction, not a
-distance. An earlier version of this project reported a false win by ignoring exactly
-that, which is why the caveat is here rather than in a footnote.
+Compare within a column, never across two. Each of the three sets was scored on its own decoding stack and against its own kind of reference: the training rows against the corrected labels the model was shown, validation against a frozen reference for two councils, test against OpenCouncil's published transcripts. Comparing two models inside one column is valid. Subtracting one column from another gives a direction, not a distance. An earlier version of this project reported a false win by ignoring exactly that, which is why the caveat is here rather than in a footnote.
 
-I did not measure training WER for v2. Its packs are a different corpus, so the v1 sample
-is not v2's training data, and a fair version needs a training sample drawn from the v2
-packs and another GPU run.
+I did not measure training WER for v2. Its packs are a different corpus, so the v1 sample is not v2's training data, and a fair version needs a training sample drawn from the v2 packs and another GPU run.
 
-### 4.4 Why we did not catch the commercial systems
+### 4.4 The gap to Scribe
 
-I took the 4.18-point gap to Scribe apart word by word across all 110,694 reference
-tokens. The result surprised me:
+I took the 4.18-point gap to Scribe apart word by word across all 110,694 reference tokens. The result surprised me:
 
-- The gap is substitutions and deletions. On insertions we are ahead: our adapter writes
-  fewer words that were never said.
-- Spelling is not the problem. Greek has many words that sound identical and are written
-  differently, and those account for 0.0066 of the 0.0418 gap. Retraining the decoder to
-  fix spelling has a small ceiling.
-- The largest recoverable group is words heard as entirely different words. That needs
-  better acoustic modelling, which a LoRA on a frozen base does not give you.
-- The gap does not depend on where a word sits in the 30-second window. Chunking is not
-  the cause.
+- The gap is substitutions and deletions. On insertions we are ahead: our adapter writes fewer words that were never said.
+- Greek has many words that sound identical and are written differently. Those account for 0.0066 of the 0.0418 gap, which puts a low ceiling on retraining the decoder to fix spelling.
+- The largest recoverable group is words heard as entirely different words. That needs better acoustic modelling, which a LoRA on a frozen base does not give you.
+- The gap does not depend on where a word sits in the 30-second window. Chunking is not the cause.
 
-Anyone continuing this work now knows which three directions are dead and why.
+Three directions are closed, with the numbers that closed them.
 
-### 4.5 Combining several systems
+### 4.5 Combining systems
 
-While measuring providers against each other I noticed they fail on different words. I
-aligned three transcripts word by word and let each position be decided by a vote,
-first on whether anyone heard a word there at all, then on which word it was. No
-language model, no audio, no speaker information.
+While measuring providers against each other I noticed they fail on different words. I aligned three transcripts word by word and let each position be decided by a vote, first on whether anyone heard a word there at all, then on which word it was. No language model, no audio, no speaker information.
 
 ```mermaid
 flowchart LR
@@ -348,34 +230,20 @@ flowchart LR
 | best single system, Scribe v2 | 0.1377 |
 | best possible choice at every position, an upper bound rather than a method | 0.0611 |
 
-The combined output scores 0.0175 better than the best single system, with a 95%
-confidence interval of [-0.0215, -0.0134]. It wins in 98 of the 117 meetings and no
-single meeting carries the result.
+The combined output scores 0.0175 better than the best single system, with a 95% confidence interval of [-0.0215, -0.0134]. It wins in 98 of the 117 meetings and no single meeting carries the result.
 
-The third row is not something you can build. It assumes you already know the right
-answer at every position, which is the thing transcription is trying to find out. It
-tells you how much information the three transcripts hold between them, and the vote
-currently extracts about half of it.
+The third row is a bound, not a method: it assumes the right answer is known at every position, which is what transcription is trying to find out. It measures how much the three transcripts hold between them, and the vote extracts about half of that.
 
-This is an idea, not a delivered system. It is the most promising thing I found, and it
-is where I would put the next month of work.
+This is an idea, not a delivered system. It is where I would put the next month of work.
 
 ---
 
-## 5. What is left to do
+## 5. What is left
 
-1. **Test fusion against the live pipeline.** Three ASR accounts per meeting costs too
-   much, so the real question is whether two systems are enough. I have written the
-   specification and measured nothing yet.
-2. **Improve the vote.** It decides cleanly on 91% of positions. Where all three systems
-   disagree, 44% of the time two of them are within a character or two of each other,
-   which the current exact-match vote cannot see. Fixing that is worth up to 0.0136 and
-   costs no GPU time.
-3. **Find out why whole passages disappear.** 36% of what our adapter deletes vanishes in
-   runs of five or more consecutive words, against 19% for Scribe. I did not find the
-   cause.
-4. **Separate the two changes between v1 and v2.** Overlap filtering and window occupancy
-   moved together. One more training run would tell us which mattered.
+1. **Test fusion against the live pipeline.** Three ASR accounts per meeting costs too much, so the real question is whether two systems are enough. I have written the specification and measured nothing yet.
+2. **Improve the vote.** It decides cleanly on 91% of positions. Where all three systems disagree, 44% of the time two of them are within a character or two of each other, which the current exact-match vote cannot see. Fixing that is worth up to 0.0136 and costs no GPU time.
+3. **Find out why whole passages disappear.** 36% of what our adapter deletes vanishes in runs of five or more consecutive words, against 19% for Scribe. I did not find the cause.
+4. **Separate the two changes between v1 and v2.** Overlap filtering and window occupancy moved together. One more training run would tell us which mattered.
 5. **Release the dataset**, once the licensing and GDPR questions are settled.
 
 ---
@@ -384,8 +252,7 @@ is where I would put the next month of work.
 
 Everything below is public and needs no special access.
 
-**This report:**
-https://github.com/eellak/gsoc2026-opencouncil-stt/blob/main/FINAL_REPORT.md
+**This report:** https://github.com/eellak/gsoc2026-opencouncil-stt/blob/main/FINAL_REPORT.md
 
 | | |
 |---|---|
@@ -411,7 +278,7 @@ https://github.com/eellak/gsoc2026-opencouncil-stt/blob/main/FINAL_REPORT.md
 
 ---
 
-## 7. Using this work
+## 7. Using this
 
 ```bash
 git clone https://github.com/eellak/gsoc2026-opencouncil-stt
@@ -419,11 +286,6 @@ cd gsoc2026-opencouncil-stt
 python3 scripts/check-research-state.py     # prints "ledger clean"
 ```
 
-Start with `CURRENT.md` for what is open, then `research/ledger.json` for the state of
-every experiment. Each record carries its question, conclusion and caveats, and records
-marked `SUPERSEDED` name what replaced them. Every number in this report traces back to
-one of them.
+Start with `CURRENT.md` for what is open, then `research/ledger.json` for the state of every experiment. Each record carries its question, conclusion and caveats, and records marked `SUPERSEDED` name what replaced them. Every number in this report traces back to one of them.
 
-The evaluation harness runs on cached benchmark output and needs no GPU. The fusion
-experiment reproduces from a downloaded `report.json` in about half an hour on fourteen
-CPU cores.
+The evaluation harness runs on cached benchmark output and needs no GPU. The fusion experiment reproduces from a downloaded `report.json` in about half an hour on fourteen CPU cores.
