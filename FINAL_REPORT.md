@@ -230,13 +230,13 @@ This is an idea, not a delivered system. It is where I would put the next month 
 
 ---
 
-## 5. What is left
+## 5. Future Work
 
-1. **Test fusion against the live pipeline.** Three ASR accounts per meeting costs too much, so the real question is whether two systems are enough. I have written the specification and measured nothing yet.
+1. **Test fusion against the live pipeline.** Three ASR accounts per meeting may cost too much, so the real question is whether two systems are enough. I have written the specification and measured nothing yet.
 2. **Improve the vote.** It decides cleanly on 91% of positions. Where all three systems disagree, 44% of the time two of them are within a character or two of each other, which the current exact-match vote cannot see. Fixing that is worth up to 0.0136 and costs no GPU time.
 3. **Find out why whole passages disappear.** 36% of what our adapter deletes vanishes in runs of five or more consecutive words, against 19% for Scribe. I did not find the cause.
 4. **Separate the two changes between v1 and v2.** Overlap filtering and window occupancy moved together. One more training run would tell us which mattered.
-5. **Release the dataset**, once the licensing and GDPR questions are settled.
+
 
 ---
 
