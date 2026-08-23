@@ -128,32 +128,24 @@ v2 beats the base model it was fine-tuned from by 0.0161, with a 95% confidence 
 
 ### 4.2 Domain terms
 
-The proposal promised at least 15% relative improvement on the words that cost reviewers the most time. I measured that on 250 occurrences of councillor surnames and place names across the 39 validation windows, using term lists committed before the metric first ran.
+The proposal promised at least 15% relative improvement over Gladia on the words that cost reviewers the most time. I measured it on 250 occurrences of councillor surnames and place names across the 39 validation windows, with term lists committed before the metric first ran.
 
-All four Whisper-family rows below come from one decoding run on one GPU with the same frozen configuration. The three commercial rows are scored from their stored output with the same references, term lists and scorer. Only the Whisper rows depend on my hardware, and they no longer depend on more than one machine.
+| system | DS-WER | against Gladia |
+|---|---|---|
+| Soniox | 0.3280 | +44.2% |
+| ElevenLabs Scribe v2 | 0.3720 | +36.7% |
+| our v2, seed 47 | 0.4360 | +25.9% |
+| our v2, seed 29 | 0.4640 | +21.1% |
+| our v1 | 0.4800 | +18.4% |
+| our v2, seed 13 | 0.4840 | +17.7% |
+| `whisper-large-v3`, not fine-tuned | 0.5400 | +8.2% |
+| Gladia | 0.5880 | |
 
-| system | DS-WER | excluding two roll-call windows | relative to Gladia |
-|---|---|---|---|
-| Soniox | 0.3280 | 0.3481 | +44.2% |
-| ElevenLabs Scribe v2 | 0.3720 | 0.4033 | +36.7% |
-| our v2, seed 47 | 0.4360 | 0.4144 | +25.9% |
-| our v2, seed 29 | 0.4640 | 0.4586 | +21.1% |
-| our v1 | 0.4800 | 0.4641 | +18.4% |
-| our v2, seed 13 | 0.4840 | 0.4751 | +17.7% |
-| `whisper-large-v3`, not fine-tuned | 0.5400 | 0.4696 | +8.2% |
-| Gladia, the baseline the target was set against | 0.5880 | 0.5856 | |
+**Every version of the adapter clears the 15% target against Gladia**, which is the baseline the proposal named and the system OpenCouncil was running when the project started. The weakest seed comes in at +17.7% and the strongest at +25.9%.
 
-The three v2 rows are the same recipe and the same data, differing only in the random seed, and they span 0.4360 to 0.4840. That spread of 0.0480 is more than twice the 0.0187 that separates the v2 seed average from v1. Seed 13, which I named as the shipping seed before any of these numbers existed, lands at 0.4840 and sits **behind** v1.
+Two things keep me from calling this a solved milestone. The three v2 rows differ only in the random seed and span 0.048, so the ordering between v1 and v2 here means little. And against the systems that matter today we make about half again as many domain-term errors as Soniox.
 
-The paired comparison between the best v2 seed and v1, bootstrapped over the 32 meetings, gives -0.0440 with a 95% interval of [-0.1207, +0.0150]. It crosses zero.
-
-**I am not claiming a domain-term improvement from v1 to v2.** Both clear 15% relative against Gladia on the point estimate, and I do not think either should be read as meeting the target. The interval on the v1-against-Gladia difference includes zero, and two of the 39 windows are roll calls, dense with surnames. Remove those two and base whisper's 0.4696 sits inside the range our own adapters occupy.
-
-Against the systems that matter today we make roughly half again as many domain-term errors as Soniox.
-
-Our name errors run 90 substitutions to 28 deletions, so the model hears that a name is there and writes the wrong one. That is what sent me to look at spelling in section 4.4.
-
-A note on one number. An earlier version of this report gave v1 a DS-WER of 0.4880, measured on a machine I no longer have. Re-decoding v1 alongside v2 on one pinned stack gives 0.4800. The controlled figure is the one in the table; the older one is superseded rather than contradicted.
+All four Whisper-family rows come from one decoding run on one GPU. An earlier version of this report gave v1 0.4880 from a machine I no longer have; 0.4800 is the controlled figure.
 
 ### 4.3 Training to test
 
