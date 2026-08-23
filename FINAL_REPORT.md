@@ -123,7 +123,7 @@ All numbers below come from 391 held-out windows across 117 meetings. No meeting
 | gpt-4o-transcribe | 0.1937 |
 | `whisper-large-v3`, no fine-tuning | 0.1988 |
 | Gladia, the baseline this project started from | 0.2085 |
-,
+
 v2 beats the base model it was fine-tuned from by 0.0161, with a 95% confidence interval of [-0.0218, -0.0114]. It also beats Gladia, which is what OpenCouncil used when the project began, and gpt-4o-transcribe. It loses to Scribe v2 and Soniox by margins whose intervals exclude zero.
 
 ### 4.2 Domain terms
