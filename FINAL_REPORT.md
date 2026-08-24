@@ -84,7 +84,7 @@ I recorded every experiment in `research/ledger.json` with its question, its con
 
 ### 2.4 Serving
 
-The merged model runs behind an OpenAI-compatible HTTP endpoint on a GPU pod, protected by an API key, with a decode policy for whole meetings rather than short clips. The policy reproduces the measured experimental arm byte for byte on pinned conformance windows.
+The model is served two ways. A serverless GPU endpoint holds a CTranslate2 build of v2, scales to zero between calls so an idle month costs nothing, and refuses any request that does not carry the API key. It decoded a whole 51 minute council meeting in a single job: 543 utterances with word timestamps, covering 3046.8 of the recording's 3046.9 seconds. Every response carries the base and adapter commit hashes that produced it, so a transcript can always name its own model. Separately, a whole-meeting decode policy runs offline on CPU and reproduces the measured experimental arm byte for byte on the pinned conformance windows.
 
 ---
 
@@ -95,7 +95,7 @@ The merged model runs behind an OpenAI-compatible HTTP endpoint on a GPU pod, pr
 | Dataset | Built and in use. Public release depends on the licensing and GDPR questions above. |
 | Fine-tuned model | Published. v2 beats base `whisper-large-v3`; both versions lose to the commercial systems. |
 | Evaluation framework | Delivered, and used for every number in this report. |
-| Serving | Delivered. Runs behind an API key, decodes whole meetings. |
+| Serving | Delivered. A pay-per-use GPU endpoint behind an API key, which decoded a full 51 minute meeting in one job. |
 | Production integration | Not done, and not the right call. See below. |
 | Domain-term WER target | Met against Gladia, the baseline it was set against. |
 | Human intervention rate | Dropped after discussion with the mentors. |

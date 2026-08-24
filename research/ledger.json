@@ -2880,6 +2880,30 @@
         "boundary kind is a description of WHERE the boundary landed, recomputed from the silence list, not provenance of why the splitter cut there. The splitter's own cut_silence_duration field is carried over unchanged when the short-tail repair moves a boundary and can name a silence seconds away."
       ],
       "updated_at": "2026-08-21T00:00:00Z"
+    },
+    {
+      "id": "artifact-adapter-cleanpack-cont-s47",
+      "kind": "lora_adapter",
+      "description": "Clean-pack contiguous adapter, seed 47: 2,476 packs of one speaker each, about 22 s of speech per window of at most 29 s, 619 steps. Published as tag v2 of the public HF repo. This is the arm reported as oc-cleanpack-cont-s47-b.",
+      "status": "ACTIVE",
+      "locations": [
+        {
+          "host": "huggingface",
+          "path": "opencouncil/whisper-large-v3-el-council-lora@1a03f207e7e9bf46253715234a91eee98fa40505"
+        }
+      ],
+      "hash": {
+        "algorithm": "sha256-file-v1",
+        "file": "adapter_model.safetensors",
+        "value": "5e4b55d2803541aa"
+      },
+      "produced_by": null,
+      "replaced_by": null,
+      "caveats": [
+        "Tag v2 on the HF repo. Tag v1 is artifact-adapter-fixed at commit f620adc5; the two adapter_model.safetensors files differ and `main` currently points at the same bits as v2.",
+        "The three clean-pack seeds spread 0.048 on DS-WER, so any v1 versus v2 ordering from a single seed is not a result.",
+        "Served on GPU float16 through cap-serverless-asr as ct2 model.bin sha256 3aa6368fb1b59a13. Those tokens are NOT comparable with the canonical CPU int8 stack."
+      ]
     }
   ],
   "capabilities": [
@@ -2989,6 +3013,36 @@
       ],
       "updated_at": "2026-08-21T00:00:00Z",
       "last_verified_at": "2026-08-21T00:00:00Z"
+    },
+    {
+      "id": "cap-serverless-asr",
+      "title": "Serverless GPU ASR endpoint, pay per use",
+      "status": "AVAILABLE",
+      "purpose": "Serve the v2 adapter over HTTP on a GPU that scales to zero, so a whole meeting can be transcribed on demand without renting a pod by the hour.",
+      "runbook": "docs/runbooks/serverless-asr-endpoint.md",
+      "auth_env": "RUNPOD_API_KEY",
+      "artifact_ids": [
+        "artifact-adapter-cleanpack-cont-s47"
+      ],
+      "operations": [
+        "provenance",
+        "transcribe_url",
+        "transcribe_inline"
+      ],
+      "smoke_check": "curl -s -X POST https://api.runpod.ai/v2/o1jda6sxo85dnk/runsync -H \"Authorization: Bearer $RUNPOD_API_KEY\" -H 'Content-Type: application/json' -d '{\"input\":{\"op\":\"provenance\"}}'",
+      "notes": [
+        "RunPod endpoint o1jda6sxo85dnk, template cilsob176z, image ghcr.io/angelospk/oc-asr-serverless@sha256:79a3afefd8fad9e7805f002f724e9d5aa8c1405b943a9fa779e860a7b95cb412. Deployed BY DIGEST, not by tag: a tag can be moved onto different bits.",
+        "The image bakes whisper-large-v3 @06f233fe merged with adapter tag v2 @1a03f207e7e9bf46253715234a91eee98fa40505, converted to CTranslate2 float16, ct2 model.bin sha256 3aa6368fb1b59a13. Both revisions are full commit shas and the build fails if they are not.",
+        "Every response carries a provenance block naming those commits and the ct2 hash. The image this replaced was built 2026-07-23 from an unpinned `main` and served an adapter of unknown identity, predating artifact-adapter-fixed.",
+        "Auth is RunPod's own endpoint key. Verified 2026-08-24: 401 with no key and 401 with a wrong key.",
+        "MEASURED 2026-08-24: 2.1x real time on an AMPERE_24 at beam 2 with word timestamps. A 50.8-minute Zografou meeting took 24.2 minutes of GPU and returned 543 utterances covering 3046.8 of 3046.9 seconds. A 2h31m meeting FAILED at the then-current 1-hour executionTimeout; the endpoint is now set to 3 hours.",
+        "saveEndpoint SILENTLY IGNORES a changed templateId on an existing endpoint. It accepted executionTimeoutMs in the same call. To change the image, mutate the template itself with saveTemplate id=cilsob176z.",
+        "float16 numbers are NOT comparable with the canonical CPU int8 evaluation stack. This endpoint serves; it does not measure.",
+        "The last utterance of the 51-minute meeting is the known whisper trailing-silence hallucination ('Υπότιτλοι AUTHORWAVE'), not a transcription of speech.",
+        "Cost of standing up and testing this, including one hour lost to the timeout: about $1.00."
+      ],
+      "updated_at": "2026-08-24T00:00:00Z",
+      "last_verified_at": "2026-08-24T00:00:00Z"
     }
   ]
 }
