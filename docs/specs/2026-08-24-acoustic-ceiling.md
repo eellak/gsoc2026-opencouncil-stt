@@ -53,7 +53,22 @@ substitutions.
 
 **The decoder-shaped part is bounded, and it is small.** An oracle that fixed every
 homophone misspelling we make moves us from 0.1795 to 0.1718. The gap to Scribe is
-4.18 WER points. Homophone spelling is about **0.6 of them, roughly 15%**.
+4.18 points. So the oracle is worth **0.77 points, 18.4% of the gap**, and the
+subset Scribe actually recovers is **0.66 points, 15.8%**. Those are two different
+numbers and the reports have conflated them; keep them apart. Either way, at least
+four fifths of the gap sits outside this error class.
+
+**"Scribe got it right" does not make our error acoustic.** This is the weakest
+joint in the whole argument. Scribe's gain on a token could come from its encoder,
+its cross-attention, its segmentation, its search, its context window, its training
+data or its language prior. End-to-end ASR has no clean boundary between hearing and
+decoding, and nothing measured here locates one. Read every "recoverable" figure as
+"another system produced this token", never as "we misheard it".
+
+**Neither vendor documents a correction stage.** ElevenLabs and Soniox describe
+context handling, long-form stability, speaker separation and formatting. Neither
+publishes an architecture with an LLM correction pass. Inferring one from output
+quality is an unsupported step, and the argument here does not need it.
 
 **The largest bucket is words, not spellings.** Far substitutions, wrong by four or
 more characters, are 6,346 errors worth 0.0386, and Scribe gets 67.3% of them right.
@@ -72,15 +87,19 @@ never emitted.
 
 Of the 4.18-point gap to Scribe, on the evidence we have:
 
-- about **0.6 points** is decoder-shaped and provably not acoustic (homophones),
-- about **3.9 points** sits in far substitutions and deletions, which are hearing
-  and architecture,
-- and those overlap, so the shares do not sum to the gap. They bound it from
+- **0.77 points, 18.4%**, is decoder-shaped and provably not acoustic (homophones,
+  full oracle); 0.66 of those are recovered by Scribe in practice.
+- The rest sits in far substitutions and whole-turn deletions. Those are content,
+  not spelling, and a text-only stage cannot reconstruct speech that left no textual
+  trace.
+- The buckets overlap, so the shares do not sum to the gap. They bound it from
   different sides.
 
 Harold's intuition is right about the *existence* of a decoder-shaped defect and
-right that we cannot spell our way to Scribe. It is wrong about the *proportion*:
-most of the gap is that Scribe hears passages we do not.
+right that we cannot spell our way to Scribe. It is wrong about the *proportion*.
+But note what the evidence does NOT say: it does not say we hear worse. It says the
+missing material is content rather than orthography, and where that content is lost
+remains unlocated.
 
 ## Where the real headroom is, and it is not where we were looking
 
@@ -89,8 +108,14 @@ alignment-conditional per-column oracle over those same three hypotheses is 0.06
 That is **5.91 WER points** left on the table by the chooser alone, larger than the
 entire gap to Scribe.
 
+0.0611 is a reference-conditioned oracle over three fixed hypotheses. It is not an
+achievable operating point and it is emphatically not an acoustic ceiling; most of
+that gap will not be learnable. What it does establish is an upper bound on how much
+complementary correct material the candidates already contain, and that bound is
+large.
+
 So the strongest measured statement available is this: **a language model's job here
-is choosing, not correcting.** Correcting our single hypothesis is bounded at 0.6
+is choosing, not correcting.** Correcting our single hypothesis is bounded at 0.77
 points. Choosing correctly among hypotheses we already have is worth up to 5.91, and
 we know the right answer is present in the candidate set 58.8% of the time in
 exactly the columns where the current vote fails.
@@ -102,14 +127,37 @@ decoder-only fine-tuning proposal was screened and bounded at 0.0066 of the gap.
 Three placements are worth separating before any of them is built:
 
 1. **Decoder-only LoRA.** Screened, bounded, not promising on its own.
-2. **Rescoring the beam** with an external Greek LM, inside the decode. Touches only
-   what whisper already emitted as alternatives, so it inherits the same ceiling as
-   any single-hypothesis correction.
+2. **Shallow fusion or beam rescoring** with an external Greek LM, inside the
+   decode. Touches only what whisper already emitted as alternatives, so it inherits
+   the same ceiling as any single-hypothesis correction. If this is tried, naive
+   shallow fusion double-counts the language prior an end-to-end model already
+   carries; density-ratio style subtraction of the internal LM is the version worth
+   testing, and whisper ships no external-LM fusion interface, so it is real work.
 3. **Rescoring across systems**, over the confusion network of several hypotheses.
    This is the only one of the three whose ceiling is 0.0611 rather than 0.1718.
 
 The first two are corrections. The third is a chooser. The numbers point at the
 third.
+
+## The ceiling is not identified
+
+Nothing above locates it. 0.1795 is an operating point, 0.1377 is proof another
+complete system does better, 0.1202 is an achievable ensemble, 0.0611 is an oracle.
+None of the four is a ceiling for `whisper-large-v3` plus LoRA on this domain.
+
+Two measurements would locate one, in ascending cost:
+
+1. **Same-model N-best oracle.** This is also the precondition for every rescoring
+   idea above, so it comes first regardless of which direction wins.
+    Generate progressively richer candidate sets from
+   our own model, wide beam, sampling, alternative chunking, timestamp and
+   no-speech ablations, and plot oracle WER against candidate budget. Where it
+   saturates separates candidate generation from ranking, and it is the precondition
+   for any rescoring work: fusion cannot select a turn that was never emitted.
+2. **Frozen-encoder probe.** Train an alternate decoder on frozen whisper encoder
+   states, sweep capacity and data to saturation, then compare against a matched
+   unfrozen encoder. The frozen plateau is the defensible empirical ceiling for that
+   encoder. No output-only analysis can establish it.
 
 ## The measurement that would settle the framing
 
@@ -117,10 +165,18 @@ Everything above is agreement-with-OpenCouncil. The claim "we hear worse" deserv
 fidelity-to-audio evidence, and this project has been burned before by merging the
 two metrics.
 
-The cheapest decisive test: take a stratified sample of the columns where Scribe is
-right and we are wrong, split by bucket (far substitution, homophone, deletion run),
-and have a human listen. If our far substitutions turn out to be audible on the
-recording, the ceiling is not where this document places it.
+The cheapest discriminator needs no audio at all: **re-score all four transcripts,
+reference plus three systems, in phoneme space** through one frozen Greek lexicon and
+grapheme-to-phoneme, with the same meeting-clustered bootstrap. If the 4.18-point gap
+largely dissolves once orthographic homophones collapse, we spell worse. If it
+survives as phoneme substitutions and deletions, we lose spoken content. Given that
+the all-homophone oracle is only 18.4% of the gap, the prediction is that most of it
+survives. No retraining, no re-decoding, no API.
+
+That separates spelling from content. It does not separate encoder weakness from
+segmentation or search, and it says nothing about fidelity to audio. For that,
+the test is still a stratified human listen over the columns where Scribe is right
+and we are wrong, split by bucket.
 
 Open questions, none preregistered:
 
