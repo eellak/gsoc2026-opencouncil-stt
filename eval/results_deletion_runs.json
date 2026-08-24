@@ -1,0 +1,660 @@
+{
+ "substrate": {
+  "report_run": "2026-08-22-post-june-held-out-test-clean-pack-cont-",
+  "generatedAt": "2026-08-22T22:45:45.125Z",
+  "items": 391,
+  "systems": [
+   "oc-cleanpack-cont-s47-b",
+   "oc-adapter-fixed-restage-2026-08-22",
+   "hf-openai-whisper-large-v3",
+   "scribe",
+   "soniox",
+   "gpt-4o-transcribe",
+   "gladia-prod"
+  ],
+  "long_run_threshold": 5,
+  "note": "agreement-with-OpenCouncil reference; deletions are published words a system did not write"
+ },
+ "run_census": {
+  "oc-cleanpack-cont-s47-b": {
+   "sub": {
+    "runs": 1759,
+    "tokens_deleted": 3507,
+    "runs_1": 1239,
+    "runs_2_4": 392,
+    "runs_5plus": 128,
+    "tokens_in_5plus": 1274,
+    "share_in_5plus": 0.36327345309381237,
+    "longest": 32
+   },
+   "del": {
+    "runs": 1834,
+    "tokens_deleted": 3623,
+    "runs_1": 1296,
+    "runs_2_4": 405,
+    "runs_5plus": 133,
+    "tokens_in_5plus": 1305,
+    "share_in_5plus": 0.36019873033397737,
+    "longest": 32
+   }
+  },
+  "oc-adapter-fixed-restage-2026-08-22": {
+   "sub": {
+    "runs": 2505,
+    "tokens_deleted": 5859,
+    "runs_1": 1506,
+    "runs_2_4": 721,
+    "runs_5plus": 278,
+    "tokens_in_5plus": 2481,
+    "share_in_5plus": 0.42345110087045573,
+    "longest": 44
+   },
+   "del": {
+    "runs": 2570,
+    "tokens_deleted": 5976,
+    "runs_1": 1566,
+    "runs_2_4": 731,
+    "runs_5plus": 273,
+    "tokens_in_5plus": 2495,
+    "share_in_5plus": 0.41750334672021416,
+    "longest": 44
+   }
+  },
+  "hf-openai-whisper-large-v3": {
+   "sub": {
+    "runs": 1989,
+    "tokens_deleted": 3746,
+    "runs_1": 1411,
+    "runs_2_4": 450,
+    "runs_5plus": 128,
+    "tokens_in_5plus": 1200,
+    "share_in_5plus": 0.3203416978109984,
+    "longest": 56
+   },
+   "del": {
+    "runs": 2063,
+    "tokens_deleted": 3859,
+    "runs_1": 1465,
+    "runs_2_4": 468,
+    "runs_5plus": 130,
+    "tokens_in_5plus": 1222,
+    "share_in_5plus": 0.3166623477584867,
+    "longest": 56
+   }
+  },
+  "scribe": {
+   "sub": {
+    "runs": 731,
+    "tokens_deleted": 1058,
+    "runs_1": 604,
+    "runs_2_4": 107,
+    "runs_5plus": 20,
+    "tokens_in_5plus": 197,
+    "share_in_5plus": 0.18620037807183365,
+    "longest": 24
+   },
+   "del": {
+    "runs": 788,
+    "tokens_deleted": 1136,
+    "runs_1": 658,
+    "runs_2_4": 109,
+    "runs_5plus": 21,
+    "tokens_in_5plus": 219,
+    "share_in_5plus": 0.19278169014084506,
+    "longest": 26
+   }
+  },
+  "soniox": {
+   "sub": {
+    "runs": 911,
+    "tokens_deleted": 1369,
+    "runs_1": 731,
+    "runs_2_4": 146,
+    "runs_5plus": 34,
+    "tokens_in_5plus": 282,
+    "share_in_5plus": 0.20598977355734113,
+    "longest": 24
+   },
+   "del": {
+    "runs": 962,
+    "tokens_deleted": 1446,
+    "runs_1": 768,
+    "runs_2_4": 160,
+    "runs_5plus": 34,
+    "tokens_in_5plus": 290,
+    "share_in_5plus": 0.20055325034578148,
+    "longest": 24
+   }
+  },
+  "gpt-4o-transcribe": {
+   "sub": {
+    "runs": 2255,
+    "tokens_deleted": 5646,
+    "runs_1": 1517,
+    "runs_2_4": 534,
+    "runs_5plus": 204,
+    "tokens_in_5plus": 2766,
+    "share_in_5plus": 0.48990435706695007,
+    "longest": 301
+   },
+   "del": {
+    "runs": 2332,
+    "tokens_deleted": 5749,
+    "runs_1": 1580,
+    "runs_2_4": 542,
+    "runs_5plus": 210,
+    "tokens_in_5plus": 2798,
+    "share_in_5plus": 0.4866933379718212,
+    "longest": 251
+   }
+  },
+  "gladia-prod": {
+   "sub": {
+    "runs": 2015,
+    "tokens_deleted": 4519,
+    "runs_1": 1472,
+    "runs_2_4": 413,
+    "runs_5plus": 130,
+    "tokens_in_5plus": 2005,
+    "share_in_5plus": 0.4436822305819872,
+    "longest": 95
+   },
+   "del": {
+    "runs": 2097,
+    "tokens_deleted": 4656,
+    "runs_1": 1534,
+    "runs_2_4": 432,
+    "runs_5plus": 131,
+    "tokens_in_5plus": 2043,
+    "share_in_5plus": 0.43878865979381443,
+    "longest": 107
+   }
+  }
+ },
+ "domination": {
+  "ours": {
+   "city": {
+    "total_tokens_in_long_runs": 1274,
+    "top": [
+     {
+      "key": "vrilissia",
+      "tokens": 233,
+      "share": 0.18288854003139718
+     },
+     {
+      "key": "athens",
+      "tokens": 213,
+      "share": 0.16718995290423863
+     },
+     {
+      "key": "argos",
+      "tokens": 159,
+      "share": 0.12480376766091052
+     },
+     {
+      "key": "samothraki",
+      "tokens": 128,
+      "share": 0.10047095761381476
+     },
+     {
+      "key": "chania",
+      "tokens": 107,
+      "share": 0.08398744113029827
+     },
+     {
+      "key": "sparta",
+      "tokens": 106,
+      "share": 0.08320251177394035
+     },
+     {
+      "key": "chalandri",
+      "tokens": 89,
+      "share": 0.06985871271585557
+     },
+     {
+      "key": "zografou",
+      "tokens": 83,
+      "share": 0.065149136577708
+     }
+    ],
+    "top5_share": 0.6593406593406593,
+    "distinct": 11
+   },
+   "meeting": {
+    "total_tokens_in_long_runs": 1274,
+    "top": [
+     {
+      "key": "vrilissia/jul29_2026",
+      "tokens": 82,
+      "share": 0.06436420722135008
+     },
+     {
+      "key": "vrilissia/aug5_2026",
+      "tokens": 81,
+      "share": 0.06357927786499215
+     },
+     {
+      "key": "samothraki/jul28_2026",
+      "tokens": 73,
+      "share": 0.05729984301412873
+     },
+     {
+      "key": "argos/jul14_2026",
+      "tokens": 60,
+      "share": 0.04709576138147567
+     },
+     {
+      "key": "athens/aug3_2026",
+      "tokens": 46,
+      "share": 0.03610675039246468
+     },
+     {
+      "key": "argos/aug14_2026",
+      "tokens": 42,
+      "share": 0.03296703296703297
+     },
+     {
+      "key": "chania/jul20_2026",
+      "tokens": 42,
+      "share": 0.03296703296703297
+     },
+     {
+      "key": "chania/jul1_2026",
+      "tokens": 42,
+      "share": 0.03296703296703297
+     }
+    ],
+    "top5_share": 0.2684458398744113,
+    "distinct": 62
+   },
+   "window": {
+    "total_tokens_in_long_runs": 1274,
+    "top": [
+     {
+      "key": "win_vrilissia_aug5_2026_602504",
+      "tokens": 62,
+      "share": 0.04866562009419152
+     },
+     {
+      "key": "win_samothraki_jul28_2026_151810",
+      "tokens": 58,
+      "share": 0.04552590266875981
+     },
+     {
+      "key": "win_argos_jul14_2026_1613975",
+      "tokens": 44,
+      "share": 0.03453689167974882
+     },
+     {
+      "key": "win_orestiada_jun12_2026_8958515",
+      "tokens": 42,
+      "share": 0.03296703296703297
+     },
+     {
+      "key": "win_vrilissia_jul29_2026_3010383",
+      "tokens": 41,
+      "share": 0.03218210361067504
+     },
+     {
+      "key": "win_sparta_jun23_2026_942215",
+      "tokens": 37,
+      "share": 0.029042386185243328
+     },
+     {
+      "key": "win_chania_jul1_2026_345310",
+      "tokens": 36,
+      "share": 0.0282574568288854
+     },
+     {
+      "key": "win_argos_aug14_2026_2204265",
+      "tokens": 30,
+      "share": 0.023547880690737835
+     }
+    ],
+    "top5_share": 0.19387755102040816,
+    "distinct": 94
+   }
+  },
+  "scribe": {
+   "city": {
+    "total_tokens_in_long_runs": 197,
+    "top": [
+     {
+      "key": "sparta",
+      "tokens": 56,
+      "share": 0.28426395939086296
+     },
+     {
+      "key": "vrilissia",
+      "tokens": 39,
+      "share": 0.19796954314720813
+     },
+     {
+      "key": "athens",
+      "tokens": 31,
+      "share": 0.15736040609137056
+     },
+     {
+      "key": "chalandri",
+      "tokens": 23,
+      "share": 0.116751269035533
+     },
+     {
+      "key": "zografou",
+      "tokens": 19,
+      "share": 0.09644670050761421
+     },
+     {
+      "key": "argithea",
+      "tokens": 12,
+      "share": 0.06091370558375635
+     },
+     {
+      "key": "samothraki",
+      "tokens": 12,
+      "share": 0.06091370558375635
+     },
+     {
+      "key": "chania",
+      "tokens": 5,
+      "share": 0.025380710659898477
+     }
+    ],
+    "top5_share": 0.8527918781725888,
+    "distinct": 8
+   },
+   "meeting": {
+    "total_tokens_in_long_runs": 197,
+    "top": [
+     {
+      "key": "sparta/jun23_2026",
+      "tokens": 33,
+      "share": 0.16751269035532995
+     },
+     {
+      "key": "sparta/jun30_2026",
+      "tokens": 23,
+      "share": 0.116751269035533
+     },
+     {
+      "key": "athens/aug3_2026",
+      "tokens": 18,
+      "share": 0.09137055837563451
+     },
+     {
+      "key": "vrilissia/jul22_2026",
+      "tokens": 17,
+      "share": 0.08629441624365482
+     },
+     {
+      "key": "vrilissia/jul15_2026",
+      "tokens": 15,
+      "share": 0.07614213197969544
+     },
+     {
+      "key": "athens/jul20_2_2026",
+      "tokens": 13,
+      "share": 0.06598984771573604
+     },
+     {
+      "key": "argithea/jul24_2026",
+      "tokens": 12,
+      "share": 0.06091370558375635
+     },
+     {
+      "key": "chalandri/jul23_2026",
+      "tokens": 12,
+      "share": 0.06091370558375635
+     }
+    ],
+    "top5_share": 0.5380710659898477,
+    "distinct": 16
+   },
+   "window": {
+    "total_tokens_in_long_runs": 197,
+    "top": [
+     {
+      "key": "win_sparta_jun23_2026_942215",
+      "tokens": 33,
+      "share": 0.16751269035532995
+     },
+     {
+      "key": "win_sparta_jun30_2026_45950",
+      "tokens": 23,
+      "share": 0.116751269035533
+     },
+     {
+      "key": "win_athens_aug3_2026_2830267",
+      "tokens": 18,
+      "share": 0.09137055837563451
+     },
+     {
+      "key": "win_vrilissia_jul22_2026_595310",
+      "tokens": 17,
+      "share": 0.08629441624365482
+     },
+     {
+      "key": "win_vrilissia_jul15_2026_256800",
+      "tokens": 15,
+      "share": 0.07614213197969544
+     },
+     {
+      "key": "win_athens_jul20_2_2026_675572",
+      "tokens": 13,
+      "share": 0.06598984771573604
+     },
+     {
+      "key": "win_chalandri_jul23_2026_981755",
+      "tokens": 12,
+      "share": 0.06091370558375635
+     },
+     {
+      "key": "win_chalandri_jul30_2026_299570",
+      "tokens": 11,
+      "share": 0.05583756345177665
+     }
+    ],
+    "top5_share": 0.5380710659898477,
+    "distinct": 17
+   }
+  }
+ },
+ "edges": {
+  "ours": {
+   "runs": 128,
+   "start_decile_counts": [
+    5,
+    16,
+    17,
+    10,
+    10,
+    16,
+    11,
+    8,
+    15,
+    20
+   ],
+   "runs_touching_window_end": 6,
+   "runs_touching_window_start": 2,
+   "tokens_in_end_runs": 49,
+   "tokens_in_start_runs": 14,
+   "tokens_in_interior_runs": 1211
+  },
+  "scribe": {
+   "runs": 20,
+   "start_decile_counts": [
+    1,
+    1,
+    4,
+    0,
+    0,
+    1,
+    1,
+    0,
+    4,
+    8
+   ],
+   "runs_touching_window_end": 1,
+   "runs_touching_window_start": 1,
+   "tokens_in_end_runs": 5,
+   "tokens_in_start_runs": 6,
+   "tokens_in_interior_runs": 186
+  }
+ },
+ "length_ratio": {
+  "oc-cleanpack-cont-s47-b": {
+   "windows_with_long_run": 94,
+   "windows_without": 297,
+   "median_hyp_over_ref_with_long_run": 0.9766666666666667,
+   "median_hyp_over_ref_without": 1.0119402985074626,
+   "mean_with": 0.9743762420231757,
+   "mean_without": 1.0339703452019195
+  },
+  "scribe": {
+   "windows_with_long_run": 17,
+   "windows_without": 374,
+   "median_hyp_over_ref_with_long_run": 1.0675990675990676,
+   "median_hyp_over_ref_without": 1.052,
+   "mean_with": 1.0554715732884965,
+   "mean_without": 1.0710811913589784
+  },
+  "hf-openai-whisper-large-v3": {
+   "windows_with_long_run": 84,
+   "windows_without": 307,
+   "median_hyp_over_ref_with_long_run": 0.9772727272727273,
+   "median_hyp_over_ref_without": 1.0088757396449703,
+   "mean_with": 0.9681612315068089,
+   "mean_without": 1.0264838140333143
+  },
+  "oc-adapter-fixed-restage-2026-08-22": {
+   "windows_with_long_run": 161,
+   "windows_without": 230,
+   "median_hyp_over_ref_with_long_run": 0.9570815450643777,
+   "median_hyp_over_ref_without": 1.0,
+   "mean_with": 0.9457966730317238,
+   "mean_without": 1.0092668693068145
+  }
+ },
+ "cross_system": {
+  "ours": {
+   "runs_by_how_many_other_systems_kept_half_the_span": {
+    "none": 23,
+    "most_4plus": 49,
+    "few_2_3": 40,
+    "one": 16
+   },
+   "tokens_by_bucket": {
+    "none": 238,
+    "most_4plus": 510,
+    "few_2_3": 411,
+    "one": 115
+   },
+   "kept_by_system": {
+    "hf-openai-whisper-large-v3": 53,
+    "scribe": 102,
+    "soniox": 86,
+    "gpt-4o-transcribe": 43,
+    "oc-adapter-fixed-restage-2026-08-22": 41,
+    "gladia-prod": 49
+   }
+  },
+  "scribe": {
+   "runs_by_how_many_other_systems_kept_half_the_span": {
+    "none": 18,
+    "one": 2
+   },
+   "tokens_by_bucket": {
+    "none": 185,
+    "one": 12
+   },
+   "kept_by_system": {
+    "gladia-prod": 1,
+    "soniox": 1
+   }
+  }
+ },
+ "inheritance": {
+  "ours_long_runs_vs_base": {
+   "runs": 128,
+   "also_mostly_deleted_by_hf-openai-whisper-large-v3": 54,
+   "share": 0.421875
+  },
+  "ours_long_runs_vs_incumbent": {
+   "runs": 128,
+   "also_mostly_deleted_by_oc-adapter-fixed-restage-2026-08-22": 77,
+   "share": 0.6015625
+  },
+  "base_long_runs_vs_ours": {
+   "runs": 128,
+   "also_mostly_deleted_by_oc-cleanpack-cont-s47-b": 57,
+   "share": 0.4453125
+  }
+ },
+ "content": {
+  "ours": {
+   "tokens": 1274,
+   "mean_word_len": 5.1020408163265305,
+   "mean_word_len_corpus": 5.19169964045025,
+   "share_with_digit": 0.029042386185243328,
+   "share_with_digit_corpus": 0.016929553544004192,
+   "share_short_words": 0.39481946624803765,
+   "share_short_words_corpus": 0.38781686450936814,
+   "runs_whose_first_3_words_repeat_elsewhere_in_window": 16
+  },
+  "scribe": {
+   "tokens": 197,
+   "mean_word_len": 4.8578680203045685,
+   "mean_word_len_corpus": 5.19169964045025,
+   "share_with_digit": 0.08629441624365482,
+   "share_with_digit_corpus": 0.016929553544004192,
+   "share_short_words": 0.4517766497461929,
+   "share_short_words_corpus": 0.38781686450936814,
+   "runs_whose_first_3_words_repeat_elsewhere_in_window": 1
+  }
+ },
+ "chunk_phase_proxy": {
+  "long_run_starts_by_3s_bin_of_30s_phase": [
+   12,
+   16,
+   11,
+   18,
+   13,
+   7,
+   12,
+   15,
+   11,
+   13
+  ],
+  "all_reference_tokens_by_bin": [
+   11094,
+   11102,
+   11127,
+   11032,
+   11008,
+   11055,
+   11032,
+   11069,
+   11083,
+   11092
+  ],
+  "caveat": "position->time is a constant-rate assumption; no word timestamps in this substrate"
+ },
+ "bootstrap_share_in_5plus": {
+  "ours": {
+   "point": 0.36327345309381237,
+   "ci95": [
+    0.3018575851393189,
+    0.41800473808897076
+   ],
+   "meetings": 116
+  },
+  "scribe": {
+   "point": 0.18620037807183365,
+   "ci95": [
+    0.10552763819095477,
+    0.26790697674418606
+   ],
+   "meetings": 108
+  }
+ }
+}

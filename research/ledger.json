@@ -4,6 +4,34 @@
   "note": "Authoritative state. Reports under docs/reports/ are immutable evidence; this file says whether their conclusions still stand. When a doc disagrees with this file, this file wins and the doc gets fixed in the same change.",
   "experiments": [
     {
+      "id": "exp-2026-08-24-deletion-runs",
+      "title": "Why whole passages disappear",
+      "question": "36% of what our adapter deletes vanishes in runs of five or more consecutive reference words, against 19% for Scribe. What causes the long runs?",
+      "status": "CLOSED",
+      "conclusion": "CAUSE NOT FOUND, and the evidence says there is probably not one cause. The question is reframed on four measured points. FIRST, the 36% is real: re-derived with an independent aligner as 1,759 runs / 3,507 deleted tokens / 128 runs of 5+ / 1,274 tokens = 36.3% for oc-cleanpack-cont-s47-b against 731 / 1,058 / 20 / 197 = 18.6% for Scribe v2. Flipping the alignment tie-break moves it to 36.0% / 19.3%; meeting-clustered bootstrap gives 0.363 [0.302,0.418] vs 0.186 [0.106,0.268], non-overlapping. Nothing dominates: 128 runs over 94 windows, 62 meetings, 11 cities, largest single window 4.9%, top five 19.4%. SECOND, the property is inherited from whisper, not made by our training: gpt-4o 49.0%, gladia 44.4%, artifact-adapter-fixed 42.3%, ours 36.3%, base hf-openai-whisper-large-v3 32.0%, Soniox 20.6%, Scribe 18.6%. Base whisper shows it with none of our data and the clean-pack adapter deletes 42% fewer long-run tokens than the incumbent. Fine-tuning moved the volume, not the shape. THIRD, the unit is a whole published utterance or speaker turn, median 7 tokens or about 2.3 s: 24.4% of runs align exactly to utterance boundaries against a 2.5% matched baseline, 41.2% sit at a speaker change against 21.0%, 25.8% are bounded by sentence punctuation against 3.1%. FOURTH, 19.1% of our long-run tokens are spans NO other system wrote, inside human-edited reference text (21 of those 22 runs) - legal citations, protocol numbers, gazette codes. That is the reference, not the model, and it accounts for almost all of Scribe's 19%: 90.6% of Scribe's long-run tokens are human-edited and 18 of its 20 runs were deleted by every system. 28.2% of ours is genuine deafness on ordinary speech that four or more systems transcribed.",
+      "decision": "Stop treating the ours-versus-Scribe long-run gap as a single model defect; a fifth of it is our own published text and the rest is a whisper-family decoder behaviour whose unit is a speaker turn. The one measurement worth buying is a word-timestamped re-decode of the 391 windows, to test whether the decoder's own emitted segment boundaries fall on the run edges.",
+      "artifact_ids": [
+        "artifact-adapter-cleanpack-cont-s47",
+        "artifact-adapter-fixed"
+      ],
+      "capability_ids": [],
+      "reports": [
+        "docs/reports/2026-08-24-deletion-runs.md"
+      ],
+      "specs": [],
+      "superseded_by": null,
+      "next_action": null,
+      "updated_at": "2026-08-24T00:00:00Z",
+      "caveats": [
+        "REFUTED and not to be re-run: window edges and truncation (only 6 of 128 runs reach the last token; hypothesis/reference length ratio 0.977 vs 1.012), the no-speech gate (already zero firings in exp-2026-08-12-decode-ablation), repetition loops (no signature, and Scribe shows the same lift), window speech density (identical split for every system), and our training granularity (base whisper shows the utterance-alignment pattern MORE strongly than we do).",
+        "SUGGESTIVE AND DISTRUSTED: 26.9% of runs start in the last 5 s of a 30 s encoder frame against 15.1% expected, CI [0.193,0.350]. Post-hoc, one of about twelve comparisons, the 30 s grid only holds for the first frame, and it is the one result that does NOT replicate on base whisper. Treat as probable noise, not a lead.",
+        "The originally published 36% came from an UNCOMMITTED scratch script (pj/gap.py in a session scratchpad), not from anything in the repo. It has now been re-derived independently and the code is committed.",
+        "Human-edit flags come from OpenCouncil's public meeting API. They record that a human touched an utterance, not that the untouched text is audio-faithful; the 19.1% is a lower bound on reference-side explanation, not a measurement of fidelity to audio.",
+        "NOT MEASURED, needs spend: the acoustic character of the dropped spans. Held-out audio is not cached and pyannote credits were exhausted 2026-08-19.",
+        "Zero cost. Public report.json (byte-identical to the cached copy) plus the public meeting API."
+      ]
+    },
+    {
       "id": "exp-2026-08-24-near-miss-vote",
       "title": "Near-miss aware column vote",
       "question": "Where all three systems disagree, two of them are often within a character or two. Can a vote that sees those near-misses beat the exact-match vote?",
@@ -33,9 +61,9 @@
       "id": "exp-2026-08-21-fusion-production",
       "title": "Production fusion with two ASR systems and no LLM",
       "question": "Can the per-column composition win be delivered in production with TWO ASR systems instead of three, given that whole-window selection with two was measured at 0.1349 and lost, and that with N=2 no 2-of-3 majority exists to break identity disagreements?",
-      "status": "OPEN",
-      "conclusion": null,
-      "decision": null,
+      "status": "CLOSED",
+      "conclusion": "STAGE 0 RAN IN FULL, ALL 18 CELLS (3 pairs x 2 bases x 3 arms), every threshold fitted leave-one-city-out with the headline from out-of-fold predictions only, on the 247-window substrate with 193 (cityId, meetingId) clusters. TWO SYSTEMS DO WIN ON WER AND STILL DO NOT SHIP. Best cell adp+snx base=adapter P1: 0.12238 against 0.13858 for the better member alone, -0.01620 [-0.02175,-0.01083]; best overall cell scr+adp base=adapter P1 at 0.12112. NO two-system cell reaches the trio's W of 0.10046. THE FROZEN COMPONENT GUARD (gate 3 of the spec, insertion delta below +0.002) FAILS FOR EVERY WER-WINNING CELL: adp+snx/adp/P1 posts dIns +0.01479 [+0.01059,+0.01937], scr+adp/adp/P1 +0.00386, scr+adp/scr/P1 +0.00367. Every winner buys WER by trading deletions for insertions, and on the preregistered rule none of them ships. The diagnostics and the cost-constrained argument agree for once: adp+snx has the best union coverage 0.9595, the lowest both-wrong rate 0.0405 and the lowest pairwise oracle 0.0630. Conditional accuracy on identity disagreements CONTRADICTS the marginal error rates - Soniox wins identity disagreements against both other systems (0.5080 vs the adapter's 0.2799; 0.4016 vs Scribe's 0.3413) despite having the worst overall WER, and 22-28% of disagreement columns have neither side correct. The fitted priority was identical in all ten folds of every cell.",
+      "decision": "Do not ship any two-system configuration on this evidence. Name the winning arm's mechanism honestly: with priority fitted to Soniox in every fold it is an occupancy filter on Soniox using our adapter as second opinion, and all of P0's gain is that filter. Because exp-2026-08-17-insertion-fidelity measured 40.8% of Soniox insertions as real speech the published reference omits, an arm whose gain comes from discarding 4,579 Soniox tokens may be WORSE on fidelity-to-audio while looking better on agreement-with-OpenCouncil. That reconciliation is the precondition for any Stage 1, not Stage 1 itself.",
       "artifact_ids": [
         "artifact-ct2-fixed",
         "artifact-adapter-fixed",
@@ -46,13 +74,15 @@
         "cap-self-hosted-asr",
         "cap-decode-x-local"
       ],
-      "reports": [],
+      "reports": [
+        "docs/reports/2026-08-24-fusion-stage0.md"
+      ],
       "specs": [
         "docs/specs/2026-08-21-fusion-production.md"
       ],
       "superseded_by": null,
-      "next_action": "Stage 0 of the spec, which costs nothing: score 3 pairs x 2 bases x 3 arms (P0/P1/P2) on the already-cached 247-window substrate, leave-one-city-out with every threshold fitted out-of-fold, plus the per-pair diagnostics (correct-token union coverage, both-wrong rate, exclusive-correct by producer, pairwise alignment-conditional oracle, KEEP-minus-DROP edit cost per singleton direction, conditional accuracy on identity disagreements, stability by city and meeting). Before any of that, one cheap probe: call Soniox stt-async-v5 on a single window and record which per-word fields it actually returns, since every timestamp and confidence figure this project holds for Soniox is stt-rt-v4 and the two must not be mixed.",
-      "updated_at": "2026-08-21T00:00:00Z",
+      "next_action": null,
+      "updated_at": "2026-08-24T00:00:00Z",
       "caveats": [
         "NOTHING HERE IS MEASURED FOR N=2. Two-system per-column composition has never been run in this project or quoted from outside it. The design extrapolates from the three-system result of exp-2026-08-16-composition-over-selection (0.1201 -> 0.1005). The only measured two-system number is whole-window SELECTION at 0.1349, which lost to the best single system.",
         "The chosen pair (artifact-ct2-fixed + Soniox stt-async-v5) is the COST-CONSTRAINED pair, not the accuracy-optimal pair. Scribe v2 dominates our adapter on WER, deletions and substitutions and loses only on insertions; it is excluded because no ElevenLabs credential exists in this environment (established by exp-2026-08-16-gold-set) and because confidence must come from the same decode pass as the text (exp-2026-08-18-conf-substrate, 0 of 133 windows text-joinable). Marginal error rates do not demonstrate complementary errors; only the Stage 0 pairwise diagnostics can.",
@@ -62,7 +92,16 @@
         "Stage 0 is the seventh pass over the same 247 windows. Cross-fitting does not undo repeated analyst exposure, so it selects a configuration and can never supply the shipping claim. Stage 1 requires audio this project has never scored; the 16 locked evaluation windows stay sealed and the gold set has spent its one confirmatory pass.",
         "The structural ceiling of exp-2026-08-17-majority-error-taxonomy applies at least as hard here: 27.7% of wrong majorities are definitely not a selection problem and 39.6% are not cleanly attributable to selection.",
         "Speaker-attribution accuracy of the emitted schema is UNMEASURED. There is no ground truth outside the gold set, where the number that means something is 0.714 recall inside overlap.",
-        "Section 6 (confusion network for an LLM, extra-speaker detection) is explicitly future work and nothing in it is implemented or measured. Shaped by codex job e2771f4c; the merge rule was rewritten from per-column tiers to base-plus-disagreement-islands by codex job 8dbcf232."
+        "Section 6 (confusion network for an LLM, extra-speaker detection) is explicitly future work and nothing in it is implemented or measured. Shaped by codex job e2771f4c; the merge rule was rewritten from per-column tiers to base-plus-disagreement-islands by codex job 8dbcf232.",
+        "ARM P2 AS SPECIFIED WAS NOT RUN. There are no per-word timestamps or confidences joinable to this run's hypothesis text: the cached Soniox tokens are stt-rt-v4 and the cached adapter confidences come from a separate decode pass, and exp-2026-08-18-conf-substrate (0 of 133 windows reproduce) forbids joining either. What ran is P2*, a context-calibrated surrogate on span shape. It is not evidence about P2.",
+        "The anchored alignment of spec section 2.2 was therefore NOT exercised; alignment is plain pairwise text dynamic programming, the drift-prone method that section exists to replace.",
+        "R4 was not implemented (it never restores alone). R1 was implemented as a suppressor rather than a restorer, following the spec's own Codex correction that an echo means realign-and-collapse.",
+        "KEEP-DROP costs are LOCAL, computed on each span's own hypothesis-to-reference alignment rather than on re-scored merged windows. The local table predicts 0.1253 against the assembled 0.12315, about 0.002 apart.",
+        "EVERYTHING HERE IS AGREEMENT-WITH-OPENCOUNCIL, NOT FIDELITY-TO-AUDIO, and the gap matters more than usual because the winning mechanism is discarding text.",
+        "Domination: no leave-one-out sign flips in any winning cell. For adp+snx/adp/P1 the worst window carries 4.9% and the worst meeting 5.9%, but ATHENS carries 27.0%. That city share is the one number to re-check on new audio.",
+        "Cluster key is (cityId, meetingId) giving 193 clusters. Earlier fusion work on this substrate clustered on meetingId alone, 144 clusters, which merges windows from different cities.",
+        "Seventh scoring pass over these same 247 windows. Cross-fitting prices parameter overfitting only; it does not price the analyst's repeated exposure.",
+        "Correctness check, not a result: where the fitted priority equals the base, P0 degenerates to the base system exactly, to the digit."
       ]
     },
     {

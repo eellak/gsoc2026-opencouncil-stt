@@ -1,0 +1,187 @@
+{
+ "method": {
+  "baseline": "same run lengths, same windows, uniformly random start, seed 20260824",
+  "windows_with_timeline": 375,
+  "windows_total": 391,
+  "long_run_threshold": 5,
+  "note": "agreement-with-OpenCouncil reference throughout"
+ },
+ "H1_speech_rate": {
+  "ours": {
+   "runs": 117,
+   "median_tok_per_s_in_run": 3.301986047490605,
+   "median_tok_per_s_matched_random_span": 2.82832647529632,
+   "median_tok_per_s_whole_window": 2.2848996775826693
+  },
+  "base": {
+   "runs": 109,
+   "median_tok_per_s_in_run": 3.4576271186440413,
+   "median_tok_per_s_matched_random_span": 2.728226652675787,
+   "median_tok_per_s_whole_window": 2.271204609406405
+  },
+  "incumbent": {
+   "runs": 252,
+   "median_tok_per_s_in_run": 3.3655223214523833,
+   "median_tok_per_s_matched_random_span": 2.884615384615491,
+   "median_tok_per_s_whole_window": 2.2399136418836862
+  },
+  "scribe": {
+   "runs": 16,
+   "median_tok_per_s_in_run": 3.9147299276511,
+   "median_tok_per_s_matched_random_span": 2.841560477968411,
+   "median_tok_per_s_whole_window": 2.2417293309036306
+  }
+ },
+ "H1_note": "rate is measured centre-of-first-word to centre-of-last-word, which inflates short spans; only the matched-random-span column is a fair comparator, and the whole-window column is not",
+ "H2_reference_is_human_edited": {
+  "corpus_share_tokens_in_human_edited_utterances": 0.3239443256028723,
+  "ours": {
+   "long_run_tokens": 1186,
+   "share_in_human_edited_utterances": 0.5691399662731872,
+   "matched_random_baseline": 0.40219224283305227
+  },
+  "base": {
+   "long_run_tokens": 1023,
+   "share_in_human_edited_utterances": 0.6334310850439883,
+   "matched_random_baseline": 0.458455522971652
+  },
+  "incumbent": {
+   "long_run_tokens": 2295,
+   "share_in_human_edited_utterances": 0.5930283224400872,
+   "matched_random_baseline": 0.4736383442265795
+  },
+  "scribe": {
+   "long_run_tokens": 191,
+   "share_in_human_edited_utterances": 0.9057591623036649,
+   "matched_random_baseline": 0.4869109947643979
+  }
+ },
+ "H3_reference_vs_real_speech": {
+  "runs": {
+   "nobody_wrote_it|human_edited": 21,
+   "others_wrote_it|human_edited": 15,
+   "others_wrote_it|asr_reference": 32,
+   "mixed|asr_reference": 21,
+   "mixed|human_edited": 29,
+   "nobody_wrote_it|asr_reference": 1
+  },
+  "tokens": {
+   "nobody_wrote_it|human_edited": 227,
+   "others_wrote_it|human_edited": 166,
+   "others_wrote_it|asr_reference": 334,
+   "mixed|asr_reference": 205,
+   "mixed|human_edited": 249,
+   "nobody_wrote_it|asr_reference": 5
+  },
+  "total_tokens": 1186,
+  "legend": "others_wrote_it = >=4 of the other 6 systems kept >=half the span; human_edited = >=half the span sits in utterances a human edited"
+ },
+ "H4_chunk_phase": {
+  "ours": {
+   "runs": 119,
+   "share_starting_in_last_5s_of_chunk": 0.2689075630252101,
+   "ci95": [
+    0.1925925925925926,
+    0.35
+   ],
+   "expected_from_token_mass": 0.1505413835671947,
+   "runs_by_chunk_index": [
+    27,
+    24,
+    25,
+    24,
+    19,
+    0
+   ]
+  },
+  "base": {
+   "runs": 111,
+   "share_starting_in_last_5s_of_chunk": 0.18018018018018017,
+   "ci95": [
+    0.10227272727272728,
+    0.2553191489361702
+   ],
+   "expected_from_token_mass": 0.1505413835671947,
+   "runs_by_chunk_index": [
+    16,
+    13,
+    25,
+    29,
+    28,
+    0
+   ]
+  },
+  "incumbent": {
+   "runs": 256,
+   "share_starting_in_last_5s_of_chunk": 0.171875,
+   "ci95": [
+    0.12903225806451613,
+    0.21559633027522937
+   ],
+   "expected_from_token_mass": 0.1505413835671947,
+   "runs_by_chunk_index": [
+    60,
+    52,
+    56,
+    54,
+    34,
+    0
+   ]
+  },
+  "scribe": {
+   "runs": 19,
+   "share_starting_in_last_5s_of_chunk": 0.15789473684210525,
+   "ci95": [
+    0.0,
+    0.3333333333333333
+   ],
+   "expected_from_token_mass": 0.1505413835671947,
+   "runs_by_chunk_index": [
+    1,
+    4,
+    2,
+    8,
+    4,
+    0
+   ]
+  }
+ },
+ "H4_caveat": "the 30 s grid is anchored to the start of the decoded window. faster-whisper advances its seek to the end of the last emitted segment, so only the first frame is guaranteed to sit on that grid; this is post-hoc, one of many comparisons run, and is not preregistered",
+ "H5_inherited_from_base": {
+  "oc-cleanpack-cont-s47-b": {
+   "tokens_deleted": 3507,
+   "tokens_in_5plus": 1274,
+   "share": 0.36327345309381237
+  },
+  "oc-adapter-fixed-restage-2026-08-22": {
+   "tokens_deleted": 5859,
+   "tokens_in_5plus": 2481,
+   "share": 0.42345110087045573
+  },
+  "hf-openai-whisper-large-v3": {
+   "tokens_deleted": 3746,
+   "tokens_in_5plus": 1200,
+   "share": 0.3203416978109984
+  },
+  "scribe": {
+   "tokens_deleted": 1058,
+   "tokens_in_5plus": 197,
+   "share": 0.18620037807183365
+  },
+  "soniox": {
+   "tokens_deleted": 1369,
+   "tokens_in_5plus": 282,
+   "share": 0.20598977355734113
+  },
+  "gpt-4o-transcribe": {
+   "tokens_deleted": 5646,
+   "tokens_in_5plus": 2766,
+   "share": 0.48990435706695007
+  },
+  "gladia-prod": {
+   "tokens_deleted": 4519,
+   "tokens_in_5plus": 2005,
+   "share": 0.4436822305819872
+  }
+ }
+}
