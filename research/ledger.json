@@ -1811,7 +1811,7 @@
       "next_action": "Audio-faithfully re-reference the two diagnosed validation windows, then freeze the hybrid-data screen; do not spend on another dense arm.",
       "updated_at": "2026-08-19T15:30:00+03:00",
       "caveats": [
-        "The recovery pod was terminated after artifacts were retrieved. Network volume qzw88vdwv2 remains retained and bills separately until deletion. The initial $0.740/h 4090 pod m9v6o9cy2zhl3f was stopped before training at the user's request.",
+        "The recovery pod was terminated after artifacts were retrieved. Network volume qzw88vdwv2 was DELETED 2026-08-24 after the user judged it no longer needed; it had been billing about $7/month since 2026-08-19. The initial $0.740/h 4090 pod m9v6o9cy2zhl3f was stopped before training at the user's request.",
         "At fixed optimizer steps, dense packs expose more labelled speech per step than isolated clips. The result tests packing plus useful-token density under a fixed update/example budget, not context shape alone.",
         "Validation A/B comparisons share one CUDA float16 stack. Their levels must not be compared directly with historical CPU int8 validation levels.",
         "The frozen promotion decision remains STOP even though one window explains 75.8% of net extra insertions; post-hoc exclusion cannot change a preregistered gate.",
@@ -2186,7 +2186,7 @@
         "Contains council audio and transcript text; stays outside git under ~/.cache/oc-public/ and must not be published.",
         "This is an input/staging artifact, not approval to create a billable network volume or GPU pod.",
         "The bundle contains raw control parquets, not precomputed control-arm Whisper features; the first attached pod still needs CPU preprocessing unless that cache is added later.",
-        "DELETED 2026-08-20 from the minipc cache to free disk for the clean-pack bundle rebuild (/home was at 100%). The dense screen it fed is CLOSED and its results live on network volume qzw88vdwv2 under runs/dense-screen/. Rebuildable from the same inputs with scripts/pod_bundle.py; the recorded sha256 identifies what to reproduce."
+        "DELETED 2026-08-20 from the minipc cache to free disk for the clean-pack bundle rebuild (/home was at 100%). The dense screen it fed is CLOSED. Its results, hypotheses and logs were recovered to ~/.cache/oc-public/dense-eval-recovery-cx9ra8iluhr225/ and to docs/reports/2026-08-19-dense-screen-300.md; network volume qzw88vdwv2, which held the run directory and the training checkpoints, was deleted 2026-08-24 WITHOUT being listed first, so the checkpoints are gone and only the recovered results survive. Rebuildable from the same inputs with scripts/pod_bundle.py; the recorded sha256 identifies what to reproduce."
       ],
       "replaced_by": null,
       "verified_at": "2026-08-19T00:48:17+03:00"
@@ -2945,7 +2945,7 @@
         "Expose 8000/http at CREATE time if the pod must serve. Ports cannot be assumed; a pod with only 22/tcp is unreachable by the benchmark.",
         "The RunPod HTTP proxy cuts a request at ~100s. On GPU a 120s council window decodes in ~11s, so this is a CPU-only problem. Measured: mini-PC CPU 128.1s mean, 22 timeouts; RunPod GPU 11.3s mean, 260/260 clean.",
         "4090 / 3090 / A5000 community capacity is frequently unavailable. RTX A4000 at $0.17/hr has been the reliable fallback for inference.",
-        "Persistent volume qzw88vdwv2 (oc-dense-screen-vfm-20260819), 100 GB standard storage in EUR-IS-1, created 2026-08-19 for the dense screen. Official rate checked that day: $0.07/GB/month while idle ($7/month ceiling). Delete it after the GPU screen. The earlier empty EU-RO-1 volume lyaqmog1jy was deleted.",
+        "Persistent volume qzw88vdwv2 (oc-dense-screen-vfm-20260819), 100 GB standard storage in EUR-IS-1, created 2026-08-19 for the dense screen, DELETED 2026-08-24 via the deleteNetworkVolume mutation; the account now reports zero network volumes and currentSpendPerHr 0. It had billed at $0.07/GB/month while idle ($7/month ceiling) for five days. The earlier empty EU-RO-1 volume lyaqmog1jy was deleted.",
         "The volume can be pre-seeded without a pod through https://s3api-eu-ro-1.runpod.io using a separate RunPod S3 access/secret key. Those credentials are not present locally; RUNPOD_API_KEY is not an S3 key.",
         "Active dense-screen pod 2n3uqipjgr4tl6 is a Secure RTX A4000 in EUR-IS-1 at $0.250/h. Detached launcher PID 3374174 handles readiness, direct resumable upload, setup and handoff; watchdog PID 3374176 enforces the 18-hour hard stop."
       ],
