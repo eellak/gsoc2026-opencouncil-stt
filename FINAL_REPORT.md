@@ -233,7 +233,7 @@ This is an idea, not a delivered system. It is where I would put the next month 
 ## 5. Future Work
 
 1. **Test fusion against the live pipeline.** Three ASR accounts per meeting may cost too much, so the real question is whether two systems are enough. I have written the specification and measured nothing yet.
-2. **Improve the vote.** It decides cleanly on 91% of positions. Where all three systems disagree, 44% of the time two of them are within a character or two of each other, which the current exact-match vote cannot see. Fixing that is worth up to 0.0136 and costs no GPU time.
+2. **Improve the vote: measured, and it does not work.** The vote decides cleanly on 91.9% of positions. Where all three systems disagree, 60.4% of the time two of them are within two characters of each other, which the exact-match vote cannot see. I built the near-miss rule and scored it: the best arm moves WER by -0.000187, an interval that includes zero, and the whole idea's own oracle ceiling is 0.0023. The near-miss signal says where the answer is, not which candidate it is: the pair contains the reference word 58.8% of the time, but the member the rule picks is the reference word only 33.8% of the time against the current vote's 30.5%. What is worth attacking is the same columns with confidence rather than spelling, which is untested.
 3. **Find out why whole passages disappear.** 36% of what our adapter deletes vanishes in runs of five or more consecutive words, against 19% for Scribe. I did not find the cause.
 4. **Separate the two changes between v1 and v2.** Overlap filtering and window occupancy moved together. One more training run would tell us which mattered.
 

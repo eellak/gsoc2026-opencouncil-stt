@@ -1,0 +1,192 @@
+{
+ "substrate": {
+  "run_id": "2026-08-10-corrected-adapter-label-prefix-fix-vs-ju",
+  "trio": [
+   "scribe-v2-clean",
+   "soniox",
+   "oc-runpod-fixed-2026-08-10"
+  ],
+  "n_windows": 247,
+  "n_meetings": 144,
+  "n_cities": 10,
+  "ref_tokens": 74917,
+  "align_cache": "/home/harold/.cache/oc-public/fusion_lab/align_65b1c4d64618a429.json"
+ },
+ "n_columns": 80659,
+ "classes": {
+  "agree": {
+   "n": 62919,
+   "share": 0.7800617414051749
+  },
+  "exact_2_of_3": {
+   "n": 6645,
+   "share": 0.08238386292912137
+  },
+  "two_present_same": {
+   "n": 4569,
+   "share": 0.05664587956706629
+  },
+  "singleton": {
+   "n": 4460,
+   "share": 0.05529451146183315
+  },
+  "unresolved_three": {
+   "n": 1104,
+   "share": 0.013687251267682466
+  },
+  "unresolved_two": {
+   "n": 962,
+   "share": 0.011926753369121858
+  }
+ },
+ "clean_share": 0.9190914839013625,
+ "min_pairwise_distance_histogram": {
+  "unresolved_three:1": 415,
+  "unresolved_three:2": 252,
+  "unresolved_three:3": 167,
+  "unresolved_three:4": 119,
+  "unresolved_three:5": 64,
+  "unresolved_three:6": 87,
+  "unresolved_two:1": 138,
+  "unresolved_two:2": 150,
+  "unresolved_two:3": 161,
+  "unresolved_two:4": 137,
+  "unresolved_two:5": 110,
+  "unresolved_two:6": 266
+ },
+ "stats": {
+  "unresolved_three:W_is_oracle_choice": 503,
+  "unresolved_three:W_is_ref": 275,
+  "unresolved_three:d1": 415,
+  "unresolved_three:d1:W_is_oracle_choice": 180,
+  "unresolved_three:d1:W_is_ref": 127,
+  "unresolved_three:d1:pair_contains_ref": 242,
+  "unresolved_three:d1:ref_attributed": 386,
+  "unresolved_three:d1:rep_is_oracle_choice": 208,
+  "unresolved_three:d1:rep_is_ref": 135,
+  "unresolved_three:d1:unblocked": 406,
+  "unresolved_three:d1:would_change_W": 227,
+  "unresolved_three:d2": 667,
+  "unresolved_three:d2:W_is_oracle_choice": 284,
+  "unresolved_three:d2:W_is_ref": 186,
+  "unresolved_three:d2:pair_contains_ref": 358,
+  "unresolved_three:d2:ref_attributed": 609,
+  "unresolved_three:d2:rep_is_oracle_choice": 355,
+  "unresolved_three:d2:rep_is_ref": 206,
+  "unresolved_three:d2:unblocked": 650,
+  "unresolved_three:d2:would_change_W": 357,
+  "unresolved_three:fold": 144,
+  "unresolved_three:fold:W_is_oracle_choice": 63,
+  "unresolved_three:fold:W_is_ref": 51,
+  "unresolved_three:fold:pair_contains_ref": 95,
+  "unresolved_three:fold:ref_attributed": 141,
+  "unresolved_three:fold:rep_is_oracle_choice": 81,
+  "unresolved_three:fold:rep_is_ref": 64,
+  "unresolved_three:fold:unblocked": 141,
+  "unresolved_three:fold:would_change_W": 83,
+  "unresolved_three:ref_among_candidates": 673,
+  "unresolved_three:ref_attributed": 966,
+  "unresolved_three:split_merge": 22,
+  "unresolved_two:W_is_oracle_choice": 167,
+  "unresolved_two:W_is_ref": 167,
+  "unresolved_two:d1": 138,
+  "unresolved_two:d1:W_is_oracle_choice": 42,
+  "unresolved_two:d1:W_is_ref": 42,
+  "unresolved_two:d1:pair_contains_ref": 74,
+  "unresolved_two:d1:ref_attributed": 74,
+  "unresolved_two:d1:rep_is_oracle_choice": 46,
+  "unresolved_two:d1:rep_is_ref": 46,
+  "unresolved_two:d1:unblocked": 138,
+  "unresolved_two:d1:would_change_W": 39,
+  "unresolved_two:d2": 288,
+  "unresolved_two:d2:W_is_oracle_choice": 80,
+  "unresolved_two:d2:W_is_ref": 80,
+  "unresolved_two:d2:pair_contains_ref": 140,
+  "unresolved_two:d2:ref_attributed": 140,
+  "unresolved_two:d2:rep_is_oracle_choice": 84,
+  "unresolved_two:d2:rep_is_ref": 84,
+  "unresolved_two:d2:unblocked": 279,
+  "unresolved_two:d2:would_change_W": 77,
+  "unresolved_two:fold": 20,
+  "unresolved_two:fold:W_is_oracle_choice": 5,
+  "unresolved_two:fold:W_is_ref": 5,
+  "unresolved_two:fold:pair_contains_ref": 12,
+  "unresolved_two:fold:ref_attributed": 12,
+  "unresolved_two:fold:rep_is_oracle_choice": 7,
+  "unresolved_two:fold:rep_is_ref": 7,
+  "unresolved_two:fold:unblocked": 20,
+  "unresolved_two:fold:would_change_W": 6,
+  "unresolved_two:ref_among_candidates": 303,
+  "unresolved_two:ref_attributed": 303,
+  "unresolved_two:split_merge": 22
+ },
+ "meeting_concentration": {
+  "d1": [
+   [
+    "apr15_2026",
+    13
+   ],
+   [
+    "mar10_2026",
+    12
+   ],
+   [
+    "mar18_2026",
+    12
+   ],
+   [
+    "mar12_2025",
+    11
+   ],
+   [
+    "apr7_2026",
+    10
+   ]
+  ],
+  "d2": [
+   [
+    "apr15_2026",
+    19
+   ],
+   [
+    "mar12_2025",
+    19
+   ],
+   [
+    "mar10_2026",
+    17
+   ],
+   [
+    "may25_2026",
+    17
+   ],
+   [
+    "mar18_2026",
+    15
+   ]
+  ],
+  "fold": [
+   [
+    "may25_2026",
+    7
+   ],
+   [
+    "mar18_2026",
+    6
+   ],
+   [
+    "feb4_2026",
+    6
+   ],
+   [
+    "jan19_2_2026",
+    5
+   ],
+   [
+    "dec23_2025",
+    4
+   ]
+  ]
+ },
+ "note": "DESCRIPTIVE. rep_is_ref / pair_contains_ref read the reference through the alignment-conditional column oracle of oracle_align(); no threshold below is fitted on them."
+}
