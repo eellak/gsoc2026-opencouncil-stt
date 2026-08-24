@@ -1,6 +1,20 @@
 # Current Work
 
-Last updated: 2026-08-23
+Last updated: 2026-08-24
+
+## PAST GSOC
+
+**The GSoC deliverable is submitted and `FINAL_REPORT.md` is frozen.** Do not edit
+it again. Work from 2026-08-24 onward is research past the programme: it lands in
+dated reports under `docs/reports/`, in `research/ledger.json`, and here. Three
+questions closed on 2026-08-24 after the report was frozen (near-miss vote,
+two-system fusion Stage 0, deletion runs); their conclusions live in the ledger
+and their reports, and are deliberately absent from `FINAL_REPORT.md`.
+
+The open direction is stated in
+[`docs/specs/2026-08-24-acoustic-ceiling.md`](docs/specs/2026-08-24-acoustic-ceiling.md):
+where the acoustic limit of this approach actually sits, and how much of the
+remaining gap is decoding rather than hearing.
 
 **The endgame plan is finished.** All four workstreams of
 [`docs/specs/2026-08-11-endgame-handoff-plan.md`](docs/specs/2026-08-11-endgame-handoff-plan.md)
