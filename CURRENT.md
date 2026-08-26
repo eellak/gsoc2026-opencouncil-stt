@@ -1,6 +1,6 @@
 # Current Work
 
-Last updated: 2026-08-24
+Last updated: 2026-08-26
 
 ## PAST GSOC
 
@@ -28,6 +28,32 @@ carried out on 2026-08-16. The adapter-confidence screen closed on 2026-08-17.
 
 Canonical research state: [`research/ledger.json`](research/ledger.json).
 Agent protocol: [`CLAUDE.md`](CLAUDE.md).
+
+## Closed 2026-08-26 — training WER for v2, and where the learning goes
+
+`exp-2026-08-26-train-wer-v2` is **CLOSED**. The 300-pack sample frozen on
+2026-08-23 was finally decoded: base 0.0824 against v2 0.0666, one CPU int8
+4-thread stack, both models hash-checked, 300/300 rows on both arms, zero failures.
+
+**The adapter learns its own labels, and the learning is entirely substitutions**
+(0.0554 → 0.0393, CI [+0.0124, +0.0205]). Deletions move the wrong way inside noise.
+On the 39 unseen validation windows the same two models show the mirror image:
+substitutions unchanged, deletions halved. Comparing the decompositions only — never
+the levels — the training gain and the validation gain are **disjoint**. The recipe
+does teach new words; they do not transfer. What transfers is coverage.
+
+That rules out "the recipe never taught it new words" and leaves transfer as the
+open mechanism. It does not distinguish memorised labels from a skill too narrow to
+generalise, and this measurement cannot.
+
+Provenance side-effect: `/home/harold/oc-asr-serve/ct2-v2` had no record anywhere.
+It is now `artifact-ct2-cleanpack-cont-s47`, proven by rebuild — cont_s47 merged into
+whisper-large-v3 and converted with `--quantization int8_float16` reproduces model.bin
+byte for byte. Its matched base is `artifact-ct2-base-large-v3-local`, **not** the
+Systran conversion, which is now marked `MISSING` because its local snapshot is a
+76-byte stub.
+
+Report: [`docs/reports/2026-08-26-train-wer-v2.md`](docs/reports/2026-08-26-train-wer-v2.md).
 
 ## Closed 2026-08-23 — the held-out benchmark, both adapters
 

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-21T00:00:00Z",
+  "updated_at": "2026-08-26T00:00:00Z",
   "note": "Authoritative state. Reports under docs/reports/ are immutable evidence; this file says whether their conclusions still stand. When a doc disagrees with this file, this file wins and the doc gets fixed in the same change.",
   "experiments": [
     {
@@ -2226,6 +2226,37 @@
         "The v2-minus-v1 WER contrast crosses zero and its net gain of 148 error tokens has 56.1% in three windows. Only the deletion contrast survives both checks.",
         "v1 was re-decoded here because the stored arm R kept only totals, so no paired interval was possible against it before."
       ]
+    },
+    {
+      "id": "exp-2026-08-26-train-wer-v2",
+      "title": "Training-set WER for the v2 clean-pack adapter, against the matched base",
+      "question": "On the 300-pack sample frozen 2026-08-23 from the corpus that trained artifact-adapter-cleanpack-cont-s47, did the adapter learn its own labels, and does the S/D/I decomposition of that learning match the one measured on unseen validation windows?",
+      "status": "CLOSED",
+      "conclusion": "It learned them, and the decomposition does NOT match. base 0.0824 vs v2 0.0666 on 19,459 reference tokens, 46 meetings, 8 cities, one CPU int8 4-thread stack, both models hash-checked, 300/300 rows on both arms with zero failures. Paired meeting-clustered bootstrap: WER +0.0158 [+0.0098,+0.0224], substitutions +0.0162 [+0.0124,+0.0205], insertions +0.0016 [+0.0002,+0.0031], deletions -0.0021 [-0.0080,+0.0040] which crosses zero and points the wrong way. The entire training gain is substitutions (0.0554 -> 0.0393). On the 39 unseen validation windows the same two models show the mirror image: substitutions 0.07841 -> 0.07724 (nothing) and deletions 0.09546 -> 0.04357 (halved). The recipe therefore DOES teach new words and they do NOT transfer; what transfers is coverage. Effect broadly distributed at row and meeting level (159 better / 94 tied / 47 worse, largest row 9.8% of net, top five 7.5%, no leave-one-out sign reversal), but Athens carries 44.6% of the net on 22% of the tokens.",
+      "decision": "Record that a LoRA on whisper-large-v3 for this domain learns recognition on its own data and delivers only coverage on new data; the failure is transfer, not capacity. Do not fund further fine-tuning aimed at substitution errors on the strength of a training-set gain. Training WER stays diagnostic and never selects an arm.",
+      "artifact_ids": [
+        "artifact-ct2-cleanpack-cont-s47",
+        "artifact-ct2-base-large-v3-local",
+        "artifact-adapter-cleanpack-cont-s47"
+      ],
+      "capability_ids": [],
+      "reports": [
+        "docs/reports/2026-08-26-train-wer-v2.md"
+      ],
+      "specs": [],
+      "superseded_by": null,
+      "next_action": null,
+      "updated_at": "2026-08-26",
+      "caveats": [
+        "Agreement with the labels the model trained on, not fidelity to audio. A low number can mean faithful reproduction of flawed labels.",
+        "Levels are NOT comparable to the v1 training WER of 0.1313: different corpus, different row length, different reference construction. The frozen sample declares this itself. Only base-versus-v2 within this run is valid.",
+        "The comparison against exp-2026-08-23-validation-canonical-stack is of the S/D/I decomposition only, never of the levels; that run used a different corpus and thread count.",
+        "Athens supplies 44.6% of the net difference on 22% of the tokens. Leave-one-city-out spans [170,316] with no sign reversal, so the direction survives, but the magnitude is city-dependent. Sparta (-0.0057) and Samothraki (-0.0027) move the wrong way; xylokastro is a single pack and means nothing.",
+        "The sample is imbalanced by construction: chania is 116 of 300 packs. Per-city figures are descriptive only.",
+        "4 CPU threads, not the 16 of earlier runs. Measured as RTF 0.591 at 4 threads versus 0.633 at 16, so both arms used 4 and no level here may be compared with a 16-thread number.",
+        "device and compute_type were backfilled into the decode-state files after the run; the harness had them hardcoded to cpu/int8 and no other value was reachable.",
+        "Nothing here separates memorisation of these labels from a skill too narrow to generalise. The measurement cannot do that."
+      ]
     }
   ],
   "artifacts": [
@@ -2260,7 +2291,7 @@
       "id": "artifact-ct2-base-large-v3",
       "kind": "ct2_model",
       "description": "Systran faster-whisper conversion of base openai/whisper-large-v3, used for the paired training-WER contrast.",
-      "status": "ACTIVE",
+      "status": "MISSING",
       "locations": [
         {
           "host": "minipc",
@@ -2275,10 +2306,11 @@
         "verified_at": "2026-08-18"
       },
       "caveats": [
-        "Local HuggingFace cache location; may be garbage-collected and must then be restored from the pinned Systran snapshot edaa852ec7e145841d8ffdb056a99866b5f0a478."
+        "Local HuggingFace cache location; may be garbage-collected and must then be restored from the pinned Systran snapshot edaa852ec7e145841d8ffdb056a99866b5f0a478.",
+        "On 2026-08-25 the local HuggingFace snapshot this record points at is a 76-byte stub, not a model. The 2026-08-18 training-WER numbers produced with it stand, but eval/controlled_eval/training_wer.py cannot be rerun as written until the snapshot is refetched."
       ],
       "replaced_by": null,
-      "verified_at": "2026-08-18T21:11:47Z"
+      "verified_at": "2026-08-25T00:00:00Z"
     },
     {
       "id": "artifact-adapter-july-broken",
@@ -2968,6 +3000,59 @@
         "Tag v2 on the HF repo. Tag v1 is artifact-adapter-fixed at commit f620adc5; the two adapter_model.safetensors files differ and `main` currently points at the same bits as v2.",
         "The three clean-pack seeds spread 0.048 on DS-WER, so any v1 versus v2 ordering from a single seed is not a result.",
         "Served on GPU float16 through cap-serverless-asr as ct2 model.bin sha256 3aa6368fb1b59a13. Those tokens are NOT comparable with the canonical CPU int8 stack."
+      ]
+    },
+    {
+      "id": "artifact-ct2-base-large-v3-local",
+      "kind": "ct2_model",
+      "description": "Local CTranslate2 int8_float16 build of unmodified whisper-large-v3, written five minutes before artifact-ct2-cleanpack-cont-s47 by the same recipe. The base arm that may be paired with it.",
+      "status": "ACTIVE",
+      "locations": [
+        {
+          "host": "minipc",
+          "path": "/home/harold/oc-asr-serve/ct2-base"
+        }
+      ],
+      "hash": {
+        "algorithm": "sha256-file-v1",
+        "file": "model.bin",
+        "value": "bba445638b80555f",
+        "verified_at": "2026-08-25"
+      },
+      "produced_by": null,
+      "replaced_by": null,
+      "verified_at": "2026-08-25T00:00:00Z",
+      "caveats": [
+        "This is the base arm to pair with artifact-ct2-cleanpack-cont-s47: identical model.bin size (1,551,326,177) and identical config.json, written 2026-08-23 19:29 against the v2 build's 19:34. Pairing v2 against the Systran published conversion instead would confound adaptation with conversion lineage.",
+        "Its own build was not reproduced; the shared size and config with the reproduced v2 build are consistency evidence, not a byte-level identity proof.",
+        "NOT artifact-ct2-base-large-v3, which is the Systran published conversion (model.bin 69f74147e3334731) used by eval/controlled_eval/training_wer.py."
+      ]
+    },
+    {
+      "id": "artifact-ct2-cleanpack-cont-s47",
+      "kind": "ct2_model",
+      "description": "CTranslate2 int8_float16 build of artifact-adapter-cleanpack-cont-s47 merged into whisper-large-v3. The CPU arm called v2 in exp-2026-08-23-validation-canonical-stack.",
+      "status": "ACTIVE",
+      "locations": [
+        {
+          "host": "minipc",
+          "path": "/home/harold/oc-asr-serve/ct2-v2"
+        }
+      ],
+      "hash": {
+        "algorithm": "sha256-file-v1",
+        "file": "model.bin",
+        "value": "0c6976f120f12f7c",
+        "value_full": "0c6976f120f12f7c6dc487f86dcb3649b80c78adb6c08e31142ec55f01e535b4",
+        "verified_at": "2026-08-25"
+      },
+      "produced_by": null,
+      "replaced_by": null,
+      "verified_at": "2026-08-25T00:00:00Z",
+      "caveats": [
+        "Provenance was absent when this record was written and was established retroactively on 2026-08-25 by rebuild: openai/whisper-large-v3 + the local cont_s47 adapter (adapter_model.safetensors 5e4b55d2803541aa..., matching artifact-adapter-cleanpack-cont-s47) through PEFT merge_and_unload, then ct2-transformers-converter --quantization int8_float16, reproduces model.bin byte for byte. Two independent rebuilds produced identical bytes, so the pipeline is deterministic.",
+        "int8_float16, NOT the int8_float32 that scripts/build_ct2_local.sh emits. The two recipes differ by 7.6 MB and are distinct binaries; int8 and int8_float32 were measured to be the same build.",
+        "Its GPU float16 sibling served through cap-serverless-asr is model.bin sha256 3aa6368fb1b59a13 and is a different stack. Do not mix their numbers."
       ]
     }
   ],

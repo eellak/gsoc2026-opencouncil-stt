@@ -1,0 +1,593 @@
+{
+ "experiment": "train-wer-v2-2026-08-23",
+ "metric": "agreement with the labels used to train the v2 adapter; not fidelity to audio",
+ "sample": {
+  "source": "research/train-wer-v2/sample.json",
+  "frozen_before": "any GPU rental or decode",
+  "population": {
+   "file": "packs.jsonl",
+   "rows": 2476,
+   "manifest_sha256": "59a63b7d0870598108ced9f3f066ad854da19711f4255164b32356bffac1467e"
+  },
+  "rule": {
+   "salt": "gsoc-2026-v2-trainwer-2026-08-23-v1",
+   "n": 300,
+   "rank": "sha256(salt \\0 manifest_sha256 \\0 pack_id \\0 audio_sha256 \\0 reference_sha256), ascending",
+   "tie_break": "canonical pack id"
+  },
+  "n_rows": 300,
+  "fingerprint": "66b4739c008fea3aea1c2b44923d8c759cb76893780ffe471d878ce0adc51c94",
+  "n_meetings": 46,
+  "n_cities": 8,
+  "n_speakers": 89,
+  "audio_seconds": 8115.4,
+  "speech_seconds": 7164.4,
+  "executed_training_rows": 2475,
+  "population_note": "Selection was frozen over the 2476-row source manifest, but training executed on 2475 rows: pack 31cba9e6d6dc28a7 carries a 480-token label and was cut by the 448-token decoder cap. It is not among the 300 selected, so every scored row was genuinely trained on.",
+  "reference_field": "text_pn",
+  "reference_field_note": "text_pn and text_p are byte-identical on all 300 sampled rows; verify re-checks both digests, so the field choice cannot move this number."
+ },
+ "decode": {
+  "device": "cpu",
+  "compute_type": "int8",
+  "cpu_threads": 4,
+  "config": {
+   "language": "el",
+   "beam_size": 5,
+   "condition_on_previous_text": false,
+   "word_timestamps": false,
+   "vad_filter": false,
+   "task": "transcribe",
+   "temperature": [
+    0.0,
+    0.2,
+    0.4,
+    0.6,
+    0.8,
+    1.0
+   ],
+   "no_speech_threshold": 0.6,
+   "log_prob_threshold": -1.0,
+   "compression_ratio_threshold": 2.4
+  },
+  "normalizer": "eval.controlled_eval.eval_freeze.ftoks",
+  "segment_join": "tokenize each segment, then concatenate token lists",
+  "seed_policy": "ctranslate2.set_random_seed(DA.seed_for('train-wer-v2', pack_id))"
+ },
+ "arms": {
+  "v2": {
+   "artifact": "artifact-ct2-cleanpack-cont-s47",
+   "model_sha256_16": "0c6976f120f12f7c",
+   "decode_wall_seconds": 7374.7,
+   "n_rows": 300,
+   "sub": 764,
+   "del": 314,
+   "ins": 218,
+   "ref_tokens": 19459,
+   "wer": 0.06660157253712935,
+   "sub_rate": 0.03926203813145588,
+   "del_rate": 0.016136492111619303,
+   "ins_rate": 0.011203042294054165,
+   "wer_ci95_meeting_clustered": [
+    0.057585677715262414,
+    0.0763674858706196
+   ],
+   "failed_rows": [],
+   "by_slice": {
+    "city": {
+     "athens": {
+      "n_rows": 65,
+      "sub": 262,
+      "del": 74,
+      "ins": 74,
+      "ref_tokens": 4356,
+      "wer": 0.09412304866850321,
+      "sub_rate": 0.06014692378328742,
+      "del_rate": 0.016988062442607896,
+      "ins_rate": 0.016988062442607896
+     },
+     "chalandri": {
+      "n_rows": 24,
+      "sub": 47,
+      "del": 33,
+      "ins": 34,
+      "ref_tokens": 1651,
+      "wer": 0.06904906117504543,
+      "sub_rate": 0.028467595396729255,
+      "del_rate": 0.019987886129618413,
+      "ins_rate": 0.02059357964869776
+     },
+     "chania": {
+      "n_rows": 116,
+      "sub": 221,
+      "del": 57,
+      "ins": 69,
+      "ref_tokens": 7380,
+      "wer": 0.0470189701897019,
+      "sub_rate": 0.02994579945799458,
+      "del_rate": 0.007723577235772358,
+      "ins_rate": 0.00934959349593496
+     },
+     "samothraki": {
+      "n_rows": 11,
+      "sub": 31,
+      "del": 26,
+      "ins": 8,
+      "ref_tokens": 747,
+      "wer": 0.08701472556894244,
+      "sub_rate": 0.041499330655957165,
+      "del_rate": 0.03480589022757698,
+      "ins_rate": 0.0107095046854083
+     },
+     "sparta": {
+      "n_rows": 26,
+      "sub": 63,
+      "del": 78,
+      "ins": 8,
+      "ref_tokens": 1592,
+      "wer": 0.0935929648241206,
+      "sub_rate": 0.03957286432160804,
+      "del_rate": 0.048994974874371856,
+      "ins_rate": 0.005025125628140704
+     },
+     "vrilissia": {
+      "n_rows": 34,
+      "sub": 93,
+      "del": 24,
+      "ins": 17,
+      "ref_tokens": 2240,
+      "wer": 0.059821428571428574,
+      "sub_rate": 0.04151785714285714,
+      "del_rate": 0.010714285714285714,
+      "ins_rate": 0.007589285714285714
+     },
+     "xylokastro": {
+      "n_rows": 1,
+      "sub": 6,
+      "del": 0,
+      "ins": 0,
+      "ref_tokens": 84,
+      "wer": 0.07142857142857142,
+      "sub_rate": 0.07142857142857142,
+      "del_rate": 0.0,
+      "ins_rate": 0.0
+     },
+     "zografou": {
+      "n_rows": 23,
+      "sub": 41,
+      "del": 22,
+      "ins": 8,
+      "ref_tokens": 1409,
+      "wer": 0.050390347764371894,
+      "sub_rate": 0.029098651525904896,
+      "del_rate": 0.015613910574875798,
+      "ins_rate": 0.0056777856635912
+     }
+    },
+    "n_utterances": {
+     "1-5": {
+      "n_rows": 86,
+      "sub": 180,
+      "del": 49,
+      "ins": 59,
+      "ref_tokens": 5007,
+      "wer": 0.057519472738166565,
+      "sub_rate": 0.035949670461354104,
+      "del_rate": 0.009786299181146395,
+      "ins_rate": 0.011783503095666068
+     },
+     "10+": {
+      "n_rows": 79,
+      "sub": 246,
+      "del": 133,
+      "ins": 50,
+      "ref_tokens": 5651,
+      "wer": 0.07591576712086356,
+      "sub_rate": 0.04353211820916652,
+      "del_rate": 0.02353565740576889,
+      "ins_rate": 0.008847991505928155
+     },
+     "6-9": {
+      "n_rows": 135,
+      "sub": 338,
+      "del": 132,
+      "ins": 109,
+      "ref_tokens": 8801,
+      "wer": 0.06578797863879104,
+      "sub_rate": 0.03840472673559823,
+      "del_rate": 0.014998295648221792,
+      "ins_rate": 0.012384956254971026
+     }
+    },
+    "occupancy_tercile": {
+     "t1": {
+      "n_rows": 100,
+      "sub": 285,
+      "del": 97,
+      "ins": 74,
+      "ref_tokens": 6677,
+      "wer": 0.06829414407668115,
+      "sub_rate": 0.04268384004792571,
+      "del_rate": 0.014527482402276472,
+      "ins_rate": 0.011082821626478957
+     },
+     "t2": {
+      "n_rows": 100,
+      "sub": 253,
+      "del": 146,
+      "ins": 97,
+      "ref_tokens": 6522,
+      "wer": 0.07605029132168047,
+      "sub_rate": 0.03879178166206685,
+      "del_rate": 0.022385771235817233,
+      "ins_rate": 0.014872738423796382
+     },
+     "t3": {
+      "n_rows": 100,
+      "sub": 226,
+      "del": 71,
+      "ins": 47,
+      "ref_tokens": 6260,
+      "wer": 0.054952076677316296,
+      "sub_rate": 0.03610223642172524,
+      "del_rate": 0.01134185303514377,
+      "ins_rate": 0.007507987220447284
+     }
+    }
+   },
+   "dominance": {
+    "largest_row_key": "02cf90008f506170",
+    "largest_row_errors": 44,
+    "largest_row_share": 0.033950617283950615,
+    "largest_meeting_key": "aa1f9f6e02616a8d",
+    "largest_meeting_errors": 101,
+    "largest_meeting_share": 0.0779320987654321
+   }
+  },
+  "base": {
+   "artifact": "artifact-ct2-base-large-v3-local",
+   "model_sha256_16": "bba445638b80555f",
+   "decode_wall_seconds": 7278.5,
+   "n_rows": 300,
+   "sub": 1079,
+   "del": 274,
+   "ins": 250,
+   "ref_tokens": 19459,
+   "wer": 0.08237833393288453,
+   "sub_rate": 0.055449920345341484,
+   "del_rate": 0.014080888020967162,
+   "ins_rate": 0.012847525566575877,
+   "wer_ci95_meeting_clustered": [
+    0.07150088144404476,
+    0.0953004205681941
+   ],
+   "failed_rows": [],
+   "by_slice": {
+    "city": {
+     "athens": {
+      "n_rows": 65,
+      "sub": 393,
+      "del": 71,
+      "ins": 83,
+      "ref_tokens": 4356,
+      "wer": 0.12557392102846648,
+      "sub_rate": 0.09022038567493113,
+      "del_rate": 0.016299357208448117,
+      "ins_rate": 0.019054178145087235
+     },
+     "chalandri": {
+      "n_rows": 24,
+      "sub": 50,
+      "del": 31,
+      "ins": 37,
+      "ref_tokens": 1651,
+      "wer": 0.07147183525136282,
+      "sub_rate": 0.03028467595396729,
+      "del_rate": 0.01877649909145972,
+      "ins_rate": 0.022410660205935795
+     },
+     "chania": {
+      "n_rows": 116,
+      "sub": 307,
+      "del": 53,
+      "ins": 79,
+      "ref_tokens": 7380,
+      "wer": 0.05948509485094851,
+      "sub_rate": 0.04159891598915989,
+      "del_rate": 0.007181571815718157,
+      "ins_rate": 0.010704607046070461
+     },
+     "samothraki": {
+      "n_rows": 11,
+      "sub": 46,
+      "del": 7,
+      "ins": 10,
+      "ref_tokens": 747,
+      "wer": 0.08433734939759036,
+      "sub_rate": 0.06157965194109773,
+      "del_rate": 0.009370816599732263,
+      "ins_rate": 0.013386880856760375
+     },
+     "sparta": {
+      "n_rows": 26,
+      "sub": 100,
+      "del": 25,
+      "ins": 15,
+      "ref_tokens": 1592,
+      "wer": 0.08793969849246232,
+      "sub_rate": 0.06281407035175879,
+      "del_rate": 0.015703517587939697,
+      "ins_rate": 0.009422110552763818
+     },
+     "vrilissia": {
+      "n_rows": 34,
+      "sub": 114,
+      "del": 35,
+      "ins": 16,
+      "ref_tokens": 2240,
+      "wer": 0.07366071428571429,
+      "sub_rate": 0.05089285714285714,
+      "del_rate": 0.015625,
+      "ins_rate": 0.007142857142857143
+     },
+     "xylokastro": {
+      "n_rows": 1,
+      "sub": 4,
+      "del": 32,
+      "ins": 0,
+      "ref_tokens": 84,
+      "wer": 0.42857142857142855,
+      "sub_rate": 0.047619047619047616,
+      "del_rate": 0.38095238095238093,
+      "ins_rate": 0.0
+     },
+     "zografou": {
+      "n_rows": 23,
+      "sub": 65,
+      "del": 20,
+      "ins": 10,
+      "ref_tokens": 1409,
+      "wer": 0.06742370475514549,
+      "sub_rate": 0.046132008516678494,
+      "del_rate": 0.014194464158977998,
+      "ins_rate": 0.007097232079488999
+     }
+    },
+    "n_utterances": {
+     "1-5": {
+      "n_rows": 86,
+      "sub": 262,
+      "del": 71,
+      "ins": 74,
+      "ref_tokens": 5007,
+      "wer": 0.08128619932095067,
+      "sub_rate": 0.05232674256041542,
+      "del_rate": 0.014180147793089674,
+      "ins_rate": 0.014779308967445576
+     },
+     "10+": {
+      "n_rows": 79,
+      "sub": 339,
+      "del": 115,
+      "ins": 54,
+      "ref_tokens": 5651,
+      "wer": 0.08989559370023005,
+      "sub_rate": 0.05998938241019289,
+      "del_rate": 0.020350380463634753,
+      "ins_rate": 0.009555830826402406
+     },
+     "6-9": {
+      "n_rows": 135,
+      "sub": 478,
+      "del": 88,
+      "ins": 122,
+      "ref_tokens": 8801,
+      "wer": 0.07817293489376208,
+      "sub_rate": 0.054312009998863764,
+      "del_rate": 0.009998863765481196,
+      "ins_rate": 0.013862061129417111
+     }
+    },
+    "occupancy_tercile": {
+     "t1": {
+      "n_rows": 100,
+      "sub": 387,
+      "del": 113,
+      "ins": 86,
+      "ref_tokens": 6677,
+      "wer": 0.08776396585292796,
+      "sub_rate": 0.0579601617492886,
+      "del_rate": 0.016923768159353002,
+      "ins_rate": 0.012880035944286355
+     },
+     "t2": {
+      "n_rows": 100,
+      "sub": 363,
+      "del": 110,
+      "ins": 96,
+      "ref_tokens": 6522,
+      "wer": 0.08724317693958908,
+      "sub_rate": 0.05565777368905244,
+      "del_rate": 0.016865992026985587,
+      "ins_rate": 0.014719411223551058
+     },
+     "t3": {
+      "n_rows": 100,
+      "sub": 329,
+      "del": 51,
+      "ins": 68,
+      "ref_tokens": 6260,
+      "wer": 0.07156549520766774,
+      "sub_rate": 0.05255591054313099,
+      "del_rate": 0.008146964856230033,
+      "ins_rate": 0.010862619808306708
+     }
+    }
+   },
+   "dominance": {
+    "largest_row_key": "18e54db106fa4799",
+    "largest_row_errors": 36,
+    "largest_row_share": 0.022457891453524642,
+    "largest_meeting_key": "aa1f9f6e02616a8d",
+    "largest_meeting_errors": 129,
+    "largest_meeting_share": 0.08047411104179664
+   }
+  }
+ },
+ "not_comparable_to": "the v1 training-WER number 0.1313. Different corpus, different row length, different reference construction. This is a within-v2 diagnostic against base on the same rows.",
+ "interpretation_guard": "Training WER measures agreement with the labels the model saw. It diagnoses fit and memorisation. It cannot establish label quality, fidelity to audio, or which adapter to ship, and it must never select an arm.",
+ "base_minus_v2": {
+  "wer_delta": 0.01577676139575518,
+  "wer_delta_ci95_meeting_clustered": [
+   0.00979654427198149,
+   0.022372049817439954
+  ],
+  "sub_rate_delta": 0.016187882213885604,
+  "sub_rate_delta_ci95_meeting_clustered": [
+   0.012421302903872417,
+   0.020537259345994256
+  ],
+  "del_rate_delta": -0.002055604090652141,
+  "del_rate_delta_ci95_meeting_clustered": [
+   -0.008020789773994633,
+   0.003971141329055887
+  ],
+  "ins_rate_delta": 0.0016444832725217122,
+  "ins_rate_delta_ci95_meeting_clustered": [
+   0.00016480023626395403,
+   0.003081290177168543
+  ],
+  "by_slice": {
+   "city": {
+    "athens": {
+     "wer": 0.03145087235996327,
+     "sub_rate": 0.030073461891643706,
+     "del_rate": -0.0006887052341597796,
+     "ins_rate": 0.002066115702479339
+    },
+    "chalandri": {
+     "wer": 0.0024227740763173855,
+     "sub_rate": 0.0018170805572380357,
+     "del_rate": -0.0012113870381586928,
+     "ins_rate": 0.0018170805572380357
+    },
+    "chania": {
+     "wer": 0.012466124661246608,
+     "sub_rate": 0.011653116531165315,
+     "del_rate": -0.0005420054200542005,
+     "ins_rate": 0.0013550135501355018
+    },
+    "samothraki": {
+     "wer": -0.0026773761713520805,
+     "sub_rate": 0.020080321285140562,
+     "del_rate": -0.025435073627844716,
+     "ins_rate": 0.0026773761713520753
+    },
+    "sparta": {
+     "wer": -0.005653266331658288,
+     "sub_rate": 0.02324120603015075,
+     "del_rate": -0.03329145728643216,
+     "ins_rate": 0.004396984924623115
+    },
+    "vrilissia": {
+     "wer": 0.013839285714285714,
+     "sub_rate": 0.009375000000000001,
+     "del_rate": 0.004910714285714286,
+     "ins_rate": -0.0004464285714285716
+    },
+    "xylokastro": {
+     "wer": 0.3571428571428571,
+     "sub_rate": -0.023809523809523808,
+     "del_rate": 0.38095238095238093,
+     "ins_rate": 0.0
+    },
+    "zografou": {
+     "wer": 0.017033356990773595,
+     "sub_rate": 0.017033356990773598,
+     "del_rate": -0.0014194464158978001,
+     "ins_rate": 0.0014194464158977993
+    }
+   },
+   "n_utterances": {
+    "1-5": {
+     "wer": 0.023766726582784108,
+     "sub_rate": 0.016377072099061314,
+     "del_rate": 0.00439384861194328,
+     "ins_rate": 0.0029958058717795086
+    },
+    "10+": {
+     "wer": 0.013979826579366486,
+     "sub_rate": 0.01645726420102637,
+     "del_rate": -0.0031852769421341354,
+     "ins_rate": 0.0007078393204742513
+    },
+    "6-9": {
+     "wer": 0.012384956254971033,
+     "sub_rate": 0.015907283263265536,
+     "del_rate": -0.004999431882740596,
+     "ins_rate": 0.001477104874446085
+    }
+   },
+   "occupancy_tercile": {
+    "t1": {
+     "wer": 0.019469821776246815,
+     "sub_rate": 0.015276321701362887,
+     "del_rate": 0.0023962857570765297,
+     "ins_rate": 0.0017972143178073986
+    },
+    "t2": {
+     "wer": 0.011192885617908613,
+     "sub_rate": 0.01686599202698559,
+     "del_rate": -0.005519779208831645,
+     "ins_rate": -0.00015332720024532377
+    },
+    "t3": {
+     "wer": 0.01661341853035144,
+     "sub_rate": 0.016453674121405748,
+     "del_rate": -0.003194888178913738,
+     "ins_rate": 0.003354632587859424
+    }
+   }
+  },
+  "dominance": {
+   "net_error_difference": 307,
+   "rows_better": 159,
+   "rows_tied": 94,
+   "rows_worse": 47,
+   "largest_row_key": "18e54db106fa4799",
+   "largest_row_error_difference": 30,
+   "largest_row_share_of_net": 0.09771986970684039,
+   "largest_gaining_row_key": "18e54db106fa4799",
+   "largest_gaining_row_errors": 30,
+   "largest_gaining_row_share_of_positive": 0.06342494714587738,
+   "top_five_row_share_of_net": 0.0749185667752443,
+   "largest_meeting_share_of_net": 0.09771986970684039,
+   "largest_city_share_of_net": 0.44625407166123776,
+   "leave_one_row_out": {
+    "range": [
+     277,
+     332
+    ],
+    "sign_reversal": false,
+    "sign_lost": false
+   },
+   "leave_one_meeting_out": {
+    "range": [
+     277,
+     317
+    ],
+    "sign_reversal": false,
+    "sign_lost": false
+   },
+   "leave_one_city_out": {
+    "range": [
+     170,
+     316
+    ],
+    "sign_reversal": false,
+    "sign_lost": false
+   }
+  },
+  "interpretation": "Positive values mean the base model is worse. Paired on the same frozen rows in the same run, so it measures what adaptation learned on its own labels. It does not establish label fidelity or validation improvement."
+ }
+}
