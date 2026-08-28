@@ -41,13 +41,19 @@ My proposal targeted a reproducible dataset, a LoRA adapter with at least 15% re
 
 ## 2. What I built
 
-### 2.1 The dataset
+### 2.1 The review interface
+
+Before any training I needed a way to look at the corrections, so I built a review app over the correction export, SvelteKit on top of SQLite. For one utterance it shows the before/after diff, plays the matching audio, and lets a reviewer fix the timestamps, tag the error category, and mark the row included, excluded or uncertain. Every label is appended to a JSONL event history. A second screen reports coverage per city.
+
+That app produced the part of the training set with the best provenance: 4.71 hours, 5,054 utterances that a human opened, heard, and explicitly chose to include. Its coverage page is also where the per-city numbers in the June metric discussion came from.
+
+### 2.2 The dataset
 
 The training data comes from OpenCouncil's human-correction pairs. I aligned audio to the corrected reference text, filtered on reference quality and speaker overlap, and cut the result into clips that fit the 30-second window Whisper expects.
 
 The dataset is built and in use. We are working out how to release it publicly without running into licensing questions, GDPR, or the rights attached to the recordings. The extraction and packing code is in the repository and runs today.
 
-### 2.2 Two adapters
+### 2.3 Two adapters
 
 Both are LoRA rank 32 on the `q_proj` and `v_proj` projections of `whisper-large-v3`, trained on rented GPUs, merged and converted to CTranslate2 for serving. What changed is the data I fed them.
 
@@ -74,7 +80,7 @@ The change works in a specific way. v2 deletes 40% less of the meeting than v1 (
 
 Two things changed at once between v1 and v2, overlap filtering and window occupancy, so I cannot say which of them did the work. Separating them needs another training run.
 
-### 2.3 Measurement
+### 2.4 Measurement
 
 I built an evaluation harness because I could not trust the numbers I was getting without one. It has a frozen evaluation set of 39 windows from two councils that appear in no training data, a frozen Greek normalizer, and an external scorer that reports meeting-clustered bootstrap confidence intervals rather than a single number.
 
@@ -82,7 +88,7 @@ The harness also talks to OpenCouncil's own benchmark API, so a self-hosted endp
 
 I recorded every experiment in `research/ledger.json` with its question, its conclusion, its caveats, and a link to the report behind it. A script checks the ledger for internal consistency. 83 records are in it.
 
-### 2.4 Serving
+### 2.5 Serving
 
 The model is served two ways. A serverless GPU endpoint holds a CTranslate2 build of v2, scales to zero between calls so an idle month costs nothing, and refuses any request that does not carry the API key. It decoded a whole 51 minute council meeting in a single job: 543 utterances with word timestamps, covering 3046.8 of the recording's 3046.9 seconds. Every response carries the base and adapter commit hashes that produced it, so a transcript can always name its own model. Separately, a whole-meeting decode policy runs offline on CPU and reproduces the measured experimental arm byte for byte on the pinned conformance windows.
 
@@ -98,11 +104,11 @@ The model is served two ways. A serverless GPU endpoint holds a CTranslate2 buil
 | Serving | Delivered. A pay-per-use GPU endpoint behind an API key, which decoded a full 51 minute meeting in one job. |
 | Production integration | Not done, and not the right call. See below. |
 | Domain-term WER target | Met against Gladia, the baseline it was set against. |
-| Human intervention rate | Dropped after discussion with the mentors. |
+| Human intervention rate | Dropped in June, after the mentors found problems with the metric itself. |
 
 **On production integration.** During the summer OpenCouncil moved from Gladia to ElevenLabs Scribe v2. Scribe scores better than either of my adapters on our own benchmark, so putting my model in front of the correction queue would make the product worse. We do plan to put the fusion approach in section 4.5 into production. I am preparing it now, we will test it against the live pipeline, and if it holds up, it ships.
 
-**On the human intervention rate.** I proposed it as the operational metric and we let it go. A single intervention rate does not tell you which errors cost a reviewer time, and by the time our model could have sat in front of the queue, the product had already moved to a better provider. The mentors and I agreed it was not worth chasing.
+**On the human intervention rate.** I proposed it, the mentors found problems with the metric in June, and I dropped it. It measures the LLM correction pass as well as the ASR, so a prompt change moves it. It counts utterances, and utterances are something the ASR emits rather than something speech contains: a model that cut one utterance per word would score worse without making a single extra transcription error. Building it also meant an extra pass in the pipeline for a metric nobody else reports against. WER and CER stayed the standard. The concern underneath it stayed as a diagnostic: a fine-tune can introduce errors that the LLM pass then hides. I never ran the before-and-after measurement, because the model never sat in front of the correction queue. That is a plain miss.
 
 **Upstream contributions.** None. No pull request was opened against the OpenCouncil product repository. This work is a research repository, a published model, and a serving endpoint.
 
@@ -125,6 +131,8 @@ All numbers below come from 391 held-out windows across 117 meetings. No meeting
 | Gladia, the baseline this project started from | 0.2085 |
 
 v2 beats the base model it was fine-tuned from by 0.0161, with a 95% confidence interval of [-0.0218, -0.0114]. It also beats Gladia, which is what OpenCouncil used when the project began, and gpt-4o-transcribe. It loses to Scribe v2 and Soniox by margins whose intervals exclude zero.
+
+We think it is the best open-weights model for Greek council speech today. The only open-weights system I scored on these windows is base `whisper-large-v3`, the model it was fine-tuned from, so the table above is not a ranking of open Greek ASR.
 
 ### 4.2 Domain terms
 
@@ -236,6 +244,7 @@ This is an idea, not a delivered system. It is where I would put the next month 
 2. **Improve the vote.** It decides cleanly on 91% of positions. Where all three systems disagree, 44% of the time two of them are within a character or two of each other, which the current exact-match vote cannot see. Fixing that is worth up to 0.0136 and costs no GPU time.
 3. **Find out why whole passages disappear.** 36% of what our adapter deletes vanishes in runs of five or more consecutive words, against 19% for Scribe. I did not find the cause.
 4. **Separate the two changes between v1 and v2.** Overlap filtering and window occupancy moved together. One more training run would tell us which mattered.
+5. **Test the open-weights claim.** Every number here comes from council audio and our own benchmark, and the only open model in it is the base the adapter was fine-tuned from. Scoring it against the other open Greek models on public sets, Common Voice and FLEURS `el_gr` among them, is what would turn what we think into something a reader can check.
 
 
 ---

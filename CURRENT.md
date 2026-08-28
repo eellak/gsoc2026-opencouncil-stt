@@ -1,11 +1,18 @@
 # Current Work
 
-Last updated: 2026-08-26
+Last updated: 2026-08-28
 
 ## PAST GSOC
 
 **The GSoC deliverable is submitted and `FINAL_REPORT.md` is frozen.** Do not edit
-it again. Work from 2026-08-24 onward is research past the programme: it lands in
+it again. One exception, 2026-08-28: three corrections after mentor review, and
+nothing else. The review UI was missing from section 2; the stated reason for
+dropping the human intervention rate did not match the recorded one
+([`docs/decisions/metric-hir.md`](docs/decisions/metric-hir.md), mentor sync
+2026-06-23); and section 4.1 now says in full that base `whisper-large-v3` is the
+only open-weights system measured, so the table is not a ranking of open Greek ASR.
+
+Work from 2026-08-24 onward is research past the programme: it lands in
 dated reports under `docs/reports/`, in `research/ledger.json`, and here. Three
 questions closed on 2026-08-24 after the report was frozen (near-miss vote,
 two-system fusion Stage 0, deletion runs); their conclusions live in the ledger
@@ -28,6 +35,122 @@ carried out on 2026-08-16. The adapter-confidence screen closed on 2026-08-17.
 
 Canonical research state: [`research/ledger.json`](research/ledger.json).
 Agent protocol: [`CLAUDE.md`](CLAUDE.md).
+
+## Open 2026-08-26 — training round 2, ceiling first
+
+`exp-2026-08-26-training-round-2` is **OPEN, spec written, nothing measured**:
+[`docs/specs/2026-08-26-training-round-2.md`](docs/specs/2026-08-26-training-round-2.md),
+settled in a 15-decision grill. Order: three CPU ceiling measurements (phoneme-skeleton
+fold of the 391, N-best oracle vs candidate budget on both adapters, base large-v3 on
+the 39) while Harold listens to ~2 h of targeted clips outside every evaluation
+meeting; then one $3 screen, continued-from-`cont_s{13,29,47}` (50/50 replay) against
+from-scratch against the untouched control, six ladder gates. Frozen-encoder probe or
+DPO on whisper's decoder only afterwards, chosen by the N-best curve. $50 GPU cap.
+Beam-8 N-best headroom is already known to be 0.0071 (`exp-2026-08-12-serving-stack`).
+
+**Amended 2026-08-27 after reading Fun-ASR (arXiv 2509.12508), reviewed by Codex
+`a471616b`.** One idea was tried as an experiment and **closed the same day**:
+`exp-2026-08-27-retrieval-hotwords` (spec §3.4) retrieved at most three roster surnames
+per window by phoneme edit distance against the unbiased pass-1 output and re-decoded
+only where the set was non-empty. **`STOP`** — 19 of 39 windows fired, mean prompt 11.1
+tokens, and it bought +15 correct name mentions of 246 against a required 18, with the
+deletion-rate CI upper endpoint still at +0.0118.
+[`docs/reports/2026-08-27-retrieval-hotwords.md`](docs/reports/2026-08-27-retrieval-hotwords.md).
+The decoy control is the finding worth carrying forward: one irrelevant surname added to
+the same prompts costs a third of the name gain and more than doubles the deletion
+penalty **while never being emitted** — the harm is suppression, not hallucination.
+`exp-2026-07-25-hotwords` stays CLOSED and is confirmed. Name work stays in post-hoc
+roster repair.
+Three things were closed rather than added: noise augmentation is OFF TARGET (deletions
+and substitutions rise at the same rate with overlap, and the causal experiment is
+already negative); the paper's multi-witness mining rule cannot run on our pools, so the
+five-witness benchmark windows are **calibration-only** and never supply a training clip
+(user decision, 2026-08-27; **99 of the original 137** after the release of 2026-08-28); and Table 8 supplies no threshold for the DPO branch.
+Two defects in the spec were fixed in the same change: §4.2 named the wrong benchmark
+for the 391 exclusions, and §4.1 overstated the witnessed `deletion_hard` rows
+(2,677 of 3,921) and named the wrong Soniox model.
+
+**Step 2 is built and the listening queue is cut.** The exclusion manifest
+(`~/.cache/oc-public/exclusion-manifest-2026-08/manifest.json`, sha256 `a45de4c6…`, 283
+meetings and 5 whole cities off limits) is hash-pinned by the new cutter
+`eval/controlled_eval/cut_listening_clips.py`, and `artifact-listen-queue-2026-08` holds
+**721 clips / 2.16 h** over 95 meetings in 4 cities. The blind page is
+`eval/controlled_eval/blind_listen.py`; the procedure is
+[`docs/runbooks/2026-08-27-blind-listening-session.md`](docs/runbooks/2026-08-27-blind-listening-session.md).
+
+Three things about that queue that decide how its result may be read:
+
+- **It is four municipalities and they were bought.** The 2026-08-27 queue was Chania
+  307 + Athens 216 only, because `calibration_260` alone blocked 1,305 of the 2,661
+  candidates. On 2026-08-28 Harold released `chalandri` and `vrilissia` from that source
+  (`CALIBRATION_RELEASED_CITIES`), which added 198 clips and cost **38 of the 137
+  five-witness calibration windows** and **36 of the 247 `composition-rt-2026-08` fusion
+  substrate windows** — a round-3 adapter may no longer be scored on those 36. Published
+  fusion results are unaffected. `zografou` was left excluded as the worst trade, and
+  there is no free subset: every meeting blocked only by `calibration_260` holds a
+  calibration window (spec §4.2b).
+- **108 rows were dropped because their span has been edited since Soniox heard it**,
+  one by 13.25 s: their witness text and their cached wav belong to different audio.
+  Found by Codex `4cf77e98` and confirmed by measurement before anything was published.
+- **The overlap rule is applied literally after all.** An earlier draft of the cutter
+  argued it could not be; the measurement says 724 of 899 clips touch no other training
+  row. The 175 that do are dropped, which also removes label supersession as a worry.
+
+Labels are collected under the **frozen** listening protocol (2026-08-09) rather than
+§4.1's clean-transcript line — false starts stay in, and the uncertainty states, the
+three-listen limit and the five hidden repeats are enforced by the page (spec §4.2c).
+Pool 2 of §4.1 has no inputs on disk and is not built.
+
+**The session is split, by Harold's decision of 2026-08-28.** Typing 721 clips from
+nothing is 9–17 hours and he said plainly he would not do it; correcting Soniox instead
+makes every label a derivative of the witness it is meant to judge. So: a **blind core
+of 120 clips** typed from the audio alone, which is the only material a measurement may
+use, then the remaining 601 with the Soniox text prefilled and edited, marked
+`assisted`. The five hidden repeats are drawn from the core, the core comes first in the
+session, `/prefill` returns 403 for a blind clip, and `training_rows(mode="blind")` is
+how any number asks for the clean set.
+
+**Every Soniox run this project has made was served by `stt-rt-v5`, not `stt-rt-v4`.**
+Soniox removed v4 on 2026-06-30 and routes the name; all our runs are August. No
+comparison is invalidated — everything we have is the same model — but the label was
+wrong wherever it appeared, and the client now requests v5 by name.
+
+## Closed 2026-08-28 — slowing the audio does not help Soniox in crosstalk
+
+`exp-2026-08-28-tempo-probe` ran Harold's question — play the audio slower so the model
+catches the words people talk over — as five arms on the gold set's 18 overlap episodes,
+three interleaved cycles, 225 free `stt-rt-v5` sessions.
+**STOP on all four arms** ([report](docs/reports/2026-08-28-tempo-probe.md)): the control
+is the best arm, at 0.8756 overlap-episode recall against 0.8710 (`raw`, `pace070`), 0.8679
+(0.85×) and 0.8587 (0.70×). The noise envelope is 0.0092; three arms sit inside it on the
+losing side and **0.70× sits outside it**, while also being the only arm to fail the
+collateral guard — recall outside the overlap falls 2.1 points. Slowing is not neutral, it
+is harmful.
+
+Harold found a real defect by reading the adjudication page: Soniox streams **sub-word
+pieces**, and the first scorer treated each piece as a word, giving recall ≈ 0.32 for
+everything. `group_words` in `eval/soniox_confidence_probe.py` already did it right; the
+probe now reuses it instead of its own loop. The adjudication itself was **not run** — after
+the fix no arm gains, so there is nothing for it to rescue.
+
+## Open 2026-08-26 — integrating the fusion into the OpenCouncil pipeline
+
+`exp-2026-08-26-fusion-integration` is **OPEN, spec written, nothing built**:
+[`docs/specs/2026-08-26-fusion-integration.md`](docs/specs/2026-08-26-fusion-integration.md),
+settled in an 18-decision grill. The shipped arm is **R1+R2 + the vote/negation
+guard** (0.11154 on 391 against Scribe's 0.13771); the LLM chooser is a bench-only
+flag until the deletion caveat closes. The code lives in `opencouncil-tasks` as a
+stdlib-only Python package behind a conformance test, exposed as an audio-in
+`openai-compatible` route so the bench can call it, then run in shadow beside Scribe.
+Word timestamps come from Scribe only. Order: reproduce → package → bench run on a
+RunPod CPU pod → shadow → flip.
+
+Side-effect: the chooser code (`cats.py`, `run_chooser.py`, `reconstruct.py`,
+`freeze.json` …) lived only in an ephemeral `/tmp` scratchpad and was **rescued** into
+`eval/controlled_eval/chooser/`; data with transcript text went to
+`~/.cache/oc-public/chooser-2026-08-25/`. Reproduction from the new location is step 1.
+
+Blocked on Harold: where `RUNPOD_API_KEY` lives, ElevenLabs and Anthropic API keys.
 
 ## Closed 2026-08-26 — training WER for v2, and where the learning goes
 
@@ -54,6 +177,50 @@ Systran conversion, which is now marked `MISSING` because its local snapshot is 
 76-byte stub.
 
 Report: [`docs/reports/2026-08-26-train-wer-v2.md`](docs/reports/2026-08-26-train-wer-v2.md).
+
+## Where the fusion line stands, 2026-08-26
+
+**0.10581 WER on the 391-window benchmark**, against Scribe v2 at 0.13771. Held out
+on five untouched cities: **0.12431**. The policy is an algorithmic split of
+disagreement islands into 21 categories, a deterministic rule in 19 of them and an
+LLM chooser in 2.
+
+**It looks immovable from here by text alone.** `exp-2026-08-26-three-composite-compose`
+is CLOSED negative: the largest remaining prize, 0.0211 of WER in `THREE|COMPOSITE`,
+did not yield to instructions, Codex revision loops, few-shot counts from 0 to 20,
+context widths from 8 to 30 tokens, free composition, two structured edit formats, or
+Opus instead of Sonnet. The frozen rule at 42.5% was never beaten reproducibly. The
+model cannot see which word is spurious, because all three candidates are equally
+plausible Greek and the question is acoustic.
+
+The next thing with new information is **acoustic rescoring against the audio**, with
+an independent CTC recogniser and a wrong-audio control. Before that,
+`exp-2026-08-26-chooser-deletion-safety` is OPEN and should be settled: the policy
+deletes 2.4x more than Scribe and the 36-clip vote-and-negation listening test exists
+unrun.
+
+## Closed 2026-08-26 — the per-category chooser
+
+`exp-2026-08-26-category-chooser` is **CLOSED**. Disagreement islands are assigned
+algorithmically to 21 categories; a deterministic rule runs where one works and an
+LLM (Opus) where none does. Confirmed once on the five held-out cities, freeze
+`6537f8e2451e7dbd`, second runs refused by the code.
+
+End-to-end WER on rebuilt confirmation windows: **policy 0.12431** against R1+R2
+0.12825, the vote 0.13798 and Scribe 0.15210. Both contrasts exclude zero and no
+cluster carries more than 15.5% of 47.
+
+The number that matters is the comparator: **+21.0 points against the vote, +3.0
+against the best trivial rule.** The LLM only pays where every rule is a coin flip —
+2 of 6 tested categories, 1,696 of 6,115 islands.
+
+**Adopt nothing yet.** Deletions rose 76% over the vote (0.01434 → 0.02524, 2.4x
+Scribe). `exp-2026-08-26-chooser-deletion-safety` is **OPEN** and holds that caveat:
+a 36-clip listening test over the vote and negation deletions exists and has not
+been run. Every number in the closed record is also ONE run of a nondeterministic
+policy; three repeats were recommended before freezing and were not done.
+
+[Report](docs/reports/2026-08-26-category-chooser.md).
 
 ## Closed 2026-08-23 — the held-out benchmark, both adapters
 
