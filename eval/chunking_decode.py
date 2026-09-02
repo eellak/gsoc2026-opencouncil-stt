@@ -38,6 +38,9 @@ from eval.controlled_eval.scoring import cluster_bootstrap  # noqa: E402
 import decode_ablation as DA  # noqa: E402
 
 
+# The ledger record for this work is `exp-2026-08-18-chunking-aware-decoding`.
+# This string is a day earlier and is left alone because it is written into every
+# cached state on disk; the ledger id is the authoritative one.
 EXPERIMENT = "exp-2026-08-17-chunking-aware-decoding"
 CONTROL = dict(DA.CONTROL)
 MAX_PIECE_SECONDS = 30.0

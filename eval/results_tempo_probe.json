@@ -1,0 +1,124 @@
+{
+  "experiment": "exp-2026-08-28-tempo-probe",
+  "spec": "docs/specs/2026-08-28-tempo-probe.md",
+  "model_requested": "stt-rt-v5",
+  "cells": 15,
+  "meetings": 5,
+  "cycles": 3,
+  "noise_envelope": 0.00922,
+  "arms": {
+    "raw": {
+      "recall": 0.87097,
+      "n_ref": 651,
+      "matched": 567,
+      "n_unmatched_hyp": 316
+    },
+    "proc10": {
+      "recall": 0.87558,
+      "n_ref": 651,
+      "matched": 570,
+      "n_unmatched_hyp": 308
+    },
+    "t085": {
+      "recall": 0.8679,
+      "n_ref": 651,
+      "matched": 565,
+      "n_unmatched_hyp": 302
+    },
+    "t070": {
+      "recall": 0.85868,
+      "n_ref": 651,
+      "matched": 559,
+      "n_unmatched_hyp": 335
+    },
+    "pace070": {
+      "recall": 0.87097,
+      "n_ref": 651,
+      "matched": 567,
+      "n_unmatched_hyp": 310
+    }
+  },
+  "control": "proc10",
+  "control_non_overlap_recall": 0.81622,
+  "per_cycle_recall": {
+    "raw": [
+      0.87558,
+      0.87097,
+      0.86636
+    ],
+    "proc10": [
+      0.88018,
+      0.87097,
+      0.87558
+    ],
+    "t085": [
+      0.87097,
+      0.86636,
+      0.86636
+    ],
+    "t070": [
+      0.86175,
+      0.85714,
+      0.85714
+    ],
+    "pace070": [
+      0.86636,
+      0.87097,
+      0.87558
+    ]
+  },
+  "arms_vs_control": {
+    "raw": {
+      "gain_vs_control": -0.00461,
+      "non_overlap_loss": -0.0009,
+      "meetings_better": 0,
+      "uncertain_recall": 0.49123,
+      "per_cycle_recall": [
+        0.87558,
+        0.87097,
+        0.86636
+      ],
+      "advance": false,
+      "why": "gain -0.0046 is inside the noise envelope 0.0092; only 0/5 meetings agree in direction"
+    },
+    "t085": {
+      "gain_vs_control": -0.00768,
+      "non_overlap_loss": 0.0045,
+      "meetings_better": 1,
+      "uncertain_recall": 0.52632,
+      "per_cycle_recall": [
+        0.87097,
+        0.86636,
+        0.86636
+      ],
+      "advance": false,
+      "why": "gain -0.0077 is inside the noise envelope 0.0092; only 1/5 meetings agree in direction"
+    },
+    "t070": {
+      "gain_vs_control": -0.0169,
+      "non_overlap_loss": 0.02072,
+      "meetings_better": 1,
+      "uncertain_recall": 0.53216,
+      "per_cycle_recall": [
+        0.86175,
+        0.85714,
+        0.85714
+      ],
+      "advance": false,
+      "why": "gain -0.0169 is inside the noise envelope 0.0092; only 1/5 meetings agree in direction; non-overlap recall fell 0.0207 > 0.01"
+    },
+    "pace070": {
+      "gain_vs_control": -0.00461,
+      "non_overlap_loss": 0.0,
+      "meetings_better": 1,
+      "uncertain_recall": 0.49123,
+      "per_cycle_recall": [
+        0.86636,
+        0.87097,
+        0.87558
+      ],
+      "advance": false,
+      "why": "gain -0.0046 is inside the noise envelope 0.0092; only 1/5 meetings agree in direction"
+    }
+  }
+}

@@ -31,6 +31,9 @@ import socketserver
 ROOT = pathlib.Path(os.environ.get("AUDIT_DIR") or pathlib.Path(__file__).parent).resolve()
 OUT = ROOT / "answers.json"
 PORT = int(os.environ.get("PORT", "8780"))
+# Default stays every interface: these packages are reviewed from a phone over the tailnet.
+# Set HOST=127.0.0.1 for a package that must never leave this machine.
+HOST = os.environ.get("HOST", "0.0.0.0")
 RANGE_RE = re.compile(r"^bytes=(\d*)-(\d*)$")
 
 
@@ -182,6 +185,6 @@ class Server(socketserver.ThreadingTCPServer):
 
 
 if __name__ == "__main__":
-    with Server(("0.0.0.0", PORT), Handler) as httpd:
-        print(f"serving {ROOT} on 0.0.0.0:{PORT}", flush=True)
+    with Server((HOST, PORT), Handler) as httpd:
+        print(f"serving {ROOT} on {HOST}:{PORT}", flush=True)
         httpd.serve_forever()

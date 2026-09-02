@@ -1,0 +1,774 @@
+{
+  "schema_version": 1,
+  "frozen_spec": "docs/specs/2026-08-18-clean-data-filter-ladder.md",
+  "inputs": {
+    "hparl2-v2": {
+      "train_jsonl_sha256": "29f4fe806b88e80a3695e6db06e753164029173ec2a3a13535eb713423a51530",
+      "second_witness": null,
+      "second_witness_rows": 0
+    },
+    "stoma-v2": {
+      "train_jsonl_sha256": "8f455a66499dad67f2468b849682393b06f8cac0e12627319d7133a5ec4c1c36",
+      "second_witness": null,
+      "second_witness_rows": 0
+    },
+    "cv-v2": {
+      "train_jsonl_sha256": "c2f60869103b75e4d39ceca1b5acc5eef10152193893f81997fd786e4d2c8487",
+      "second_witness": null,
+      "second_witness_rows": 0
+    },
+    "eurospeech-v2": {
+      "train_jsonl_sha256": "931a8958096174f904a0bc85588f78577de78aafecc7612675bc97a9f7c7b2f5",
+      "second_witness": "whisper_turbo_ds_wer",
+      "second_witness_rows": 17946
+    }
+  },
+  "thresholds": {
+    "l2_min_align": 0.95,
+    "l3_max_second_wer": 0.05,
+    "duration_s": [
+      1.5,
+      30.0
+    ],
+    "min_normalized_tokens": 3,
+    "fast_tokens_per_s": 3.0,
+    "hard_align_interval": [
+      0.5,
+      0.85
+    ]
+  },
+  "known_roster_name_phrases": 1572,
+  "levels": {
+    "L0": {
+      "by_source": {
+        "hparl2-v2": {
+          "rows": 9334,
+          "hours": 13.161,
+          "row_retention_vs_L0": 1.0,
+          "hour_retention_vs_L0": 1.0,
+          "unmeasurable_rows": 0,
+          "unmeasurable_hours": 0.0,
+          "diagnostics": {
+            "capitalized_noninitial": {
+              "rows": 2960,
+              "hours": 5.129,
+              "row_retention_vs_L0": 1.0,
+              "hour_retention_vs_L0": 1.0
+            },
+            "edge_clipped": {
+              "rows": 2259,
+              "hours": 2.992,
+              "row_retention_vs_L0": 1.0,
+              "hour_retention_vs_L0": 1.0
+            },
+            "fast_speech": {
+              "rows": 985,
+              "hours": 1.145,
+              "row_retention_vs_L0": 1.0,
+              "hour_retention_vs_L0": 1.0
+            },
+            "hard_example": {
+              "rows": 3324,
+              "hours": 4.377,
+              "row_retention_vs_L0": 1.0,
+              "hour_retention_vs_L0": 1.0
+            },
+            "known_roster_name": {
+              "rows": 114,
+              "hours": 0.21,
+              "row_retention_vs_L0": 1.0,
+              "hour_retention_vs_L0": 1.0
+            }
+          }
+        },
+        "stoma-v2": {
+          "rows": 14407,
+          "hours": 24.187,
+          "row_retention_vs_L0": 1.0,
+          "hour_retention_vs_L0": 1.0,
+          "unmeasurable_rows": 0,
+          "unmeasurable_hours": 0.0,
+          "diagnostics": {
+            "capitalized_noninitial": {
+              "rows": 2511,
+              "hours": 5.609,
+              "row_retention_vs_L0": 1.0,
+              "hour_retention_vs_L0": 1.0
+            },
+            "edge_clipped": {
+              "rows": 1298,
+              "hours": 2.255,
+              "row_retention_vs_L0": 1.0,
+              "hour_retention_vs_L0": 1.0
+            },
+            "fast_speech": {
+              "rows": 734,
+              "hours": 0.885,
+              "row_retention_vs_L0": 1.0,
+              "hour_retention_vs_L0": 1.0
+            },
+            "hard_example": {
+              "rows": 2133,
+              "hours": 3.707,
+              "row_retention_vs_L0": 1.0,
+              "hour_retention_vs_L0": 1.0
+            },
+            "known_roster_name": {
+              "rows": 327,
+              "hours": 0.692,
+              "row_retention_vs_L0": 1.0,
+              "hour_retention_vs_L0": 1.0
+            }
+          }
+        },
+        "cv-v2": {
+          "rows": 12971,
+          "hours": 15.108,
+          "row_retention_vs_L0": 1.0,
+          "hour_retention_vs_L0": 1.0,
+          "unmeasurable_rows": 0,
+          "unmeasurable_hours": 0.0,
+          "diagnostics": {
+            "capitalized_noninitial": {
+              "rows": 2865,
+              "hours": 3.51,
+              "row_retention_vs_L0": 1.0,
+              "hour_retention_vs_L0": 1.0
+            },
+            "edge_clipped": {
+              "rows": 1636,
+              "hours": 1.924,
+              "row_retention_vs_L0": 1.0,
+              "hour_retention_vs_L0": 1.0
+            },
+            "fast_speech": {
+              "rows": 34,
+              "hours": 0.033,
+              "row_retention_vs_L0": 1.0,
+              "hour_retention_vs_L0": 1.0
+            },
+            "hard_example": {
+              "rows": 3003,
+              "hours": 3.503,
+              "row_retention_vs_L0": 1.0,
+              "hour_retention_vs_L0": 1.0
+            },
+            "known_roster_name": {
+              "rows": 67,
+              "hours": 0.093,
+              "row_retention_vs_L0": 1.0,
+              "hour_retention_vs_L0": 1.0
+            }
+          }
+        },
+        "eurospeech-v2": {
+          "rows": 14136,
+          "hours": 58.571,
+          "row_retention_vs_L0": 1.0,
+          "hour_retention_vs_L0": 1.0,
+          "unmeasurable_rows": 0,
+          "unmeasurable_hours": 0.0,
+          "diagnostics": {
+            "capitalized_noninitial": {
+              "rows": 10810,
+              "hours": 45.724,
+              "row_retention_vs_L0": 1.0,
+              "hour_retention_vs_L0": 1.0
+            },
+            "edge_clipped": {
+              "rows": 2449,
+              "hours": 10.327,
+              "row_retention_vs_L0": 1.0,
+              "hour_retention_vs_L0": 1.0
+            },
+            "fast_speech": {
+              "rows": 300,
+              "hours": 1.219,
+              "row_retention_vs_L0": 1.0,
+              "hour_retention_vs_L0": 1.0
+            },
+            "hard_example": {
+              "rows": 3499,
+              "hours": 14.641,
+              "row_retention_vs_L0": 1.0,
+              "hour_retention_vs_L0": 1.0
+            },
+            "known_roster_name": {
+              "rows": 403,
+              "hours": 1.757,
+              "row_retention_vs_L0": 1.0,
+              "hour_retention_vs_L0": 1.0
+            }
+          }
+        }
+      }
+    },
+    "L1": {
+      "by_source": {
+        "hparl2-v2": {
+          "rows": 9334,
+          "hours": 13.161,
+          "row_retention_vs_L0": 1.0,
+          "hour_retention_vs_L0": 1.0,
+          "unmeasurable_rows": 0,
+          "unmeasurable_hours": 0.0,
+          "diagnostics": {
+            "capitalized_noninitial": {
+              "rows": 2960,
+              "hours": 5.129,
+              "row_retention_vs_L0": 1.0,
+              "hour_retention_vs_L0": 1.0
+            },
+            "edge_clipped": {
+              "rows": 2259,
+              "hours": 2.992,
+              "row_retention_vs_L0": 1.0,
+              "hour_retention_vs_L0": 1.0
+            },
+            "fast_speech": {
+              "rows": 985,
+              "hours": 1.145,
+              "row_retention_vs_L0": 1.0,
+              "hour_retention_vs_L0": 1.0
+            },
+            "hard_example": {
+              "rows": 3324,
+              "hours": 4.377,
+              "row_retention_vs_L0": 1.0,
+              "hour_retention_vs_L0": 1.0
+            },
+            "known_roster_name": {
+              "rows": 114,
+              "hours": 0.21,
+              "row_retention_vs_L0": 1.0,
+              "hour_retention_vs_L0": 1.0
+            }
+          }
+        },
+        "stoma-v2": {
+          "rows": 14407,
+          "hours": 24.187,
+          "row_retention_vs_L0": 1.0,
+          "hour_retention_vs_L0": 1.0,
+          "unmeasurable_rows": 0,
+          "unmeasurable_hours": 0.0,
+          "diagnostics": {
+            "capitalized_noninitial": {
+              "rows": 2511,
+              "hours": 5.609,
+              "row_retention_vs_L0": 1.0,
+              "hour_retention_vs_L0": 1.0
+            },
+            "edge_clipped": {
+              "rows": 1298,
+              "hours": 2.255,
+              "row_retention_vs_L0": 1.0,
+              "hour_retention_vs_L0": 1.0
+            },
+            "fast_speech": {
+              "rows": 734,
+              "hours": 0.885,
+              "row_retention_vs_L0": 1.0,
+              "hour_retention_vs_L0": 1.0
+            },
+            "hard_example": {
+              "rows": 2133,
+              "hours": 3.707,
+              "row_retention_vs_L0": 1.0,
+              "hour_retention_vs_L0": 1.0
+            },
+            "known_roster_name": {
+              "rows": 327,
+              "hours": 0.692,
+              "row_retention_vs_L0": 1.0,
+              "hour_retention_vs_L0": 1.0
+            }
+          }
+        },
+        "cv-v2": {
+          "rows": 12971,
+          "hours": 15.108,
+          "row_retention_vs_L0": 1.0,
+          "hour_retention_vs_L0": 1.0,
+          "unmeasurable_rows": 0,
+          "unmeasurable_hours": 0.0,
+          "diagnostics": {
+            "capitalized_noninitial": {
+              "rows": 2865,
+              "hours": 3.51,
+              "row_retention_vs_L0": 1.0,
+              "hour_retention_vs_L0": 1.0
+            },
+            "edge_clipped": {
+              "rows": 1636,
+              "hours": 1.924,
+              "row_retention_vs_L0": 1.0,
+              "hour_retention_vs_L0": 1.0
+            },
+            "fast_speech": {
+              "rows": 34,
+              "hours": 0.033,
+              "row_retention_vs_L0": 1.0,
+              "hour_retention_vs_L0": 1.0
+            },
+            "hard_example": {
+              "rows": 3003,
+              "hours": 3.503,
+              "row_retention_vs_L0": 1.0,
+              "hour_retention_vs_L0": 1.0
+            },
+            "known_roster_name": {
+              "rows": 67,
+              "hours": 0.093,
+              "row_retention_vs_L0": 1.0,
+              "hour_retention_vs_L0": 1.0
+            }
+          }
+        },
+        "eurospeech-v2": {
+          "rows": 14136,
+          "hours": 58.571,
+          "row_retention_vs_L0": 1.0,
+          "hour_retention_vs_L0": 1.0,
+          "unmeasurable_rows": 0,
+          "unmeasurable_hours": 0.0,
+          "diagnostics": {
+            "capitalized_noninitial": {
+              "rows": 10810,
+              "hours": 45.724,
+              "row_retention_vs_L0": 1.0,
+              "hour_retention_vs_L0": 1.0
+            },
+            "edge_clipped": {
+              "rows": 2449,
+              "hours": 10.327,
+              "row_retention_vs_L0": 1.0,
+              "hour_retention_vs_L0": 1.0
+            },
+            "fast_speech": {
+              "rows": 300,
+              "hours": 1.219,
+              "row_retention_vs_L0": 1.0,
+              "hour_retention_vs_L0": 1.0
+            },
+            "hard_example": {
+              "rows": 3499,
+              "hours": 14.641,
+              "row_retention_vs_L0": 1.0,
+              "hour_retention_vs_L0": 1.0
+            },
+            "known_roster_name": {
+              "rows": 403,
+              "hours": 1.757,
+              "row_retention_vs_L0": 1.0,
+              "hour_retention_vs_L0": 1.0
+            }
+          }
+        }
+      }
+    },
+    "L2": {
+      "by_source": {
+        "hparl2-v2": {
+          "rows": 4360,
+          "hours": 5.956,
+          "row_retention_vs_L0": 0.4671,
+          "hour_retention_vs_L0": 0.4526,
+          "unmeasurable_rows": 0,
+          "unmeasurable_hours": 0.0,
+          "diagnostics": {
+            "capitalized_noninitial": {
+              "rows": 1176,
+              "hours": 2.034,
+              "row_retention_vs_L0": 0.3973,
+              "hour_retention_vs_L0": 0.3966
+            },
+            "edge_clipped": {
+              "rows": 0,
+              "hours": 0.0,
+              "row_retention_vs_L0": 0.0,
+              "hour_retention_vs_L0": 0.0
+            },
+            "fast_speech": {
+              "rows": 271,
+              "hours": 0.326,
+              "row_retention_vs_L0": 0.2751,
+              "hour_retention_vs_L0": 0.2849
+            },
+            "hard_example": {
+              "rows": 0,
+              "hours": 0.0,
+              "row_retention_vs_L0": 0.0,
+              "hour_retention_vs_L0": 0.0
+            },
+            "known_roster_name": {
+              "rows": 49,
+              "hours": 0.093,
+              "row_retention_vs_L0": 0.4298,
+              "hour_retention_vs_L0": 0.4438
+            }
+          }
+        },
+        "stoma-v2": {
+          "rows": 10332,
+          "hours": 16.823,
+          "row_retention_vs_L0": 0.7172,
+          "hour_retention_vs_L0": 0.6955,
+          "unmeasurable_rows": 0,
+          "unmeasurable_hours": 0.0,
+          "diagnostics": {
+            "capitalized_noninitial": {
+              "rows": 1349,
+              "hours": 2.993,
+              "row_retention_vs_L0": 0.5372,
+              "hour_retention_vs_L0": 0.5336
+            },
+            "edge_clipped": {
+              "rows": 0,
+              "hours": 0.0,
+              "row_retention_vs_L0": 0.0,
+              "hour_retention_vs_L0": 0.0
+            },
+            "fast_speech": {
+              "rows": 506,
+              "hours": 0.606,
+              "row_retention_vs_L0": 0.6894,
+              "hour_retention_vs_L0": 0.6855
+            },
+            "hard_example": {
+              "rows": 0,
+              "hours": 0.0,
+              "row_retention_vs_L0": 0.0,
+              "hour_retention_vs_L0": 0.0
+            },
+            "known_roster_name": {
+              "rows": 208,
+              "hours": 0.408,
+              "row_retention_vs_L0": 0.6361,
+              "hour_retention_vs_L0": 0.5899
+            }
+          }
+        },
+        "cv-v2": {
+          "rows": 8619,
+          "hours": 9.723,
+          "row_retention_vs_L0": 0.6645,
+          "hour_retention_vs_L0": 0.6436,
+          "unmeasurable_rows": 0,
+          "unmeasurable_hours": 0.0,
+          "diagnostics": {
+            "capitalized_noninitial": {
+              "rows": 1866,
+              "hours": 2.196,
+              "row_retention_vs_L0": 0.6513,
+              "hour_retention_vs_L0": 0.6256
+            },
+            "edge_clipped": {
+              "rows": 0,
+              "hours": 0.0,
+              "row_retention_vs_L0": 0.0,
+              "hour_retention_vs_L0": 0.0
+            },
+            "fast_speech": {
+              "rows": 21,
+              "hours": 0.021,
+              "row_retention_vs_L0": 0.6176,
+              "hour_retention_vs_L0": 0.6229
+            },
+            "hard_example": {
+              "rows": 0,
+              "hours": 0.0,
+              "row_retention_vs_L0": 0.0,
+              "hour_retention_vs_L0": 0.0
+            },
+            "known_roster_name": {
+              "rows": 36,
+              "hours": 0.047,
+              "row_retention_vs_L0": 0.5373,
+              "hour_retention_vs_L0": 0.5088
+            }
+          }
+        },
+        "eurospeech-v2": {
+          "rows": 6733,
+          "hours": 27.567,
+          "row_retention_vs_L0": 0.4763,
+          "hour_retention_vs_L0": 0.4707,
+          "unmeasurable_rows": 0,
+          "unmeasurable_hours": 0.0,
+          "diagnostics": {
+            "capitalized_noninitial": {
+              "rows": 4975,
+              "hours": 20.796,
+              "row_retention_vs_L0": 0.4602,
+              "hour_retention_vs_L0": 0.4548
+            },
+            "edge_clipped": {
+              "rows": 0,
+              "hours": 0.0,
+              "row_retention_vs_L0": 0.0,
+              "hour_retention_vs_L0": 0.0
+            },
+            "fast_speech": {
+              "rows": 102,
+              "hours": 0.404,
+              "row_retention_vs_L0": 0.34,
+              "hour_retention_vs_L0": 0.3311
+            },
+            "hard_example": {
+              "rows": 0,
+              "hours": 0.0,
+              "row_retention_vs_L0": 0.0,
+              "hour_retention_vs_L0": 0.0
+            },
+            "known_roster_name": {
+              "rows": 176,
+              "hours": 0.762,
+              "row_retention_vs_L0": 0.4367,
+              "hour_retention_vs_L0": 0.4338
+            }
+          }
+        }
+      }
+    },
+    "L3": {
+      "by_source": {
+        "hparl2-v2": {
+          "rows": 0,
+          "hours": 0.0,
+          "row_retention_vs_L0": null,
+          "hour_retention_vs_L0": null,
+          "unmeasurable_rows": 4360,
+          "unmeasurable_hours": 5.956,
+          "diagnostics": {
+            "capitalized_noninitial": {
+              "rows": 0,
+              "hours": 0.0,
+              "row_retention_vs_L0": null,
+              "hour_retention_vs_L0": null
+            },
+            "edge_clipped": {
+              "rows": 0,
+              "hours": 0.0,
+              "row_retention_vs_L0": null,
+              "hour_retention_vs_L0": null
+            },
+            "fast_speech": {
+              "rows": 0,
+              "hours": 0.0,
+              "row_retention_vs_L0": null,
+              "hour_retention_vs_L0": null
+            },
+            "hard_example": {
+              "rows": 0,
+              "hours": 0.0,
+              "row_retention_vs_L0": null,
+              "hour_retention_vs_L0": null
+            },
+            "known_roster_name": {
+              "rows": 0,
+              "hours": 0.0,
+              "row_retention_vs_L0": null,
+              "hour_retention_vs_L0": null
+            }
+          }
+        },
+        "stoma-v2": {
+          "rows": 0,
+          "hours": 0.0,
+          "row_retention_vs_L0": null,
+          "hour_retention_vs_L0": null,
+          "unmeasurable_rows": 10332,
+          "unmeasurable_hours": 16.823,
+          "diagnostics": {
+            "capitalized_noninitial": {
+              "rows": 0,
+              "hours": 0.0,
+              "row_retention_vs_L0": null,
+              "hour_retention_vs_L0": null
+            },
+            "edge_clipped": {
+              "rows": 0,
+              "hours": 0.0,
+              "row_retention_vs_L0": null,
+              "hour_retention_vs_L0": null
+            },
+            "fast_speech": {
+              "rows": 0,
+              "hours": 0.0,
+              "row_retention_vs_L0": null,
+              "hour_retention_vs_L0": null
+            },
+            "hard_example": {
+              "rows": 0,
+              "hours": 0.0,
+              "row_retention_vs_L0": null,
+              "hour_retention_vs_L0": null
+            },
+            "known_roster_name": {
+              "rows": 0,
+              "hours": 0.0,
+              "row_retention_vs_L0": null,
+              "hour_retention_vs_L0": null
+            }
+          }
+        },
+        "cv-v2": {
+          "rows": 0,
+          "hours": 0.0,
+          "row_retention_vs_L0": null,
+          "hour_retention_vs_L0": null,
+          "unmeasurable_rows": 8619,
+          "unmeasurable_hours": 9.723,
+          "diagnostics": {
+            "capitalized_noninitial": {
+              "rows": 0,
+              "hours": 0.0,
+              "row_retention_vs_L0": null,
+              "hour_retention_vs_L0": null
+            },
+            "edge_clipped": {
+              "rows": 0,
+              "hours": 0.0,
+              "row_retention_vs_L0": null,
+              "hour_retention_vs_L0": null
+            },
+            "fast_speech": {
+              "rows": 0,
+              "hours": 0.0,
+              "row_retention_vs_L0": null,
+              "hour_retention_vs_L0": null
+            },
+            "hard_example": {
+              "rows": 0,
+              "hours": 0.0,
+              "row_retention_vs_L0": null,
+              "hour_retention_vs_L0": null
+            },
+            "known_roster_name": {
+              "rows": 0,
+              "hours": 0.0,
+              "row_retention_vs_L0": null,
+              "hour_retention_vs_L0": null
+            }
+          }
+        },
+        "eurospeech-v2": {
+          "rows": 1063,
+          "hours": 4.146,
+          "row_retention_vs_L0": 0.0752,
+          "hour_retention_vs_L0": 0.0708,
+          "unmeasurable_rows": 0,
+          "unmeasurable_hours": 0.0,
+          "diagnostics": {
+            "capitalized_noninitial": {
+              "rows": 669,
+              "hours": 2.677,
+              "row_retention_vs_L0": 0.0619,
+              "hour_retention_vs_L0": 0.0586
+            },
+            "edge_clipped": {
+              "rows": 0,
+              "hours": 0.0,
+              "row_retention_vs_L0": 0.0,
+              "hour_retention_vs_L0": 0.0
+            },
+            "fast_speech": {
+              "rows": 9,
+              "hours": 0.037,
+              "row_retention_vs_L0": 0.03,
+              "hour_retention_vs_L0": 0.0307
+            },
+            "hard_example": {
+              "rows": 0,
+              "hours": 0.0,
+              "row_retention_vs_L0": 0.0,
+              "hour_retention_vs_L0": 0.0
+            },
+            "known_roster_name": {
+              "rows": 18,
+              "hours": 0.08,
+              "row_retention_vs_L0": 0.0447,
+              "hour_retention_vs_L0": 0.0456
+            }
+          }
+        }
+      }
+    }
+  },
+  "equal_hours_design": {
+    "hparl2-v2": {
+      "comparison": "L0_random_downsample_vs_L2",
+      "target_seconds_per_arm": 21442.73,
+      "target_hours_per_arm": 5.956,
+      "sampling_seeds": [
+        13,
+        29,
+        47
+      ],
+      "match": [
+        "source",
+        "audio_seconds",
+        "optimizer_updates"
+      ],
+      "do_not_match": [
+        "diagnostic_categories"
+      ]
+    },
+    "stoma-v2": {
+      "comparison": "L0_random_downsample_vs_L2",
+      "target_seconds_per_arm": 60562.62,
+      "target_hours_per_arm": 16.823,
+      "sampling_seeds": [
+        13,
+        29,
+        47
+      ],
+      "match": [
+        "source",
+        "audio_seconds",
+        "optimizer_updates"
+      ],
+      "do_not_match": [
+        "diagnostic_categories"
+      ]
+    },
+    "cv-v2": {
+      "comparison": "L0_random_downsample_vs_L2",
+      "target_seconds_per_arm": 35001.96,
+      "target_hours_per_arm": 9.723,
+      "sampling_seeds": [
+        13,
+        29,
+        47
+      ],
+      "match": [
+        "source",
+        "audio_seconds",
+        "optimizer_updates"
+      ],
+      "do_not_match": [
+        "diagnostic_categories"
+      ]
+    },
+    "eurospeech-v2": {
+      "comparison": "L0_random_downsample_vs_L2",
+      "target_seconds_per_arm": 99240.23,
+      "target_hours_per_arm": 27.567,
+      "sampling_seeds": [
+        13,
+        29,
+        47
+      ],
+      "match": [
+        "source",
+        "audio_seconds",
+        "optimizer_updates"
+      ],
+      "do_not_match": [
+        "diagnostic_categories"
+      ]
+    }
+  },
+  "privacy": "aggregate_only_no_transcript_or_audio_paths"
+}

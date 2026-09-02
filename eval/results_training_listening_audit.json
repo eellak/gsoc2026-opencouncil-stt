@@ -1,0 +1,72 @@
+{
+ "experiment": "training-listening-audit-2026-08-19",
+ "status": "complete",
+ "training": {
+  "overall": {
+   "n_rows": 36,
+   "n_complete": 36,
+   "label_faithful": {
+    "unsure": 26,
+    "yes": 10
+   },
+   "boundaries_usable": {
+    "no": 1,
+    "unsure": 27,
+    "yes": 8
+   },
+   "n_routed_to_protected_correction": 1
+  },
+  "by_selected_stratum": {
+   "adjustment:>1": {
+    "n_rows": 12,
+    "n_complete": 12,
+    "label_faithful": {
+     "unsure": 7,
+     "yes": 5
+    },
+    "boundaries_usable": {
+     "no": 1,
+     "unsure": 8,
+     "yes": 3
+    },
+    "n_routed_to_protected_correction": 1
+   },
+   "boundary_status:suspect_cut_start": {
+    "n_rows": 12,
+    "n_complete": 12,
+    "label_faithful": {
+     "unsure": 8,
+     "yes": 4
+    },
+    "boundaries_usable": {
+     "unsure": 8,
+     "yes": 4
+    },
+    "n_routed_to_protected_correction": 0
+   },
+   "category:other_lexical": {
+    "n_rows": 12,
+    "n_complete": 12,
+    "label_faithful": {
+     "unsure": 11,
+     "yes": 1
+    },
+    "boundaries_usable": {
+     "unsure": 11,
+     "yes": 1
+    },
+    "n_routed_to_protected_correction": 0
+   }
+  }
+ },
+ "validation_reference_completeness": {
+  "material_omission": 2
+ },
+ "frozen_interpretation": "re-reference omitted speech before model insertion adjudication",
+ "guards": [
+  "Outcome-enriched audit; observed fractions do not estimate dataset prevalence.",
+  "No entire stratum is filtered from these verdicts.",
+  "No verdict can retroactively promote the dense SCREEN - STOP arm.",
+  "Aggregate contains no transcript, audio, free-text note, or window id."
+ ]
+}

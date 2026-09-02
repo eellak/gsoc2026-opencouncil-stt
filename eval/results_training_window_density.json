@@ -1,0 +1,623 @@
+{
+  "schema_version": 1,
+  "audit": "training-window-density-2026-08-18",
+  "definitions_frozen_in": "docs/specs/2026-08-18-training-window-density-audit.md",
+  "inputs": {
+    "training_parquet": {
+      "path": "/home/harold/opencouncil-fine-tuning/data/hf-dataset/public/train.parquet",
+      "sha256": "f37d3532b4b60389172e479326a025a3ccb8197f07b23ad441218a7a7585c1e8"
+    },
+    "inference_decode_cache": {
+      "path": "/home/harold/.cache/oc-public/conf-substrate-2026-08/decode-rw.json",
+      "sha256": "09950c8f73e5f082cb89207cfdf1957b49477f901762945138f6b1d0f99818b4"
+    },
+    "audio_headers": {
+      "path": "/home/harold/.cache/oc-public/bench_windows",
+      "n_wav_headers": 247,
+      "sha256": "e8d7a8757d543ff1f1578809ff0fee0d7f583320cefca01d7f8240383a4b6e47"
+    }
+  },
+  "training": {
+    "n_rows": 28967,
+    "raw_speech_span_proxy": {
+      "hours": 22.472547,
+      "seconds": {
+        "mean": 2.792874,
+        "p10": 1.078,
+        "p25": 1.363,
+        "median": 2.064,
+        "p75": 3.4385,
+        "p90": 5.453,
+        "p95": 7.066,
+        "max": 26.607
+      },
+      "occupancy": {
+        "mean": 0.093096,
+        "p10": 0.035933,
+        "p25": 0.045433,
+        "median": 0.0688,
+        "p75": 0.114617,
+        "p90": 0.181767,
+        "p95": 0.235533,
+        "max": 0.8869
+      },
+      "histogram_seconds": [
+        {
+          "lo_s": 0.0,
+          "hi_s": 1.5,
+          "count": 8636,
+          "share": 0.298132
+        },
+        {
+          "lo_s": 1.5,
+          "hi_s": 3.0,
+          "count": 11321,
+          "share": 0.390824
+        },
+        {
+          "lo_s": 3.0,
+          "hi_s": 5.0,
+          "count": 5434,
+          "share": 0.187593
+        },
+        {
+          "lo_s": 5.0,
+          "hi_s": 10.0,
+          "count": 3127,
+          "share": 0.10795
+        },
+        {
+          "lo_s": 10.0,
+          "hi_s": 15.0,
+          "count": 387,
+          "share": 0.01336
+        },
+        {
+          "lo_s": 15.0,
+          "hi_s": 20.0,
+          "count": 58,
+          "share": 0.002002
+        },
+        {
+          "lo_s": 20.0,
+          "hi_s": 25.0,
+          "count": 3,
+          "share": 0.000104
+        },
+        {
+          "lo_s": 25.0,
+          "hi_s": 30.0,
+          "count": 1,
+          "share": 3.5e-05
+        }
+      ],
+      "position_by_5s": [
+        {
+          "lo_s": 0.0,
+          "hi_s": 5.0,
+          "mean_seconds_per_window": 2.42625,
+          "windows_with_any_share": 0.999965,
+          "share_of_all_interval_seconds": 0.875957
+        },
+        {
+          "lo_s": 5.0,
+          "hi_s": 10.0,
+          "mean_seconds_per_window": 0.299194,
+          "windows_with_any_share": 0.147927,
+          "share_of_all_interval_seconds": 0.108019
+        },
+        {
+          "lo_s": 10.0,
+          "hi_s": 15.0,
+          "mean_seconds_per_window": 0.038692,
+          "windows_with_any_share": 0.017813,
+          "share_of_all_interval_seconds": 0.013969
+        },
+        {
+          "lo_s": 15.0,
+          "hi_s": 20.0,
+          "mean_seconds_per_window": 0.005138,
+          "windows_with_any_share": 0.002624,
+          "share_of_all_interval_seconds": 0.001855
+        },
+        {
+          "lo_s": 20.0,
+          "hi_s": 25.0,
+          "mean_seconds_per_window": 0.000456,
+          "windows_with_any_share": 0.000138,
+          "share_of_all_interval_seconds": 0.000165
+        },
+        {
+          "lo_s": 25.0,
+          "hi_s": 30.0,
+          "mean_seconds_per_window": 9.7e-05,
+          "windows_with_any_share": 3.5e-05,
+          "share_of_all_interval_seconds": 3.5e-05
+        }
+      ],
+      "onset_seconds": {
+        "mean": 0.43709,
+        "p10": 0.3595,
+        "p25": 0.38025,
+        "median": 0.4,
+        "p75": 0.42,
+        "p90": 0.500098,
+        "p95": 1.04,
+        "max": 1.2005
+      },
+      "offset_seconds": {
+        "mean": 3.206916,
+        "p10": 1.480125,
+        "p25": 1.8,
+        "median": 2.506,
+        "p75": 3.843,
+        "p90": 5.864075,
+        "p95": 7.4498,
+        "max": 27.807
+      }
+    },
+    "aligned_span": {
+      "hours": 25.368868,
+      "seconds": {
+        "mean": 3.152826,
+        "p10": 1.44,
+        "p25": 1.76,
+        "median": 2.48,
+        "p75": 3.79,
+        "p90": 5.76,
+        "p95": 7.3207,
+        "max": 23.82
+      },
+      "histogram_seconds": [
+        {
+          "lo_s": 0.0,
+          "hi_s": 1.5,
+          "count": 3557,
+          "share": 0.122795
+        },
+        {
+          "lo_s": 1.5,
+          "hi_s": 3.0,
+          "count": 14462,
+          "share": 0.499258
+        },
+        {
+          "lo_s": 3.0,
+          "hi_s": 5.0,
+          "count": 6825,
+          "share": 0.235613
+        },
+        {
+          "lo_s": 5.0,
+          "hi_s": 10.0,
+          "count": 3640,
+          "share": 0.12566
+        },
+        {
+          "lo_s": 10.0,
+          "hi_s": 15.0,
+          "count": 418,
+          "share": 0.01443
+        },
+        {
+          "lo_s": 15.0,
+          "hi_s": 20.0,
+          "count": 63,
+          "share": 0.002175
+        },
+        {
+          "lo_s": 20.0,
+          "hi_s": 25.0,
+          "count": 2,
+          "share": 6.9e-05
+        },
+        {
+          "lo_s": 25.0,
+          "hi_s": 30.0,
+          "count": 0,
+          "share": 0.0
+        }
+      ]
+    },
+    "intended_clip_audio_before_source_end_clamp": {
+      "hours": 28.587196,
+      "seconds": {
+        "mean": 3.552798,
+        "p10": 1.84,
+        "p25": 2.16,
+        "median": 2.88,
+        "p75": 4.19,
+        "p90": 6.16,
+        "p95": 7.7207,
+        "max": 24.22
+      },
+      "occupancy": {
+        "mean": 0.118427,
+        "p10": 0.061333,
+        "p25": 0.072,
+        "median": 0.096,
+        "p75": 0.139667,
+        "p90": 0.205333,
+        "p95": 0.257357,
+        "max": 0.807333
+      },
+      "digital_padding_share": {
+        "mean": 0.881573,
+        "p10": 0.794667,
+        "p25": 0.860333,
+        "median": 0.904,
+        "p75": 0.928,
+        "p90": 0.938667,
+        "p95": 0.943333,
+        "max": 0.969333
+      },
+      "histogram_seconds": [
+        {
+          "lo_s": 0.0,
+          "hi_s": 1.5,
+          "count": 480,
+          "share": 0.016571
+        },
+        {
+          "lo_s": 1.5,
+          "hi_s": 3.0,
+          "count": 14942,
+          "share": 0.515828
+        },
+        {
+          "lo_s": 3.0,
+          "hi_s": 5.0,
+          "count": 8582,
+          "share": 0.296268
+        },
+        {
+          "lo_s": 5.0,
+          "hi_s": 10.0,
+          "count": 4391,
+          "share": 0.151586
+        },
+        {
+          "lo_s": 10.0,
+          "hi_s": 15.0,
+          "count": 498,
+          "share": 0.017192
+        },
+        {
+          "lo_s": 15.0,
+          "hi_s": 20.0,
+          "count": 70,
+          "share": 0.002417
+        },
+        {
+          "lo_s": 20.0,
+          "hi_s": 25.0,
+          "count": 4,
+          "share": 0.000138
+        },
+        {
+          "lo_s": 25.0,
+          "hi_s": 30.0,
+          "count": 0,
+          "share": 0.0
+        }
+      ],
+      "position_by_5s": [
+        {
+          "lo_s": 0.0,
+          "hi_s": 5.0,
+          "mean_seconds_per_window": 3.165462,
+          "windows_with_any_share": 1.0,
+          "share_of_all_interval_seconds": 0.890977
+        },
+        {
+          "lo_s": 5.0,
+          "hi_s": 10.0,
+          "mean_seconds_per_window": 0.34006,
+          "windows_with_any_share": 0.170677,
+          "share_of_all_interval_seconds": 0.095716
+        },
+        {
+          "lo_s": 10.0,
+          "hi_s": 15.0,
+          "mean_seconds_per_window": 0.041803,
+          "windows_with_any_share": 0.019747,
+          "share_of_all_interval_seconds": 0.011766
+        },
+        {
+          "lo_s": 15.0,
+          "hi_s": 20.0,
+          "mean_seconds_per_window": 0.005271,
+          "windows_with_any_share": 0.002555,
+          "share_of_all_interval_seconds": 0.001484
+        },
+        {
+          "lo_s": 20.0,
+          "hi_s": 25.0,
+          "mean_seconds_per_window": 0.000202,
+          "windows_with_any_share": 0.000138,
+          "share_of_all_interval_seconds": 5.7e-05
+        },
+        {
+          "lo_s": 25.0,
+          "hi_s": 30.0,
+          "mean_seconds_per_window": 0.0,
+          "windows_with_any_share": 0.0,
+          "share_of_all_interval_seconds": 0.0
+        }
+      ]
+    },
+    "by_source": {
+      "correction": {
+        "rows": 13929,
+        "raw_span_hours": 11.156202
+      },
+      "no_edit": {
+        "rows": 15038,
+        "raw_span_hours": 11.316345
+      }
+    }
+  },
+  "inference": {
+    "n_decode_clips": 247,
+    "n_clips_with_local_audio": 247,
+    "n_missing_audio": 0,
+    "n_reconstructed_windows": 1148,
+    "available_source_audio": {
+      "seconds": {
+        "mean": 27.355744,
+        "p10": 16.0393,
+        "p25": 30.0,
+        "median": 30.0,
+        "p75": 30.0,
+        "p90": 30.0,
+        "p95": 30.0,
+        "max": 30.0
+      },
+      "occupancy": {
+        "mean": 0.911858,
+        "p10": 0.534643,
+        "p25": 1.0,
+        "median": 1.0,
+        "p75": 1.0,
+        "p90": 1.0,
+        "p95": 1.0,
+        "max": 1.0
+      },
+      "histogram_seconds": [
+        {
+          "lo_s": 0.0,
+          "hi_s": 1.5,
+          "count": 2,
+          "share": 0.001742
+        },
+        {
+          "lo_s": 1.5,
+          "hi_s": 3.0,
+          "count": 5,
+          "share": 0.004355
+        },
+        {
+          "lo_s": 3.0,
+          "hi_s": 5.0,
+          "count": 9,
+          "share": 0.00784
+        },
+        {
+          "lo_s": 5.0,
+          "hi_s": 10.0,
+          "count": 42,
+          "share": 0.036585
+        },
+        {
+          "lo_s": 10.0,
+          "hi_s": 15.0,
+          "count": 50,
+          "share": 0.043554
+        },
+        {
+          "lo_s": 15.0,
+          "hi_s": 20.0,
+          "count": 39,
+          "share": 0.033972
+        },
+        {
+          "lo_s": 20.0,
+          "hi_s": 25.0,
+          "count": 29,
+          "share": 0.025261
+        },
+        {
+          "lo_s": 25.0,
+          "hi_s": 30.0,
+          "count": 972,
+          "share": 0.84669
+        }
+      ],
+      "position_by_5s": [
+        {
+          "lo_s": 0.0,
+          "hi_s": 5.0,
+          "mean_seconds_per_window": 4.974617,
+          "windows_with_any_share": 1.0,
+          "share_of_all_interval_seconds": 0.181849
+        },
+        {
+          "lo_s": 5.0,
+          "hi_s": 10.0,
+          "mean_seconds_per_window": 4.838666,
+          "windows_with_any_share": 0.986063,
+          "share_of_all_interval_seconds": 0.176879
+        },
+        {
+          "lo_s": 10.0,
+          "hi_s": 15.0,
+          "mean_seconds_per_window": 4.629764,
+          "windows_with_any_share": 0.949477,
+          "share_of_all_interval_seconds": 0.169243
+        },
+        {
+          "lo_s": 15.0,
+          "hi_s": 20.0,
+          "mean_seconds_per_window": 4.440152,
+          "windows_with_any_share": 0.905923,
+          "share_of_all_interval_seconds": 0.162311
+        },
+        {
+          "lo_s": 20.0,
+          "hi_s": 25.0,
+          "mean_seconds_per_window": 4.296757,
+          "windows_with_any_share": 0.871951,
+          "share_of_all_interval_seconds": 0.15707
+        },
+        {
+          "lo_s": 25.0,
+          "hi_s": 30.0,
+          "mean_seconds_per_window": 4.175789,
+          "windows_with_any_share": 0.84669,
+          "share_of_all_interval_seconds": 0.152648
+        }
+      ],
+      "full_30s_windows": 948,
+      "at_least_25s_windows": 972
+    },
+    "emitted_word_proxy": {
+      "windows_with_any_word": 1148,
+      "latest_word_phase_seconds": {
+        "mean": 26.597796,
+        "p10": 14.62,
+        "p25": 28.315,
+        "median": 29.54,
+        "p75": 29.82,
+        "p90": 29.92,
+        "p95": 29.96,
+        "max": 30.0
+      },
+      "windows_with_word_by_5s": [
+        {
+          "lo_s": 0.0,
+          "hi_s": 5.0,
+          "share": 0.956446
+        },
+        {
+          "lo_s": 5.0,
+          "hi_s": 10.0,
+          "share": 0.949477
+        },
+        {
+          "lo_s": 10.0,
+          "hi_s": 15.0,
+          "share": 0.915505
+        },
+        {
+          "lo_s": 15.0,
+          "hi_s": 20.0,
+          "share": 0.873693
+        },
+        {
+          "lo_s": 20.0,
+          "hi_s": 25.0,
+          "share": 0.839721
+        },
+        {
+          "lo_s": 25.0,
+          "hi_s": 30.0,
+          "share": 0.832753
+        }
+      ]
+    }
+  },
+  "comparison": {
+    "mean_audio_occupancy_gap_inference_minus_training": 0.793431,
+    "median_audio_occupancy_gap_inference_minus_training": 0.904
+  },
+  "dense_candidate": {
+    "n_packs": 3877,
+    "duration_seconds": {
+      "mean": 26.147702,
+      "p10": 22.236,
+      "p25": 25.72,
+      "median": 27.54,
+      "p75": 28.54,
+      "p90": 29.1,
+      "p95": 29.32,
+      "max": 29.5
+    },
+    "duration_histogram_seconds": [
+      {
+        "lo_s": 0.0,
+        "hi_s": 1.5,
+        "count": 3,
+        "share": 0.000774
+      },
+      {
+        "lo_s": 1.5,
+        "hi_s": 3.0,
+        "count": 10,
+        "share": 0.002579
+      },
+      {
+        "lo_s": 3.0,
+        "hi_s": 5.0,
+        "count": 27,
+        "share": 0.006964
+      },
+      {
+        "lo_s": 5.0,
+        "hi_s": 10.0,
+        "count": 59,
+        "share": 0.015218
+      },
+      {
+        "lo_s": 10.0,
+        "hi_s": 15.0,
+        "count": 62,
+        "share": 0.015992
+      },
+      {
+        "lo_s": 15.0,
+        "hi_s": 20.0,
+        "count": 100,
+        "share": 0.025793
+      },
+      {
+        "lo_s": 20.0,
+        "hi_s": 25.0,
+        "count": 505,
+        "share": 0.130255
+      },
+      {
+        "lo_s": 25.0,
+        "hi_s": 30.0,
+        "count": 3111,
+        "share": 0.802425
+      }
+    ],
+    "encoder_audio_occupancy": {
+      "mean": 0.87159,
+      "p10": 0.7412,
+      "p25": 0.857333,
+      "median": 0.918,
+      "p75": 0.951333,
+      "p90": 0.97,
+      "p95": 0.977333,
+      "max": 0.983333
+    },
+    "share_20_to_30_seconds": 0.93268,
+    "source_aligned_hours": 25.368868,
+    "inserted_silence_hours": 2.787778,
+    "existing_gate_failure_count": 0,
+    "frozen_gates": {
+      "existing_accounting_and_timing_gates_pass": true,
+      "at_least_80pct_packs_are_20_to_30s": true,
+      "median_pack_duration_at_least_20s": true,
+      "mean_encoder_audio_occupancy_at_least_75pct": true
+    },
+    "construction_feasible": true
+  },
+  "limits": [
+    "Training speech density is a timestamp-span proxy, not frame-level VAD speech.",
+    "The pod-built training WAV cache is unavailable locally; intended clip audio is before the final clamp to source-recording end.",
+    "Inference emitted-word positions are model outputs, not ground-truth speech, and are descriptive only.",
+    "Construction feasibility does not imply a WER or deletion improvement."
+  ]
+}

@@ -1,0 +1,300 @@
+{
+ "substrate": {
+  "run": "2026-08-22-post-june-held-out-test-clean-pack-cont-",
+  "report_sha256_16": "e33d5617fc2b1c30",
+  "trio": [
+   "scribe",
+   "soniox",
+   "oc-cleanpack-cont-s47-b"
+  ],
+  "n_windows": 391,
+  "n_clusters": 117,
+  "n_cities": 11
+ },
+ "code_commit": "092fe476",
+ "boot_seed": 20260825,
+ "n_boot": 10000,
+ "reconciliation": {
+  "single:scribe": {
+   "got": 0.13771297450629663,
+   "expected": 0.13771297450629663
+  },
+  "single:soniox": {
+   "got": 0.14752380436157334,
+   "expected": 0.14752380436157334
+  },
+  "single:oc-cleanpack-cont-s47-b": {
+   "got": 0.1795128913942942,
+   "expected": 0.1795128913942942
+  },
+  "W": {
+   "got": 0.12019621659710554,
+   "expected": 0.12019621659710554
+  },
+  "oracle_msa": {
+   "got": 0.061132491372612785,
+   "expected": 0.061132491372612785
+  }
+ },
+ "reading_note": "Every 'opportunity' below is WER(W) minus the WER of the best path through ONE fixed hypothesis alignment when only the named columns may deviate from the vote. It reads the reference. It is a clairvoyant in-sample ceiling, not an achievable gain, and opportunities do not sum across sets.",
+ "arms": {
+  "single:scribe": {
+   "wer": 0.13771297450629663,
+   "sub": 0.05242379894122536,
+   "del": 0.009557880282580809,
+   "ins": 0.07573129528249047,
+   "ref_tokens": 110694
+  },
+  "single:soniox": {
+   "wer": 0.14752380436157334,
+   "sub": 0.06005745568865521,
+   "del": 0.012367427322167416,
+   "ins": 0.07509892135075072,
+   "ref_tokens": 110694
+  },
+  "single:oc-cleanpack-cont-s47-b": {
+   "wer": 0.1795128913942942,
+   "sub": 0.10576905704012864,
+   "del": 0.031681933980161524,
+   "ins": 0.04206190037400401,
+   "ref_tokens": 110694
+  },
+  "W": {
+   "wer": 0.12019621659710554,
+   "sub": 0.04874699622382424,
+   "del": 0.012033172529676405,
+   "ins": 0.059416047843604894,
+   "ref_tokens": 110694
+  },
+  "oracle_msa": {
+   "wer": 0.061132491372612785,
+   "sub": 0.02160912063887835,
+   "del": 0.009946338554935227,
+   "ins": 0.02957703217879921,
+   "ref_tokens": 110694
+  }
+ },
+ "n_columns": 121952,
+ "classes": {
+  "singleton": {
+   "n": 6013,
+   "share": 0.04930628443977959,
+   "windows_containing": 388
+  },
+  "two_present_same": {
+   "n": 4672,
+   "share": 0.038310154815009184,
+   "windows_containing": 380
+  },
+  "agree": {
+   "n": 94421,
+   "share": 0.7742472448176332,
+   "windows_containing": 391
+  },
+  "exact_2_of_3": {
+   "n": 12450,
+   "share": 0.10208934662818157,
+   "windows_containing": 391
+  },
+  "unresolved_two": {
+   "n": 1658,
+   "share": 0.013595512988716873,
+   "windows_containing": 306
+  },
+  "unresolved_three": {
+   "n": 2738,
+   "share": 0.022451456310679612,
+   "windows_containing": 353
+  }
+ },
+ "flags": {
+  "exact_2_of_3:chardist_1": 4006,
+  "exact_2_of_3:chardist_3": 6301,
+  "unresolved_three:chardist_3": 2480,
+  "exact_2_of_3:strict_homophone": 1075,
+  "exact_2_of_3:loose_homophone": 1102,
+  "exact_2_of_3:chardist_2": 2143,
+  "unresolved_two:chardist_3": 1147,
+  "unresolved_two:chardist_1": 274,
+  "unresolved_three:partial_homophone": 205,
+  "unresolved_two:chardist_2": 237,
+  "unresolved_three:chardist_2": 232,
+  "unresolved_three:chardist_1": 26,
+  "unresolved_three:strict_homophone": 30,
+  "unresolved_three:loose_homophone": 31,
+  "unresolved_two:strict_homophone": 22,
+  "unresolved_two:loose_homophone": 23
+ },
+ "split_merge_columns": 541,
+ "opportunity_by_class": {
+  "singleton": {
+   "n_columns": 6013,
+   "wer_with_class_free": 0.11501978427015014,
+   "opportunity": 0.005176432326955402,
+   "ci": [
+    0.0038684361522942218,
+    0.006946340279673613
+   ],
+   "top_cluster_share": 0.11867364746945899,
+   "n_clusters": 117
+  },
+  "two_present_same": {
+   "n_columns": 4672,
+   "wer_with_class_free": 0.10081847254593745,
+   "opportunity": 0.019377744051168086,
+   "ci": [
+    0.016867726095193908,
+    0.02190057803468208
+   ],
+   "top_cluster_share": 0.04149184149184149,
+   "n_clusters": 117
+  },
+  "agree": {
+   "n_columns": 94421,
+   "wer_with_class_free": 0.12019621659710554,
+   "opportunity": 0.0,
+   "ci": [
+    0.0,
+    0.0
+   ],
+   "top_cluster_share": 0.0,
+   "n_clusters": 117
+  },
+  "exact_2_of_3": {
+   "n_columns": 12450,
+   "wer_with_class_free": 0.10425135960395324,
+   "opportunity": 0.015944856993152304,
+   "ci": [
+    0.014628345589199676,
+    0.01741577579773604
+   ],
+   "top_cluster_share": 0.03172804532577904,
+   "n_clusters": 117
+  },
+  "unresolved_two": {
+   "n_columns": 1658,
+   "wer_with_class_free": 0.1094097241042875,
+   "opportunity": 0.010786492492818045,
+   "ci": [
+    0.008859874096526,
+    0.012983697091197954
+   ],
+   "top_cluster_share": 0.07035175879396985,
+   "n_clusters": 117
+  },
+  "unresolved_three": {
+   "n_columns": 2738,
+   "wer_with_class_free": 0.11243608506332774,
+   "opportunity": 0.007760131533777803,
+   "ci": [
+    0.006506341624114648,
+    0.009171510102022315
+   ],
+   "top_cluster_share": 0.050058207217694994,
+   "n_clusters": 117
+  }
+ },
+ "islands_by_length": {
+  "1": {
+   "n": 7767,
+   "split_merge": 0,
+   "oracle_deviates": 1933,
+   "tok_scribe": 7102,
+   "tok_soniox": 6918,
+   "tok_oc-cleanpack-c": 6031,
+   "tok_W": 6590,
+   "ragged": 2073,
+   "opportunity": 0.015411856107828789,
+   "ci": [
+    0.014547738036055358,
+    0.01629710520470866
+   ],
+   "top_cluster_share": 0.029308323563892145,
+   "n_clusters": 117
+  },
+  "2": {
+   "n": 2798,
+   "split_merge": 171,
+   "oracle_deviates": 1172,
+   "tok_scribe": 4771,
+   "tok_soniox": 4537,
+   "tok_oc-cleanpack-c": 3640,
+   "tok_W": 4268,
+   "ragged": 1912,
+   "opportunity": 0.012222884709198342,
+   "ci": [
+    0.011137605856319982,
+    0.013296806716424858
+   ],
+   "top_cluster_share": 0.03917220990391722,
+   "n_clusters": 117
+  },
+  "3": {
+   "n": 1198,
+   "split_merge": 54,
+   "oracle_deviates": 651,
+   "tok_scribe": 2995,
+   "tok_soniox": 2933,
+   "tok_oc-cleanpack-c": 2263,
+   "tok_W": 2704,
+   "ragged": 999,
+   "opportunity": 0.007877572406815192,
+   "ci": [
+    0.006937877274695747,
+    0.00890263080736732
+   ],
+   "top_cluster_share": 0.045871559633027525,
+   "n_clusters": 117
+  },
+  "4+": {
+   "n": 1651,
+   "split_merge": 39,
+   "oracle_deviates": 1237,
+   "tok_scribe": 8730,
+   "tok_soniox": 8829,
+   "tok_oc-cleanpack-c": 5488,
+   "tok_W": 7956,
+   "ragged": 1551,
+   "opportunity": 0.023587547653892718,
+   "ci": [
+    0.019156909102802516,
+    0.02842655476413966
+   ],
+   "top_cluster_share": 0.057449253159708925,
+   "n_clusters": 117
+  }
+ },
+ "n_islands": 13414,
+ "minority_in_exact_2_of_3": {
+  "n:soniox+oc-cleanpack-c|scribe": 3227,
+  "oracle_took_minority:soniox+oc-cleanpack-c|scribe": 1528,
+  "n:scribe+soniox|oc-cleanpack-c": 6829,
+  "n:scribe+oc-cleanpack-c|soniox": 2394,
+  "oracle_took_minority:scribe+soniox|oc-cleanpack-c": 261,
+  "oracle_took_minority:scribe+oc-cleanpack-c|soniox": 452
+ },
+ "minority_note": "'oracle_took_minority' means the GLOBAL fixed-lattice oracle path, which reads the reference, emitted the dissenting token at a column where two systems agreed. It is grouped by the agreeing PAIR because two agreeing systems are not two independent votes if they share a lineage. It is not evidence that any decode-time rule could find those columns.",
+ "substitution_profile": {
+  "scribe": {
+   "far": 3625,
+   "near_char": 1924,
+   "homophone_strict": 245,
+   "homophone_loose": 9,
+   "S_total": 5803
+  },
+  "soniox": {
+   "near_char": 2578,
+   "far": 3667,
+   "homophone_strict": 393,
+   "homophone_loose": 10,
+   "S_total": 6648
+  },
+  "oc-cleanpack-cont-s47-b": {
+   "near_char": 4339,
+   "far": 6308,
+   "homophone_strict": 1028,
+   "homophone_loose": 33,
+   "S_total": 11708
+  }
+ }
+}

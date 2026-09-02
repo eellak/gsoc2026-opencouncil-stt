@@ -1,0 +1,35 @@
+{
+ "mem_gb": 12.0,
+ "atlas": "atlas_b85d8064a16e0dd1.json",
+ "rows": [
+  {
+   "n": 400,
+   "status": "ok",
+   "band": 40,
+   "cols": 431,
+   "sec": 4.21,
+   "peak_rss_mb": 139,
+   "meeting": "argos/jul29_2_2026"
+  },
+  {
+   "n": 1000,
+   "status": "ok",
+   "band": 40,
+   "cols": 1049,
+   "sec": 12.52,
+   "peak_rss_mb": 1127,
+   "meeting": "argos/jul29_2_2026"
+  },
+  {
+   "n": 2500,
+   "status": "MemoryError",
+   "band": 40,
+   "sec": 75.27,
+   "peak_rss_mb": 12278
+  },
+  {
+   "n": 4000,
+   "status": "no_meeting_long_enough"
+  }
+ ]
+}

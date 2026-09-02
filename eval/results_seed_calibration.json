@@ -1,0 +1,98 @@
+{
+ "experiment": "exp-2026-08-18-training-measurement-rule",
+ "set": "eval-freeze-2026-08 validation",
+ "n_windows": 39,
+ "n_meetings": 31,
+ "decode_config": {
+  "language": "el",
+  "beam_size": 5,
+  "condition_on_previous_text": false,
+  "word_timestamps": false,
+  "vad_filter": false,
+  "task": "transcribe",
+  "temperature": [
+   0.0,
+   0.2,
+   0.4,
+   0.6,
+   0.8,
+   1.0
+  ],
+  "no_speech_threshold": 0.6,
+  "log_prob_threshold": -1.0,
+  "compression_ratio_threshold": 2.4
+ },
+ "controls": {
+  "a_s13": {
+   "sub": 908,
+   "del": 723,
+   "ins": 222,
+   "ref_tokens": 11911,
+   "wer": 0.1555704810679204,
+   "sub_rate": 0.07623205440349257,
+   "del_rate": 0.06070019309881622,
+   "ins_rate": 0.01863823356561162,
+   "recall_error_rate": 0.13693224750230878,
+   "hyp_ref_ratio": 0.9579380404667954
+  },
+  "a_s29": {
+   "sub": 892,
+   "del": 722,
+   "ins": 242,
+   "ref_tokens": 11911,
+   "wer": 0.15582234908907733,
+   "sub_rate": 0.0748887582906557,
+   "del_rate": 0.06061623709176391,
+   "ins_rate": 0.02031735370665771,
+   "recall_error_rate": 0.1355049953824196,
+   "hyp_ref_ratio": 0.9597011166148938
+  },
+  "a_s47": {
+   "sub": 877,
+   "del": 730,
+   "ins": 280,
+   "ref_tokens": 11911,
+   "wer": 0.15842498530769877,
+   "sub_rate": 0.07362941818487113,
+   "del_rate": 0.061287885148182356,
+   "ins_rate": 0.023507681974645287,
+   "recall_error_rate": 0.1349173033330535,
+   "hyp_ref_ratio": 0.962219796826463
+  }
+ },
+ "fixed_same_recipe_seed13": {
+  "sub": 938,
+  "del": 715,
+  "ins": 240,
+  "ref_tokens": 11911,
+  "wer": 0.1589287213500126,
+  "sub_rate": 0.07875073461506171,
+  "del_rate": 0.06002854504239778,
+  "ins_rate": 0.020149441692553102,
+  "recall_error_rate": 0.13877927965745948,
+  "hyp_ref_ratio": 0.9601208966501553
+ },
+ "calibration": {
+  "wer_points": {
+   "a_s13": 15.55704810679204,
+   "a_s29": 15.582234908907733,
+   "a_s47": 15.842498530769877
+  },
+  "range_points": 0.2854504239778368,
+  "sample_sd_points": 0.15803663732119366,
+  "same_seed_repeat_delta_points_a_s13_minus_fixed": -0.3358240282092195,
+  "naive_control_only_normal_approx_for_1pt_80pct_power_two_sided_5pct": 1,
+  "confirmation_paired_seeds_per_arm": null,
+  "screen_paired_seeds_per_arm": 3,
+  "warning": "n=3 raw control outcomes. The SD is imprecise and is not the SD of paired treatment effects. The naive normal approximation is reported only to show why control-only variance cannot size confirmation; estimate paired-effect variance from the 300-step control/treatment pilot."
+ },
+ "range_influence": {
+  "high": "a_s47",
+  "low": "a_s13",
+  "net_error_difference": 34,
+  "largest_window": "win_argos_feb27_2_2026_1959208",
+  "largest_window_error_difference": 23,
+  "largest_window_share_of_net": 0.6764705882352942
+ },
+ "same_seed_repeat_caveat": "artifact-adapter-fixed and A_s13 have matching run_meta fields but different weight hashes. The delta is descriptive run nondeterminism; identical batch order and hardware provenance were not recorded."
+}

@@ -1,0 +1,30 @@
+{
+ "experiment": "dense-reference-repair-2026-08-19",
+ "spec": "docs/specs/2026-08-19-dense-reference-repair.md",
+ "status": "incomplete",
+ "source_fingerprint": "a5447a3d549689d9",
+ "windows": [
+  {
+   "window_id": "win_argos_oct31__2_2025_2353650",
+   "status": "incomplete",
+   "reason": "not finalized",
+   "published_tokens": 244,
+   "uncertain_spans": 3
+  },
+  {
+   "window_id": "win_argos_sep24_2025_371824",
+   "status": "incomplete",
+   "reason": "not finalized",
+   "published_tokens": 313,
+   "uncertain_spans": 0
+  }
+ ],
+ "guards": [
+  "Reference-assisted repair, not independently transcribed gold: the published words were shown, time-placed, while listening.",
+  "Unintelligible spans are marked [?] and are not tokens; overlapped speech is transcribed only where separately intelligible.",
+  "Two outcome-selected windows: a fidelity diagnostic, not validation WER and not the strict validation set.",
+  "A 39-window WER mixing these repaired references with the 37 published ones is forbidden.",
+  "No number here revises the dense screen's SCREEN - STOP decision.",
+  "Rescoring any model against these references needs its own preregistration."
+ ]
+}

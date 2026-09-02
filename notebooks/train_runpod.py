@@ -595,6 +595,20 @@ def main():
                      f"carry adapters, e.g. {_enc[:2]}")
         if _scope == "all" and not _enc:
             sys.exit("[train FATAL] LORA_SCOPE=all but no encoder module carries an adapter")
+        # Naming the expected count is the difference between "the regex matched something"
+        # and "the regex matched exactly what I meant". Whisper puts self_attn and
+        # encoder_attn in every decoder layer, so decoder scope is 4 modules per layer.
+        _n_dec_layers = len(model.base_model.model.model.decoder.layers)
+        _want = 4 * _n_dec_layers
+        _dec = len(_lora_mods) - len(_enc)
+        if _scope == "decoder" and _dec != _want:
+            sys.exit(f"[train FATAL] decoder scope adapted {_dec} modules, expected "
+                     f"{_want} (4 per layer x {_n_dec_layers} layers)")
+        _enc_train = [n for n, q in model.named_parameters()
+                      if ".encoder." in n and q.requires_grad]
+        if _scope == "decoder" and _enc_train:
+            sys.exit(f"[train FATAL] {len(_enc_train)} encoder parameters are still "
+                     f"trainable under decoder scope, e.g. {_enc_train[:2]}")
         log(f"LoRA scope={_scope}: {len(_lora_mods)} adapted modules "
             f"({len(_enc)} encoder, {len(_lora_mods) - len(_enc)} decoder)")
     model.print_trainable_parameters()

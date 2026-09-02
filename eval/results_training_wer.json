@@ -1,0 +1,209 @@
+{
+ "experiment": "training-wer-2026-08-18",
+ "metric": "agreement with the labels used for training; not fidelity to audio",
+ "sample": {
+  "method": "lowest SHA-256 ranks of salt + utterance_id",
+  "salt": "training-wer-v1",
+  "sample_size": 300,
+  "population_rows": 28967,
+  "train_parquet_sha256": "f37d3532b4b60389172e479326a025a3ccb8197f07b23ad441218a7a7585c1e8",
+  "sample_sha256": "78e5c3e7128a41c4384b34db8512059b4d93c63bf3b5bdd7c1bad57c023e5fd1",
+  "runtime_pilot_note": "An initial n=1000 freeze was stopped manually after 25 unscored fixed-arm decodes projected 80-100 minutes per arm. No hypotheses or WER were inspected. This n=300 prefix was then frozen in a new cache before any outcome was scored.",
+  "n_meetings": 136,
+  "n_cities": 9,
+  "audio_seconds": 861.365,
+  "source_rows": {
+   "correction": 151,
+   "no_edit": 149
+  }
+ },
+ "decode": {
+  "device": "cpu",
+  "compute_type": "int8",
+  "cpu_threads": 16,
+  "config": {
+   "language": "el",
+   "beam_size": 5,
+   "condition_on_previous_text": false,
+   "word_timestamps": false,
+   "vad_filter": false,
+   "task": "transcribe",
+   "temperature": [
+    0.0,
+    0.2,
+    0.4,
+    0.6,
+    0.8,
+    1.0
+   ],
+   "no_speech_threshold": 0.6,
+   "log_prob_threshold": -1.0,
+   "compression_ratio_threshold": 2.4
+  },
+  "normalizer": "eval.controlled_eval.eval_freeze.ftoks",
+  "segment_join": "tokenize each segment, then concatenate token lists"
+ },
+ "validation_references": {
+  "directly_comparable_primary": {
+   "source": "~/.cache/oc-public/served-config-2026-08/results.json arm R",
+   "set": "eval-freeze-2026-08 validation",
+   "n_windows": 39,
+   "n_meetings": 31,
+   "ref_tokens": 11911,
+   "artifact": "artifact-ct2-fixed",
+   "sub": 919,
+   "del": 683,
+   "ins": 242,
+   "wer": 0.15481487700444968,
+   "sub_rate": 0.07715557048106791,
+   "del_rate": 0.05734195281672404,
+   "ins_rate": 0.02031735370665771,
+   "why_primary": "Same artifact, CONTROL options, CPU int8/16-thread stack, ftoks, per-segment token concatenation and DA.seed_for item-key policy as this training sample. Different items necessarily have different seeds."
+  },
+  "historical_not_directly_comparable": {
+   "artifact_fixed_legacy_fused_join_wer": 0.1589287213500126,
+   "artifact_fixed_legacy_fused_join_note": "Same artifact/config/normalizer, but the old decode joined raw segment strings and can fuse words; do not use it for a numeric train-validation gap.",
+   "full_recipe_control_seed_wers": [
+    0.1555704810679204,
+    0.15582234908907733,
+    0.15842498530769877
+   ],
+   "full_recipe_control_note": "A_s13/A_s29/A_s47 are distinct training artifacts, not artifact-ct2-fixed. They calibrate training-run variation and are reported as a range only."
+  }
+ },
+ "arms": {
+  "base": {
+   "artifact": "artifact-ct2-base-large-v3",
+   "decode_wall_seconds": 1267.817,
+   "sub": 346,
+   "del": 109,
+   "ins": 191,
+   "ref_tokens": 2368,
+   "wer": 0.27280405405405406,
+   "sub_rate": 0.14611486486486486,
+   "del_rate": 0.04603040540540541,
+   "ins_rate": 0.08065878378378379,
+   "wer_ci95_meeting_clustered": [
+    0.23108812000577614,
+    0.32111662915626105
+   ],
+   "by_label_source": {
+    "correction": {
+     "sub": 307,
+     "del": 100,
+     "ins": 117,
+     "ref_tokens": 1172,
+     "wer": 0.447098976109215,
+     "sub_rate": 0.2619453924914676,
+     "del_rate": 0.08532423208191127,
+     "ins_rate": 0.09982935153583618
+    },
+    "no_edit": {
+     "sub": 39,
+     "del": 9,
+     "ins": 74,
+     "ref_tokens": 1196,
+     "wer": 0.1020066889632107,
+     "sub_rate": 0.03260869565217391,
+     "del_rate": 0.007525083612040134,
+     "ins_rate": 0.061872909698996656
+    }
+   },
+   "dominance": {
+    "largest_row_key": "8d8712742232b7d1",
+    "largest_row_errors": 17,
+    "largest_row_share": 0.02631578947368421,
+    "largest_meeting_key": "3c2050c503fde764",
+    "largest_meeting_errors": 34,
+    "largest_meeting_share": 0.05263157894736842
+   }
+  },
+  "fixed": {
+   "artifact": "artifact-ct2-fixed",
+   "decode_wall_seconds": 1251.843,
+   "sub": 186,
+   "del": 34,
+   "ins": 91,
+   "ref_tokens": 2368,
+   "wer": 0.13133445945945946,
+   "sub_rate": 0.0785472972972973,
+   "del_rate": 0.014358108108108109,
+   "ins_rate": 0.03842905405405406,
+   "wer_ci95_meeting_clustered": [
+    0.10557659543653146,
+    0.16187601356332007
+   ],
+   "by_label_source": {
+    "correction": {
+     "sub": 171,
+     "del": 30,
+     "ins": 64,
+     "ref_tokens": 1172,
+     "wer": 0.22610921501706485,
+     "sub_rate": 0.14590443686006827,
+     "del_rate": 0.025597269624573378,
+     "ins_rate": 0.05460750853242321
+    },
+    "no_edit": {
+     "sub": 15,
+     "del": 4,
+     "ins": 27,
+     "ref_tokens": 1196,
+     "wer": 0.038461538461538464,
+     "sub_rate": 0.01254180602006689,
+     "del_rate": 0.0033444816053511705,
+     "ins_rate": 0.0225752508361204
+    }
+   },
+   "dominance": {
+    "largest_row_key": "8d8712742232b7d1",
+    "largest_row_errors": 14,
+    "largest_row_share": 0.04501607717041801,
+    "largest_meeting_key": "3c2050c503fde764",
+    "largest_meeting_errors": 20,
+    "largest_meeting_share": 0.06430868167202572
+   }
+  }
+ },
+ "fixed_train_minus_validation": {
+  "wer_delta": -0.023480417544990223,
+  "status": "descriptive, not a pure generalisation-gap estimate",
+  "caveat": "The decode/scoring stack is matched, but training observations are isolated 0.3-30 s utterances with 0.2 s pad while validation observations are long frozen windows. In-sample status and acoustic unit shape are confounded."
+ },
+ "optional_arms_not_run": [
+  "july"
+ ],
+ "interpretation_guard": "Training WER measures agreement with the labels the model saw. It diagnoses fit/memorisation but cannot establish label quality or model selection.",
+ "base_minus_fixed": {
+  "wer_delta": 0.1414695945945946,
+  "wer_delta_ci95_meeting_clustered": [
+   0.1138389949541941,
+   0.17254581295441138
+  ],
+  "sub_rate_delta": 0.06756756756756756,
+  "del_rate_delta": 0.0316722972972973,
+  "ins_rate_delta": 0.04222972972972973,
+  "by_label_source": {
+   "correction": {
+    "wer": 0.22098976109215016,
+    "sub_rate": 0.11604095563139932,
+    "del_rate": 0.05972696245733789,
+    "ins_rate": 0.04522184300341297
+   },
+   "no_edit": {
+    "wer": 0.06354515050167224,
+    "sub_rate": 0.020066889632107024,
+    "del_rate": 0.004180602006688964,
+    "ins_rate": 0.039297658862876256
+   }
+  },
+  "dominance": {
+   "net_error_difference": 335,
+   "largest_row_key": "30489542cb561484",
+   "largest_row_error_difference": 10,
+   "largest_row_share_of_net": 0.029850746268656716,
+   "leave_one_out_sign_reversal": false
+  },
+  "interpretation": "Positive values mean the base model is worse. This paired frozen-sample contrast measures what adaptation learned on its own labels; it does not establish label fidelity or validation improvement."
+ }
+}

@@ -1,0 +1,146 @@
+{
+ "TWO_no_ours": {
+  "n": 60,
+  "paired": {
+   "diff": 39,
+   "sonnet_right": 7,
+   "opus_right": 23,
+   "both_wrong": 9,
+   "same": 21
+  },
+  "sonnet": {
+   "ok": 20,
+   "decided": 44
+  },
+  "opus": {
+   "ok": 36,
+   "decided": 60
+  }
+ },
+ "THREE|COMPOSITE": {
+  "n": 60,
+  "paired": {
+   "same": 32,
+   "diff": 28,
+   "sonnet_right": 5,
+   "opus_right": 7,
+   "both_wrong": 16
+  },
+  "sonnet": {
+   "ok": 18,
+   "decided": 58
+  },
+  "opus": {
+   "ok": 20,
+   "decided": 54
+  }
+ },
+ "THREE|ATOMIC": {
+  "n": 60,
+  "paired": {
+   "same": 38,
+   "diff": 22,
+   "sonnet_right": 11,
+   "opus_right": 7,
+   "both_wrong": 4
+  },
+  "sonnet": {
+   "ok": 36,
+   "decided": 43
+  },
+  "opus": {
+   "ok": 32,
+   "decided": 47
+  }
+ },
+ "PAIR_soniox+ours|ATOMIC": {
+  "n": 60,
+  "paired": {
+   "same": 51,
+   "diff": 9,
+   "sonnet_right": 3,
+   "opus_right": 6,
+   "both_wrong": 0
+  },
+  "sonnet": {
+   "ok": 35,
+   "decided": 60
+  },
+  "opus": {
+   "ok": 38,
+   "decided": 59
+  }
+ },
+ "PAIRE_scribe+soniox": {
+  "n": 60,
+  "paired": {
+   "diff": 9,
+   "sonnet_right": 4,
+   "opus_right": 5,
+   "both_wrong": 0,
+   "same": 51
+  },
+  "sonnet": {
+   "ok": 41,
+   "decided": 58
+  },
+  "opus": {
+   "ok": 42,
+   "decided": 60
+  }
+ },
+ "DUP": {
+  "n": 60,
+  "paired": {
+   "same": 49,
+   "diff": 11,
+   "sonnet_right": 4,
+   "opus_right": 7,
+   "both_wrong": 0
+  },
+  "sonnet": {
+   "ok": 48,
+   "decided": 60
+  },
+  "opus": {
+   "ok": 51,
+   "decided": 60
+  }
+ },
+ "PAIRE_scribe+ours&PAIRE_soniox+ours&TWO_no_soniox": {
+  "n": 107,
+  "paired": {
+   "same": 54,
+   "diff": 53,
+   "sonnet_right": 24,
+   "opus_right": 26,
+   "both_wrong": 3
+  },
+  "sonnet": {
+   "ok": 56,
+   "decided": 102
+  },
+  "opus": {
+   "ok": 58,
+   "decided": 106
+  }
+ },
+ "PAIR_scribe+ours|ATOMIC": {
+  "n": 90,
+  "paired": {
+   "same": 71,
+   "diff": 19,
+   "sonnet_right": 7,
+   "opus_right": 11,
+   "both_wrong": 1
+  },
+  "sonnet": {
+   "ok": 70,
+   "decided": 60
+  },
+  "opus": {
+   "ok": 74,
+   "decided": 0
+  }
+ }
+}

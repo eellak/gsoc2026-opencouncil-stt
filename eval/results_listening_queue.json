@@ -1,0 +1,34 @@
+{
+  "source": "listen-2026-08",
+  "pool": "deletion_hard",
+  "witness": "soniox-stt-rt-v4",
+  "exclusion_manifest_sha256": "a45de4c6c670124d0edfdec6daed39264ceb61cb6f114aed6fcb4ba6904d9a2c",
+  "train_manifest_sha256": "c98add2b0676d355",
+  "gap_verify_sha256": "9283f63fb8184c71",
+  "n_train_rows": 42289,
+  "n_pool_rows": 3921,
+  "n_candidates": 2661,
+  "n_clips": 721,
+  "drops": {
+    "excluded": 1611,
+    "too_long": 43,
+    "witness_span_mismatch": 108,
+    "training_overlap": 175,
+    "queue_overlap": 3
+  },
+  "clip_hours": 2.158,
+  "labelled_span_hours": 1.0238,
+  "cities": {
+    "athens": 216,
+    "chalandri": 108,
+    "chania": 307,
+    "vrilissia": 90
+  },
+  "meetings": 95,
+  "reused_gap_verify": 616,
+  "n_clips_cut": 721,
+  "n_failed": 0,
+  "failure_reasons": {},
+  "generation": "438aaea941866e08",
+  "queue_sha256": "438aaea941866e087c0f25e02cd3a2b9b6badeea1c54ba3bda6b2400f4a0550a"
+}

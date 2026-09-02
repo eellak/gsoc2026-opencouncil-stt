@@ -1,6 +1,6 @@
 # Current Work
 
-Last updated: 2026-08-28
+Last updated: 2026-08-31
 
 ## PAST GSOC
 
@@ -148,7 +148,27 @@ RunPod CPU pod → shadow → flip.
 Side-effect: the chooser code (`cats.py`, `run_chooser.py`, `reconstruct.py`,
 `freeze.json` …) lived only in an ephemeral `/tmp` scratchpad and was **rescued** into
 `eval/controlled_eval/chooser/`; data with transcript text went to
-`~/.cache/oc-public/chooser-2026-08-25/`. Reproduction from the new location is step 1.
+`~/.cache/oc-public/chooser-2026-08-25/`.
+
+**Amended 2026-08-31, by Codex plan review `4ea2d051` and one measurement**
+(spec §10). The plan is reordered, not withdrawn. `align3` **does not fit a 15-minute
+segment**: fine at 1,000 tokens (12.5 s / 1.13 GB), `MemoryError` at 2,500 under a 12 GB
+cap, because the `ops` table allocates `n³` bytes and the band does not reduce it
+([report](docs/reports/2026-08-31-align3-scaling.md)). Text-level chunking is therefore
+the production candidate rather than a fallback, and every gate has to measure the
+chunked system. Three more things changed: the 36-clip listening test is a **pilot**,
+not the flip gate (zero harm in 36 still leaves an 8% upper bound; the flip needs ~120
+events over 12 meetings and 5 cities with two blind annotators); the 169 held-out
+windows are **spent** and the chunked candidate needs a new blind set; and both policy
+arms are frozen out of scope. The month's target is **rules-only, in shadow,
+canary-ready** — not a flip.
+
+**Step 1 is done, 2026-08-31.** `reconstruct.py` run from the new location with
+`SKIP_LLM=1 CITIES=ALL` reproduces `wer_result_ALL.json` exactly on every deterministic
+arm: W 0.12020, R1+R2 0.11154, Scribe 0.13771, Soniox 0.14752, our adapter 0.17951, over
+391 windows in 117 clusters. The `policy` arm was **not** reproduced — the new `SKIP_LLM`
+flag skips its two LLM categories, they fall back to `r12`, and the 0.10835 that prints is
+not a reproduction of the frozen 0.10581. Step 2 is the four fixtures of §4.4.
 
 Blocked on Harold: where `RUNPOD_API_KEY` lives, ElevenLabs and Anthropic API keys.
 

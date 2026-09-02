@@ -1,0 +1,142 @@
+{
+ "experiment": "overlap-clean-selection-2026-08-19",
+ "spec": "docs/specs/2026-08-19-overlap-clean-selection.md",
+ "stage": "pilot",
+ "audio_files_diarized": 7,
+ "overall": {
+  "label": "all diarized files",
+  "rows": 13264,
+  "accepted_rows": 9837,
+  "accepted_row_fraction": 0.7416,
+  "speech_hours": 7.96,
+  "accepted_speech_hours": 5.182,
+  "accepted_hour_fraction": 0.651
+ },
+ "skipped": {
+  "no_job": 0,
+  "outside_recording": 12
+ },
+ "independent_flags": {
+  "no_primary": 357,
+  "low_coverage": 1501,
+  "competing_inside": 1511,
+  "overlap_guarded": 2163,
+  "competing_guard": 1782
+ },
+ "rejection_waterfall": {
+  "no_primary": 357,
+  "low_coverage": 1501,
+  "competing_inside": 1141,
+  "overlap_guarded": 372,
+  "competing_guard": 56
+ },
+ "by_city": [
+  {
+   "label": "athens",
+   "rows": 1983,
+   "accepted_rows": 1327,
+   "accepted_row_fraction": 0.6692,
+   "speech_hours": 1.194,
+   "accepted_speech_hours": 0.743,
+   "accepted_hour_fraction": 0.6219
+  },
+  {
+   "label": "chalandri",
+   "rows": 2824,
+   "accepted_rows": 2413,
+   "accepted_row_fraction": 0.8545,
+   "speech_hours": 1.754,
+   "accepted_speech_hours": 1.355,
+   "accepted_hour_fraction": 0.7723
+  },
+  {
+   "label": "chania",
+   "rows": 550,
+   "accepted_rows": 419,
+   "accepted_row_fraction": 0.7618,
+   "speech_hours": 0.34,
+   "accepted_speech_hours": 0.245,
+   "accepted_hour_fraction": 0.7192
+  },
+  {
+   "label": "samothraki",
+   "rows": 6165,
+   "accepted_rows": 4219,
+   "accepted_row_fraction": 0.6843,
+   "speech_hours": 3.473,
+   "accepted_speech_hours": 1.994,
+   "accepted_hour_fraction": 0.5742
+  },
+  {
+   "label": "sparta",
+   "rows": 115,
+   "accepted_rows": 102,
+   "accepted_row_fraction": 0.887,
+   "speech_hours": 0.08,
+   "accepted_speech_hours": 0.069,
+   "accepted_hour_fraction": 0.8627
+  },
+  {
+   "label": "vrilissia",
+   "rows": 1317,
+   "accepted_rows": 1112,
+   "accepted_row_fraction": 0.8443,
+   "speech_hours": 0.901,
+   "accepted_speech_hours": 0.669,
+   "accepted_hour_fraction": 0.7427
+  },
+  {
+   "label": "xylokastro",
+   "rows": 310,
+   "accepted_rows": 245,
+   "accepted_row_fraction": 0.7903,
+   "speech_hours": 0.217,
+   "accepted_speech_hours": 0.107,
+   "accepted_hour_fraction": 0.4937
+  }
+ ],
+ "by_source": [
+  {
+   "label": "transcript",
+   "rows": 13264,
+   "accepted_rows": 9837,
+   "accepted_row_fraction": 0.7416,
+   "speech_hours": 7.96,
+   "accepted_speech_hours": 5.182,
+   "accepted_hour_fraction": 0.651
+  }
+ ],
+ "per_file_accepted_fraction": [
+  0.6692,
+  0.6843,
+  0.7618,
+  0.7903,
+  0.8443,
+  0.8545,
+  0.887
+ ],
+ "boundary_clearance_sec": {
+  "p10": 0.051,
+  "median": 0.164
+ },
+ "same_speaker_runs": {
+  "n_runs": 2382,
+  "mean_len": 4.13,
+  "max_len": 55
+ },
+ "packer": {
+  "packs": 363,
+  "packed_speech_hours": 2.213,
+  "dropped_tail_hours": 2.969,
+  "mean_pack_speech_sec": 21.95,
+  "mean_utterances_per_pack": 9.03,
+  "target_speech_sec": 22.0,
+  "max_waveform_sec": 29.0
+ },
+ "guards": [
+  "A pilot over few meetings is an engineering smoke test; its surviving fraction does not estimate the corpus.",
+  "Speaker labels are local to one diarization job and are never grouped across audio files.",
+  "Diarization is not ground truth; an outcome-blind human audit is required before GPU spend.",
+  "boundary_clearance is measured, not an acceptance criterion: diarization cannot prove a cut misses a word."
+ ]
+}

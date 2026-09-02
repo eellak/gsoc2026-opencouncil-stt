@@ -1,0 +1,48 @@
+{
+  "experiment": "dense-screen-300step-2026-08-19",
+  "status": "SCREEN - STOP",
+  "validation": {
+    "n_windows": 39,
+    "n_meetings": 31,
+    "ref_tokens": 11911,
+    "mean_A_wer": 0.15310777152771948,
+    "mean_B_wer": 0.14759466039795147,
+    "mean_delta_wer": -0.005513111129767999,
+    "mean_delta_del_rate": -0.005681023143872613,
+    "mean_delta_ins_rate": 0.003694064310301403,
+    "per_seed_delta_wer": {
+      "13": -0.008059776677021235,
+      "29": -0.00537318445134749,
+      "47": -0.0031063722609352695
+    }
+  },
+  "training_diagnostic": {
+    "n_rows": 300,
+    "mean_A_wer": 0.20945945945945943,
+    "mean_B_wer": 0.21649774774774774
+  },
+  "promotion_gates": {
+    "mean_delta_wer_lt_zero": true,
+    "at_least_two_of_three_delta_wer_lt_zero": true,
+    "mean_delta_del_rate_le_zero": true,
+    "mean_delta_ins_rate_lt_0.0005": false,
+    "no_loo_sign_reversal": true,
+    "no_window_over_25pct": false
+  },
+  "posthoc_diagnosis": {
+    "net_extra_insertions_across_seeds": 132,
+    "largest_window_extra_insertions": 100,
+    "largest_window_share": 0.7575757575757576,
+    "mean_insertion_delta_excluding_largest_window": 0.000914426429788334,
+    "alignment_tiebreak_mean_insertion_delta_range": [
+      0.003358,
+      0.003694064310301403
+    ]
+  },
+  "guards": [
+    "A/B validation comparisons share one CUDA float16 faster-whisper stack; their levels are not directly comparable to historical CPU int8 validation levels.",
+    "At fixed optimizer steps B exposes roughly seven times more labelled speech per update, so this tests packing plus useful-token density rather than context shape alone.",
+    "The post-hoc diagnosis explains the stopped screen; it does not alter the frozen promotion decision.",
+    "This aggregate contains no transcript or audio content. Window-level hypotheses remain in the private cache."
+  ]
+}
