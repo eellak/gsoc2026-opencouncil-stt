@@ -168,7 +168,17 @@ canary-ready** — not a flip.
 arm: W 0.12020, R1+R2 0.11154, Scribe 0.13771, Soniox 0.14752, our adapter 0.17951, over
 391 windows in 117 clusters. The `policy` arm was **not** reproduced — the new `SKIP_LLM`
 flag skips its two LLM categories, they fall back to `r12`, and the 0.10835 that prints is
-not a reproduction of the frozen 0.10581. Step 2 is the four fixtures of §4.4.
+not a reproduction of the frozen 0.10581.
+
+**Step 2 is done, 2026-09-02.** `make_fixtures.py` wrote the §4.4 fixtures +
+`MANIFEST.json` to `~/.cache/oc-public/chooser-2026-08-25/` (never git — transcript
+text). W and rules-off match the frozen totals byte-exactly. **Guard-on is measured
+for the first time: 0.11205** (+0.0005 over guard-off, fired on 75 of 13,414 islands),
+under the guard definition frozen in `make_fixtures.py`. The build now runs in
+`opencouncil-tasks` branch `feat/fusion-provider`, shaped by Codex review `f784ace4`
+(chunking before orchestration, replay fake provider + benchmark-shaped integration
+gate before any paid run, 3 stacked PRs, `FUSION_LLM` flag default-off). No PR opens
+without Harold's approval.
 
 Blocked on Harold: where `RUNPOD_API_KEY` lives, ElevenLabs and Anthropic API keys.
 
