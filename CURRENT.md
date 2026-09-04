@@ -1,6 +1,6 @@
 # Current Work
 
-Last updated: 2026-08-31
+Last updated: 2026-09-04
 
 ## PAST GSOC
 
@@ -138,7 +138,8 @@ the fix no arm gains, so there is nothing for it to rescue.
 `exp-2026-08-26-fusion-integration` is **OPEN, spec written, nothing built**:
 [`docs/specs/2026-08-26-fusion-integration.md`](docs/specs/2026-08-26-fusion-integration.md),
 settled in an 18-decision grill. The shipped arm is **R1+R2 + the vote/negation
-guard** (0.11154 on 391 against Scribe's 0.13771); the LLM chooser is a bench-only
+guard**, and its number is **0.11205** on 391 — 0.11154 is the guard-**off** arm, and
+Scribe is 0.13771. The LLM chooser is a bench-only
 flag until the deletion caveat closes. The code lives in `opencouncil-tasks` as a
 stdlib-only Python package behind a conformance test, exposed as an audio-in
 `openai-compatible` route so the bench can call it, then run in shadow beside Scribe.
@@ -179,6 +180,35 @@ under the guard definition frozen in `make_fixtures.py`. The build now runs in
 (chunking before orchestration, replay fake provider + benchmark-shaped integration
 gate before any paid run, 3 stacked PRs, `FUSION_LLM` flag default-off). No PR opens
 without Harold's approval.
+
+**Step 3 is building, 2026-09-04.** Three commits on `feat/fusion-provider`
+(`12bac04` core, `5c8ce7e`, `83b0cbf`); nothing pushed, no PR. The Python fuse core is
+**byte-exact against all three frozen arms over the 391 windows**: W
+`[5396,1332,6577,110694]` = 0.12020, rules guard-off `[5030,1865,5452,110694]` = 0.11154,
+rules guard-on `[5036,1848,5519,110694]` = 0.11205.
+
+The production chunking is **frozen at `max_tokens=120`** (`anchor_n=3`,
+`search_radius=200`), exported as `PRODUCTION_CHUNKING` and mirrored in
+`tests/fusion/test_resource.py`. At 120 over all 391 windows: 1342 chunks, 1 forced cut,
+99.7% token equality, WER 0.11154 → 0.11163, **Δ +0.00009** against a 0.002 gate. The
+timing table at 2,500 tokens per system, one `fuse.py` call each, is 800→260.6 s,
+400→75.7 s, 240→40.0 s, 160→26.3 s, 120→20.1 s, 80→14.7 s, with peak RSS 340 MB at every
+value — time is the only binding limit. 120 was picked because it is the one candidate
+with a measured ΔWER; **no sweep was run to choose a winner**, because picking the best
+`max_tokens` off the benchmark would turn the frozen set into a development set.
+
+Two defects were found by measuring rather than reading, and neither would have been
+caught by the integration gate as it was planned:
+
+- A raw provider word that normalizes to several tokens (`κ.λπ` → `κ`, `λπ`) was emitted
+  once per token, so it appeared twice in `full_transcript` and in `words[]`. Fixed in
+  `5c8ce7e`; the old test used an impossible fixture, which is why it survived.
+- `FusionTranscriber` sent no `config.chunking`, so production silently ran Python's
+  default 800 — the 260 s path. Fixed in `83b0cbf`.
+
+Remaining before any paid run: the replay integration gate (Codex `f784ace4`), whose
+oracle is the guard-**on** total `[5036,1848,5519,110694]`, since `guard: true` is
+hardcoded in `FusionTranscriber`.
 
 Blocked on Harold: where `RUNPOD_API_KEY` lives, ElevenLabs and Anthropic API keys.
 
