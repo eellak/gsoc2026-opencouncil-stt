@@ -49,6 +49,34 @@ compatibility. It says nothing about which system is closer to what was said.
 These numbers and the frozen 0.11205 are separately labelled results on different
 cohorts. Their difference is not a replication, an improvement, or a regression.
 
+## Does the serving stack move the number?
+
+The same 40 windows were run twice. The only difference is where `ours` was
+decoded: CPU int8 on this machine, which is the canonical measurement stack, or
+the RunPod serverless endpoint at float16, which is what production calls. The
+endpoint's own runbook says the two "give different tokens from the same
+weights", so they are never merged — they are two runs, compared on the 37
+windows both scored.
+
+| arm | local (CPU int8) | gpu (serverless float16) | delta |
+|---|---:|---:|---:|
+| Scribe | 0.18741 | 0.18741 | +0.00000 |
+| Soniox | 0.16598 | 0.16598 | +0.00000 |
+| ours | 0.16206 | 0.16069 | −0.00137 |
+| vote | 0.13999 | 0.13917 | −0.00082 |
+| rules_on | 0.13197 | 0.13087 | −0.00109 |
+
+Scribe and Soniox are the same recordings in both runs, and they come out
+byte-identical: that is the control, and it says the comparison is measuring the
+one thing it is supposed to.
+
+**The serving stack moves the fused number by about 0.001 WER** — roughly a
+fiftieth of the gain fusion itself buys. Deletions move more on the single arm
+(`ours` +0.00328 on GPU) than on the fused one (+0.00018), which is what you
+would expect if fusion is absorbing the difference. For the production decision
+this is the useful part: serving the fine-tune on the GPU endpoint instead of the
+measurement stack does not meaningfully change what the fusion returns.
+
 ## What the live path broke on
 
 The route had a 391-window replay gate at 15/15, zero hard mismatches. It still

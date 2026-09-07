@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import signal
 import os
 import random
 import subprocess
@@ -157,7 +158,19 @@ def bootstrap(per_window, arm_a, arm_b, clusters, replicates=4000, seed=7):
     return {"lo": round(lo, 5), "hi": round(hi, 5), "replicates": len(deltas)}
 
 
+def _die_cleanly(signum, _frame):
+    """SIGTERM must unwind, not stop the process where it stands.
+
+    Measured 2026-09-07: five duplicate runs were killed with SIGTERM and left
+    two Soniox transcriptions behind, because the default handler skips every
+    `finally` on the stack -- including the one that deletes them. The account
+    allows 2000 stored, so leaks are a slow way to break the next run.
+    """
+    raise KeyboardInterrupt(f"signal {signum}")
+
+
 def main():
+    signal.signal(signal.SIGTERM, _die_cleanly)
     ap = argparse.ArgumentParser()
     ap.add_argument("--n", type=int, default=30)
     ap.add_argument("--cap", type=int, default=MAX_PER_CITY,
