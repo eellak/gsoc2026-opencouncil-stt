@@ -2328,7 +2328,7 @@
    "status": "OPEN",
    "conclusion": "",
    "decision": "",
-   "next_action": "STEP 3 GATE PASSED STRICT 2026-09-07, branch feat/fusion-provider HEAD 3e4505e: 15/15 tests, 391/391 windows, N_HARD_MISMATCHES 0, chunked [5030,1861,5520,110694] = 0.11212 against the frozen guard-on 0.11205, delta +0.00007 inside the pre-declared 0.002. The numbers are unchanged from the 2026-09-06 run; what changed is that they are now PROVEN -- the first scorer only called the oracle when HTTP text already differed from the frozen fixture, so its real acceptance condition was 'HTTP == frozen OR HTTP == oracle' and a defect moving output back towards the unchunked text passed unexamined (Astra review 2026-09-07). Two negative controls now hold it: a divergent window replaced by its frozen text must land in the hard bucket, and a duplicated window with another dropped must fail on set equality. DOMINATION unchanged: only 2 of 391 windows diverge (samothraki +10 errors, athens -2), largest_window_share_of_net_delta 1.25, so +0.00007 is not a systematic tax. NOT PROVEN by this gate: live provider compatibility, real credentials, long recordings, failure handling. The live pilot of 2026-09-07 (eval/live_fusion/) answers the first of those on real audio.",
+   "next_action": "LIVE PILOT DONE 2026-09-07 (docs/reports/2026-09-07-live-fusion-pilot.md). The three systems were called on the same audio for the first time. 40 windows, 10 cities, drawn training-disjoint with a seed and a per-city cap fixed before any aggregate: scribe 0.18348, soniox 0.16124, ours 0.15562, vote 0.13480, rules_on 0.12641, all agreement-with-OpenCouncil on one stack. rules_on beats scribe by 0.05708, CI [-0.0725,-0.0439], 40/40 windows better, largest window 7.9% of the net gain, no single-window removal reverses it; beats the plain vote by 0.00839, CI [-0.0140,-0.0030], 22 better / 10 tied / 8 worse. Deletions rise: 0.02484 against scribe 0.02275 and vote 0.02182, which is the axis exp-2026-08-26-chooser-deletion-safety exists to settle. The production route now runs live end to end without any bucket, and a recorded-live replay of every window fuses 39/39 with zero fallbacks. NEXT: (1) a bucket, or an equivalent, for full-length segments -- base64 tops out around 6.7 MB of audio and a 15-minute segment is 28.8 MB; (2) the shadow smoke test on a real meeting; (3) the deletion listening test, still unrun.",
    "artifact_ids": [
     "artifact-adapter-cleanpack-cont-s47",
     "artifact-ct2-cleanpack-cont-s47"
@@ -2339,7 +2339,8 @@
    ],
    "reports": [
     "docs/reports/2026-08-26-category-chooser.md",
-    "docs/reports/2026-08-31-align3-scaling.md"
+    "docs/reports/2026-08-31-align3-scaling.md",
+    "docs/reports/2026-09-07-live-fusion-pilot.md"
    ],
    "specs": [
     "docs/specs/2026-08-26-fusion-integration.md",
@@ -2363,7 +2364,10 @@
     "The gate on the integrated system is the guard-ON total [5036,1848,5519,110694] = 0.11205, not 0.11154. FusionTranscriber hardcodes guard: true, which is the shipped arm; 0.11154 is the guard-off arm and is not reachable through the product path. Codex review of the gate plan (2026-09-04) caught this before the gate was written.",
     "Two production defects were found by measuring rather than by reading, and the integration gate as first planned would have caught neither, since every benchmark fixture token is wtoks-stable: (1) a raw provider word that normalizes to several tokens was emitted once per token, duplicating it in full_transcript and words[] - fixed in 5c8ce7e, and the pre-existing test hid it by using an impossible fixture; (2) FusionTranscriber sent no config.chunking, so production silently ran fuse.py's default max_tokens=800 - fixed in 83b0cbf.",
     "The route gate's first version (2026-09-06) accepted a window that matched the frozen unchunked fixture WITHOUT ever calling the production-config oracle, so 'the route reproduces fuse.py per window' was asserted more strongly than the code checked. Verified by counterexample: 391 frozen-matching results against a disagreeing oracle returned ok=true with zero oracle calls. Fixed in 3e4505e; the re-run gives the same totals. Any future gate that skips its oracle on a cheap equality shortcut has the same defect.",
-    "RUNPOD_API_KEY was never missing: it lives in ~/.runpod/config.toml and ~/.bashrc, not in .env, and was copied into .env on 2026-09-07. Two nights of planning treated the serverless GPU endpoint as unreachable because only .env was checked."
+    "RUNPOD_API_KEY was never missing: it lives in ~/.runpod/config.toml and ~/.bashrc, not in .env, and was copied into .env on 2026-09-07. Two nights of planning treated the serverless GPU endpoint as unreachable because only .env was checked.",
+    "The live path had two defects that the 391-window replay gate could not see, both found on 2026-09-07 by calling the vendor: ocasr.ts sent RunPod a field named `url` (the endpoint requires `audioUrl` or `audioBase64`), and the response parser read `words`/`segments` while the endpoint returns the OpenCouncil Transcript schema, so every real call normalized to zero words and the route fell back to Scribe. A gate built on fake providers proves the code path, never the vendor contract.",
+    "The byte transport (Scribe multipart, Soniox file_id, ours audioBase64) removes the DO_SPACES_BUCKET dependency only for SHORT audio. RunPod documents 10 MB for /run and base64 costs 4*ceil(n/3), so the ceiling is about 6.7 MB of raw audio: a 140 s window fits, a 15-minute production segment (28.8 MB) does not and is refused as inline_payload_too_large. Full-length segments still need a bucket; transcoding or splitting to fit would change the audio the model hears.",
+    "Node's default fetch abandons a request after ~5 minutes of waiting for response headers, and a cold RunPod worker plus two cloud vendors on a 140 s window exceeds that. The first live call failed as HeadersTimeout while the route was still working. Any caller of /v1/audio/transcriptions -- benchmark runner, proxy, load balancer -- needs a raised header timeout."
    ],
    "updated_at": "2026-09-07T00:00:00Z"
   },

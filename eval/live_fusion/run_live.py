@@ -78,7 +78,7 @@ ARMS = {
 }
 
 
-def draw(items, n):
+def draw(items, n, cap=MAX_PER_CITY):
     """Deterministic draw: training-disjoint windows, per-city cap, fixed seed.
 
     The whole ordered list is decided here, before any decoding, and every drawn
@@ -93,7 +93,7 @@ def draw(items, n):
     rng.shuffle(pool)
     picked, per_city = [], defaultdict(int)
     for item in pool:
-        if per_city[item["cityId"]] >= MAX_PER_CITY:
+        if per_city[item["cityId"]] >= cap:
             continue
         picked.append(item)
         per_city[item["cityId"]] += 1
@@ -160,19 +160,31 @@ def bootstrap(per_window, arm_a, arm_b, clusters, replicates=4000, seed=7):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--n", type=int, default=30)
+    ap.add_argument("--cap", type=int, default=MAX_PER_CITY,
+                    help="windows per city. Stage A is 4 and stage B is 8, both fixed in "
+                         "PREDECLARED.md before any aggregate existed; the shuffle is the "
+                         "same, so stage A is a prefix of stage B.")
+    ap.add_argument("--ours", choices=["local", "gpu"], default="local",
+                    help="local = CPU int8 on this machine, the canonical measurement "
+                         "stack. gpu = the RunPod serverless endpoint production calls. "
+                         "The two are different stacks and their numbers are never merged.")
     ap.add_argument("--out", default=str(REPO / "eval/results_live_fusion.json"))
     args = ap.parse_args()
 
     scribe_key = os.environ.get("SCRIBE_API_KEY")
     soniox_key = os.environ.get("SONIOX_API_KEY")
+    runpod_key = os.environ.get("RUNPOD_API_KEY")
     if not scribe_key or not soniox_key:
         print("SCRIBE_API_KEY and SONIOX_API_KEY must be set", file=sys.stderr)
         return 2
+    if args.ours == "gpu" and not runpod_key:
+        print("RUNPOD_API_KEY must be set for --ours gpu", file=sys.stderr)
+        return 2
 
     bench = json.loads(BENCH_JSON.read_text(encoding="utf-8"))
-    sample, pool_size = draw(bench["items"], args.n)
+    sample, pool_size = draw(bench["items"], args.n, args.cap)
     print(f"[live] {len(sample)} of {pool_size} training-disjoint windows, "
-          f"seed {SAMPLE_SEED}, cap {MAX_PER_CITY}/city", file=sys.stderr)
+          f"seed {SAMPLE_SEED}, cap {args.cap}/city", file=sys.stderr)
 
     per_window, clusters, failures = {}, {}, []
     shas = {}
@@ -186,7 +198,10 @@ def main():
         try:
             sw, s_sha = P.scribe_words(wid, wav, scribe_key)
             nw, n_sha = P.soniox_words(wid, wav, soniox_key)
-            ow, o_sha = P.ours_words(wid, wav)
+            if args.ours == "gpu":
+                ow, o_sha = P.ours_gpu_words(wid, wav, runpod_key)
+            else:
+                ow, o_sha = P.ours_words(wid, wav)
         except Exception as exc:                      # noqa: BLE001
             failures.append({"id": wid, "stage": "provider", "error": type(exc).__name__,
                              "detail": str(exc)[:200]})
@@ -247,9 +262,11 @@ def main():
         print(f"[live] {k}/{len(sample)} {wid} ok in {time.time() - t0:.0f}s "
               f"(scribe {len(sw)} soniox {len(nw)} ours {len(ow)} words)", file=sys.stderr)
 
-        _write(args.out, per_window, clusters, failures, shas, sample, started, pool_size_note)
+        _write(args.out, per_window, clusters, failures, shas, sample, started,
+                   pool_size_note, args.ours, args.cap)
 
-    _write(args.out, per_window, clusters, failures, shas, sample, started, pool_size_note)
+    _write(args.out, per_window, clusters, failures, shas, sample, started,
+                   pool_size_note, args.ours, args.cap)
     print(f"[live] done: {len(per_window)} scored, {len(failures)} failed, "
           f"{time.time() - started:.0f}s", file=sys.stderr)
     return 0
@@ -301,7 +318,8 @@ def compare(per_window, arm_a, arm_b):
     }
 
 
-def _write(path, per_window, clusters, failures, shas, sample, started, pool_size=None):
+def _write(path, per_window, clusters, failures, shas, sample, started, pool_size=None,
+           ours_stack="local", cap=MAX_PER_CITY):
     """Rewritten after every window so a killed run still has its numbers."""
     arms = ["scribe", "soniox", "ours", "W", "rules_on"]
     agg = {a: totals([r[a] for r in per_window.values()]) for a in arms} if per_window else {}
@@ -335,10 +353,10 @@ def _write(path, per_window, clusters, failures, shas, sample, started, pool_siz
                         "decides nothing about fidelity to the audio."),
         "sample": {
             "source": "bench_2026-06-10-oc-benchmark.json items with cached window audio",
-            "seed": SAMPLE_SEED, "max_per_city": MAX_PER_CITY,
+            "seed": SAMPLE_SEED,
             "pool": ("bench windows with cached audio whose (city, meeting) is in none of "
                      + ", ".join(TRAINING_PACKS)),
-            "pool_size": pool_size,
+            "pool_size": pool_size, "max_per_city": cap,
             "n_drawn": len(sample), "n_scored": len(per_window), "n_failed": len(failures),
             "selected_ids": [it["itemId"] for it in sample],
             "contamination_caveat": ("Disjoint from the 2026-08 training packs only. The "
@@ -351,6 +369,12 @@ def _write(path, per_window, clusters, failures, shas, sample, started, pool_siz
             "soniox": {"params": P.SONIOX_PARAMS, "params_sha": shas.get("soniox"),
                        "transport": "file upload by file_id, not audio_url (no public bucket "
                                     "credential here); model and decode flags are the frozen ones"},
+            "ours_stack": ours_stack,
+            "ours_stack_note": ("local = CPU int8 on the mini-PC, the canonical measurement "
+                                "stack. gpu = the RunPod serverless endpoint, float16 on CUDA "
+                                "at beam 2, which is what production calls. The runbook is "
+                                "explicit that the two give different tokens from the same "
+                                "weights, so these are two runs, never one."),
             "ours": {"model_dir": str(P.OURS_MODEL_DIR), "model_sha256": P.OURS_MODEL_SHA,
                      "artifact": "artifact-ct2-cleanpack-cont-s47",
                      "runtime": P.OURS_RUNTIME, "decode": P.OURS_DECODE,

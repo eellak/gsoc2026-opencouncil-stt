@@ -182,6 +182,20 @@ def remaining(presentations, labels: dict) -> list[dict]:
     return [p for p in presentations if not _committed(labels.get(p["token"]))]
 
 
+def _script_json(obj) -> str:
+    """JSON safe to substitute into an inline ``<script>`` block.
+
+    ``json.dumps`` leaves ``<`` and ``>`` as themselves, so any payload field that ever
+    carries free text could close the block with ``</script>``. Today the payload is
+    tokens, durations and a mode, none of which can, but the substitution site is the
+    same shape that was exploitable in ``blind_preference.py`` (CodeRabbit, 2026-09-06).
+    ``\u003c`` and friends are ordinary JSON escapes, so the page reads back byte-identical
+    strings.
+    """
+    return (json.dumps(obj, ensure_ascii=False)
+            .replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026"))
+
+
 def page_payload(presentations) -> list[dict]:
     """What the browser is allowed to know: that a clip exists and how long it is.
 
@@ -500,8 +514,7 @@ def make_handler(presentations, clips_dir: Path, labels_path: Path,
     def page() -> str:
         todo = remaining(presentations, state["labels"])
         return (PAGE
-                .replace("__DATA__", json.dumps(page_payload(todo),
-                                                ensure_ascii=False))
+                .replace("__DATA__", _script_json(page_payload(todo)))
                 .replace("__DONE__", str(len(presentations) - len(todo)))
                 .replace("__TOTAL__", str(len(presentations)))
                 .replace("__MAXL__", str(MAX_LISTENS)))

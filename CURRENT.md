@@ -197,6 +197,31 @@ shadow** — κάθε νούμερο είναι agreement-with-OpenCouncil, δη
 
 ## Open 2026-08-26 — integrating the fusion into the OpenCouncil pipeline
 
+**The fusion runs live, and it wins on real audio, 2026-09-07**
+([report](docs/reports/2026-09-07-live-fusion-pilot.md)). Until today every number
+came from recorded token streams; the three systems had never been called on the same
+audio. On 40 training-disjoint windows in 10 cities, drawn with a seed and a per-city
+cap fixed before any aggregate existed: Scribe **0.18348**, Soniox **0.16124**, ours
+**0.15562**, vote **0.13480**, **rules_on 0.12641**. Against Scribe that is
+**−0.05708**, CI [−0.0725, −0.0439], and **40 windows of 40 are better**, largest window
+7.9% of the gain. Against the plain vote **−0.00839**, CI [−0.0140, −0.0030]. The price
+is visible too: `rules_on` deletes more than either (0.02484 vs 0.02275 vs 0.02182).
+Agreement-with-OpenCouncil throughout — this says nothing about fidelity to the audio.
+
+The production route now runs end to end with three live vendors **and no bucket**
+(Scribe multipart, Soniox `file_id`, ours `audioBase64`), and a replay of every recorded
+live response fuses **39/39, zero fallbacks**. Calling the vendors found two defects the
+391-window gate could not: `ocasr.ts` sent RunPod a field named `url` (it requires
+`audioUrl`), and the response parser read `words`/`segments` while the endpoint returns
+the OpenCouncil `Transcript` schema — so every real call produced zero words and the
+route fell back to Scribe. `RUNPOD_API_KEY` was never missing either; it was in
+`~/.runpod/config.toml` and `~/.bashrc`, not `.env`.
+
+Still needed before production: a bucket (or equivalent) for full-length segments —
+base64 tops out near 6.7 MB of audio and a 15-minute segment is 28.8 MB — the shadow
+smoke test on a real meeting, and the deletion listening test, still unrun.
+
+
 `exp-2026-08-26-fusion-integration` is **OPEN, spec written, nothing built**:
 [`docs/specs/2026-08-26-fusion-integration.md`](docs/specs/2026-08-26-fusion-integration.md),
 settled in an 18-decision grill. The shipped arm is **R1+R2 + the vote/negation

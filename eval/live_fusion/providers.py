@@ -121,7 +121,10 @@ def cached(window_id: str, provider: str, sha: str):
 
 def store(window_id: str, provider: str, sha: str, value) -> None:
     p = _cache_path(window_id, provider, sha)
-    tmp = p.with_suffix(".part")
+    # Unique per process: the local arm and the GPU arm share this cache and can
+    # be filling the same scribe/soniox entry at the same moment, and two writers
+    # sharing one .part name would hand one of them a truncated file.
+    tmp = p.with_suffix(f".part{os.getpid()}")
     tmp.write_text(json.dumps(value, ensure_ascii=False), encoding="utf-8")
     tmp.replace(p)
 
@@ -262,6 +265,84 @@ def soniox_words(window_id: str, wav: Path, api_key: str, timeout=900):
 
 
 # --------------------------------------------------------------- ours
+
+# ---------------------------------------------------------- ours, on the GPU
+#
+# The SAME adapter, served float16 on CUDA through the RunPod serverless
+# endpoint. Its runbook says in as many words that this is not a measurement
+# stack: "it runs float16 on CUDA; the canonical evaluation numbers are CPU int8
+# on the mini-PC, and the two give different tokens from the same weights."
+#
+# It is here anyway, as a SEPARATE arm that is never merged with the local one,
+# because it is the path production would actually call -- so the question it
+# answers is not "which is better" but "does the serving stack move the fused
+# number", which has to be answered before anything ships.
+OCASR_ENDPOINT = os.environ.get("OCASR_ENDPOINT", "o1jda6sxo85dnk")
+OCASR_GPU_CT2_SHA = "3aa6368fb1b59a132492ef70aa54f2fd6ab24255d41b4355927fe142746b69c7"
+
+
+def ours_gpu_words(window_id: str, wav: Path, api_key: str, timeout=900):
+    """Transcribe on the serverless GPU. Inline base64: no public bucket needed.
+
+    Provenance is checked on every call, not once per process: the endpoint can
+    be re-pointed at another image between two windows, and an output whose
+    producing model is unknown is not evidence.
+    """
+    import base64
+
+    sha = params_sha({"endpoint": OCASR_ENDPOINT, "language": "el",
+                      "ct2_sha": OCASR_GPU_CT2_SHA[:16], "transport": "audioBase64"})
+    hit = cached(window_id, "ours_gpu", sha)
+    if hit is None:
+        audio = base64.b64encode(wav.read_bytes()).decode()
+        url = f"https://api.runpod.ai/v2/{OCASR_ENDPOINT}/runsync?wait=280000"
+        body = {"input": {"audioBase64": audio, "language": "el", "suffix": ".wav"}}
+        r = with_retry(lambda: requests.post(
+            url, headers={"Authorization": f"Bearer {api_key}"}, json=body,
+            timeout=timeout), f"ocasr {window_id}")
+        payload = r.json()
+        # runsync's wait is a courtesy, not a contract: when the queue is deep it
+        # returns IN_QUEUE with a job id and the job goes on running. Measured
+        # 2026-09-07: 3 of 40 windows came back this way, and treating that as a
+        # failure threw away work that had already been paid for.
+        deadline = time.time() + timeout
+        while payload.get("status") in ("IN_QUEUE", "IN_PROGRESS"):
+            job_id = payload.get("id")
+            if not job_id:
+                raise RuntimeError(f"runpod status {payload.get('status')} with no job id")
+            if time.time() > deadline:
+                raise TimeoutError(f"runpod job {job_id} still {payload.get('status')}")
+            time.sleep(5)
+            payload = with_retry(lambda: requests.get(
+                f"https://api.runpod.ai/v2/{OCASR_ENDPOINT}/status/{job_id}",
+                headers={"Authorization": f"Bearer {api_key}"}, timeout=120),
+                f"ocasr status {window_id}").json()
+        if payload.get("status") != "COMPLETED":
+            raise RuntimeError(f"runpod status {payload.get('status')}")
+        hit = payload["output"]
+        store(window_id, "ours_gpu", sha, hit)
+
+    got = ((hit.get("provenance") or {}).get("ct2_model_bin_sha256")
+           or ((hit.get("metadata") or {}).get("provenance") or {}).get("ct2_model_bin_sha256"))
+    if got and got != OCASR_GPU_CT2_SHA:
+        raise RuntimeError(f"endpoint served ct2 {got[:16]}, expected {OCASR_GPU_CT2_SHA[:16]}")
+
+    words = []
+    transcription = hit.get("transcription") or {}
+    for utt in transcription.get("utterances") or []:
+        for w in utt.get("words") or []:
+            raw = (w.get("word") or w.get("text") or "").strip()
+            if raw:
+                words.append({"raw": raw, "start": w.get("start"), "end": w.get("end"),
+                              "conf": w.get("confidence", w.get("prob"))})
+    if not words:
+        for w in hit.get("words") or []:
+            raw = (w.get("word") or w.get("text") or "").strip()
+            if raw:
+                words.append({"raw": raw, "start": w.get("start"), "end": w.get("end"),
+                              "conf": w.get("confidence", w.get("prob"))})
+    return words, sha
+
 
 _MODEL = None
 

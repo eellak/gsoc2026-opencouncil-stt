@@ -1,0 +1,44 @@
+{
+  "sample": "challenge",
+  "source": "challenge-sample-2026-09",
+  "seed": "challenge-sample-2026-09/v1",
+  "pool": "deletion_hard",
+  "max_per_meeting": 2,
+  "queue_sha256": "438aaea941866e08",
+  "exclusion_manifest_sha256": "a45de4c6c670124d0edfdec6daed39264ceb61cb6f114aed6fcb4ba6904d9a2c",
+  "n_pool_clips": 449,
+  "n_pool_meetings": 67,
+  "pool_clips_by_city": {
+    "athens": 104,
+    "chalandri": 86,
+    "chania": 222,
+    "vrilissia": 37
+  },
+  "city_quotas": {
+    "athens": 9,
+    "chalandri": 8,
+    "chania": 20,
+    "vrilissia": 3
+  },
+  "n_clips": 40,
+  "n_meetings_used": 40,
+  "clips_by_city": {
+    "athens": 9,
+    "chalandri": 8,
+    "chania": 20,
+    "vrilissia": 3
+  },
+  "meetings_with_two_clips": 0,
+  "clip_seconds_min": 7.0,
+  "clip_seconds_max": 15.0,
+  "clip_hours": 0.1233,
+  "decides": false,
+  "role": "training-side diagnostic",
+  "estimand": "TRAINING-SIDE DIAGNOSTIC, not an evaluation: preference on spans where the incumbent adapter already failed, inside meetings the assisted training clips are drawn from. Both the positions and the meetings favour the arm being judged. It answers only 'did the recipe fix the failures in meetings it trained on' -- a negative kills the recipe, a positive means little -- and it may never be added to the ordinary sample's number.",
+  "may_support": "did the recipe fix the failures in meetings it trained on; never a claim about overall quality, and never summed with the ordinary sample",
+  "n_clips_cut": 40,
+  "n_failed": 0,
+  "failure_reasons": {},
+  "generation": "abbf3043909c257f",
+  "sample_sha256": "abbf3043909c257f8788c45eb0a34d1b823c6b8f9971a587524830b334ee0ef1"
+}

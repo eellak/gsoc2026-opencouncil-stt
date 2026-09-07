@@ -36,10 +36,28 @@ _Avoid_: better run, best seed
 The maximum minus the minimum effect across paired seeds; it is not a variance or standard deviation.
 _Avoid_: seed variance, per-seed spread
 
-**Primary endpoint**:
-Validation WER, evaluated on the frozen validation set; training-set WER and benchmark WER do not replace it.
-_Avoid_: benchmark score, trainer validation
-
 **Deletion guard**:
 A safety constraint under which lower WER accompanied by a higher deletion-rate point estimate is a failed arm, not a trade-off.
 _Avoid_: secondary metric
+
+## Listening evidence
+
+**Ordinary sample**:
+Clips cut at random positions inside meetings, chosen without consulting where any model failed; the only listening evidence that may support a claim that a model is better overall.
+_Avoid_: validation clips, the listening test, random sample
+
+**Challenge sample**:
+Clips selected because the incumbent model already failed there; it may support a claim that a model improved on previously identified failures, and no claim about overall quality.
+_Avoid_: hard cases, the deletion clips, validation clips
+
+**Blind preference judgement**:
+A listener hears a clip and picks which of two hidden-identity transcripts is closer to the audio, or neither; it yields a win rate over meetings, never a WER, and its labels are not training data.
+_Avoid_: listening test, adjudication, blind label
+
+**Assisted label**:
+A transcript produced by editing another system's output rather than typed from the audio; it may feed training and may never enter a measurement.
+_Avoid_: corrected transcript, blind label
+
+**Primary endpoint**:
+Validation WER, evaluated on the frozen validation set; training-set WER and benchmark WER do not replace it. **Superseded 2026-09-06 for fidelity claims**: a claim that a model is better rests on the ordinary sample's blind preference judgement, and the frozen validation set becomes a regression check.
+_Avoid_: benchmark score, trainer validation

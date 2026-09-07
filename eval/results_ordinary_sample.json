@@ -1,0 +1,55 @@
+{
+  "sample": "ordinary",
+  "design_version": "v2",
+  "source": "ordinary-sample-2026-09-v2",
+  "seed": "ordinary-sample-2026-09/v2",
+  "supersedes_generation": "9dc8a18fa43cd6bf",
+  "estimand": "preference at a uniformly random position inside a meeting, with meetings drawn evenly (3 clips each) from the released council meetings that no council training source touched, that the exclusion manifest permits at both the meeting and the city level, and that share no meeting and no recording with the listening queue any model was scored or trained on; the frame is independent of every model output, including where any model failed. NOT a uniformly random second of council audio: meetings are drawn evenly, not in proportion to their length.",
+  "precision_note": "15 meeting clusters, against v1's 67. At this cluster count the decision rule's confidence interval is not merely wider -- it is a different order of precision, and only a large effect will be visible at all.",
+  "n_meeting_clusters": 15,
+  "v1_meeting_clusters": 67,
+  "clip_seconds": 20.0,
+  "clips_per_meeting": 3,
+  "allocation": "fully determined: every meeting supplies the same number",
+  "city_weighting": "none; meetings are drawn evenly. Duration weighting was rejected by measurement: one 4.26 h thira meeting holds 32.8% of the eligible audio and can supply 3 clips, so duration weights and a per-meeting cap have no feasible point together above N = 10.",
+  "frame_sha256": "977f0ee015fe6e01",
+  "exclusion_manifest_sha256": "a45de4c6c670124d0edfdec6daed39264ceb61cb6f114aed6fcb4ba6904d9a2c",
+  "training_manifest_sha256": {
+    "clean-pack-arm-2026-08": "3c771fe8c5d0cde9",
+    "spliced-pack-arm-2026-08": "76904f9758f3c31c",
+    "spliced-pack-arm-jitter-2026-08": "784bb0d5fba0aa65"
+  },
+  "n_released_meetings": 151,
+  "n_eligible_meetings": 15,
+  "meeting_drops": {
+    "trained_on": 0,
+    "excluded_meeting": 75,
+    "excluded_city": 61
+  },
+  "meetings_by_city": {
+    "athens": 4,
+    "chalandri": 4,
+    "chania": 1,
+    "papagos-cholargos": 1,
+    "thira": 1,
+    "vrilissia": 2,
+    "zografou": 2
+  },
+  "n_clips": 45,
+  "clips_by_city": {
+    "athens": 12,
+    "chalandri": 12,
+    "chania": 3,
+    "papagos-cholargos": 3,
+    "thira": 3,
+    "vrilissia": 6,
+    "zografou": 6
+  },
+  "clip_hours": 0.25,
+  "eligible_audio_hours": 12.95,
+  "n_clips_cut": 45,
+  "n_failed": 0,
+  "failure_reasons": {},
+  "generation": "ecd34338a61cf645",
+  "sample_sha256": "ecd34338a61cf64579608b8591ea2eb1d37a8f1653059dbba39f40e196b1af76"
+}
