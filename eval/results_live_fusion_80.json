@@ -10,7 +10,7 @@
   "pool_size": 206,
   "max_per_city": 8,
   "n_drawn": 80,
-  "n_scored": 53,
+  "n_scored": 80,
   "n_failed": 0,
   "selected_ids": [
    "win_orestiada_apr28_2026_1872686",
@@ -166,89 +166,89 @@
  },
  "totals": {
   "scribe": {
-   "s": 984,
-   "d": 367,
-   "i": 1390,
-   "n": 15850,
-   "wer": 0.17293375394321767,
-   "deletion_rate": 0.023154574132492115
+   "s": 1547,
+   "d": 429,
+   "i": 2073,
+   "n": 24313,
+   "wer": 0.16653642084481554,
+   "deletion_rate": 0.01764488133920125
   },
   "soniox": {
-   "s": 856,
-   "d": 381,
-   "i": 1259,
-   "n": 15850,
-   "wer": 0.15747634069400632,
-   "deletion_rate": 0.024037854889589906
+   "s": 1303,
+   "d": 447,
+   "i": 1668,
+   "n": 24313,
+   "wer": 0.14058322708016288,
+   "deletion_rate": 0.018385226010776128
   },
   "ours": {
-   "s": 1291,
-   "d": 609,
-   "i": 499,
-   "n": 15850,
-   "wer": 0.1513564668769716,
-   "deletion_rate": 0.03842271293375394
+   "s": 1940,
+   "d": 764,
+   "i": 650,
+   "n": 24313,
+   "wer": 0.13795089047011885,
+   "deletion_rate": 0.031423518282400364
   },
   "W": {
-   "s": 706,
-   "d": 354,
-   "i": 994,
-   "n": 15850,
-   "wer": 0.12958990536277604,
-   "deletion_rate": 0.022334384858044166
+   "s": 1078,
+   "d": 414,
+   "i": 1351,
+   "n": 24313,
+   "wer": 0.11693332784929873,
+   "deletion_rate": 0.017027927446222186
   },
   "rules_on": {
-   "s": 711,
-   "d": 403,
-   "i": 817,
-   "n": 15850,
-   "wer": 0.12182965299684542,
-   "deletion_rate": 0.025425867507886436
+   "s": 1072,
+   "d": 497,
+   "i": 1112,
+   "n": 24313,
+   "wer": 0.11027022580512483,
+   "deletion_rate": 0.02044173898737301
   }
  },
  "contrasts": {
   "rules_on_minus_scribe": {
-   "lo": -0.0642,
-   "hi": -0.04059,
+   "lo": -0.07335,
+   "hi": -0.04393,
    "replicates": 4000
   },
   "rules_on_minus_W": {
-   "lo": -0.01301,
-   "hi": -0.00311,
+   "lo": -0.01038,
+   "hi": -0.00348,
    "replicates": 4000
   },
   "W_minus_scribe": {
-   "lo": -0.05592,
-   "hi": -0.03357,
+   "lo": -0.06609,
+   "hi": -0.03775,
    "replicates": 4000
   }
  },
  "domination_rules_on_vs_scribe": {
-  "net_errors_saved": 810,
-  "largest_window": "win_sparta_feb11_2026_7639016",
-  "largest_window_share": 0.067
+  "net_errors_saved": 1368,
+  "largest_window": "win_chalandri_may25_2026_592579",
+  "largest_window_share": 0.114
  },
  "sensitivity": {
   "rules_on_vs_scribe": {
-   "corpus_delta_wer": -0.0511,
-   "leave_one_out_min": -0.05204,
-   "leave_one_out_max": -0.04809,
+   "corpus_delta_wer": -0.05627,
+   "leave_one_out_min": -0.05707,
+   "leave_one_out_max": -0.05026,
    "reverses_on_removing_one_window": false,
-   "window_that_hurts_the_claim_most": "win_sparta_feb11_2026_7639016",
-   "windows_better": 53,
+   "window_that_hurts_the_claim_most": "win_chalandri_may25_2026_592579",
+   "windows_better": 80,
    "windows_tied": 0,
    "windows_worse": 0,
    "note": "negative corpus_delta_wer means the first arm has fewer errors; if reverses_on_removing_one_window is true the benefit is one window"
   },
   "rules_on_vs_W": {
-   "corpus_delta_wer": -0.00776,
-   "leave_one_out_min": -0.00858,
-   "leave_one_out_max": -0.00647,
+   "corpus_delta_wer": -0.00666,
+   "leave_one_out_min": -0.00717,
+   "leave_one_out_max": -0.00582,
    "reverses_on_removing_one_window": false,
    "window_that_hurts_the_claim_most": "win_chania_may19_2025_146745",
-   "windows_better": 28,
-   "windows_tied": 14,
-   "windows_worse": 11,
+   "windows_better": 41,
+   "windows_tied": 23,
+   "windows_worse": 16,
    "note": "negative corpus_delta_wer means the first arm has fewer errors; if reverses_on_removing_one_window is true the benefit is one window"
   }
  },
@@ -2373,6 +2373,1086 @@
     "ours": 250
    },
    "duration_sec": 143.732
+  },
+  "win_vrilissia_dec8_2025_751776": {
+   "scribe": {
+    "s": 17,
+    "d": 8,
+    "i": 73,
+    "n": 262
+   },
+   "soniox": {
+    "s": 33,
+    "d": 3,
+    "i": 64,
+    "n": 262
+   },
+   "ours": {
+    "s": 25,
+    "d": 7,
+    "i": 5,
+    "n": 262
+   },
+   "W": {
+    "s": 14,
+    "d": 8,
+    "i": 56,
+    "n": 262
+   },
+   "rules_on": {
+    "s": 15,
+    "d": 7,
+    "i": 48,
+    "n": 262
+   },
+   "chunks": 4,
+   "forced_cuts": 0,
+   "words": {
+    "scribe": 326,
+    "soniox": 322,
+    "ours": 260
+   },
+   "duration_sec": 149.129
+  },
+  "win_vrilissia_dec8_2025_2688884": {
+   "scribe": {
+    "s": 8,
+    "d": 5,
+    "i": 14,
+    "n": 376
+   },
+   "soniox": {
+    "s": 10,
+    "d": 3,
+    "i": 7,
+    "n": 376
+   },
+   "ours": {
+    "s": 18,
+    "d": 7,
+    "i": 8,
+    "n": 376
+   },
+   "W": {
+    "s": 10,
+    "d": 3,
+    "i": 7,
+    "n": 376
+   },
+   "rules_on": {
+    "s": 9,
+    "d": 4,
+    "i": 7,
+    "n": 376
+   },
+   "chunks": 4,
+   "forced_cuts": 0,
+   "words": {
+    "scribe": 384,
+    "soniox": 379,
+    "ours": 377
+   },
+   "duration_sec": 149.535
+  },
+  "win_sparta_may13_2_2026_5483722": {
+   "scribe": {
+    "s": 7,
+    "d": 0,
+    "i": 13,
+    "n": 264
+   },
+   "soniox": {
+    "s": 4,
+    "d": 0,
+    "i": 1,
+    "n": 264
+   },
+   "ours": {
+    "s": 6,
+    "d": 1,
+    "i": 1,
+    "n": 264
+   },
+   "W": {
+    "s": 3,
+    "d": 0,
+    "i": 1,
+    "n": 264
+   },
+   "rules_on": {
+    "s": 4,
+    "d": 0,
+    "i": 1,
+    "n": 264
+   },
+   "chunks": 3,
+   "forced_cuts": 0,
+   "words": {
+    "scribe": 276,
+    "soniox": 264,
+    "ours": 264
+   },
+   "duration_sec": 146.889
+  },
+  "win_sparta_jun9_2026_0": {
+   "scribe": {
+    "s": 16,
+    "d": 2,
+    "i": 20,
+    "n": 330
+   },
+   "soniox": {
+    "s": 30,
+    "d": 2,
+    "i": 13,
+    "n": 330
+   },
+   "ours": {
+    "s": 34,
+    "d": 8,
+    "i": 3,
+    "n": 330
+   },
+   "W": {
+    "s": 16,
+    "d": 2,
+    "i": 11,
+    "n": 330
+   },
+   "rules_on": {
+    "s": 16,
+    "d": 2,
+    "i": 9,
+    "n": 330
+   },
+   "chunks": 4,
+   "forced_cuts": 0,
+   "words": {
+    "scribe": 347,
+    "soniox": 341,
+    "ours": 325
+   },
+   "duration_sec": 149.359
+  },
+  "win_chalandri_apr29_2026_2598239": {
+   "scribe": {
+    "s": 42,
+    "d": 1,
+    "i": 16,
+    "n": 348
+   },
+   "soniox": {
+    "s": 20,
+    "d": 0,
+    "i": 15,
+    "n": 348
+   },
+   "ours": {
+    "s": 22,
+    "d": 2,
+    "i": 0,
+    "n": 348
+   },
+   "W": {
+    "s": 16,
+    "d": 0,
+    "i": 11,
+    "n": 348
+   },
+   "rules_on": {
+    "s": 11,
+    "d": 0,
+    "i": 7,
+    "n": 348
+   },
+   "chunks": 4,
+   "forced_cuts": 0,
+   "words": {
+    "scribe": 361,
+    "soniox": 353,
+    "ours": 346
+   },
+   "duration_sec": 149.426
+  },
+  "win_argos_sep10_2025_573077": {
+   "scribe": {
+    "s": 12,
+    "d": 3,
+    "i": 23,
+    "n": 393
+   },
+   "soniox": {
+    "s": 22,
+    "d": 3,
+    "i": 20,
+    "n": 393
+   },
+   "ours": {
+    "s": 23,
+    "d": 24,
+    "i": 2,
+    "n": 393
+   },
+   "W": {
+    "s": 15,
+    "d": 3,
+    "i": 15,
+    "n": 393
+   },
+   "rules_on": {
+    "s": 11,
+    "d": 7,
+    "i": 14,
+    "n": 393
+   },
+   "chunks": 5,
+   "forced_cuts": 0,
+   "words": {
+    "scribe": 412,
+    "soniox": 409,
+    "ours": 371
+   },
+   "duration_sec": 149.784
+  },
+  "win_xylokastro_oct13_2025_1575940": {
+   "scribe": {
+    "s": 9,
+    "d": 2,
+    "i": 9,
+    "n": 269
+   },
+   "soniox": {
+    "s": 9,
+    "d": 1,
+    "i": 5,
+    "n": 269
+   },
+   "ours": {
+    "s": 19,
+    "d": 0,
+    "i": 1,
+    "n": 269
+   },
+   "W": {
+    "s": 8,
+    "d": 1,
+    "i": 6,
+    "n": 269
+   },
+   "rules_on": {
+    "s": 8,
+    "d": 1,
+    "i": 6,
+    "n": 269
+   },
+   "chunks": 3,
+   "forced_cuts": 0,
+   "words": {
+    "scribe": 276,
+    "soniox": 272,
+    "ours": 270
+   },
+   "duration_sec": 144.909
+  },
+  "win_athens_may28_2_2026_2067509": {
+   "scribe": {
+    "s": 43,
+    "d": 6,
+    "i": 48,
+    "n": 332
+   },
+   "soniox": {
+    "s": 27,
+    "d": 4,
+    "i": 36,
+    "n": 332
+   },
+   "ours": {
+    "s": 73,
+    "d": 15,
+    "i": 30,
+    "n": 332
+   },
+   "W": {
+    "s": 33,
+    "d": 5,
+    "i": 33,
+    "n": 332
+   },
+   "rules_on": {
+    "s": 40,
+    "d": 8,
+    "i": 25,
+    "n": 332
+   },
+   "chunks": 4,
+   "forced_cuts": 0,
+   "words": {
+    "scribe": 374,
+    "soniox": 363,
+    "ours": 347
+   },
+   "duration_sec": 148.964
+  },
+  "win_athens_feb26_2026_4688694": {
+   "scribe": {
+    "s": 20,
+    "d": 1,
+    "i": 18,
+    "n": 310
+   },
+   "soniox": {
+    "s": 11,
+    "d": 2,
+    "i": 5,
+    "n": 310
+   },
+   "ours": {
+    "s": 18,
+    "d": 4,
+    "i": 4,
+    "n": 310
+   },
+   "W": {
+    "s": 12,
+    "d": 3,
+    "i": 6,
+    "n": 310
+   },
+   "rules_on": {
+    "s": 13,
+    "d": 3,
+    "i": 6,
+    "n": 310
+   },
+   "chunks": 4,
+   "forced_cuts": 0,
+   "words": {
+    "scribe": 326,
+    "soniox": 313,
+    "ours": 310
+   },
+   "duration_sec": 150.075
+  },
+  "win_chalandri_oct8_2025_1254808": {
+   "scribe": {
+    "s": 13,
+    "d": 3,
+    "i": 32,
+    "n": 240
+   },
+   "soniox": {
+    "s": 10,
+    "d": 1,
+    "i": 16,
+    "n": 240
+   },
+   "ours": {
+    "s": 14,
+    "d": 6,
+    "i": 7,
+    "n": 240
+   },
+   "W": {
+    "s": 8,
+    "d": 3,
+    "i": 15,
+    "n": 240
+   },
+   "rules_on": {
+    "s": 7,
+    "d": 3,
+    "i": 11,
+    "n": 240
+   },
+   "chunks": 3,
+   "forced_cuts": 0,
+   "words": {
+    "scribe": 269,
+    "soniox": 253,
+    "ours": 241
+   },
+   "duration_sec": 147.585
+  },
+  "win_vrilissia_apr1_2_2026_1945951": {
+   "scribe": {
+    "s": 14,
+    "d": 4,
+    "i": 11,
+    "n": 414
+   },
+   "soniox": {
+    "s": 8,
+    "d": 7,
+    "i": 11,
+    "n": 414
+   },
+   "ours": {
+    "s": 21,
+    "d": 5,
+    "i": 7,
+    "n": 414
+   },
+   "W": {
+    "s": 7,
+    "d": 6,
+    "i": 10,
+    "n": 414
+   },
+   "rules_on": {
+    "s": 9,
+    "d": 6,
+    "i": 10,
+    "n": 414
+   },
+   "chunks": 5,
+   "forced_cuts": 0,
+   "words": {
+    "scribe": 421,
+    "soniox": 416,
+    "ours": 416
+   },
+   "duration_sec": 150.114
+  },
+  "win_athens_mar23_2026_5939601": {
+   "scribe": {
+    "s": 17,
+    "d": 3,
+    "i": 13,
+    "n": 289
+   },
+   "soniox": {
+    "s": 14,
+    "d": 2,
+    "i": 10,
+    "n": 289
+   },
+   "ours": {
+    "s": 21,
+    "d": 1,
+    "i": 1,
+    "n": 289
+   },
+   "W": {
+    "s": 14,
+    "d": 1,
+    "i": 10,
+    "n": 289
+   },
+   "rules_on": {
+    "s": 15,
+    "d": 1,
+    "i": 9,
+    "n": 289
+   },
+   "chunks": 3,
+   "forced_cuts": 0,
+   "words": {
+    "scribe": 299,
+    "soniox": 297,
+    "ours": 289
+   },
+   "duration_sec": 149.812
+  },
+  "win_chalandri_feb25_2026_2320131": {
+   "scribe": {
+    "s": 5,
+    "d": 1,
+    "i": 9,
+    "n": 252
+   },
+   "soniox": {
+    "s": 2,
+    "d": 0,
+    "i": 3,
+    "n": 252
+   },
+   "ours": {
+    "s": 4,
+    "d": 0,
+    "i": 2,
+    "n": 252
+   },
+   "W": {
+    "s": 0,
+    "d": 0,
+    "i": 3,
+    "n": 252
+   },
+   "rules_on": {
+    "s": 0,
+    "d": 0,
+    "i": 2,
+    "n": 252
+   },
+   "chunks": 3,
+   "forced_cuts": 0,
+   "words": {
+    "scribe": 259,
+    "soniox": 253,
+    "ours": 254
+   },
+   "duration_sec": 148.626
+  },
+  "win_zografou_may21_2_2026_2734957": {
+   "scribe": {
+    "s": 19,
+    "d": 3,
+    "i": 34,
+    "n": 371
+   },
+   "soniox": {
+    "s": 17,
+    "d": 2,
+    "i": 36,
+    "n": 371
+   },
+   "ours": {
+    "s": 24,
+    "d": 4,
+    "i": 7,
+    "n": 371
+   },
+   "W": {
+    "s": 15,
+    "d": 2,
+    "i": 29,
+    "n": 371
+   },
+   "rules_on": {
+    "s": 15,
+    "d": 2,
+    "i": 22,
+    "n": 371
+   },
+   "chunks": 4,
+   "forced_cuts": 0,
+   "words": {
+    "scribe": 401,
+    "soniox": 404,
+    "ours": 374
+   },
+   "duration_sec": 149.032
+  },
+  "win_zografou_jun4_2026_6168559": {
+   "scribe": {
+    "s": 10,
+    "d": 0,
+    "i": 21,
+    "n": 317
+   },
+   "soniox": {
+    "s": 3,
+    "d": 0,
+    "i": 18,
+    "n": 317
+   },
+   "ours": {
+    "s": 11,
+    "d": 2,
+    "i": 1,
+    "n": 317
+   },
+   "W": {
+    "s": 6,
+    "d": 0,
+    "i": 13,
+    "n": 317
+   },
+   "rules_on": {
+    "s": 6,
+    "d": 0,
+    "i": 9,
+    "n": 317
+   },
+   "chunks": 4,
+   "forced_cuts": 0,
+   "words": {
+    "scribe": 338,
+    "soniox": 334,
+    "ours": 317
+   },
+   "duration_sec": 149.253
+  },
+  "win_xylokastro_dec19_2024_552208": {
+   "scribe": {
+    "s": 8,
+    "d": 0,
+    "i": 4,
+    "n": 272
+   },
+   "soniox": {
+    "s": 6,
+    "d": 0,
+    "i": 0,
+    "n": 272
+   },
+   "ours": {
+    "s": 8,
+    "d": 0,
+    "i": 2,
+    "n": 272
+   },
+   "W": {
+    "s": 4,
+    "d": 0,
+    "i": 0,
+    "n": 272
+   },
+   "rules_on": {
+    "s": 4,
+    "d": 0,
+    "i": 0,
+    "n": 272
+   },
+   "chunks": 3,
+   "forced_cuts": 0,
+   "words": {
+    "scribe": 275,
+    "soniox": 270,
+    "ours": 274
+   },
+   "duration_sec": 150.164
+  },
+  "win_xylokastro_may4_2026_2764060": {
+   "scribe": {
+    "s": 16,
+    "d": 0,
+    "i": 31,
+    "n": 335
+   },
+   "soniox": {
+    "s": 13,
+    "d": 0,
+    "i": 27,
+    "n": 335
+   },
+   "ours": {
+    "s": 19,
+    "d": 1,
+    "i": 8,
+    "n": 335
+   },
+   "W": {
+    "s": 8,
+    "d": 0,
+    "i": 25,
+    "n": 335
+   },
+   "rules_on": {
+    "s": 10,
+    "d": 0,
+    "i": 22,
+    "n": 335
+   },
+   "chunks": 4,
+   "forced_cuts": 0,
+   "words": {
+    "scribe": 364,
+    "soniox": 361,
+    "ours": 342
+   },
+   "duration_sec": 149.964
+  },
+  "win_samothraki_may9_2026_600534": {
+   "scribe": {
+    "s": 23,
+    "d": 0,
+    "i": 38,
+    "n": 238
+   },
+   "soniox": {
+    "s": 23,
+    "d": 2,
+    "i": 27,
+    "n": 238
+   },
+   "ours": {
+    "s": 54,
+    "d": 5,
+    "i": 19,
+    "n": 238
+   },
+   "W": {
+    "s": 22,
+    "d": 0,
+    "i": 28,
+    "n": 238
+   },
+   "rules_on": {
+    "s": 23,
+    "d": 2,
+    "i": 25,
+    "n": 238
+   },
+   "chunks": 3,
+   "forced_cuts": 0,
+   "words": {
+    "scribe": 276,
+    "soniox": 263,
+    "ours": 252
+   },
+   "duration_sec": 146.264
+  },
+  "win_xylokastro_feb25_2026_6123319": {
+   "scribe": {
+    "s": 15,
+    "d": 0,
+    "i": 24,
+    "n": 314
+   },
+   "soniox": {
+    "s": 16,
+    "d": 1,
+    "i": 9,
+    "n": 314
+   },
+   "ours": {
+    "s": 31,
+    "d": 10,
+    "i": 4,
+    "n": 314
+   },
+   "W": {
+    "s": 12,
+    "d": 1,
+    "i": 8,
+    "n": 314
+   },
+   "rules_on": {
+    "s": 12,
+    "d": 2,
+    "i": 7,
+    "n": 314
+   },
+   "chunks": 4,
+   "forced_cuts": 0,
+   "words": {
+    "scribe": 331,
+    "soniox": 322,
+    "ours": 308
+   },
+   "duration_sec": 148.501
+  },
+  "win_samothraki_may15_2026_2277432": {
+   "scribe": {
+    "s": 13,
+    "d": 2,
+    "i": 25,
+    "n": 286
+   },
+   "soniox": {
+    "s": 16,
+    "d": 1,
+    "i": 19,
+    "n": 286
+   },
+   "ours": {
+    "s": 21,
+    "d": 3,
+    "i": 12,
+    "n": 286
+   },
+   "W": {
+    "s": 10,
+    "d": 2,
+    "i": 16,
+    "n": 286
+   },
+   "rules_on": {
+    "s": 10,
+    "d": 3,
+    "i": 14,
+    "n": 286
+   },
+   "chunks": 3,
+   "forced_cuts": 0,
+   "words": {
+    "scribe": 308,
+    "soniox": 299,
+    "ours": 295
+   },
+   "duration_sec": 149.446
+  },
+  "win_chalandri_oct15_2_2025_2835549": {
+   "scribe": {
+    "s": 33,
+    "d": 2,
+    "i": 9,
+    "n": 331
+   },
+   "soniox": {
+    "s": 25,
+    "d": 1,
+    "i": 7,
+    "n": 331
+   },
+   "ours": {
+    "s": 25,
+    "d": 3,
+    "i": 3,
+    "n": 331
+   },
+   "W": {
+    "s": 24,
+    "d": 1,
+    "i": 6,
+    "n": 331
+   },
+   "rules_on": {
+    "s": 23,
+    "d": 3,
+    "i": 6,
+    "n": 331
+   },
+   "chunks": 4,
+   "forced_cuts": 0,
+   "words": {
+    "scribe": 338,
+    "soniox": 337,
+    "ours": 331
+   },
+   "duration_sec": 148.759
+  },
+  "win_samothraki_nov19_2025_7533942": {
+   "scribe": {
+    "s": 38,
+    "d": 4,
+    "i": 34,
+    "n": 336
+   },
+   "soniox": {
+    "s": 40,
+    "d": 1,
+    "i": 38,
+    "n": 336
+   },
+   "ours": {
+    "s": 37,
+    "d": 16,
+    "i": 16,
+    "n": 336
+   },
+   "W": {
+    "s": 28,
+    "d": 5,
+    "i": 31,
+    "n": 336
+   },
+   "rules_on": {
+    "s": 23,
+    "d": 12,
+    "i": 24,
+    "n": 336
+   },
+   "chunks": 4,
+   "forced_cuts": 0,
+   "words": {
+    "scribe": 365,
+    "soniox": 372,
+    "ours": 336
+   },
+   "duration_sec": 148.14
+  },
+  "win_zografou_apr30_2026_1203213": {
+   "scribe": {
+    "s": 21,
+    "d": 5,
+    "i": 18,
+    "n": 373
+   },
+   "soniox": {
+    "s": 19,
+    "d": 5,
+    "i": 5,
+    "n": 373
+   },
+   "ours": {
+    "s": 18,
+    "d": 6,
+    "i": 2,
+    "n": 373
+   },
+   "W": {
+    "s": 13,
+    "d": 6,
+    "i": 3,
+    "n": 373
+   },
+   "rules_on": {
+    "s": 12,
+    "d": 7,
+    "i": 3,
+    "n": 373
+   },
+   "chunks": 4,
+   "forced_cuts": 0,
+   "words": {
+    "scribe": 386,
+    "soniox": 366,
+    "ours": 369
+   },
+   "duration_sec": 149.227
+  },
+  "win_chalandri_mar26_2026_3296154": {
+   "scribe": {
+    "s": 14,
+    "d": 3,
+    "i": 5,
+    "n": 432
+   },
+   "soniox": {
+    "s": 12,
+    "d": 5,
+    "i": 2,
+    "n": 432
+   },
+   "ours": {
+    "s": 9,
+    "d": 0,
+    "i": 0,
+    "n": 432
+   },
+   "W": {
+    "s": 4,
+    "d": 2,
+    "i": 1,
+    "n": 432
+   },
+   "rules_on": {
+    "s": 4,
+    "d": 2,
+    "i": 1,
+    "n": 432
+   },
+   "chunks": 5,
+   "forced_cuts": 0,
+   "words": {
+    "scribe": 434,
+    "soniox": 428,
+    "ours": 432
+   },
+   "duration_sec": 148.283
+  },
+  "win_argos_dec5_2025_996850": {
+   "scribe": {
+    "s": 40,
+    "d": 2,
+    "i": 30,
+    "n": 289
+   },
+   "soniox": {
+    "s": 23,
+    "d": 4,
+    "i": 11,
+    "n": 289
+   },
+   "ours": {
+    "s": 40,
+    "d": 18,
+    "i": 2,
+    "n": 289
+   },
+   "W": {
+    "s": 34,
+    "d": 1,
+    "i": 8,
+    "n": 289
+   },
+   "rules_on": {
+    "s": 28,
+    "d": 11,
+    "i": 3,
+    "n": 289
+   },
+   "chunks": 4,
+   "forced_cuts": 0,
+   "words": {
+    "scribe": 314,
+    "soniox": 294,
+    "ours": 273
+   },
+   "duration_sec": 143.677
+  },
+  "win_argos_jun3_2026_855222": {
+   "scribe": {
+    "s": 31,
+    "d": 2,
+    "i": 7,
+    "n": 291
+   },
+   "soniox": {
+    "s": 28,
+    "d": 7,
+    "i": 3,
+    "n": 291
+   },
+   "ours": {
+    "s": 46,
+    "d": 6,
+    "i": 4,
+    "n": 291
+   },
+   "W": {
+    "s": 30,
+    "d": 4,
+    "i": 4,
+    "n": 291
+   },
+   "rules_on": {
+    "s": 28,
+    "d": 7,
+    "i": 3,
+    "n": 291
+   },
+   "chunks": 3,
+   "forced_cuts": 0,
+   "words": {
+    "scribe": 295,
+    "soniox": 284,
+    "ours": 289
+   },
+   "duration_sec": 144.077
+  },
+  "win_chalandri_may25_2026_592579": {
+   "scribe": {
+    "s": 59,
+    "d": 0,
+    "i": 104,
+    "n": 199
+   },
+   "soniox": {
+    "s": 6,
+    "d": 9,
+    "i": 1,
+    "n": 199
+   },
+   "ours": {
+    "s": 8,
+    "d": 1,
+    "i": 0,
+    "n": 199
+   },
+   "W": {
+    "s": 6,
+    "d": 1,
+    "i": 1,
+    "n": 199
+   },
+   "rules_on": {
+    "s": 5,
+    "d": 1,
+    "i": 1,
+    "n": 199
+   },
+   "chunks": 3,
+   "forced_cuts": 0,
+   "words": {
+    "scribe": 303,
+    "soniox": 164,
+    "ours": 198
+   },
+   "duration_sec": 139.688
   }
  },
  "clusters": {
@@ -2428,7 +3508,34 @@
   "win_sparta_mar30_2026_14394624": "sparta/mar30_2026",
   "win_xylokastro_may7_2025_3008819": "xylokastro/may7_2025",
   "win_samothraki_jan28_2026_9762073": "samothraki/jan28_2026",
-  "win_sparta_may19_2026_46": "sparta/may19_2026"
+  "win_sparta_may19_2026_46": "sparta/may19_2026",
+  "win_vrilissia_dec8_2025_751776": "vrilissia/dec8_2025",
+  "win_vrilissia_dec8_2025_2688884": "vrilissia/dec8_2025",
+  "win_sparta_may13_2_2026_5483722": "sparta/may13_2_2026",
+  "win_sparta_jun9_2026_0": "sparta/jun9_2026",
+  "win_chalandri_apr29_2026_2598239": "chalandri/apr29_2026",
+  "win_argos_sep10_2025_573077": "argos/sep10_2025",
+  "win_xylokastro_oct13_2025_1575940": "xylokastro/oct13_2025",
+  "win_athens_may28_2_2026_2067509": "athens/may28_2_2026",
+  "win_athens_feb26_2026_4688694": "athens/feb26_2026",
+  "win_chalandri_oct8_2025_1254808": "chalandri/oct8_2025",
+  "win_vrilissia_apr1_2_2026_1945951": "vrilissia/apr1_2_2026",
+  "win_athens_mar23_2026_5939601": "athens/mar23_2026",
+  "win_chalandri_feb25_2026_2320131": "chalandri/feb25_2026",
+  "win_zografou_may21_2_2026_2734957": "zografou/may21_2_2026",
+  "win_zografou_jun4_2026_6168559": "zografou/jun4_2026",
+  "win_xylokastro_dec19_2024_552208": "xylokastro/dec19_2024",
+  "win_xylokastro_may4_2026_2764060": "xylokastro/may4_2026",
+  "win_samothraki_may9_2026_600534": "samothraki/may9_2026",
+  "win_xylokastro_feb25_2026_6123319": "xylokastro/feb25_2026",
+  "win_samothraki_may15_2026_2277432": "samothraki/may15_2026",
+  "win_chalandri_oct15_2_2025_2835549": "chalandri/oct15_2_2025",
+  "win_samothraki_nov19_2025_7533942": "samothraki/nov19_2025",
+  "win_zografou_apr30_2026_1203213": "zografou/apr30_2026",
+  "win_chalandri_mar26_2026_3296154": "chalandri/mar26_2026",
+  "win_argos_dec5_2025_996850": "argos/dec5_2025",
+  "win_argos_jun3_2026_855222": "argos/jun3_2026",
+  "win_chalandri_may25_2026_592579": "chalandri/may25_2026"
  },
- "elapsed_sec": 2631.2
+ "elapsed_sec": 6299.8
 }

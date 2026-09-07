@@ -200,12 +200,15 @@ shadow** — κάθε νούμερο είναι agreement-with-OpenCouncil, δη
 **The fusion runs live, and it wins on real audio, 2026-09-07**
 ([report](docs/reports/2026-09-07-live-fusion-pilot.md)). Until today every number
 came from recorded token streams; the three systems had never been called on the same
-audio. On 40 training-disjoint windows in 10 cities, drawn with a seed and a per-city
-cap fixed before any aggregate existed: Scribe **0.18348**, Soniox **0.16124**, ours
-**0.15562**, vote **0.13480**, **rules_on 0.12641**. Against Scribe that is
-**−0.05708**, CI [−0.0725, −0.0439], and **40 windows of 40 are better**, largest window
-7.9% of the gain. Against the plain vote **−0.00839**, CI [−0.0140, −0.0030]. The price
-is visible too: `rules_on` deletes more than either (0.02484 vs 0.02275 vs 0.02182).
+audio. On 80 training-disjoint windows in 10 cities, drawn with a seed and a per-city
+cap fixed before any aggregate existed, 0 failures: Scribe **0.16654**, Soniox
+**0.14058**, ours **0.13795**, vote **0.11693**, **rules_on 0.11027**. Against Scribe
+that is **−0.05627**, CI [−0.0734, −0.0439], and **80 windows of 80 are better**,
+largest window 11.4% of the gain. Against the plain vote **−0.00666**, CI
+[−0.0104, −0.0035]. The price is visible too: `rules_on` deletes more than either
+(0.02044 vs 0.01764 vs 0.01703). Running the same windows with `ours` served from the
+RunPod GPU instead of local CPU moves the fused number by no more than about 0.001 —
+the order of vendor nondeterminism, and a sixtieth of what fusion buys.
 Agreement-with-OpenCouncil throughout — this says nothing about fidelity to the audio.
 
 The production route now runs end to end with three live vendors **and no bucket**
