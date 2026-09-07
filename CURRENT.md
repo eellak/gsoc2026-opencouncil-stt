@@ -38,6 +38,33 @@ Agent protocol: [`CLAUDE.md`](CLAUDE.md).
 
 ## Open 2026-08-26 — training round 2, ceiling first
 
+**Η μέτρηση ξανασχεδιάστηκε, 2026-09-06** (χάρτης
+[#57](https://github.com/eellak/gsoc2026-opencouncil-stt/issues/57), tickets #59 και #60).
+Το blind core των 120 της παγωμένης ουράς **δεν είναι σύνολο μέτρησης**: 117 από τα 120
+μοιράζονται συνεδρίαση με assisted training clips, και 47 κάθονται σε συνεδρίαση που ο
+`artifact-adapter-cleanpack-cont-s47` έχει ήδη εκπαιδευτεί πάνω της. Από τις 95
+συνεδριάσεις της ουράς (κλειδί `(city, meeting_id)` — το `meeting_id` σκέτο δεν είναι
+μοναδικό), οι 28 εμφανίζονται σε `clean-pack-arm-2026-08` ή `spliced-pack-arm-2026-08`·
+μένουν **67 ανέγγιχτες συνεδριάσεις με 449 clips**.
+
+Στη θέση του μπαίνουν δύο δείγματα που δεν αθροίζονται ποτέ: ένα **ordinary sample** 80
+clips των 20 s, σε τυχαίες θέσεις μέσα σε εκείνες τις 67 συνεδριάσεις, το πολύ 2 ανά
+συνεδρίαση, κομμένο **χωρίς να διαβαστεί καμία έξοδος μοντέλου**· και ένα **challenge
+sample** 40 `deletion_hard` clips από τις ίδιες συνεδριάσεις. Κανένα φίλτρο καθαρής
+ομιλίας στο ordinary sample — η καθαρή ομιλία κρίνει τι *μαθαίνει* το μοντέλο, όχι τι το
+*μετράει*.
+
+Οι ετικέτες είναι **blind preference judgements** (Α/Β/ισοπαλία συν σημαία «έχασε λόγια»),
+όχι πληκτρολογημένα κείμενα: βγάζουν ποσοστό νικών, ποτέ WER, και δεν γίνονται ποτέ
+δεδομένα εκπαίδευσης. Ο κανόνας πάγωσε πριν από κάθε νούμερο: ο νέος adapter κερδίζει
+**μόνο** αν το CI του ποσοστού νικών αποκλείει το 50% με bootstrap ανά συνεδρίαση **στο
+ordinary sample**, και το «έχασε λόγια» δεν αυξάνεται. Τα 601 assisted μένουν ως δεδομένα
+εκπαίδευσης· επειδή είναι προσυμπληρωμένα από Soniox, το fusion ξανατρέχει με τον παλιό
+και με τον νέο adapter για να τιμολογηθεί η απώλεια ανεξαρτησίας.
+
+Οι όροι ζουν πλέον στο [`CONTEXT.md`](CONTEXT.md). Κανένα clip δεν ακούγεται πριν κλείσει
+το [#64](https://github.com/eellak/gsoc2026-opencouncil-stt/issues/64).
+
 `exp-2026-08-26-training-round-2` is **OPEN, spec written, nothing measured**:
 [`docs/specs/2026-08-26-training-round-2.md`](docs/specs/2026-08-26-training-round-2.md),
 settled in a 15-decision grill. Order: three CPU ceiling measurements (phoneme-skeleton
@@ -133,6 +160,41 @@ everything. `group_words` in `eval/soniox_confidence_probe.py` already did it ri
 probe now reuses it instead of its own loop. The adjudication itself was **not run** — after
 the fix no arm gains, so there is nothing for it to rescue.
 
+## Closed 2026-09-06 — the replay gate passes, and the guard is priced on the right arm
+
+Χάρτης [#57](https://github.com/eellak/gsoc2026-opencouncil-stt/issues/57). Τρία tickets
+έκλεισαν την ίδια μέρα.
+
+**Το replay gate περνά** ([#58](https://github.com/eellak/gsoc2026-opencouncil-stt/issues/58)).
+`npm run test:fusion-route-gate`, branch `feat/fusion-provider` HEAD `52b33a2`: 13/13 tests,
+391/391 παράθυρα, **μηδέν hard mismatches** — η διαδρομή HTTP αναπαράγει ακριβώς το
+`fuse.py`, ανά παράθυρο, χωρίς καμία κλήση σε πληρωμένο API. Κόστος chunking στα
+`max_tokens=120`: **+0.00007** έναντι ορίου 0.002. Αλλά μόνο **2 από τα 391** παράθυρα
+διαφέρουν και το `largest_window_share_of_net_delta` είναι **1.25** — ένα παράθυρο εξηγεί
+παραπάνω από όλο το delta, οπότε το +0.00007 δεν διαβάζεται ως συστηματικός φόρος.
+Αδοκίμαστα μένουν: ζωντανοί providers, πραγματικά διαπιστευτήρια, μεγάλες ηχογραφήσεις.
+
+**Ο guard κοστίζει τετραπλάσια στο arm που στέλνουμε**
+([#61](https://github.com/eellak/gsoc2026-opencouncil-stt/issues/61),
+[report](docs/reports/2026-09-06-guard-rules-only.md)). Το δημοσιευμένο «26 διασώσεις / 31
+ζημιές, καθαρό −5» μετρήθηκε στο **policy** arm. Στο **rules-only**, στα ίδια 169 παράθυρα:
+**10 / 31, καθαρό −21**. Στα 391: 12 σωστές, 63 λάθος. Το λεξιλόγιο είναι δύο tokens,
+`ναι` και `δεν`· το άνοιγμά του σε πέντε δίνει 0.11211, χειρότερα από κάθε εναλλακτική.
+Καμία κυριαρχία (μεγαλύτερη συνεδρίαση 8,8%). **Απόφαση: μένει προσωρινά, μόνο για το
+shadow** — κάθε νούμερο είναι agreement-with-OpenCouncil, δηλαδή ακριβώς η μετρική που δεν
+κωδικοποιεί αυτό που ο guard προστατεύει. Το κρίνουν τα 36 clips του
+`exp-2026-08-26-chooser-deletion-safety`, που παραμένουν άτρεχτα.
+
+**Το seam-repair έκλεισε, τίποτα δεν υιοθετήθηκε**
+([#63](https://github.com/eellak/gsoc2026-opencouncil-stt/issues/63),
+[report](docs/reports/2026-09-05-seam-repair-39.md)). Έναντι του **P**, όχι του control:
+το **F** είναι το μόνο arm που κινεί τις διαγραφές με διάστημα που αποκλείει το μηδέν
+(−0.00160), τον άξονα στον οποίο το P απέτυχε στο δικό του gate. Το μισό αυτού είναι μία
+συνεδρίαση και ολόκληρο είναι **19 tokens**. Το X ξανατρέχτηκε υπό τη διόρθωση γεωμετρίας
+του `46867240` και βγήκε byte-identical, οπότε το caveat του στένεψε στο pilot.
+**Το arm P καταγράφηκε επιτέλους ως εκτός production** (απόφαση 2026-09-04)· δεν υπήρχε
+πουθενά γραμμένη.
+
 ## Open 2026-08-26 — integrating the fusion into the OpenCouncil pipeline
 
 `exp-2026-08-26-fusion-integration` is **OPEN, spec written, nothing built**:
@@ -181,8 +243,9 @@ under the guard definition frozen in `make_fixtures.py`. The build now runs in
 gate before any paid run, 3 stacked PRs, `FUSION_LLM` flag default-off). No PR opens
 without Harold's approval.
 
-**Step 3 is building, 2026-09-04.** Three commits on `feat/fusion-provider`
-(`12bac04` core, `5c8ce7e`, `83b0cbf`); nothing pushed, no PR. The Python fuse core is
+**Step 3 is built and gated, 2026-09-06.** Six commits on `feat/fusion-provider`,
+HEAD `52b33a2` (`12bac04` core, `5c8ce7e`, `83b0cbf`, `62820a6`, `2c9d1ad`, `52b33a2`);
+nothing pushed, no PR. The Python fuse core is
 **byte-exact against all three frozen arms over the 391 windows**: W
 `[5396,1332,6577,110694]` = 0.12020, rules guard-off `[5030,1865,5452,110694]` = 0.11154,
 rules guard-on `[5036,1848,5519,110694]` = 0.11205.
@@ -206,9 +269,27 @@ caught by the integration gate as it was planned:
 - `FusionTranscriber` sent no `config.chunking`, so production silently ran Python's
   default 800 — the 260 s path. Fixed in `83b0cbf`.
 
-Remaining before any paid run: the replay integration gate (Codex `f784ace4`), whose
-oracle is the guard-**on** total `[5036,1848,5519,110694]`, since `guard: true` is
-hardcoded in `FusionTranscriber`.
+**The replay integration gate passes, and since 2026-09-07 it passes strictly**
+(HEAD `3e4505e`). Its oracle is the guard-**on** total `[5036,1848,5519,110694]`, since
+`guard: true` is hardcoded in `FusionTranscriber`. `npm run test:fusion-route-gate`:
+**15/15 tests**, 391/391 windows, zero hard mismatches, chunked
+`[5030,1861,5520,110694]` = 0.11212 against the frozen 0.11205 — **+0.00007**, inside the
+0.002 budget, but carried by 2 windows out of 391 with
+`largest_window_share_of_net_delta` 1.25, so it is not a systematic tax.
+
+The numbers did not move on 2026-09-07; what moved is what they prove. The first
+scorer called the oracle **only** when the HTTP text already differed from the frozen
+fixture, so the real acceptance condition was `HTTP == frozen OR HTTP == oracle` — a
+TypeScript defect that pushed output back towards the unchunked text would have passed
+unexamined. Astra review demonstrated it by counterexample: 391 frozen-matching results
+against a disagreeing oracle returned `ok=true` with zero oracle calls. The oracle now
+runs on every window, and two negative controls keep it honest: a divergent window
+replaced by its frozen text must land in the hard bucket, and a window submitted twice
+while another is dropped must fail on set equality — row count and summed totals both
+survive that swap.
+
+What the gate does **not** prove: live providers, real credentials, long recordings,
+failure handling. A small shadow smoke test is still required.
 
 Blocked on Harold: where `RUNPOD_API_KEY` lives, ElevenLabs and Anthropic API keys.
 
