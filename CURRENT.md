@@ -347,6 +347,65 @@ Systran conversion, which is now marked `MISSING` because its local snapshot is 
 
 Report: [`docs/reports/2026-08-26-train-wer-v2.md`](docs/reports/2026-08-26-train-wer-v2.md).
 
+## Open 2026-09-07 — the decoder does not repeat itself
+
+`exp-2026-09-07-decode-nondeterminism` is **OPEN** and blocks the fusion
+integration: [report](docs/reports/2026-09-07-decode-nondeterminism.md).
+
+The same audio, decoded twice with the same configuration, does not produce the
+same words — **on both stacks**. One window, three decodes each: CPU int8
+self-WER 0.0972 / 0.1215 / 0.0962, GPU float16 0.1883 / 0.1172 / 0.1778. The
+cause is the `temperature` ladder: in faster-whisper 1.2.1 any temperature above
+zero decodes by **sampling**, and faster-whisper sets no seed. (CTranslate2 does
+expose `set_random_seed`, untested here — a seeded ladder is not a closed door.
+And a reported `temperature` of 1.0 means the ladder was *exhausted*, not that
+the returned text was sampled at 1.0.)
+
+It probably does not threaten the fusion result, but that part is extrapolation:
+*if* ~10% per-window noise is independent across windows it would average down
+over 391 windows to order ±0.003–0.004, against a gain of 0.056. Independence is
+unchecked and pooled noise was never measured. What is structurally safe is the
+comparison between arms of one run, which share the same cached `ours` draw.
+
+In doubt regardless: every per-window claim, the direction of the CPU-vs-GPU
+serving-stack delta, and the exact reproducibility of every published number.
+
+**Confirmed by intervention, 2026-09-08.** `temperature=0.0` was shipped to the
+serving stack (image `sha256:1bd21e69…`, template `cilsob176z`; rollback is
+template `4u0k7ykwrf` on the old digest, and `TEMPERATURE` is now an env var).
+Same window, three decodes: CPU 78.8/77.7/77.9 s with self-WER **0.0000** against
+181.4/181.4/178.4 s and 0.0972/0.1215/0.0962; GPU execution **13.7–14.7 s**
+against 123.9–145.4 s, byte-identical. Both symptoms went together.
+
+**The record stays OPEN, and the reason is quality, not speed.** The ladder
+rescues chunks that trip the thresholds and it is gone. Word counts moved
+(247 → 237) and nothing measured says whether what left was degenerate output or
+speech. Until the 60-window experiment runs, this is a *measured* speed and
+reproducibility win and an *unmeasured* quality change — and no number produced
+with it may be compared to one produced with the ladder.
+
+`OURS_DECODE` in `eval/live_fusion/providers.py` still carries the ladder, so
+the CPU measurement stack and the GPU serving stack now run **different
+decoders**. Deliberate until the quality question is settled; do not forget it.
+
+**Latency, resolved 2026-09-08.** The route now answers a fresh 136.8 s window in
+**31.2 s** end to end, against 96.5 s before: soniox 21.9 s, ours 22.3 s, scribe
+28.7 s. **Scribe is the critical path now**, so further decode work on `ours`
+buys nothing here.
+
+The "~100 s limit" was never a benchmark rule — it is **Cloudflare's 524 origin
+timeout**. An instrumented 130 s request returned 524 through Cloudflare and 200
+through Tailscale Funnel. At 31 s either path works.
+
+The route runs on the mini-PC off the unpushed `feat/fusion-provider` branch,
+reachable at `ocfusion.haroldpoi.dev` and `minipc.tail11f3d4.ts.net`. Endpoint
+`o1jda6sxo85dnk` had `idleTimeout` 5 s, so no measurement before 2026-09-07 was
+ever warm; it is 300 s now. The `audioUrl` transport works live and needs no new
+bucket. **Registration is still not cleared**, because the decode change that
+bought the speed is an unmeasured quality change. The benchmark provider
+`oc-cleanpack-cont-s47-b` points at a pod that no longer exists and must be
+disabled before any run.
+
 ## Where the fusion line stands, 2026-08-26
 
 **0.10581 WER on the 391-window benchmark**, against Scribe v2 at 0.13771. Held out
