@@ -377,6 +377,29 @@ Same window, three decodes: CPU 78.8/77.7/77.9 s with self-WER **0.0000** agains
 181.4/181.4/178.4 s and 0.0972/0.1215/0.0962; GPU execution **13.7–14.7 s**
 against 123.9–145.4 s, byte-identical. Both symptoms went together.
 
+**The cost is measured, 2026-09-08**
+([report](docs/reports/2026-09-08-temperature-zero-cost.md)). 60 windows, the
+pre-declared prefix of the live cohort, both conditions on the same local CPU stack,
+only `ours` differing: `temperature=0.0` costs **+0.00061 WER on `rules_on`** and
++0.00111 on `ours`. **The ladder was not rescuing speech** — words emitted rose
+17,960 → 18,022 and the deletion rate fell 0.02344 → 0.02316.
+
+Two things keep it open anyway. The **noise floor came out exactly zero**: two ladder
+draws over the same 12 windows were byte-identical on all five arms, so the
+nondeterminism only appears where a segment trips a threshold and the ladder fires.
+The +0.00061 clears the noise floor of a subset that contains no noisy windows, which
+is weaker than it looks. And the control drifted (−0.00006 / +0.00017) because the
+earlier parallel runs raced, so the third decimal is not trustworthy.
+
+**A timing bug found by the benchmark, fixed 2026-09-08** (`cbe9caa4`). Three of 250
+windows fell back with `timing_invariant`; naming both timing sources in the message
+turned it into one shape. Pass 1 of `assignTimings` grouped only *consecutive* tokens
+sharing a Scribe anchor, so an unanchored token between two that share one broke the
+run and handed that word's span out twice — the timeline jumped backwards by up to
+3.4 s. Reproduced offline from the cached components, no audio and no vendor calls.
+Coverage goes **247/250 → 250/250**; the 391-window gate still passes 15/15 at
+0.11212, because only the times moved.
+
 **The record stays OPEN, and the reason is quality, not speed.** The ladder
 rescues chunks that trip the thresholds and it is gone. Word counts moved
 (247 → 237) and nothing measured says whether what left was degenerate output or
