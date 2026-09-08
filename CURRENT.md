@@ -1,6 +1,6 @@
 # Current Work
 
-Last updated: 2026-09-04
+Last updated: 2026-09-09
 
 ## PAST GSOC
 
@@ -384,12 +384,18 @@ only `ours` differing: `temperature=0.0` costs **+0.00061 WER on `rules_on`** an
 +0.00111 on `ours`. **The ladder was not rescuing speech** — words emitted rose
 17,960 → 18,022 and the deletion rate fell 0.02344 → 0.02316.
 
-Two things keep it open anyway. The **noise floor came out exactly zero**: two ladder
-draws over the same 12 windows were byte-identical on all five arms, so the
-nondeterminism only appears where a segment trips a threshold and the ladder fires.
-The +0.00061 clears the noise floor of a subset that contains no noisy windows, which
-is weaker than it looks. And the control drifted (−0.00006 / +0.00017) because the
-earlier parallel runs raced, so the third decimal is not trustworthy.
+**And the cost is inside the noise, 2026-09-09.** A second ladder draw over the
+**same 60 windows** moves `rules_on` by **+0.00094** and `ours` by **+0.00238** — on
+both arms more than dropping the ladder cost. So +0.00061 is not a measured
+regression; it is inside the range the ladder produces by rerunning itself on the
+same audio. The vote's noise is exactly **0.00000**: a majority of three absorbs
+`ours` moving entirely. Only 3–4 windows in 60 differ between draws — the
+nondeterminism is rare and large, not common and small.
+
+An earlier 12-window noise probe returned exactly zero and **must not be quoted**:
+none of those windows fire the ladder, so it measured noise where there is none.
+The control also drifted (−0.00006 / +0.00017) because the earlier parallel runs
+raced, so the fifth decimal is not trustworthy.
 
 **A timing bug found by the benchmark, fixed 2026-09-08** (`cbe9caa4`). Three of 250
 windows fell back with `timing_invariant`; naming both timing sources in the message
@@ -400,7 +406,8 @@ run and handed that word's span out twice — the timeline jumped backwards by u
 Coverage goes **247/250 → 250/250**; the 391-window gate still passes 15/15 at
 0.11212, because only the times moved.
 
-**The record stays OPEN, and the reason is quality, not speed.** The ladder
+**The record stays OPEN for one reason only: every number above is
+agreement-with-OpenCouncil, which decides nothing about fidelity to the audio.** The ladder
 rescues chunks that trip the thresholds and it is gone. Word counts moved
 (247 → 237) and nothing measured says whether what left was degenerate output or
 speech. Until the 60-window experiment runs, this is a *measured* speed and
@@ -424,10 +431,53 @@ The route runs on the mini-PC off the unpushed `feat/fusion-provider` branch,
 reachable at `ocfusion.haroldpoi.dev` and `minipc.tail11f3d4.ts.net`. Endpoint
 `o1jda6sxo85dnk` had `idleTimeout` 5 s, so no measurement before 2026-09-07 was
 ever warm; it is 300 s now. The `audioUrl` transport works live and needs no new
-bucket. **Registration is still not cleared**, because the decode change that
-bought the speed is an unmeasured quality change. The benchmark provider
-`oc-cleanpack-cont-s47-b` points at a pod that no longer exists and must be
-disabled before any run.
+bucket.
+
+**Registration happened on 2026-09-08** under a stated limit: the run is the first
+number of the `temperature=0.0` configuration, not a quality clearance for it. See
+the section below. `oc-cleanpack-cont-s47-b`, which pointed at a deleted pod, was
+disabled before the run.
+
+## Done 2026-09-09 — the benchmark scored the fusion: 0.09913 on 391 windows
+
+[Report](docs/reports/2026-09-09-fusion-bench-391.md). Run
+`2026-09-08-fusion-rules-temp0-vs-post-june-held-out`, cloned from the post-June
+held-out run so the eight existing providers came free. **391/391 windows, 0
+errors, $4.66, 3.4 hours** at concurrency 1.
+
+| system | WER | del | ins |
+|---|---:|---:|---:|
+| **fusion-rules (temp=0)** | **0.09913** | 0.01866 | 0.03413 |
+| Scribe v2 | 0.14027 | 0.00955 | 0.07526 |
+| Soniox `stt-async-v5` | 0.15022 | 0.01229 | 0.07446 |
+| gpt-4o-transcribe | 0.19417 | 0.05086 | 0.03109 |
+| Gladia | 0.20911 | 0.04075 | 0.04356 |
+
+Against Scribe: **−0.04114**, 339 windows better / 9 tied / 43 worse, largest single
+window 2.5% of the net delta, zero leave-one-out sign reversals. On the two
+training-disjoint cities the gap widens: argos 0.08720 against 0.13488, orestiada
+0.05967 against 0.09481.
+
+**The price is deletions: 0.01866 against Scribe's 0.00955, +95% relative.** The WER
+win is bought by halving insertions. Whether the extra deletions are fillers or
+speech is exactly `exp-2026-08-26-chooser-deletion-safety`, which is still unrun —
+this number does not close it.
+
+**Not comparable to 0.11205 or 0.11027.** Those were the ladder-era decoder on
+recorded token streams; this is `temperature=0.0` on live vendor calls. Two variables
+moved at once. It is also agreement-with-OpenCouncil, and the pool is contaminated —
+read the argos and orestiada strata for model quality.
+
+**Seven windows never fused** and were scored as exact Scribe inside the fusion
+column: 4 × `timing_invariant` (fused word timings came out non-monotonic — a bug in
+the timing path, first measured rate 1.0%) and 3 × `TypeError: fetch failed` to
+RunPod. The benchmark cannot see this; only the traces can. The route answers
+`{"text"}`, so a fallback window still scores `ok`.
+
+The route now runs as `fusion-bench-route.service` (systemd `--user`,
+`Restart=always`) — one `configSha` across all 391 traces, no restart during the run,
+p50 31.2 s and p95 42.0 s per window. Procedure:
+[`docs/runbooks/fusion-bench-provider.md`](docs/runbooks/fusion-bench-provider.md).
 
 ## Where the fusion line stands, 2026-08-26
 

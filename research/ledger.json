@@ -1,6 +1,6 @@
 {
  "schema_version": 1,
- "updated_at": "2026-09-08T00:00:00Z",
+ "updated_at": "2026-09-09T00:00:00Z",
  "note": "Authoritative state. Reports under docs/reports/ are immutable evidence; this file says whether their conclusions still stand. When a doc disagrees with this file, this file wins and the doc gets fixed in the same change.",
  "experiments": [
   {
@@ -2328,19 +2328,21 @@
    "status": "OPEN",
    "conclusion": "",
    "decision": "",
-   "next_action": "LATENCY BLOCKER CLEARED 2026-09-08: the route now answers a fresh 136.8 s window in 31.2 s end to end (was 96.5 s), scribe 28.7 s is the critical path, and the route is publicly reachable at https://ocfusion.haroldpoi.dev (Cloudflare tunnel) and https://minipc.tail11f3d4.ts.net (Tailscale Funnel) from a server running on the mini-PC off the unpushed feat/fusion-provider branch. MEASURED: the ~100 s ceiling is Cloudflare's 524 origin timeout, not a benchmark rule -- an instrumented 130 s request returned 524 through Cloudflare and 200 through Funnel. At 31 s either path works. REGISTRATION IS STILL NOT CLEARED, because the decode change that bought the speed is an unmeasured quality change (exp-2026-09-07-decode-nondeterminism). PRIOR: BLOCKED 2026-09-07 by exp-2026-09-07-decode-nondeterminism: the decoder is not reproducible on either stack (self-WER 0.096-0.122 CPU, 0.117-0.188 GPU, same audio, same config, unseeded temperature-fallback sampling), and the fusion route is 1.8x over the benchmark's ~100 s per-request budget (141 s window: ours 175.8 s of a 181.4 s total; 126 s even with a warm worker). Fix decode determinism FIRST -- it is also the leading candidate explanation for the latency -- then re-measure, then resume below. Do not register the route as a benchmark provider until then, and when registering, CLONE the run rather than adding a provider to 2026-08-22-post-june-held-out-test-clean-pack-cont-: that run's numbers back FINAL_REPORT.md, a provider cannot be removed once added, and cloning copies every existing provider's results for free. Before starting any clone, DISABLE or repoint oc-cleanpack-cont-s47-b in /api/config/providers: it is enabled and targets deleted pod v5fntwcc5h0h34, a provider cannot be removed from a run once it has been added, and /api/config/providers/test sends its clip through every enabled provider. PRIOR: LIVE PILOT DONE 2026-09-07 (docs/reports/2026-09-07-live-fusion-pilot.md). The three systems were called on the same audio for the first time. 80 training-disjoint windows in 10 cities, seed and per-city cap fixed before any aggregate, 0 failures: scribe 0.16654, soniox 0.14058, ours 0.13795, vote 0.11693, rules_on 0.11027, all agreement-with-OpenCouncil on one stack. rules_on beats scribe by 0.05627, CI [-0.0734,-0.0439], 80/80 windows better, largest window 11.4% of the net gain, no single-window removal reverses it; beats the plain vote by 0.00666, CI [-0.0104,-0.0035], 41 better / 23 tied / 16 worse. Deletions rise: 0.02044 against scribe 0.01764 and vote 0.01703, which is the axis exp-2026-08-26-chooser-deletion-safety exists to settle. SERVING STACK PRICED: the same windows with `ours` from the RunPod serverless GPU instead of local CPU int8 move rules_on by 0.00131 on the 78 windows both scored (2 of 80 never left the RunPod queue and were not retried a third time), but the control (scribe/soniox, identical recordings) drifts 0.00017-0.00038 because the two runs raced, so the honest bound is 'no more than about 0.001, the order of vendor nondeterminism'. The production route runs live end to end without any bucket, and a replay of every recorded live response fuses 39/39 with zero fallbacks. NEXT: (1) a bucket or equivalent for full-length segments -- base64 tops out near 6.7 MB and a 15-minute segment is 28.8 MB; (2) the shadow smoke test on a real meeting; (3) the deletion listening test, still unrun.",
+   "next_action": "BENCHMARKED 2026-09-09 (docs/reports/2026-09-09-fusion-bench-391.md). The fusion route was registered as benchmark provider oc-fusion-rules-2026-09-08 and scored on the 391-window clone 2026-09-08-fusion-rules-temp0-vs-post-june-held-out: 391/391 windows, 0 errors, $4.66 of vendor billing, 3.4 h at concurrency 1. WER 0.09913 against Scribe v2 0.14027, Soniox 0.15022, gpt-4o-transcribe 0.19417, Gladia 0.20911, all five on identical windows and references. Paired against Scribe: -0.04114, 339 better / 9 tied / 43 worse, largest single window 2.5% of the net delta, zero leave-one-out sign reversals. Training-disjoint strata hold and widen: argos 0.08720 vs 0.13488, orestiada 0.05967 vs 0.09481. THE PRICE: deletions 0.01866 against Scribe's 0.00955, +95% relative, bought by halving insertions (0.03413 vs 0.07526) -- exp-2026-08-26-chooser-deletion-safety is what decides whether that is fillers or speech, and it is STILL UNRUN. This number is agreement-with-OpenCouncil and is NOT comparable to the ladder-era 0.11154/0.11205 replay or the 0.11027 live pilot: decoder and pipeline both changed. NEXT, unchanged in substance: (1) the deletion listening test; (2) the timing_invariant defect now has a measured rate -- 4 of 391 live windows (1.0%) silently returned exact Scribe because fused word timings came out non-monotonic, and it is a bug in the timing path, not a vendor failure; (3) the shadow smoke test on a real meeting; (4) a bucket or equivalent for full-length segments (base64 tops out near 6.7 MB, a 15-minute segment is 28.8 MB). ALSO, from the CodeRabbit review of this change: give each trace a stable non-PII identifier that the benchmark report also carries, so the windows that fell back to Scribe can be joined to their report rows and re-scored. In this run they could not be identified at all -- traces hold no text by design and audio hashes do not join to benchmark items -- so the 7 non-fused windows are inside the headline number with no way to isolate them. Do this before the next paid run; it is a change to the trace/report flow in opencouncil-tasks, not to any published record here.",
    "artifact_ids": [
     "artifact-adapter-cleanpack-cont-s47",
     "artifact-ct2-cleanpack-cont-s47"
    ],
    "capability_ids": [
     "cap-serverless-asr",
-    "cap-bench-http-api"
+    "cap-bench-http-api",
+    "cap-fusion-bench-route"
    ],
    "reports": [
     "docs/reports/2026-08-26-category-chooser.md",
     "docs/reports/2026-08-31-align3-scaling.md",
-    "docs/reports/2026-09-07-live-fusion-pilot.md"
+    "docs/reports/2026-09-07-live-fusion-pilot.md",
+    "docs/reports/2026-09-09-fusion-bench-391.md"
    ],
    "specs": [
     "docs/specs/2026-08-26-fusion-integration.md",
@@ -2374,10 +2376,15 @@
     "2026-09-07: measured through the real route, one 140.85 s window, cold component cache, warm pod: total 181.4 s (soniox 20.4 s, scribe 29.6 s, ours 175.8 s). The three run in parallel, so ours alone sets the total. Direct to the endpoint: upload 5.1 s, queue 42.0 s, GPU 123.9 s.",
     "2026-09-07: endpoint o1jda6sxo85dnk had idleTimeout 5 s, so every job paid a cold start and no measurement before this date was ever warm. Raised to 300 s; queue delay fell from 12076 ms to 199 ms, GPU time did NOT move (145 s -> 125 s -> 128 s). The model is constructed at module scope in handler.py, so its load lives in delayTime, not executionTime. workersMax is still 1.",
     "2026-09-07: the audioUrl transport works live and has no size limit worth the name -- a 9.0 MB / 565.6 s meeting fused whole (coverage 559.3 s), where 12 MB of base64 would have exceeded the /run cap. But the handler on main reads no start/end offsets and verifies no audio hash, so passing offsets today would be silently ignored. A new R2 bucket is not needed; presigned private URLs from the existing Spaces cover the case where no source URL exists.",
-    "2026-09-07: the benchmark provider oc-cleanpack-cont-s47-b is enabled and points at pod v5fntwcc5h0h34, which no longer exists (zero live pods). Any run cloned today with it enabled fails on every window.",
-    "TIMING BUG, found and fixed 2026-09-08: three of 250 benchmark windows fell back with timing_invariant because pass 1 of assignTimings grouped only CONSECUTIVE tokens sharing a Scribe anchor. An unanchored token between two tokens that share one broke the run in two and handed that word's span out twice, so the timeline jumped backwards by up to 3.4 s. Fixed in opencouncil-tasks cbe9caa4; the 391-window gate still passes 15/15 at 0.11212 because the text was never affected, only the times. Coverage on the benchmark run goes 247/250 -> 250/250."
+    "2026-09-07, RESOLVED 2026-09-08: the benchmark provider oc-cleanpack-cont-s47-b was enabled and pointed at pod v5fntwcc5h0h34, which no longer exists, so any run cloned with it enabled would have failed on every window. It was set enabled=false before the 2026-09-08 run and the provider smoke test now reports it as skipped/disabled. It still exists in the provider list and in the results of runs that already contain it -- a provider cannot be removed from a run.",
+    "TIMING BUG, found and fixed 2026-09-08: three of 250 benchmark windows fell back with timing_invariant because pass 1 of assignTimings grouped only CONSECUTIVE tokens sharing a Scribe anchor. An unanchored token between two tokens that share one broke the run in two and handed that word's span out twice, so the timeline jumped backwards by up to 3.4 s. Fixed in opencouncil-tasks cbe9caa4; the 391-window gate still passes 15/15 at 0.11212 because the text was never affected, only the times. Coverage on the benchmark run goes 247/250 -> 250/250.",
+    "2026-09-09: 7 of 391 benchmark windows did not fuse and were scored as exact Scribe inside the fusion column -- 4 timing_invariant, 3 aux_ours_provider_failed (TypeError: fetch failed to RunPod). The benchmark cannot see this: the route answers {\"text\"} and the window scores ok either way. Only the traces record it. Their identity inside the report is NOT recoverable -- traces carry no text by design and audio hashes cannot be joined to benchmark items. The timing_invariant cause was found the same evening from these traces (commit cbe9caa4: pass 1 grouped only consecutive tokens sharing a Scribe anchor, so an unanchored token between two that share one handed that word's span out twice) and fixed in eval/live_fusion/providers.py; the served route in opencouncil-tasks still carried the defect during the run.",
+    "2026-09-09: identifying non-fused windows by 'hypothesis text identical to Scribe' DOES NOT WORK and was withdrawn. The benchmark's scribe column is a separate ElevenLabs call from August, not the route's own Scribe call, so byte-identity was never expected. The trace count is the only authority on how many windows fused.",
+    "2026-09-09: the 0.09913 was produced with temperature=0.0 on the GPU decoder while the CPU measurement stack (eval/live_fusion/providers.py OURS_DECODE) still carries the ladder. Two variables separate it from the published 0.11205: the decoder and live-vendor-versus-replay. The difference cannot be attributed to either.",
+    "2026-09-09: RunPod serverless GPU cost for the run was NOT measured. The $4.66 is Scribe plus Soniox as billed through the benchmark. The ours component spent 1.81 h of wall time over 388 calls, which includes queue and upload and is not billable GPU seconds.",
+    "2026-09-09: the Python fuse core in opencouncil-tasks (a subprocess per window) was rewritten in place at 22:28:59, mid-run, with content byte-identical to HEAD. It reads as a touch, not a change, and the route process itself never restarted -- but the run cannot distinguish touched from changed-and-reverted. Recorded rather than hidden."
    ],
-   "updated_at": "2026-09-08T00:00:00Z"
+   "updated_at": "2026-09-09T00:00:00Z"
   },
   {
    "id": "exp-2026-08-26-training-round-2",
@@ -2520,7 +2527,7 @@
     "cap-decode-x-local"
    ],
    "superseded_by": null,
-   "next_action": "COST MEASURED 2026-09-08 (docs/reports/2026-09-08-temperature-zero-cost.md). 60 windows, the pre-declared prefix of the live cohort, both conditions on the SAME local CPU stack, only `ours` differing and scribe/soniox read from cache as a control. temperature=0.0 costs +0.00061 WER on rules_on and +0.00111 on ours, better/tied/worse 4/51/5 and 2/57/1. THE LADDER WAS NOT RESCUING SPEECH: words emitted rose 17960->18022 and the deletion rate fell 0.02344->0.02316. BUT the noise floor came out EXACTLY ZERO -- two ladder draws over the same 12 windows were byte-identical on all five arms -- so the nondeterminism is not uniform: it appears only where a segment trips a threshold and the ladder fires. The +0.00061 is above the noise floor of a subset containing no noisy windows. The control also drifted -0.00006/+0.00017 because earlier parallel runs raced and left the cache holding a different vendor draw than the results file recorded. NEXT: a noise floor measured on windows where the ladder actually fires, then the listening test. Until then the CPU measurement stack keeps the ladder and the GPU serving stack does not, deliberately.",
+   "next_action": "COST MEASURED AND IT IS INSIDE THE NOISE, 2026-09-09 (docs/reports/2026-09-08-temperature-zero-cost.md). 60 windows, the pre-declared prefix of the live cohort, both conditions on the same local CPU stack, only `ours` differing, vendors read from cache as a control. Dropping the ladder costs +0.00061 WER on rules_on and +0.00111 on ours. A SECOND LADDER DRAW over the same 60 windows moves rules_on by +0.00094 and ours by +0.00238 -- so on both arms the cost of the change is SMALLER than the decoder's disagreement with itself, and the +0.00061 is not a measured regression. The vote's noise is exactly 0.00000: a majority of three absorbs `ours` moving. Only 3-4 windows in 60 differ between draws at all. The ladder was also not rescuing speech: words emitted rose 17960->18022 and the deletion rate fell 0.02344->0.02316. AN EARLIER 12-WINDOW NOISE PROBE RETURNED EXACTLY ZERO and must not be quoted: none of those windows fire the ladder, so it measured noise where there is none. STILL OPEN, and only for one reason: every number here is agreement-with-OpenCouncil, which decides nothing about fidelity to the audio. The listening test is the remaining evidence. Second item: the CPU measurement stack still carries the ladder while the GPU serving stack does not.",
    "caveats": [
     "One window, dense continuous council speech, one city, three runs per stack. The fallback rate on other material is unmeasured.",
     "The +/-0.003-0.004 pooled-noise figure is an extrapolation from a single window's self-WER, not a measurement of pooled noise. Bounding it properly needs the repetition described in next_action.",
@@ -2534,10 +2541,12 @@
     "2026-09-08: the fusion route's component cache at ~/.cache/oc-public/fusion-bench-cache was PURGED after the change, because its key does not include the decode parameters and it still held pre-change results. The live-fusion pilot cache (~/.cache/oc-public/live-fusion-2026-09, 318 files) was deliberately LEFT IN PLACE: it is the evidence behind the published pilot and must not be silently mixed with post-change results.",
     "2026-09-08: CPU showed 2.3x and GPU about 9x from the same change. The two are not directly comparable -- different compute type, different hardware, and the CPU figure is wall clock while the GPU figure is RunPod executionTime -- so neither number predicts the other.",
     "2026-09-08: the speed result removes the latency blocker but does NOT close the quality question, and the two must not be reported as one outcome.",
-    "The nondeterminism is window-dependent, not uniform. Two ladder draws over 12 windows were byte-identical on every arm; the probe window that produced 0.0972-0.1215 self-WER trips the thresholds and those twelve do not. Any noise floor measured on windows where the ladder never fires is zero by construction and must not be quoted as the decoder's noise floor."
+    "The nondeterminism is window-dependent, not uniform. Two ladder draws over 12 windows were byte-identical on every arm; the probe window that produced 0.0972-0.1215 self-WER trips the thresholds and those twelve do not. Any noise floor measured on windows where the ladder never fires is zero by construction and must not be quoted as the decoder's noise floor.",
+    "2026-09-09: the first benchmark number of the temperature=0.0 configuration exists (docs/reports/2026-09-09-fusion-bench-391.md, fusion WER 0.09913 on 391 windows). It is the score of a system that contains this decoder, NOT an independent measurement of the decoder: no ladder arm was run on those 391 windows. The ladder-versus-zero price is the separate 60-window paired measurement in docs/reports/2026-09-08-temperature-zero-cost.md (+0.00061 WER on rules_on), and the two must not be added together or confused.",
+    "2026-09-09: the ocasr provider's cache key DOES include the decode configuration -- paramsSha hashes the endpoint's whole provenance blob, which carries decode.temperature. Checked because a key that ignored it would have served pre-change results after the change. Separately, the trace labels the ours component with the endpoint id rather than the model.bin hash, because the handler returns ct2_model_bin_sha256 while ocasr.ts reads model_bin_sha256; cosmetic for the cache, but it makes a trace harder to attribute."
    ],
    "opened": "2026-09-07",
-   "updated_at": "2026-09-08T00:00:00Z"
+   "updated_at": "2026-09-09T00:00:00Z"
   }
  ],
  "artifacts": [
@@ -3540,6 +3549,30 @@
    ],
    "updated_at": "2026-08-24T00:00:00Z",
    "last_verified_at": "2026-08-24T00:00:00Z"
+  },
+  {
+   "id": "cap-fusion-bench-route",
+   "title": "Fusion route as an OpenAI-compatible benchmark provider",
+   "status": "AVAILABLE",
+   "purpose": "Serve Scribe v2 + Soniox + artifact-ct2-cleanpack-cont-s47, fused by the rules engine, over HTTP so the benchmark can score the fusion like any other provider.",
+   "runbook": "docs/runbooks/fusion-bench-provider.md",
+   "code": "opencouncil-tasks feat/fusion-provider: fusion_bench_server.mjs, src/routes/openaiCompat.ts",
+   "base_url": "https://ocfusion.haroldpoi.dev/v1",
+   "auth_env": "BENCH_PROVIDER_TOKEN",
+   "operations": [
+    "transcribe"
+   ],
+   "smoke_check": "curl -s https://ocfusion.haroldpoi.dev/healthz",
+   "notes": [
+    "Runs under systemd --user unit fusion-bench-route.service (Restart=always) on the mini-PC, reachable through the oc-asr cloudflared tunnel and Tailscale Funnel. Its secrets live in ~/.config/fusion-bench/route.env (mode 600).",
+    "dist/lib/auth.js reads API_TOKENS at import time and exits without it, even though the server passes its tokens explicitly. Quote it as API_TOKENS='[\"tbp_...\"]' in the env file.",
+    "Models accepted: scribe, fusion-rules, fusion-policy-opus, fusion-policy-sonnet. The policy models return 400 while the LLM chooser is off.",
+    "ANY component failure returns exact Scribe (outcome scribe-fallback) and the benchmark still scores the window ok. Every run must be audited against ~/.cache/oc-public/fusion-bench-traces/ for outcome=fused, one configSha, and three non-empty components.",
+    "Measured 2026-09-08/09 over 391 windows: 384 fused, p50 31.2 s, p95 42.0 s, max 49.0 s per window at concurrency 1.",
+    "The route serves the compiled dist/; rebuild after any source change or it serves the old code."
+   ],
+   "updated_at": "2026-09-09T00:00:00Z",
+   "last_verified_at": "2026-09-09T00:35:00Z"
   }
  ]
 }

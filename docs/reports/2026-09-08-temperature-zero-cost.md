@@ -35,35 +35,50 @@ conditions, so their rows are a control: if they move, the comparison is broken.
 arm. That was the fear the report before this one named, and on this sample it
 does not happen.
 
-The cost is **+0.00061 WER on the arm we ship**, against determinism and roughly
-2.3× the speed on CPU and 10× on GPU.
+## The cost is smaller than the noise
 
-## Two things that keep this open
+A first attempt at the noise floor used 12 windows and returned **exactly zero** —
+two ladder draws, byte-identical on all five arms. That was a finding about the
+sample, not about the decoder: the nondeterminism appears only where a segment
+trips a threshold and the ladder actually fires, and none of those twelve do.
+Quoting it as the noise floor would have made a difference look real by measuring
+the noise where there is none.
 
-**The noise floor came out exactly zero, and that is a finding about the
-experiment.** Two ladder draws over the same 12 windows produced byte-identical
-output on every arm — 0/12/0 on all five. So the nondeterminism is **not
-uniform**: it appears only when a segment trips a threshold and the ladder
-actually fires. The window that produced the original 0.0972–0.1215 self-WER
-tripped it; these twelve did not. The +0.00061 is therefore above the noise floor
-*of a subset that contains no noisy windows*, which is weaker than it looks. A
-noise floor measured on windows where the ladder fires is the missing number.
+Repeated on the **same 60 windows** the cost was measured on, a second ladder draw
+against the first gives:
+
+| arm | cost of dropping the ladder | the ladder's disagreement with itself |
+|---|---:|---:|
+| ours | +0.00111 | **+0.00238** |
+| majority vote | −0.00022 | **+0.00000** |
+| **rules_on** | +0.00061 | **+0.00094** |
+
+**On both arms the cost is smaller than the noise.** The +0.00061 is not a
+measured regression; it is inside the range the ladder produces by rerunning
+itself on the same audio. Removing it costs nothing this instrument can see, and
+buys determinism and roughly 2.3× the speed on CPU, 10× on GPU.
+
+Two details worth keeping. The vote's noise is **exactly zero** — a majority of
+three absorbs the whole of `ours` moving — while `rules_on` inherits some of it,
+which is what you would expect from an arm that follows `ours` where the rules
+say to. And only 3 or 4 windows in 60 differ between draws at all: the
+nondeterminism is rare and large, not common and small.
 
 **The control moved**, by −0.00006 and +0.00017. Scribe and Soniox should be
 identical in both conditions. They are not, because the earlier parallel runs
 raced on some windows and left the cache holding a different vendor draw than the
-80-window results file recorded. The drift is an order of magnitude below the
-`ours` delta, but it means this table's third decimal is not trustworthy.
+80-window results file recorded. It is an order of magnitude below the `ours`
+delta, but this table's fifth decimal is not trustworthy.
 
 ## What is settled and what is not
 
-Settled: the ladder does not remove speech on these 60 windows, and the shipped
-arm loses about 0.0006 WER by dropping it.
+Settled, on agreement-with-OpenCouncil: the ladder does not remove speech, and
+dropping it costs less than the decoder's own draw-to-draw variation.
 
-Not settled: whether that holds on windows where the ladder actually fires, and
-whether any of it survives a listening test. The metric here is
-agreement-with-OpenCouncil throughout. It records product compatibility and
-decides nothing about which decoder is closer to the audio.
+Not settled: fidelity to the audio. Every number here is agreement with our own
+published text, which records product compatibility and decides nothing about
+which decoder is closer to what was said. That is the listening test's job, and
+it is still unrun.
 
 `OURS_DECODE` in `eval/live_fusion/providers.py` still carries the ladder while
 the serving stack does not, so the two stacks still run different decoders. That
