@@ -59,6 +59,32 @@ OURS_DECODE = {
     "log_prob_threshold": -1.0,
     "compression_ratio_threshold": 2.4,
 }
+# The two decode policies under test. `ladder` is what every number before
+# 2026-09-08 was produced with: faster-whisper retries a segment at rising
+# temperatures when it trips the log-probability or compression-ratio threshold,
+# and any temperature above zero decodes by SAMPLING with no seed -- which is why
+# the same audio does not decode to the same words twice. `zero` collapses the
+# ladder to one deterministic beam-search pass.
+#
+# They are not interchangeable: the ladder exists to rescue chunks that trip the
+# thresholds, and whether what it rescues is speech or degenerate repetition is
+# the open question. Switching this changes the decode params sha, so the two
+# policies can never share a cache entry.
+TEMPERATURE_LADDER = [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]
+TEMPERATURE_ZERO = [0.0]
+
+
+def set_ours_temperature(mode: str) -> list:
+    """Select the decode policy. Returns the ladder actually installed."""
+    if mode == "zero":
+        OURS_DECODE["temperature"] = list(TEMPERATURE_ZERO)
+    elif mode == "ladder":
+        OURS_DECODE["temperature"] = list(TEMPERATURE_LADDER)
+    else:
+        raise ValueError(f"unknown temperature policy {mode!r}")
+    return OURS_DECODE["temperature"]
+
+
 OURS_MODEL_DIR = Path(os.environ.get("OURS_MODEL_DIR", "/home/harold/oc-asr-serve/ct2-v2"))
 OURS_MODEL_SHA = "0c6976f120f12f7c6dc487f86dcb3649b80c78adb6c08e31142ec55f01e535b4"
 OURS_RUNTIME = {"device": "cpu", "compute_type": "int8", "cpu_threads": 4}
@@ -375,9 +401,18 @@ def load_ours():
     return _MODEL
 
 
-def ours_words(window_id: str, wav: Path):
-    sha = params_sha({"decode": OURS_DECODE, "runtime": OURS_RUNTIME,
-                      "model_sha": OURS_MODEL_SHA[:16]})
+def ours_words(window_id: str, wav: Path, draw: int = 0):
+    """`draw` gives a repeat decode its own cache slot.
+
+    Without it a second decode of the same window under the same policy is a
+    cache hit, which is exactly the wrong answer when the question is how much
+    the decoder moves between draws.
+    """
+    key = {"decode": OURS_DECODE, "runtime": OURS_RUNTIME,
+           "model_sha": OURS_MODEL_SHA[:16]}
+    if draw:
+        key["draw"] = draw
+    sha = params_sha(key)
     hit = cached(window_id, "ours", sha)
     if hit is None:
         model = load_ours()

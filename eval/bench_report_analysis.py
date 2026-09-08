@@ -110,6 +110,26 @@ def paired_delta(a: dict, b: dict) -> dict:
     }
 
 
+def identical_to_scribe(report: dict, instance_id: str) -> list[str]:
+    """Items where the provider's hypothesis is byte-identical to Scribe's.
+
+    The fusion route answers `{"text": …}` and nothing else, so a window that fell
+    back to exact Scribe is invisible in the benchmark: it reports `ok`. It is not
+    invisible here, because "exact Scribe" means exact. This over-counts only if a
+    fused window happens to reproduce Scribe word for word, which the trace count
+    is there to cross-check.
+    """
+    out = []
+    for item in report["items"]:
+        mine = item["perProvider"].get(instance_id) or {}
+        scribe = item["perProvider"].get("scribe") or {}
+        if mine.get("status") != "ok" or scribe.get("status") != "ok":
+            continue
+        if mine.get("hypothesisText") and mine["hypothesisText"] == scribe.get("hypothesisText"):
+            out.append(item["itemId"])
+    return out
+
+
 def main() -> None:
     if len(sys.argv) < 3:
         raise SystemExit(__doc__)
@@ -118,6 +138,15 @@ def main() -> None:
 
     print(f"run: {report['manifest']['id']}")
     print(f"items in sample: {len(report['items'])}")
+
+    if any(p["instanceId"] == "scribe" for p in report["providers"]) and target != "scribe":
+        same = identical_to_scribe(report, target)
+        print(f"\nwindows where {target} is byte-identical to scribe: {len(same)}"
+              f" — cross-check against the trace count of non-fused outcomes")
+        if same:
+            print("  " + ", ".join(same[:10]) + (" …" if len(same) > 10 else ""))
+
+    excluded = set(identical_to_scribe(report, target)) if target != "scribe" else set()
 
     for metric in ("wer", "wer-nofillers"):
         print(f"\n=== metric: {metric} ===")
@@ -146,6 +175,18 @@ def main() -> None:
             print(f"   better {d['better']} / tied {d['tied']} / worse {d['worse']}")
             print(f"   largest single window = {d['largest_window_share']:.1%} of the net edit delta")
             print(f"   leave-one-out sign reversals: {d['loo_sign_reversals']}")
+
+        if excluded:
+            # A window that fell back is a Scribe row wearing the fusion's name. It
+            # belongs in the headline number -- it is what the system did -- but the
+            # question "how good is the fusion when it fuses" needs it dropped from
+            # every provider at once, or the sets stop being paired.
+            keep = {pid: {k: v for k, v in rows[pid].items() if k not in excluded}
+                    for pid in [target, *baselines]}
+            print(f"\n-- secondary, {len(excluded)} non-fused window(s) dropped from every provider --")
+            for pid in [target, *baselines]:
+                score, num, den = pooled(keep[pid])
+                print(f"   {pid:31s} pooled {score:.5f}  ({num}/{den})  items {len(keep[pid])}")
 
 
 if __name__ == "__main__":

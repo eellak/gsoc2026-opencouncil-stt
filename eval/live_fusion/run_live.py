@@ -173,6 +173,13 @@ def main():
     signal.signal(signal.SIGTERM, _die_cleanly)
     ap = argparse.ArgumentParser()
     ap.add_argument("--n", type=int, default=30)
+    ap.add_argument("--ours-temperature", choices=["ladder", "zero"], default="ladder",
+                    help="decode policy for `ours`. ladder = the unseeded temperature "
+                         "fallback every number before 2026-09-08 used; zero = one "
+                         "deterministic beam-search pass. Never merge their numbers.")
+    ap.add_argument("--draw", type=int, default=0,
+                    help="repeat decode index. A second draw under the same policy needs "
+                         "its own cache slot or it just reads the first one back.")
     ap.add_argument("--cap", type=int, default=MAX_PER_CITY,
                     help="windows per city. Stage A is 4 and stage B is 8, both fixed in "
                          "PREDECLARED.md before any aggregate existed; the shuffle is the "
@@ -194,6 +201,10 @@ def main():
         print("RUNPOD_API_KEY must be set for --ours gpu", file=sys.stderr)
         return 2
 
+    installed = P.set_ours_temperature(args.ours_temperature)
+    print(f"[live] ours decode policy: {args.ours_temperature} temperature={installed}"
+          + (f" draw={args.draw}" if args.draw else ""), file=sys.stderr)
+
     bench = json.loads(BENCH_JSON.read_text(encoding="utf-8"))
     sample, pool_size = draw(bench["items"], args.n, args.cap)
     print(f"[live] {len(sample)} of {pool_size} training-disjoint windows, "
@@ -214,7 +225,7 @@ def main():
             if args.ours == "gpu":
                 ow, o_sha = P.ours_gpu_words(wid, wav, runpod_key)
             else:
-                ow, o_sha = P.ours_words(wid, wav)
+                ow, o_sha = P.ours_words(wid, wav, draw=args.draw)
         except Exception as exc:                      # noqa: BLE001
             failures.append({"id": wid, "stage": "provider", "error": type(exc).__name__,
                              "detail": str(exc)[:200]})
@@ -276,10 +287,10 @@ def main():
               f"(scribe {len(sw)} soniox {len(nw)} ours {len(ow)} words)", file=sys.stderr)
 
         _write(args.out, per_window, clusters, failures, shas, sample, started,
-                   pool_size_note, args.ours, args.cap)
+                   pool_size_note, args.ours, args.cap, args.ours_temperature, args.draw)
 
     _write(args.out, per_window, clusters, failures, shas, sample, started,
-                   pool_size_note, args.ours, args.cap)
+                   pool_size_note, args.ours, args.cap, args.ours_temperature, args.draw)
     print(f"[live] done: {len(per_window)} scored, {len(failures)} failed, "
           f"{time.time() - started:.0f}s", file=sys.stderr)
     return 0
@@ -332,7 +343,7 @@ def compare(per_window, arm_a, arm_b):
 
 
 def _write(path, per_window, clusters, failures, shas, sample, started, pool_size=None,
-           ours_stack="local", cap=MAX_PER_CITY):
+           ours_stack="local", cap=MAX_PER_CITY, temperature_policy="ladder", draw=0):
     """Rewritten after every window so a killed run still has its numbers."""
     arms = ["scribe", "soniox", "ours", "W", "rules_on"]
     agg = {a: totals([r[a] for r in per_window.values()]) for a in arms} if per_window else {}
@@ -383,6 +394,8 @@ def _write(path, per_window, clusters, failures, shas, sample, started, pool_siz
                        "transport": "file upload by file_id, not audio_url (no public bucket "
                                     "credential here); model and decode flags are the frozen ones"},
             "ours_stack": ours_stack,
+            "ours_temperature_policy": temperature_policy,
+            "ours_draw": draw,
             "ours_stack_note": ("local = CPU int8 on the mini-PC, the canonical measurement "
                                 "stack. gpu = the RunPod serverless endpoint, float16 on CUDA "
                                 "at beam 2, which is what production calls. The runbook is "
