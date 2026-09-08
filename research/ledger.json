@@ -2547,6 +2547,60 @@
    ],
    "opened": "2026-09-07",
    "updated_at": "2026-09-09T00:00:00Z"
+  },
+  {
+   "id": "exp-2026-09-09-scribe-confidence-routing",
+   "title": "Scribe's own per-word confidence as the trigger for calling the other two ASR systems",
+   "question": "Does Scribe v2's per-word logprob concentrate the FUSION'S GAIN over Scribe well enough to route -- to call Soniox and our adapter only where Scribe looks unsure -- and separately, does it predict Scribe's own errors against a human who listened?",
+   "status": "CLOSED",
+   "conclusion": "NO for whole-window routing, and the pre-declared gate failed on the number it named. Leg B ran on the 391 windows of run 2026-09-08-fusion-rules-temp0-vs-post-june-held-out, joined to the cached raw Scribe responses (perfect 391<->391 permutation). Both endpoints reproduced under the analysis pipeline BEFORE anything else was computed: scribe 0.14027, fusion 0.09913. The fusion helps in 339 windows, HURTS in 43, ties in 9, total available gain 4554 edit operations. At the pre-declared 25% routed-audio budget the best of the four declared confidence scores (1 - mean of the lowest decile) captures 34.5% of that gain against a duration-matched random p95 of 29.8% and a random mean of 25.2%, and against an ORACLE that captures 61.6%. GATE was 'capture >= 50% AND beat random p95' -> FAIL. The signal is REAL and WEAK: it beats random by 9.3 points of gain and beats a confidence-free longest-windows-first ranking by 11.9 (that baseline is WORSE than random at 22.6%), so Scribe's logprob does carry routing information, but roughly half of the exploitable structure is invisible to it. The product sentence: to keep 80% of the fusion's gain you must route 75% of the audio anyway, which is where the saving was supposed to come from. Deletions rise monotonically along every ranking (0.00955 at 0% to 0.01866 at 100%); a 25% budget buys about a third of the WER gain and about 45% of the extra deletions. No single window carries it (largest 7.4% of the captured gain, 7 routed windows contribute negatively), and the training-disjoint cities agree rather than rescue: argos captures 38.9% of its own gain at that budget, orestiada 28.8%. THE REASON IT FAILS is the one Codex Astra a5b91215 named before the code was written: confidence ranks where SCRIBE STRUGGLES, and routing needs where THE FUSION HELPS. A window that is hard for Scribe is usually hard for all three systems.",
+   "decision": "DO NOT build whole-window confidence routing. The measured operating points do not pay: a 25% audio budget keeps about a third of the fusion's gain, and keeping most of the gain requires routing most of the audio. | LEG A WAS NOT RUN, on purpose: the pre-registration made it conditional on leg B passing. Whether Scribe's per-word confidence predicts Scribe's OWN errors against a human who listened is therefore still unanswered, and it is still worth about $0.07 over the 30 frozen gold cells IF someone wants it for a different purpose -- flagging passages for human review is not routing, and the same signal can be useful there while failing here. | LEG C (region-level splicing) is not scheduled. Before anyone builds it, note the ceiling measured here: even a PERFECT window-level router leaves 38% of the gain unreachable at a 25% budget, and the island construction has to solve that Scribe and the fusion have different word sequences and timestamps, that a Scribe deletion has no word to anchor an island around, and that the hybrid must be spliced by a reference-independent rule and scored as an actual transcript.",
+   "next_action": "CLOSED. The unanswered part was split out into exp-2026-09-09-scribe-confidence-fidelity, which owns leg A.",
+   "artifact_ids": [],
+   "capability_ids": [
+    "cap-fusion-bench-route",
+    "cap-bench-http-api"
+   ],
+   "reports": [
+    "docs/reports/2026-09-09-scribe-confidence-routing.md"
+   ],
+   "specs": [],
+   "superseded_by": null,
+   "opened": "2026-09-09",
+   "caveats": [
+    "THREE CLAIMS THAT MUST NEVER MERGE (Codex Astra a5b91215): (1) confidence detects Scribe's emitted-word errors; (2) a frozen gate concentrates the fusion's benefit on this benchmark; (3) an independently confirmed gate improves human-reference transcription at a worthwhile cost. Leg B can only ever support (2). No AUROC and no agreement-with-OpenCouncil number is evidence that routing improves fidelity to the audio.",
+    "A per-word confidence cannot see deletions, by construction. For Scribe on these 391 windows deletions are 0.00955 of a 0.14027 WER, about 6.8% of edit operations -- a smaller blind spot than Soniox's 22.8% or our adapter's 41.1%, but not zero.",
+    "The 43.7% of identical consecutive logprobs seen in a first pass was an artifact of counting spacing tokens: word-to-word ties are 28 of 110,890 pairs (0.0%), and a spacing token carries the value of the word that follows it (43.9%). The signal is genuinely per-word.",
+    "Showing the whole curve does not prevent post-hoc selection of the best score, budget or subgroup. Every choice made after seeing the curve is exploratory and needs a confirmation set that is not these 391 windows.",
+    "Dollar savings do not follow from the routed-window share: cost is Scribe on all audio plus the other two on routed audio plus overhead, and vendor billing minima, GPU cold starts and the added latency of waiting for Scribe before launching the others are not in the curve.",
+    "2026-09-09: the four window scores, the 25% primary budget, the 50% capture gate and the baselines were all written into this record BEFORE the outcome was computed, and the analysis asserts both published anchors before it reports anything. What was already seen at that point: the confidence distribution and the quality of the cache-to-report join, neither of which is an outcome."
+   ],
+   "updated_at": "2026-09-09T00:00:00Z"
+  },
+  {
+   "id": "exp-2026-09-09-scribe-confidence-fidelity",
+   "title": "Does Scribe's per-word confidence predict Scribe's own errors against a human who listened?",
+   "question": "Scribe v2 returns a per-word logprob. Does it rank the words a human listener marked wrong, on the same frozen gold set that measured Soniox (0.8167) and our own adapter (0.8151) -- and is it therefore usable to flag passages for human review?",
+   "status": "OPEN",
+   "conclusion": "",
+   "decision": "",
+   "next_action": "Split out of exp-2026-09-09-scribe-confidence-routing on 2026-09-09, which CLOSED negative on ROUTING and deliberately left this unrun. The two questions are independent: a signal can fail to say where the fusion is worth paying for and still say where a human should listen. COST about $0.07: Scribe over the 30 frozen gold cells (6 meetings, 6 cities, 35 s clips, 15 s scored core, 17.5 minutes of audio total); the gold set already holds human answers plus adapter and soniox hypotheses, and has no Scribe row. PROTOCOL, unchanged from the two prior probes so the numbers stay comparable: mean WITHIN-MEETING AUROC of (1 - exp(logprob)) for predicting that an EMITTED Scribe word is an error, pre-declared GO threshold 0.60, 2000-permutation within-meeting null, leave-one-meeting-out, bottom-decile lift, and the deletion share of edit operations stated as the structural ceiling. FIRST, per Codex Astra a5b91215: define emitted-word error precisely (substitutions and insertions, one deterministic alignment and normalization policy), declare how a meeting with no errors is handled since AUROC is undefined there, and state that identical methodology does NOT make the three systems' AUROCs strictly like-for-like -- they emit different words and therefore face different error populations.",
+   "artifact_ids": [],
+   "capability_ids": [
+    "cap-bench-http-api"
+   ],
+   "reports": [
+    "docs/reports/2026-09-09-scribe-confidence-routing.md"
+   ],
+   "specs": [],
+   "superseded_by": null,
+   "opened": "2026-09-09",
+   "caveats": [
+    "This is a FIDELITY-TO-AUDIO question and must not be answered with agreement-with-OpenCouncil data. The 391-window benchmark cannot serve it.",
+    "A per-word confidence cannot see deletions by construction. On the 391 benchmark windows Scribe's deletions are about 6.8% of its edit operations; on the gold set the share will differ and must be recomputed there, not carried over.",
+    "A pass here is NOT a reversal of exp-2026-09-09-scribe-confidence-routing. That record failed on where the FUSION helps; this one asks where SCRIBE is wrong."
+   ],
+   "updated_at": "2026-09-09T00:00:00Z"
   }
  ],
  "artifacts": [

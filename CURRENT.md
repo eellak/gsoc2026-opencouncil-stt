@@ -438,6 +438,28 @@ number of the `temperature=0.0` configuration, not a quality clearance for it. S
 the section below. `oc-cleanpack-cont-s47-b`, which pointed at a deleted pod, was
 disabled before the run.
 
+## Closed 2026-09-09 — Scribe's confidence cannot route the fusion
+
+[Report](docs/reports/2026-09-09-scribe-confidence-routing.md).
+`exp-2026-09-09-scribe-confidence-routing` is **CLOSED, negative**, at zero cost: the idea
+was to call Soniox and our adapter only where Scribe's own per-word logprob looks unsure,
+and pay for them on a fraction of the audio.
+
+A Codex review reframed it before any code ran: routing depends on where the **fusion
+improves on Scribe**, not where Scribe errs. Those differ — a hard window is hard for all
+three systems, and the fusion hurts in 43 of 391 windows.
+
+**At the pre-declared 25% audio budget the best confidence score captures 34.5% of the
+available gain**, against a duration-matched random p95 of 29.8% and an oracle of 61.6%.
+Gate was ≥50% and beating random: **fail**. The signal is real (it beats random, and beats
+ranking by window length, which is worse than random) and too weak to pay: **keeping 80% of
+the fusion's gain needs 75% of the audio routed anyway.**
+
+Leg A — does Scribe's confidence predict Scribe's own errors against a human listener —
+**was not run on purpose**, because the pre-registration made it conditional on this passing.
+It stays open as a ~$0.07 question for a different use: flagging passages for human review
+is not routing.
+
 ## Done 2026-09-09 — the benchmark scored the fusion: 0.09913 on 391 windows
 
 [Report](docs/reports/2026-09-09-fusion-bench-391.md). Run
