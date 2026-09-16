@@ -235,8 +235,23 @@ runs.
 
 Excluding the two leaked speakers changes nothing qualitatively — threshold 0 gives
 0.9043 / 0.4904 / 0.0104 and threshold 70 gives 0.9041 / 0.4856 / 0.0088 — so the
-threshold conclusion survives the contamination. The naming figures elsewhere in this
-report carry it as an unquantified favourable bias.
+threshold conclusion survives the contamination.
+
+The bias is now measured rather than assumed. Joining all **409** production
+voiceprints to their source segment resolves every one of them to a meeting (141
+distinct meetings), and **5 of the 52 person-meeting pairs** used across all seven
+scored meetings are self-enrolled — the 3 in `athens/may18_2` and the 2 here, none
+anywhere else. Those speakers carry 464 of the 8928 reviewed turns (5.2%). Pooled over
+all seven meetings, arm `b0`:
+
+| turns counted | correct/all | wrong@unenrolled | wrong@enrolled | no name |
+|---|---|---|---|---|
+| all 8928 | 0.7109 | 0.0281 | 0.0351 | 0.2259 |
+| 8464, self-enrolled speakers dropped | 0.6980 | 0.0297 | 0.0349 | 0.2375 |
+
+So the naming figures in this report are inflated by about **1.3 points of accuracy**,
+concentrated in two Athens meetings. No conclusion in this report turns on a margin
+that small.
 
 ## Still untested
 
