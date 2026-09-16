@@ -77,3 +77,18 @@ def test_params_sha_changes_when_a_request_parameter_changes():
     a = P.params_sha(P.SCRIBE_PARAMS)
     b = P.params_sha({**P.SCRIBE_PARAMS, "no_verbatim": False})
     assert a != b, "the cache key must not survive a parameter change"
+
+
+def test_scribe_request_carries_every_parameter_in_its_own_cache_key():
+    """The defect this exists for: SCRIBE_PARAMS declared no_verbatim and the
+    POST body omitted it, so every run served verbatim Scribe under a key that
+    claimed clean. A sha over parameters the request never sends is a lie the
+    cache then repeats. Field parity is the only assertion that catches it."""
+    form = P._scribe_form()
+    assert set(form) == set(P.SCRIBE_PARAMS), (
+        "every parameter in the cache key must be in the request, and nothing else")
+    # booleans go on the wire as lowercase strings, never Python's True/False
+    assert form["no_verbatim"] == "true"
+    assert form["diarize"] == "false"
+    assert form["tag_audio_events"] == "false"
+    assert all(isinstance(v, str) for v in form.values())

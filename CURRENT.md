@@ -36,6 +36,192 @@ carried out on 2026-08-16. The adapter-confidence screen closed on 2026-08-17.
 Canonical research state: [`research/ledger.json`](research/ledger.json).
 Agent protocol: [`CLAUDE.md`](CLAUDE.md).
 
+## 2026-09-15 — Scribe in `no_verbatim` mode beats the fusion
+
+[Report](docs/reports/2026-09-15-clean-scribe-vs-fusion.md). On the same 391 windows
+and the same references: **clean Scribe 0.09294 against the fusion's 0.09913**, paired
+−0.00619, 219 better / 26 tied / 146 worse, −0.00606 on `wer-nofillers`, and clean wins
+both training-disjoint cities. The baseline this integration exists to beat was never
+0.14023; that was Scribe in **verbatim** mode, which is not what production calls.
+
+**The fusion that lost was never the one we would ship.** `SCRIBE_PARAMS` declared
+`no_verbatim` and the multipart body omitted it, so every fused window ate verbatim
+Scribe — while `params_sha` hashed the parameter anyway, leaving 80 verbatim recordings
+at exactly the sha a corrected request now computes. Fixed 2026-09-16: the body is
+derived from the parameter dict, the scribe cache moved to `scribe-nv`, and a test
+asserts field parity. The clean-input rematch has not been run.
+
+**"The fusion helps on hard windows" was selection bias and is withdrawn.** Binning by
+clean Scribe's own WER put fusion ahead in the hardest quartile (−0.00223); re-sorting
+the same windows by Soniox's WER — independent of both contestants — reverses it:
+fusion wins the *easiest* quartile (−0.00205) and loses worst on the hardest (+0.01646).
+A perfect quartile router buys 0.00054 pooled, so difficulty routing is dead on value.
+The substitution advantage is an alignment artefact too: against verbatim Scribe the
+substitution gain (−0.00912) and deletion loss (+0.00911) cancel to four decimals.
+
+Everything above is agreement-with-OpenCouncil, against a reference produced by this
+same vendor in this same mode. No fraction of the margin is transcription quality.
+
+Plan reviewed by Codex Astra and Claude Fable 5.1 independently before anything was
+written.
+
+## Closed 2026-09-16 — the dropped words are real, and patching is not how to get them
+
+`exp-2026-09-16-deletion-recovery` is **CLOSED, gate failed**, for $0.07
+([report](docs/reports/2026-09-16-deletion-recovery.md)). Clean as base, verbatim as
+donor, same vendor. On 391 windows, restoring every non-filler donor-only word takes the
+deletion rate 0.02118 → 0.00757 and the WER 0.09056 → 0.12908; only 21.6% of candidates
+appear in the published reference, flat across token length.
+
+**On the gold set the same 80 restored words remove 45 deletions — 56.2% of them are
+words the human actually heard**, against 21.6% support on the published text. The clean
+read drops real speech and the OpenCouncil reference does not contain it either. But the
+gate (≥80% real speech and net gold edits fall) fails on both arms, and no restore arm
+approaches simply using the donor: clean 0.20420, best restore 0.20120, **plain verbatim
+0.18418**.
+
+**The finding underneath is not about patching.** Clean wins on the OpenCouncil reference
+by 0.00619; verbatim wins on the human reference by 0.02002. Each reference rewards the
+mode that produced it — the published text comes from the clean-read pipeline, and the
+gold protocol keeps false starts in. Neither number says one mode hears better.
+
+## Open 2026-09-16 — which Scribe mode should production call
+
+`exp-2026-09-16-scribe-mode-product-choice` is **OPEN, and the next step is not a
+measurement**: it is a product decision about what a transcript is for. What measurement
+can add, in order — grow the gold set (27 cells over 6 meetings is the binding constraint
+on every open question here), label *what* the clean mode drops by category, and only if
+the product wants verbatim, re-price the fusion on the arm it was always built on.
+
+## Closed 2026-09-15 — slicing per topic does not fix speaker merging
+
+`exp-2026-09-15-diarization-clustering` is **CLOSED, negative**:
+[report](docs/reports/2026-09-15-diarization-clustering.md),
+[code](eval/diarization_clustering/README.md). Plan reviewed by Codex Astra before
+any job was submitted. 35 `precision-2` jobs, 12.25 audio-hours, zero failures.
+
+**Re-diarizing topic slices buys nothing.** Against the control that cuts the *same*
+whole-meeting output at the same boundaries: mean paired **Δ = −0.0074, better in 0 of
+4 meetings**, no leave-one-out reverses the sign. And cutting alone already costs
+recall **0.9156 → 0.5705**, because one person recurring in ten slices becomes ten
+voices. A sliced pipeline would need a cross-slice linking stage to recover
+0.57 → 0.92 just to match doing nothing.
+
+**The verdict is narrower than "the idea fails".** The premise holds: inside one
+meeting, slices with fewer identities do score better (**r = −0.674** over 29 slices).
+What fails is the treatment, because cutting trades two things against each other —
+fewer people per piece, but less voice per person, and pyannote clusters by embedding.
+Measured: slices where each speaker has little voice lose **−0.0304**, slices where
+each has more lose **−0.0061**. Where slicing is easy the model was already right:
+8 of 29 slices return Δ exactly 0.0000, and chania's two partitions are **identical**
+(Jaccard 1.0000).
+
+## Closed 2026-09-15 — enrolment rescues most of slicing, and one parameter was never tested
+
+`exp-2026-09-15-voiceprint-diarization` is **CLOSED, mixed**:
+[report](docs/reports/2026-09-15-diarization-clustering.md). 56 jobs, 20.97 audio-hours
+(91 and 33.22 across both records).
+
+**Enrolled voiceprints are worth +0.3067 on sliced audio, 4 of 4 meetings**
+(0.5210 → 0.8277). `/identify` returns the enrolled personId, stable across calls, so a
+sliced arm needs no relinking. They also give a **name** — pooled accuracy **0.9182**
+over 5952 turns — which `a0` cannot emit at all.
+
+**And it still loses to leaving the meeting whole**: b3 vs a0 −0.0687, better in 1 of 4,
+and that one is a tie. Ranking: a0 0.8964, c3 0.8933, b0 0.8842, b3 0.8277, b3L 0.7906,
+a0_local 0.5280, a3 0.5210. **Bigger slices are worse** (0.7906 at 15 min against 0.8277
+at 5), which kills the "slices were too small" explanation.
+
+**The residual failure has a name: `matching.threshold`, left at its default 0.** A
+sliced call cannot decline to name anyone, so speech from unenrolled speakers is handed
+an enrolled label. Damage tracks exposure exactly — vrilissia 0.0% exposed → −0.0218,
+athens/may28 16.4% → −0.0494, athens/may18_2 43.2% → **−0.2043** with named accuracy
+collapsing 0.913 → 0.524. chania at 2.9% ties the whole-meeting arm outright.
+
+**Reviewed by Codex Astra (`6d206083`), which withdrew three claims.** Slicing is not
+shown to fail *intrinsically* — this is a configuration comparison and rejection
+thresholds were never exercised. High enrolment is **not sufficient** for slicing to
+break even: `vrilissia` had **0.0% exposed speech and still lost 0.0218**, and chania's
++0.0006 is a tie with variability unmeasured. And 5-min beating 15-min slices is two
+settings, not a general relationship.
+
+**The architecture the data supports:** whole meeting as the acoustic *and identity*
+scope, agenda segmentation applied afterwards retaining global speaker ids — `c3`
+measures exactly that at **−0.0031** from the best arm. Voiceprints when names are
+needed, accepting a −0.0122 clustering trade.
+
+**The threshold was run, 2026-09-16, and it confirms the mechanism without rescuing
+slicing.** `matching.threshold = 50` (pyannote's own documented value, declared before
+the arm ran) on `athens/may18_2_2026`'s existing slices, 7 jobs, 1.2 audio-hours:
+
+| arm | B³ F | σωστά/**όλα** | λάθος σε μη-εγγ. | καμία αξίωση |
+|---|---:|---:|---:|---:|
+| b3 threshold 0 | 0.6444 | 0.3440 | **0.3962** | 0.0029 |
+| b3t threshold 50 | **0.7098** | 0.3353 | **0.0588** | 0.4057 |
+
+Wrong names on unenrolled speakers **−85%** with correct names essentially unchanged —
+abstention removed false claims specifically, not accuracy. But 0.7098 still loses to
+b0 0.8207 and a0 0.8487, so the threshold explains only part of the gap.
+
+**And the whole-meeting threshold was answered offline, for nothing.** `/identify`
+returns a confidence score for every diarization speaker, so any threshold can be
+replayed against the saved responses. Over all six meetings, as a share of every turn:
+
+| threshold | σωστά | λάθος | χωρίς όνομα |
+|---:|---:|---:|---:|
+| 0 (ως έτρεξε) | 0.739 | 0.070 | 0.191 |
+| **70** | **0.739** | **0.052** | 0.210 |
+| 85 | 0.731 | 0.049 | 0.220 |
+
+At 70 wrong names fall **26% with no correct name lost**; at 85 the trade begins. But
+**the whole effect is one meeting** — `chalandri` goes 0.520 → 0.029 wrong while the
+other five are unchanged, and it is the meeting where 64.2% of speech comes from
+unenrolled people.
+
+**The held-out meeting killed that rule, 2026-09-16.** `athens/mar16_2_2026` (70.7 min,
+outside the cohort, `humanReview: true`, 1534 turns) was run at threshold 0 and at 70,
+with 70 frozen from the previous simulation beforehand. Result: **neutral** — B³ F
+0.8990 → 0.8983, wrong names on unenrolled 0.0085 → 0.0072 (13 turns of 1534) at a cost
+of 5 correct names.
+
+**And it falsifies the exposure heuristic.** That meeting draws 46% of its speech from
+unenrolled people — the supposed danger condition — yet misnames only **0.85%** of
+turns, against chalandri's 52%. Exposure does not predict misnaming on unseen data.
+**Threshold 70 is not adopted**; it stays a safeguard for a meeting observed to misname
+heavily, and there is no rule yet for predicting which those are.
+
+**Voiceprint leakage, found in the same check:** 2 of 8 enrolled speakers in the held-out
+meeting were enrolled *from that meeting* (20.5% of its speech), and 3 of 44
+person-meeting pairs in the original cohort are likewise self-enrolled. Excluding them
+leaves the threshold conclusion unchanged, but every naming figure carries an
+unquantified favourable bias. Check `VoicePrint.sourceSegmentId` before the next run.
+
+Upstream measured that `exclusive: true` fixes only ~13% of speaker misattribution and
+that the rest is pyannote merging several people into one voice
+([opencouncil-tasks#15](https://github.com/schemalabz/opencouncil-tasks/issues/15)).
+Harold's hypothesis was a ceiling near 30 speakers, beaten by diarizing per agenda topic.
+
+**The ceiling is not supported and not falsified.** Over 6 human-reviewed meetings
+(15.8–134.4 min) automatic counting returned **13/7/9/15/15/19 voices** — never near the
+35-cluster falsification threshold frozen before the run. pyannote returns *fewer* voices
+than there are real identities, so a saturating count is not the mechanism.
+
+**What the data shows is degradation by speaker count, not by duration.** B-cubed
+precision against human identities falls 0.9894 (3 identities) → 0.8145 (40):
+identities-vs-precision **r = −0.935**, duration-vs-precision only **r = −0.282**.
+Precision is the component that falls, which is the signature of merging.
+
+**The free control already prices the intervention.** Cutting the *same* a0 output at the
+topic boundaries and namespacing per slice costs recall **0.9156 → 0.5705** and F
+**0.9091 → 0.6636**, because one person recurring in ten slices becomes ten voices. The
+sliced arm is read only against that control, never against a0.
+
+Arms a1/a2 (speaker-count hints) were **dropped before running**, by user decision: the
+reviewed-people count is not the acoustic count — 16–57% of utterances sit on unresolved
+anonymous tags — and `numSpeakers=5` on a meeting with 64 active tags would have forced
+the very merging under study. Two of six meetings yield a single topic slice, so the
+sliced arm rests on four.
+
 ## Open 2026-08-26 — training round 2, ceiling first
 
 **Η μέτρηση ξανασχεδιάστηκε, 2026-09-06** (χάρτης
@@ -268,8 +454,22 @@ for the first time: 0.11205** (+0.0005 over guard-off, fired on 75 of 13,414 isl
 under the guard definition frozen in `make_fixtures.py`. The build now runs in
 `opencouncil-tasks` branch `feat/fusion-provider`, shaped by Codex review `f784ace4`
 (chunking before orchestration, replay fake provider + benchmark-shaped integration
-gate before any paid run, 3 stacked PRs, `FUSION_LLM` flag default-off). No PR opens
-without Harold's approval.
+gate before any paid run, 3 stacked PRs, `FUSION_LLM` flag default-off).
+
+**The PR is open, 2026-09-09: [schemalabz/opencouncil-tasks#99](https://github.com/schemalabz/opencouncil-tasks/pull/99)**,
+head `84ddd61`, one PR rather than the three stacked ones the plan named — 93 files,
+12,448 insertions. Route gate 15/15 on that head (`ok:true`, 391/391, WER 0.11212 vs
+frozen 0.11205, delta 0.00007 in a 0.002 budget, zero hard mismatches). Review found
+six real defects, all fixed with tests; **the one that matters for every earlier claim
+about production is that the canary could never select a meeting** — the pipeline sent
+no `meetingKey`, so `FUSION_MODE=on` at any canary percent still sent every segment to
+Scribe. The live pilot and the 391-window bench went through the openai-compatible
+route, not that path, so their numbers stand. Also fixed: a 502 on uploaded segments
+when a bucket is set, queued Scribe calls that ran after their deadline and were
+billed, an ocasr cache identity read from shared mutable state, and a raw log that
+nothing deleted (now 14-day expiry). Blocked on Harold for three things: staging
+credentials (`SONIOX_API_KEY` must be the paid `stt-async-v5`), which meeting to run,
+and whether to split the PR.
 
 **Step 3 is built and gated, 2026-09-06.** Six commits on `feat/fusion-provider`,
 HEAD `52b33a2` (`12bac04` core, `5c8ce7e`, `83b0cbf`, `62820a6`, `2c9d1ad`, `52b33a2`);
@@ -456,9 +656,35 @@ ranking by window length, which is worse than random) and too weak to pay: **kee
 the fusion's gain needs 75% of the audio routed anyway.**
 
 Leg A — does Scribe's confidence predict Scribe's own errors against a human listener —
-**was not run on purpose**, because the pre-registration made it conditional on this passing.
-It stays open as a ~$0.07 question for a different use: flagging passages for human review
-is not routing.
+was split out rather than dropped, and **closed the same day** (below).
+
+## Closed 2026-09-09 — Scribe's confidence does predict Scribe's own errors
+
+[Report](docs/reports/2026-09-09-scribe-confidence-fidelity.md).
+`exp-2026-09-09-scribe-confidence-fidelity` is **CLOSED, GO**, for $0.07: 30 gold cells
+transcribed with `scribe_v2`, 30/30, zero failures. **Mean within-meeting AUROC 0.7974**
+against a pre-declared threshold of 0.60, all six meetings informative (0.7137–0.8965),
+leave-one-meeting-out 0.7776–0.8141, permutation null mean 0.5005 with the observed value
+outside the whole 95% band (p = 0.0005). Bottom decile error rate 0.5644 against a
+prevalence of 0.1433, **3.94× lift**.
+
+That closes the last of the three per-word confidence questions:
+
+| | Scribe v2 | Soniox | our adapter |
+|---|---:|---:|---:|
+| mean within-meeting AUROC | 0.7974 | 0.8167 | 0.8151 |
+| deletions as a share of edits | **20.7%** | 22.8% | 41.1% |
+| emitted words carrying a confidence | **100%** | — | 91.1% |
+
+**The table is not a ranking and must not be quoted as one.** The methodology is identical
+by construction — every statistic is imported from `eval/soniox_confidence_probe.py` — but
+the three systems emit different words and therefore face different error populations.
+
+What it does support: Scribe's logprob is the most *usable* of the three for review triage.
+Complete coverage, half the adapter's blind spot, and attached to
+the system that supplies the fused transcript's timings and its fallback. It is a ranking
+signal; no calibrated probability is claimed. It does not touch deletions, and nothing
+per-word can — 20.6% of Scribe's damage is words it never emitted.
 
 ## Done 2026-09-09 — the benchmark scored the fusion: 0.09913 on 391 windows
 

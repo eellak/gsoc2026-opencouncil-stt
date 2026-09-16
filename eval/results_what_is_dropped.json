@@ -1,0 +1,24 @@
+{
+ "protocol": "what-is-dropped-2026-09-16",
+ "experiment": "exp-2026-09-16-scribe-mode-product-choice",
+ "region": "core_envelope",
+ "cells": 27,
+ "heard_by_category": {
+  "repetition_of_a_neighbour": 29,
+  "content_word": 12,
+  "single_character": 3,
+  "critical_negation_or_vote": 1,
+  "function_word": 4
+ },
+ "not_heard_by_category": {
+  "content_word": 12,
+  "repetition_of_a_neighbour": 13,
+  "function_word": 5,
+  "single_character": 1
+ },
+ "totals": {
+  "heard": 49,
+  "not_heard": 31
+ },
+ "caveat": "single-token categorisation without context; every category count is an upper bound and a pointer for a human, not an adjudication"
+}

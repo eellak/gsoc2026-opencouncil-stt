@@ -1,0 +1,313 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>Έλεγχος διαγραφών</title>
+<style>
+  :root{ --bg:#12141a; --fg:#e8e9ee; --mut:#878d9c; --line:#282c38;
+         --hot:#ffd166; --ok:#57c98a; --err:#ff6b6b; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);
+       font:17px/1.6 system-ui,"Segoe UI",Roboto,"Noto Sans",sans-serif}
+  .wrap{max-width:820px;margin:0 auto;padding:14px 18px 60px}
+  header{display:flex;gap:14px;align-items:baseline;flex-wrap:wrap;
+         padding-bottom:10px;border-bottom:1px solid var(--line)}
+  h1{font-size:15px;margin:0;font-weight:600;letter-spacing:.02em}
+  #prog{font-size:15px;color:var(--mut);font-variant-numeric:tabular-nums}
+  #prog b{color:var(--fg)}
+  #status{margin-inline-start:auto;font-size:13px;color:var(--mut)}
+  #status.ok{color:var(--ok)} #status.err{color:var(--err);font-weight:700}
+  #bar{height:3px;background:var(--line);margin-top:10px}
+  #bar i{display:block;height:3px;background:var(--ok);width:0}
+  .note-approx{margin:14px 0 8px;font-size:13px;color:var(--mut)}
+  audio{width:100%;margin:6px 0 4px;filter:invert(.92) hue-rotate(180deg)}
+  .ctx{background:#191c25;border:1px solid var(--line);border-radius:8px;
+       padding:16px 18px;margin:14px 0 18px;font-size:20px;line-height:1.85}
+  .ctx .side{color:var(--mut)}
+  .ctx .empty{color:#5a5f6d;font-style:italic;font-size:16px}
+  .lost{background:var(--hot);color:#12141a;font-weight:700;
+        padding:1px 7px;border-radius:4px;margin:0 4px;display:inline-block}
+  .opts{display:grid;gap:8px}
+  .opt{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:start;
+       background:#181b23;color:var(--fg);border:1px solid var(--line);
+       border-radius:8px;padding:11px 13px;font:inherit;cursor:pointer}
+  .opt:hover{border-color:#3d4353}
+  .opt kbd{flex:0 0 auto;background:#000;border:1px solid #333a4a;border-radius:5px;
+           padding:1px 9px;font:600 15px/1.5 ui-monospace,monospace;color:var(--mut)}
+  .opt .txt{flex:1}
+  .opt .imp{display:block;font-size:13px;color:var(--mut);margin-top:2px}
+  .opt[aria-pressed="true"]{border-color:var(--ok);background:#16241d}
+  .opt[aria-pressed="true"] kbd{color:var(--ok);border-color:var(--ok)}
+  textarea{width:100%;margin-top:14px;background:#181b23;color:var(--fg);
+           border:1px solid var(--line);border-radius:8px;padding:10px 12px;
+           font:inherit;min-height:64px;resize:vertical}
+  textarea:focus{outline:2px solid #3d6ea5;border-color:#3d6ea5}
+  .keys{margin-top:16px;font-size:13px;color:var(--mut);
+        display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+  .keys b{color:#b9bfce;font-weight:600}
+  .nav{background:none;border:1px solid var(--line);color:var(--mut);
+       border-radius:6px;padding:3px 11px;font:inherit;cursor:pointer}
+  #done{display:none;margin:18px 0;padding:12px 14px;border-radius:8px;
+        background:#16241d;border:1px solid var(--ok);color:var(--ok)}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Έλεγχος διαγραφών</h1>
+    <div id="prog"></div>
+    <div id="status"></div>
+  </header>
+  <div id="bar"><i></i></div>
+
+  <p class="note-approx">
+    Η θέση της διαγραφής μέσα στο κλιπ είναι <b>κατά προσέγγιση</b> — υπολογίστηκε
+    αναλογικά, όχι από χρονοσήμανση. Άκου ολόκληρο το κλιπ, όχι μόνο τη μέση.
+  </p>
+
+  <audio id="au" controls preload="auto"></audio>
+
+  <div class="ctx" id="ctx"></div>
+
+  <div id="done">Όλα απαντήθηκαν. Μπορείς να γυρίσεις πίσω και να αλλάξεις ό,τι θες.</div>
+
+  <div class="opts" id="opts"></div>
+
+  <textarea id="note" placeholder="Σχόλιο (προαιρετικό) — π.χ. τι ακούγεται πραγματικά, ή γιατί δεν κρίνεται"></textarea>
+
+  <div class="keys">
+    <span><b>1–4</b> απάντηση</span>
+    <span><b>space</b> ξανά</span>
+    <span><b>← →</b> πλοήγηση</span>
+    <span><b>c</b> σχόλιο</span>
+    <span><b>Esc</b> έξοδος από σχόλιο</span>
+    <span><b>u</b> πρώτο αναπάντητο</span>
+    <button class="nav" id="prev">←</button>
+    <button class="nav" id="next">→</button>
+    <button class="nav" id="rep">▶ ξανά</button>
+  </div>
+</div>
+
+<script>
+const DECK = __DATA__;
+const ST = __STATE__;
+const TOKEN = "__TOKEN__";
+const N = DECK.length;
+
+const OPTS = [
+  [1, "Ειπώθηκε και ΠΡΕΠΕΙ να είναι στο κείμενο", "η διαγραφή ήταν λάθος"],
+  [2, "Ειπώθηκε ΑΛΛΑ είναι κόμπιασμα / επανάληψη που δεν χρειάζεται", "η διαγραφή ήταν σωστή"],
+  [3, "ΔΕΝ ειπώθηκε", "η διαγραφή ήταν σωστή"],
+  [4, "Δεν κρίνεται — επικάλυψη, θόρυβος, ή δεν ακούγεται", "εξαιρείται από την καταμέτρηση"],
+];
+
+const au = document.getElementById("au");
+const ctx = document.getElementById("ctx");
+const optsEl = document.getElementById("opts");
+const noteEl = document.getElementById("note");
+const progEl = document.getElementById("prog");
+const statusEl = document.getElementById("status");
+const barEl = document.querySelector("#bar i");
+const doneEl = document.getElementById("done");
+
+let cur = 0, shownCid = null;
+const busy = new Set();
+
+for (const [n, txt, imp] of OPTS) {
+  const b = document.createElement("button");
+  b.className = "opt"; b.type = "button"; b.dataset.a = n; b.setAttribute("aria-pressed", "false");
+  const k = document.createElement("kbd"); k.textContent = n;
+  const t = document.createElement("span"); t.className = "txt"; t.textContent = txt;
+  const i = document.createElement("span"); i.className = "imp"; i.textContent = "→ " + imp;
+  t.appendChild(i); b.append(k, t);
+  b.addEventListener("click", () => answer(n));
+  optsEl.appendChild(b);
+}
+
+/* ---- saving: one request at a time, disk before UI ---- */
+let chain = Promise.resolve();
+function enqueue(fn) {
+  const r = chain.then(fn, fn);
+  chain = r.then(() => {}, () => {});
+  return r;
+}
+function setStatus(t, cls) { statusEl.textContent = t; statusEl.className = cls || ""; }
+
+async function send(patch) {          // raw; every caller runs inside the queue
+  const r = await fetch("/save", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(Object.assign({ token: TOKEN }, patch)),
+  });
+  if (!r.ok) throw new Error("HTTP " + r.status);
+  return r.json();
+}
+
+/* ---- comments: dirty until the server says otherwise ----
+   The map is the source of truth for unsaved text. Clearing it before the write
+   lands is how a comment disappears while the UI says "saved". */
+const dirty = new Map();              // cid -> text not yet known to be on disk
+let noteTimer = null;
+
+function scheduleNote(cid, text) {
+  dirty.set(cid, text);
+  clearTimeout(noteTimer);
+  noteTimer = setTimeout(() => { flushNotes().catch(() => {}); }, 700);
+}
+
+function flushNotes() {
+  clearTimeout(noteTimer); noteTimer = null;
+  return enqueue(async () => {
+    while (dirty.size) {
+      const [cid, text] = dirty.entries().next().value;
+      const had = (ST[cid] && ST[cid].note) || "";
+      if (had === text) { dirty.delete(cid); continue; }
+      setStatus("αποθήκευση σχολίου…");
+      await send({ cid: cid, note: text });        // throws -> stays dirty, keeps retrying
+      ST[cid] = ST[cid] || {}; ST[cid].note = text;
+      // Edited again while that request was in flight? Then it is still dirty, and
+      // the loop will send the newer text rather than leaving the older one on disk.
+      if (dirty.get(cid) === text) dirty.delete(cid);
+      setStatus("αποθηκεύτηκε", "ok");
+    }
+  }).catch((e) => {
+    setStatus("ΤΟ ΣΧΟΛΙΟ ΔΕΝ ΑΠΟΘΗΚΕΥΤΗΚΕ", "err");
+    // Nothing else re-arms this timer. Without it a failed write leaves the
+    // comment in memory only, and closing the tab loses what he typed.
+    if (dirty.size && noteTimer === null)
+      noteTimer = setTimeout(() => { flushNotes().catch(() => {}); }, 3000);
+    throw e;
+  });
+}
+
+/* ---- answering: advance only after the write lands, and only from the clip
+   that was actually answered. Navigating while a save is in flight used to make
+   the acknowledgement skip a clip. ---- */
+async function answer(a) {
+  const idx = cur, cid = DECK[idx].cid;
+  if (busy.has(cid)) return;
+  busy.add(cid);
+  try {
+    await flushNotes();               // an unsaved comment must block the answer
+    setStatus("αποθήκευση…");
+    await enqueue(() => send({ cid: cid, a: a }));
+    ST[cid] = ST[cid] || {}; ST[cid].a = a;
+    setStatus("αποθηκεύτηκε", "ok");
+    if (cur === idx && cur < N - 1) cur++;
+    render();
+  } catch (e) {
+    if (!dirty.size) setStatus("ΔΕΝ ΑΠΟΘΗΚΕΥΤΗΚΕ — δοκίμασε ξανά", "err");
+    render();
+  } finally { busy.delete(cid); }
+}
+
+function goto(i) {
+  // Navigation never waits on the network. Unsaved text stays in `dirty`, the
+  // textarea keeps showing it, and the status line keeps saying it is unsaved.
+  if (i < 0 || i >= N || i === cur) return;
+  cur = i; render();
+  flushNotes().catch(() => {});
+}
+function firstUnanswered() {
+  for (let i = 0; i < N; i++) if (!(ST[DECK[i].cid] || {}).a) return i;
+  return -1;
+}
+function replay() { try { au.currentTime = 0; } catch (e) {} au.play().catch(() => {}); }
+
+function render() {
+  const d = DECK[cur], rec = ST[d.cid] || {};
+  const answered = DECK.reduce((n, x) => n + ((ST[x.cid] || {}).a ? 1 : 0), 0);
+
+  progEl.innerHTML = "";
+  progEl.append(document.createTextNode("κλιπ "));
+  const b1 = document.createElement("b"); b1.textContent = (cur + 1) + " από " + N;
+  const b2 = document.createElement("b"); b2.textContent = answered;
+  progEl.append(b1, document.createTextNode(" · απαντημένα "), b2,
+                document.createTextNode(" · μένουν " + (N - answered)));
+  barEl.style.width = (100 * answered / N) + "%";
+  doneEl.style.display = answered === N ? "block" : "none";
+
+  ctx.innerHTML = "";
+  ctx.append(side(d.L, "…δεν υπάρχει αριστερό συμφραζόμενο…"));
+  const hot = document.createElement("span");
+  hot.className = "lost"; hot.textContent = d.lost.join(" ");
+  ctx.append(hot);
+  ctx.append(side(d.R, "…δεν υπάρχει δεξί συμφραζόμενο…"));
+
+  for (const b of optsEl.children)
+    b.setAttribute("aria-pressed", String(rec.a === Number(b.dataset.a)));
+
+  if (document.activeElement !== noteEl)
+    noteEl.value = dirty.has(d.cid) ? dirty.get(d.cid) : (rec.note || "");
+
+  if (d.cid !== shownCid) {
+    shownCid = d.cid;
+    au.src = "/clip/" + d.cid + ".mp3";
+    au.load();
+    au.play().catch(() => {});   // blocked before the first gesture; harmless
+  }
+}
+function side(text, fallback) {
+  const s = document.createElement("span");
+  if (text && text.trim()) { s.className = "side"; s.textContent = text; }
+  else { s.className = "empty"; s.textContent = fallback; }
+  return s;
+}
+
+noteEl.addEventListener("input", () => scheduleNote(DECK[cur].cid, noteEl.value));
+noteEl.addEventListener("blur", () => { flushNotes().catch(() => {}); });
+document.getElementById("prev").addEventListener("click", () => goto(cur - 1));
+document.getElementById("next").addEventListener("click", () => goto(cur + 1));
+document.getElementById("rep").addEventListener("click", replay);
+
+document.addEventListener("keydown", (e) => {
+  if (e.isComposing || e.keyCode === 229) return;
+  const t = e.target;
+  const editing = t && (t.tagName === "TEXTAREA" || t.tagName === "INPUT" || t.isContentEditable);
+  if (e.key === "Escape") { if (editing) { t.blur(); e.preventDefault(); } return; }
+  if (editing) return;                       // typing must never answer
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  if (e.key >= "1" && e.key <= "4") { e.preventDefault(); if (!e.repeat) answer(Number(e.key)); return; }
+  if (e.key === " " || e.key === "Spacebar") { e.preventDefault(); if (!e.repeat) replay(); return; }
+  if (e.key === "ArrowLeft") { e.preventDefault(); goto(cur - 1); return; }
+  if (e.key === "ArrowRight") { e.preventDefault(); goto(cur + 1); return; }
+  if (e.key === "c" || e.key === "C" || e.key === "ψ" || e.key === "Ψ") {
+    e.preventDefault(); noteEl.focus(); return;
+  }
+  if (e.key === "u" || e.key === "U" || e.key === "θ" || e.key === "Θ") {
+    e.preventDefault(); const i = firstUnanswered(); if (i >= 0) goto(i); return;
+  }
+});
+// A focused button natively activates on Space AND on Enter, and Enter autorepeats:
+// holding it would answer clip after clip unheard. Native activation is suppressed
+// here; the buttons stay reachable by mouse and by the number keys.
+optsEl.addEventListener("keydown", (e) => {
+  const b = e.target.closest && e.target.closest(".opt");
+  if (e.key === " " || e.key === "Spacebar") {
+    e.preventDefault(); e.stopPropagation();
+    if (!e.repeat) replay();
+  } else if (e.key === "Enter") {
+    e.preventDefault(); e.stopPropagation();
+    if (!e.repeat && b) answer(Number(b.dataset.a));
+  }
+});
+
+// Multi-sitting use means the tab gets closed mid-thought. Warn, and try once more.
+window.addEventListener("beforeunload", (e) => {
+  if (dirty.size || busy.size) { e.preventDefault(); e.returnValue = ""; }
+});
+window.addEventListener("pagehide", () => {
+  for (const [cid, text] of dirty) {
+    try {
+      navigator.sendBeacon("/save", new Blob(
+        [JSON.stringify({ token: TOKEN, cid: cid, note: text })],
+        { type: "application/json" }));
+    } catch (err) { /* best effort */ }
+  }
+});
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden") flushNotes().catch(() => {});
+});
+
+const start = firstUnanswered();
+cur = start < 0 ? 0 : start;
+render();
+</script>

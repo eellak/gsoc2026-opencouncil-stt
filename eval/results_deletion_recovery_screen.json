@@ -1,0 +1,128 @@
+{
+ "protocol": "deletion-recovery-screen-2026-09-16",
+ "experiment": "exp-2026-09-16-deletion-recovery",
+ "report": "bench_2026-09-15-clean-scribe-baseline-vs-fusion.json",
+ "base": "scribe-v2-clean",
+ "donor": "scribe",
+ "totals": {
+  "windows": 391,
+  "ref_words": 110694,
+  "candidates": 7592,
+  "fillers": 452,
+  "non_fillers": 7140,
+  "restored_blind": 7140,
+  "restored_oracle": 1462
+ },
+ "wer": {
+  "clean": 0.09055594702513235,
+  "blind": 0.12907655338139376,
+  "oracle": 0.08008564149818419
+ },
+ "edits": {
+  "clean": {
+   "sub": 0.04591034744430592,
+   "del": 0.021184526713281658,
+   "ins": 0.023461072867544765
+  },
+  "blind": {
+   "sub": 0.04715702748116429,
+   "del": 0.0075704193542558765,
+   "ins": 0.07434910654597358
+  },
+  "oracle": {
+   "sub": 0.04427520913509314,
+   "del": 0.010163152474388856,
+   "ins": 0.025647279888702187
+  }
+ },
+ "per_city": {
+  "argithea": {
+   "clean": 0.09084167593622544,
+   "blind": 0.13076257570139663,
+   "delta": 0.03992089976517118,
+   "windows": 28,
+   "ref_words": 8091,
+   "training_disjoint": false
+  },
+  "argos": {
+   "clean": 0.07859831511023481,
+   "blind": 0.12305072593654777,
+   "delta": 0.04445241082631296,
+   "windows": 40,
+   "ref_words": 11158,
+   "training_disjoint": true
+  },
+  "athens": {
+   "clean": 0.09155663655316192,
+   "blind": 0.13157285151725737,
+   "delta": 0.04001621496409544,
+   "windows": 60,
+   "ref_words": 17268,
+   "training_disjoint": false
+  },
+  "chalandri": {
+   "clean": 0.0653052064631957,
+   "blind": 0.10121184919210054,
+   "delta": 0.03590664272890485,
+   "windows": 32,
+   "ref_words": 8912,
+   "training_disjoint": false
+  },
+  "chania": {
+   "clean": 0.05785282548210688,
+   "blind": 0.10189005084908376,
+   "delta": 0.04403722536697688,
+   "windows": 40,
+   "ref_words": 10423,
+   "training_disjoint": false
+  },
+  "orestiada": {
+   "clean": 0.05254827477049699,
+   "blind": 0.0789806900918012,
+   "delta": 0.02643241532130421,
+   "windows": 20,
+   "ref_words": 6318,
+   "training_disjoint": true
+  },
+  "samothraki": {
+   "clean": 0.17013381311143597,
+   "blind": 0.2338918250309232,
+   "delta": 0.06375801191948724,
+   "windows": 35,
+   "ref_words": 8893,
+   "training_disjoint": false
+  },
+  "sparta": {
+   "clean": 0.088230210853785,
+   "blind": 0.10974766678188731,
+   "delta": 0.021517455928102315,
+   "windows": 40,
+   "ref_words": 11572,
+   "training_disjoint": false
+  },
+  "vrilissia": {
+   "clean": 0.10755091902632886,
+   "blind": 0.14307004470938897,
+   "delta": 0.03551912568306011,
+   "windows": 40,
+   "ref_words": 12078,
+   "training_disjoint": false
+  },
+  "xylokastro": {
+   "clean": 0.11501244124965442,
+   "blind": 0.139341996129389,
+   "delta": 0.024329554879734587,
+   "windows": 26,
+   "ref_words": 7234,
+   "training_disjoint": false
+  },
+  "zografou": {
+   "clean": 0.0741968674974277,
+   "blind": 0.11844060820852864,
+   "delta": 0.044243740711100946,
+   "windows": 30,
+   "ref_words": 8747,
+   "training_disjoint": false
+  }
+ }
+}

@@ -32,6 +32,24 @@ SCRIBE_PARAMS = {
     "language_code": "ell",
 }
 
+# Every recording made before 2026-09-16 sits under "scribe" and is VERBATIM
+# Scribe, because the request omitted no_verbatim while the sha over these
+# parameters claimed it. Those files therefore sit at exactly the sha the fixed
+# request now computes, and would be served as if they were clean. A separate
+# directory is the only thing that keeps the fix from reusing them; the old ones
+# stay because they are the components of every published fusion number.
+SCRIBE_CACHE_DIR = "scribe-nv"
+
+
+def _scribe_form() -> dict:
+    """The multipart form, derived from SCRIBE_PARAMS rather than retyped.
+
+    Retyping is what produced the defect: the dict declared no_verbatim, the
+    hand-written body did not carry it, and the cache key could not tell.
+    """
+    return {k: ("true" if v is True else "false" if v is False else str(v))
+            for k, v in SCRIBE_PARAMS.items()}
+
 # Mirrors src/lib/fusion/providers/soniox.ts SONIOX_REQUEST_PARAMS. stt-async-v5
 # is the PAID async model; the free stt-rt-* realtime models are a different
 # system and mixing them has already invalidated one measurement here.
@@ -167,15 +185,9 @@ def logprob_to_conf(logprob):
 
 def scribe_words(window_id: str, wav: Path, api_key: str, timeout=600):
     sha = params_sha(SCRIBE_PARAMS)
-    hit = cached(window_id, "scribe", sha)
+    hit = cached(window_id, SCRIBE_CACHE_DIR, sha)
     if hit is None:
-        data = {
-            "model_id": SCRIBE_PARAMS["model_id"],
-            "language_code": SCRIBE_PARAMS["language_code"],
-            "tag_audio_events": "false",
-            "timestamps_granularity": "word",
-            "diarize": "false",
-        }
+        data = _scribe_form()
 
         def post():
             # Reopened per attempt: an exhausted handle would upload zero bytes
@@ -187,7 +199,7 @@ def scribe_words(window_id: str, wav: Path, api_key: str, timeout=600):
                                      timeout=timeout)
 
         hit = with_retry(post, f"scribe {window_id}").json()
-        store(window_id, "scribe", sha, hit)
+        store(window_id, SCRIBE_CACHE_DIR, sha, hit)
     words = [{"raw": w["text"], "start": w.get("start"), "end": w.get("end"),
               "conf": logprob_to_conf(w.get("logprob"))}
              for w in hit.get("words", []) if w.get("type") == "word"]

@@ -1,0 +1,602 @@
+{
+ "protocol": "scribe-confidence-fidelity-2026-09-09",
+ "experiment": "exp-2026-09-09-scribe-confidence-fidelity",
+ "arm": "verbatim",
+ "model": "ElevenLabs scribe_v2, verbatim arm (no_verbatim=ABSENT from the request)",
+ "answers_sha256": "fa7a5dec12a9d2787e4151d2388388b480e19de8a35c8fb7e3585da3a5d1f063",
+ "substrate": "gold set, FIDELITY-TO-AUDIO; never merged with the 391-window agreement-with-OpenCouncil substrate",
+ "frozen_before_looking": {
+  "primary_statistic": "mean of within-meeting AUROC of (1 - exp(logprob)) for predicting that an EMITTED word is an error",
+  "go_threshold": 0.6,
+  "primary_region": "core_envelope",
+  "auroc_null": 0.5,
+  "error_definition": "one Levenshtein alignment, priority (S,D,I), wtoks normalization; err = op in {S, I}",
+  "meeting_with_no_errors": "AUROC undefined -> excluded from the mean; n_meetings_informative reports the count",
+  "words_without_logprob": "excluded and counted, never scored as confident",
+  "comparability": "identical methodology does NOT make the three systems' AUROCs strictly like-for-like: they emit different words and therefore face different error populations"
+ },
+ "published_comparators": {
+  "soniox_stt_rt_v4": 0.8167,
+  "our_adapter": 0.8151
+ },
+ "n_cells_scored": 27,
+ "n_cells_expected": 27,
+ "n_meetings": 6,
+ "regions": {
+  "core_strict": {
+   "edit_op_ceiling": {
+    "M": 410,
+    "I": 24,
+    "D": 29,
+    "S": 47,
+    "deletion_share_of_edits": 0.29,
+    "edits_visible_to_confidence": 0.71,
+    "punctuation_only_words_dropped": 0,
+    "words_splitting_into_multiple_tokens": 1,
+    "emitted_words_without_logprob": 0
+   },
+   "conf": {
+    "n": 481,
+    "n_err": 71,
+    "prevalence": 0.14760914760914762,
+    "pooled_auroc": 0.8557025077293027,
+    "average_precision": 0.5621872550877631,
+    "ap_null_prevalence": 0.14760914760914762,
+    "per_meeting": {
+     "jul1_2026": {
+      "auroc": 0.7954545454545454,
+      "n": 24,
+      "n_err": 2
+     },
+     "jul29_2026": {
+      "auroc": 0.7875,
+      "n": 42,
+      "n_err": 2
+     },
+     "jul6_2026": {
+      "auroc": 0.8026315789473685,
+      "n": 94,
+      "n_err": 38
+     },
+     "jun18_2026": {
+      "auroc": 0.904,
+      "n": 30,
+      "n_err": 5
+     },
+     "jun24_2026": {
+      "auroc": 0.8710575139146568,
+      "n": 168,
+      "n_err": 14
+     },
+     "jun29_2026": {
+      "auroc": 0.85,
+      "n": 123,
+      "n_err": 10
+     }
+    },
+    "mean_within_meeting_auroc": 0.8351072730527619,
+    "n_meetings_informative": 6,
+    "leave_one_meeting_out_mean": {
+     "jul1_2026": 0.843037818572405,
+     "jul29_2026": 0.8446287276633141,
+     "jul6_2026": 0.8416024118738404,
+     "jun18_2026": 0.8213287276633141,
+     "jun24_2026": 0.8279172248803828,
+     "jun29_2026": 0.8321287276633141
+    }
+   }
+  },
+  "core_envelope": {
+   "edit_op_ceiling": {
+    "M": 873,
+    "S": 88,
+    "D": 38,
+    "I": 58,
+    "deletion_share_of_edits": 0.20652173913043478,
+    "edits_visible_to_confidence": 0.7934782608695652,
+    "punctuation_only_words_dropped": 0,
+    "words_splitting_into_multiple_tokens": 5,
+    "emitted_words_without_logprob": 0
+   },
+   "conf": {
+    "n": 1019,
+    "n_err": 146,
+    "prevalence": 0.14327772325809618,
+    "pooled_auroc": 0.834592571670668,
+    "average_precision": 0.491129039693267,
+    "ap_null_prevalence": 0.14327772325809618,
+    "per_meeting": {
+     "jul1_2026": {
+      "auroc": 0.7136752136752137,
+      "n": 121,
+      "n_err": 4
+     },
+     "jul29_2026": {
+      "auroc": 0.8435251798561151,
+      "n": 145,
+      "n_err": 6
+     },
+     "jul6_2026": {
+      "auroc": 0.775974025974026,
+      "n": 227,
+      "n_err": 84
+     },
+     "jun18_2026": {
+      "auroc": 0.7541666666666667,
+      "n": 38,
+      "n_err": 8
+     },
+     "jun24_2026": {
+      "auroc": 0.8964555300295373,
+      "n": 299,
+      "n_err": 22
+     },
+     "jun29_2026": {
+      "auroc": 0.8006260206859009,
+      "n": 189,
+      "n_err": 22
+     }
+    },
+    "mean_within_meeting_auroc": 0.7974037728145765,
+    "n_meetings_informative": 6,
+    "leave_one_meeting_out_mean": {
+     "jul1_2026": 0.8141494846424491,
+     "jul29_2026": 0.7881794914062689,
+     "jul6_2026": 0.8016897221826866,
+     "jun18_2026": 0.8060511940441586,
+     "jun24_2026": 0.7775934213715845,
+     "jun29_2026": 0.7967593232403117
+    }
+   },
+   "meeting_cluster_ci": {
+    "ci95_meeting_cluster": [
+     0.752047301223948,
+     0.8468840200269747
+    ],
+    "n_clusters": 6,
+    "n_boot": 2000
+   },
+   "permutation_null": {
+    "observed": 0.7974037728145765,
+    "null_mean": 0.5005137186271261,
+    "null_p2.5": 0.41693399321076996,
+    "null_p97.5": 0.5782798705063464,
+    "p_value_one_sided": 0.0004997501249375312,
+    "n_perm": 2000
+   },
+   "calibration_equal_width": [
+    {
+     "lo": 0.0,
+     "hi": 0.1,
+     "n": 0,
+     "n_err": 0,
+     "err_rate": null,
+     "n_meetings": 0
+    },
+    {
+     "lo": 0.1,
+     "hi": 0.2,
+     "n": 1,
+     "n_err": 1,
+     "err_rate": 1.0,
+     "n_meetings": 1
+    },
+    {
+     "lo": 0.2,
+     "hi": 0.3,
+     "n": 2,
+     "n_err": 1,
+     "err_rate": 0.5,
+     "n_meetings": 1
+    },
+    {
+     "lo": 0.3,
+     "hi": 0.4,
+     "n": 3,
+     "n_err": 3,
+     "err_rate": 1.0,
+     "n_meetings": 2
+    },
+    {
+     "lo": 0.4,
+     "hi": 0.5,
+     "n": 5,
+     "n_err": 3,
+     "err_rate": 0.6,
+     "n_meetings": 2
+    },
+    {
+     "lo": 0.5,
+     "hi": 0.6,
+     "n": 18,
+     "n_err": 12,
+     "err_rate": 0.6666666666666666,
+     "n_meetings": 5
+    },
+    {
+     "lo": 0.6,
+     "hi": 0.7,
+     "n": 19,
+     "n_err": 9,
+     "err_rate": 0.47368421052631576,
+     "n_meetings": 3
+    },
+    {
+     "lo": 0.7,
+     "hi": 0.8,
+     "n": 23,
+     "n_err": 14,
+     "err_rate": 0.6086956521739131,
+     "n_meetings": 5
+    },
+    {
+     "lo": 0.8,
+     "hi": 0.9,
+     "n": 54,
+     "n_err": 22,
+     "err_rate": 0.4074074074074074,
+     "n_meetings": 6
+    },
+    {
+     "lo": 0.9,
+     "hi": 1.0,
+     "n": 894,
+     "n_err": 81,
+     "err_rate": 0.09060402684563758,
+     "n_meetings": 6
+    }
+   ],
+   "calibration_deciles": [
+    {
+     "lo": 0.15726738100644738,
+     "hi": 0.8696128846474036,
+     "n": 102,
+     "n_err": 58,
+     "err_rate": 0.5686274509803921,
+     "n_meetings": 6
+    },
+    {
+     "lo": 0.8696128846474036,
+     "hi": 0.9744239903081717,
+     "n": 102,
+     "n_err": 32,
+     "err_rate": 0.3137254901960784,
+     "n_meetings": 6
+    },
+    {
+     "lo": 0.9744239903081717,
+     "hi": 0.9955685177326519,
+     "n": 102,
+     "n_err": 20,
+     "err_rate": 0.19607843137254902,
+     "n_meetings": 6
+    },
+    {
+     "lo": 0.9955685177326519,
+     "hi": 0.998733219934687,
+     "n": 102,
+     "n_err": 10,
+     "err_rate": 0.09803921568627451,
+     "n_meetings": 6
+    },
+    {
+     "lo": 0.998733219934687,
+     "hi": 0.9995765923451511,
+     "n": 102,
+     "n_err": 9,
+     "err_rate": 0.08823529411764706,
+     "n_meetings": 6
+    },
+    {
+     "lo": 0.9995765923451511,
+     "hi": 0.9998230712214283,
+     "n": 101,
+     "n_err": 5,
+     "err_rate": 0.04950495049504951,
+     "n_meetings": 6
+    },
+    {
+     "lo": 0.9998230712214283,
+     "hi": 0.9999188390944067,
+     "n": 102,
+     "n_err": 5,
+     "err_rate": 0.049019607843137254,
+     "n_meetings": 6
+    },
+    {
+     "lo": 0.9999188390944067,
+     "hi": 0.999972781459369,
+     "n": 102,
+     "n_err": 3,
+     "err_rate": 0.029411764705882353,
+     "n_meetings": 6
+    },
+    {
+     "lo": 0.999972781459369,
+     "hi": 0.9999927282861518,
+     "n": 102,
+     "n_err": 4,
+     "err_rate": 0.0392156862745098,
+     "n_meetings": 6
+    },
+    {
+     "lo": 0.9999927282861518,
+     "hi": 1.0,
+     "n": 102,
+     "n_err": 0,
+     "err_rate": 0.0,
+     "n_meetings": 6
+    }
+   ],
+   "split_overlap": {
+    "n": 204,
+    "n_err": 28,
+    "prevalence": 0.13725490196078433,
+    "pooled_auroc": 0.7797280844155844,
+    "average_precision": 0.29575550492693026,
+    "ap_null_prevalence": 0.13725490196078433,
+    "per_meeting": {
+     "jul1_2026": {
+      "auroc": null,
+      "n": 36,
+      "n_err": 0
+     },
+     "jul29_2026": {
+      "auroc": null,
+      "n": 19,
+      "n_err": 0
+     },
+     "jul6_2026": {
+      "auroc": 0.6869639794168096,
+      "n": 75,
+      "n_err": 22
+     },
+     "jun24_2026": {
+      "auroc": 1.0,
+      "n": 12,
+      "n_err": 1
+     },
+     "jun29_2026": {
+      "auroc": 0.8210526315789474,
+      "n": 62,
+      "n_err": 5
+     }
+    },
+    "mean_within_meeting_auroc": 0.8360055369985857,
+    "n_meetings_informative": 3,
+    "leave_one_meeting_out_mean": {
+     "jul1_2026": 0.8360055369985857,
+     "jul29_2026": 0.8360055369985857,
+     "jul6_2026": 0.9105263157894736,
+     "jun24_2026": 0.7540083054978786,
+     "jun29_2026": 0.8434819897084048
+    }
+   },
+   "split_non_overlap": {
+    "n": 815,
+    "n_err": 118,
+    "prevalence": 0.14478527607361963,
+    "pooled_auroc": 0.8495732315249374,
+    "average_precision": 0.5514927262808299,
+    "ap_null_prevalence": 0.14478527607361963,
+    "per_meeting": {
+     "jul1_2026": {
+      "auroc": 0.6728395061728395,
+      "n": 85,
+      "n_err": 4
+     },
+     "jul29_2026": {
+      "auroc": 0.85625,
+      "n": 126,
+      "n_err": 6
+     },
+     "jul6_2026": {
+      "auroc": 0.810752688172043,
+      "n": 152,
+      "n_err": 62
+     },
+     "jun18_2026": {
+      "auroc": 0.7541666666666667,
+      "n": 38,
+      "n_err": 8
+     },
+     "jun24_2026": {
+      "auroc": 0.8968850698174007,
+      "n": 287,
+      "n_err": 21
+     },
+     "jun29_2026": {
+      "auroc": 0.8008021390374331,
+      "n": 127,
+      "n_err": 17
+     }
+    },
+    "mean_within_meeting_auroc": 0.7986160116443971,
+    "n_meetings_informative": 6,
+    "leave_one_meeting_out_mean": {
+     "jul1_2026": 0.8237713127387087,
+     "jul29_2026": 0.7870892139732766,
+     "jul6_2026": 0.796188676338868,
+     "jun18_2026": 0.8075058806399433,
+     "jun24_2026": 0.7789622000097964,
+     "jun29_2026": 0.79817878616579
+    }
+   },
+   "insertions_vs_match": {
+    "n": 931,
+    "n_err": 58,
+    "prevalence": 0.06229860365198711,
+    "pooled_auroc": 0.802869613303314,
+    "average_precision": 0.25571795114410756,
+    "ap_null_prevalence": 0.06229860365198711,
+    "per_meeting": {
+     "jul1_2026": {
+      "auroc": 0.5811965811965812,
+      "n": 118,
+      "n_err": 1
+     },
+     "jul29_2026": {
+      "auroc": 0.8489208633093526,
+      "n": 140,
+      "n_err": 1
+     },
+     "jul6_2026": {
+      "auroc": 0.788011988011988,
+      "n": 178,
+      "n_err": 35
+     },
+     "jun18_2026": {
+      "auroc": 0.5,
+      "n": 33,
+      "n_err": 3
+     },
+     "jun24_2026": {
+      "auroc": 0.8543922984356197,
+      "n": 283,
+      "n_err": 6
+     },
+     "jun29_2026": {
+      "auroc": 0.720309381237525,
+      "n": 179,
+      "n_err": 12
+     }
+    },
+    "mean_within_meeting_auroc": 0.7154718520318445,
+    "n_meetings_informative": 6,
+    "leave_one_meeting_out_mean": {
+     "jul1_2026": 0.7423269061988971,
+     "jul29_2026": 0.6887820497763428,
+     "jul6_2026": 0.7009638248358157,
+     "jun18_2026": 0.7585662224382134,
+     "jun24_2026": 0.6876877627510893,
+     "jun29_2026": 0.7145043461907082
+    }
+   },
+   "substitutions_vs_match": {
+    "n": 961,
+    "n_err": 88,
+    "prevalence": 0.09157127991675339,
+    "pooled_auroc": 0.8555008851400604,
+    "average_precision": 0.42010137027219707,
+    "ap_null_prevalence": 0.09157127991675339,
+    "per_meeting": {
+     "jul1_2026": {
+      "auroc": 0.7578347578347578,
+      "n": 120,
+      "n_err": 3
+     },
+     "jul29_2026": {
+      "auroc": 0.8424460431654677,
+      "n": 144,
+      "n_err": 5
+     },
+     "jul6_2026": {
+      "auroc": 0.767375481661196,
+      "n": 192,
+      "n_err": 49
+     },
+     "jun18_2026": {
+      "auroc": 0.9066666666666666,
+      "n": 35,
+      "n_err": 5
+     },
+     "jun24_2026": {
+      "auroc": 0.9122292418772563,
+      "n": 293,
+      "n_err": 16
+     },
+     "jun29_2026": {
+      "auroc": 0.8970059880239521,
+      "n": 177,
+      "n_err": 10
+     }
+    },
+    "mean_within_meeting_auroc": 0.8472596965382161,
+    "n_meetings_informative": 6,
+    "leave_one_meeting_out_mean": {
+     "jul1_2026": 0.8651446842789078,
+     "jul29_2026": 0.8482224272127658,
+     "jul6_2026": 0.8632365395136201,
+     "jun18_2026": 0.835378302512526,
+     "jun24_2026": 0.834265787470408,
+     "jun29_2026": 0.837310438241069
+    }
+   },
+   "bottom_decile": {
+    "n": 101,
+    "err_rate": 0.5643564356435643,
+    "prevalence": 0.14327772325809618,
+    "lift": 3.9388986843889864
+   }
+  },
+  "clip": {
+   "edit_op_ceiling": {
+    "M": 969,
+    "S": 97,
+    "D": 42,
+    "I": 62,
+    "deletion_share_of_edits": 0.208955223880597,
+    "edits_visible_to_confidence": 0.7910447761194029,
+    "punctuation_only_words_dropped": 0,
+    "words_splitting_into_multiple_tokens": 5,
+    "emitted_words_without_logprob": 0
+   },
+   "conf": {
+    "n": 1128,
+    "n_err": 159,
+    "prevalence": 0.14095744680851063,
+    "pooled_auroc": 0.8262099940936322,
+    "average_precision": 0.48722288755687343,
+    "ap_null_prevalence": 0.14095744680851063,
+    "per_meeting": {
+     "jul1_2026": {
+      "auroc": 0.7136752136752137,
+      "n": 121,
+      "n_err": 4
+     },
+     "jul29_2026": {
+      "auroc": 0.8516666666666667,
+      "n": 156,
+      "n_err": 6
+     },
+     "jul6_2026": {
+      "auroc": 0.7856773907910272,
+      "n": 242,
+      "n_err": 88
+     },
+     "jun18_2026": {
+      "auroc": 0.7635135135135135,
+      "n": 45,
+      "n_err": 8
+     },
+     "jun24_2026": {
+      "auroc": 0.8068425568425568,
+      "n": 361,
+      "n_err": 28
+     },
+     "jun29_2026": {
+      "auroc": 0.8176404494382022,
+      "n": 203,
+      "n_err": 25
+     }
+    },
+    "mean_within_meeting_auroc": 0.78983596515453,
+    "n_meetings_informative": 6,
+    "leave_one_meeting_out_mean": {
+     "jul1_2026": 0.8050681154503933,
+     "jul29_2026": 0.7774698248521027,
+     "jul6_2026": 0.7906676800272306,
+     "jun18_2026": 0.7951004554827333,
+     "jun24_2026": 0.7864346468169247,
+     "jun29_2026": 0.7842750682977956
+    }
+   }
+  }
+ },
+ "VERDICT": {
+  "mean_within_meeting_auroc": 0.7974037728145765,
+  "n_meetings_informative": 6,
+  "go_threshold": 0.6,
+  "passes_go": true
+ }
+}

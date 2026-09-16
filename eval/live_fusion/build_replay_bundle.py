@@ -24,6 +24,8 @@ import json
 import os
 from pathlib import Path
 
+from eval.live_fusion import providers as P
+
 CACHE = Path(os.environ.get("LIVE_FUSION_CACHE")
              or Path.home() / ".cache/oc-public/live-fusion-2026-09")
 AUDIO_DIR = Path.home() / ".cache/oc-public/bench_windows"
@@ -51,7 +53,11 @@ def main() -> int:
 
     OUT.mkdir(parents=True, exist_ok=True)
     by_window: dict[str, dict[str, Path]] = {}
-    for provider, directory in (("scribe", "scribe"), ("soniox", "soniox"), ("ours", ours_dir)):
+    # The scribe recordings moved directory when the request was fixed to send
+    # no_verbatim (providers.SCRIBE_CACHE_DIR). Reading the constant rather than
+    # the old literal means a bundle is never built from verbatim recordings
+    # while claiming the clean parameters; a missing directory stops the run.
+    for provider, directory in (("scribe", P.SCRIBE_CACHE_DIR), ("soniox", "soniox"), ("ours", ours_dir)):
         source = CACHE / directory
         if not source.exists():
             print(f"no recordings in {source}")
