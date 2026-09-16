@@ -2,10 +2,11 @@
 
 `exp-2026-09-15-diarization-clustering` and `exp-2026-09-15-voiceprint-diarization`.
 Plan reviewed by Codex Astra (`6d9715190ad149778f958c62ddc0f8f0`) before any job was
-submitted. Both run on the same 6 meetings: the clustering arms took **35 jobs and
-12.25 audio-hours**, the voiceprint arms **54 jobs and 18.61** (including the threshold
-arm's 7 jobs and 1.20 h), for **89 jobs and 30.86 audio-hours** of a 150-hour trial.
-Zero failures. Two arms — `a0_local` and `c3` — submitted nothing and cost nothing.
+submitted. Both run on the same 6 meetings, plus a seventh held out for confirmation
+(§7): the clustering arms took **35 jobs and 12.25 audio-hours**, the voiceprint arms
+**56 jobs and 20.97** (the threshold arm 7 jobs and 1.20 h, the held-out meeting 2 jobs
+and 2.36 h), for **91 jobs and 33.22 audio-hours** of a 150-hour trial. Zero failures.
+Two arms — `a0_local` and `c3` — submitted nothing and cost nothing.
 
 ## The question
 
@@ -129,18 +130,21 @@ the enrolment set cannot claim.
 
 Not licensed, and three of these were overstated in an earlier draft:
 
-- **That slicing intrinsically fails.** This is a *configuration* comparison. Rejection
-  thresholds were never exercised.
+- **That slicing intrinsically fails.** This is a *configuration* comparison. Only two
+  rejection thresholds were exercised (§5 at 50 on slices, §7 at 70 on a whole meeting).
 - **That high enrolment is sufficient for slicing to break even.** `vrilissia` had
   **0.0% exposed speech and still lost 0.0218**. `chania`'s +0.0006 is a tie with
-  variability unmeasured. Exposure is a promising condition, not an established rule —
-  and in production it would have to be *estimated in advance*, which nothing here does.
+  variability unmeasured.
+- **That exposure predicts anything.** §7 falsifies it: a held-out meeting with 46%
+  unenrolled speech misnames only 0.85% of turns. There is no rule for when a threshold
+  helps.
 - **That 5-minute slices beat 15-minute ones in general.** Two settings, one direction.
 
-Also not licensed: any statement about `matching.threshold` above 0, never run; any
-end-to-end production number, since this uses human utterance boundaries while
-production uses Scribe's, and Scribe errors could reorder arms rather than lower all
-scores equally; any claim about speaker-count hints, built and deliberately not run.
+Also not licensed: any end-to-end production number, since this uses human utterance
+boundaries while production uses Scribe's, and Scribe errors could reorder arms rather
+than lower all scores equally; any claim about speaker-count hints, built and
+deliberately not run; and any naming figure as unbiased, since some speakers are
+enrolled from the meeting they are scored on (§7).
 
 ## 5. The threshold was run, and it confirms the mechanism without rescuing slicing
 
@@ -199,6 +203,40 @@ Since the enrolled speakers in these meetings match at confidence 77–92 and th
 rejected ones at 18–72, a threshold anywhere in 70–75 separates them cleanly here. One
 cohort, six meetings: that separation is an observation, not a calibrated operating
 point.
+
+## 7. The held-out meeting does not reproduce the threshold gain
+
+`athens/mar16_2_2026` — 70.7 minutes, outside the cohort, outside
+`exclusion-manifest-2026-08`, `humanReview: true`, 1534 reviewed turns, 8 enrolled
+voiceprints, 2.36 audio-hours. **Threshold 70 was frozen from the previous cohort's
+simulation before this meeting ran**, which makes it a genuine held-out test.
+
+| arm | B³ F | correct / all turns | wrong on unenrolled | no name |
+|---|---:|---:|---:|---:|
+| threshold 0 | 0.8990 | 0.5750 | 0.0085 | 0.3950 |
+| threshold 70 | 0.8983 | 0.5717 | 0.0072 | 0.4003 |
+
+**Neutral.** The wrong-name reduction is 13 turns out of 1534, and it costs 5 correct
+names. Neither the 26% cut the simulation predicted, nor any harm.
+
+**And it falsifies the exposure rule.** This meeting takes **46% of its speech from
+people with no voiceprint** — the condition that was supposed to predict damage — and
+still misnames only **0.85%** of turns, against chalandri's 52%. Unenrolled-speech share
+does not predict misnaming on unseen data. There is currently **no rule** for when a
+threshold helps.
+
+### Voiceprint leakage, found here and present in the original cohort
+
+Checking `VoicePrint.sourceSegmentId` against the meeting being scored: **2 of the 8
+enrolled speakers were enrolled from this very meeting**, 30 seconds each, covering
+20.5% of its speech. In the original six-meeting cohort, **3 of 44 person-meeting pairs**
+are likewise self-enrolled. Enrolment audio independence was never checked before those
+runs.
+
+Excluding the two leaked speakers changes nothing qualitatively — threshold 0 gives
+0.9043 / 0.4904 / 0.0104 and threshold 70 gives 0.9041 / 0.4856 / 0.0088 — so the
+threshold conclusion survives the contamination. The naming figures elsewhere in this
+report carry it as an unquantified favourable bias.
 
 ## Still untested
 

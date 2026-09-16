@@ -39,11 +39,13 @@ import exclusive_diar_api as api  # noqa: E402
 
 CACHE = Path(os.environ.get("OC_CACHE", Path.home() / ".cache/oc-public"))
 RUN_DIR = CACHE / "diarization-clustering-2026-09"
-API_ARMS = ("a0", "a1", "a2", "a3", "b0", "b3", "b3t")
+API_ARMS = ("a0", "a1", "a2", "a3", "b0", "b0t", "b3", "b3t")
+# Arms whose output depends on the threshold, so it belongs in the filename.
+THRESHOLD_ARMS = ("b0t", "b3t")
 # b-arms call /identify with the meeting's enrolled voiceprints instead of
 # /diarize. Identity then comes from enrollment rather than from how much voice a
 # speaker happens to have in the piece, which is what the a-arms could not do.
-VOICEPRINT_ARMS = ("b0", "b3", "b3t")
+VOICEPRINT_ARMS = ("b0", "b0t", "b3", "b3t")
 # Arms derived from results already on disk. They submit nothing and cost nothing.
 FREE_ARMS = ("a0_local", "c3")
 ALL_ARMS = API_ARMS + FREE_ARMS
@@ -280,7 +282,7 @@ def run_meeting(rec: dict, arm: str, key: str, out_root: Path, dry: bool,
     named = rec["named_speakers"]
     # The threshold is part of the cache identity: without it, a run at 60 would
     # silently return the file written at 50.
-    dest = mdir / (f"diarization_b3t{threshold:g}.json" if arm == "b3t"
+    dest = mdir / (f"diarization_{arm}{threshold:g}.json" if arm in THRESHOLD_ARMS
                    else f"diarization_{arm}.json")
 
     if dest.exists():
@@ -322,12 +324,17 @@ def run_meeting(rec: dict, arm: str, key: str, out_root: Path, dry: bool,
         # Only these labels mean "a known person"; see identification_timeline.
         known_labels = {v["personId"] for v in vps}
 
-        if arm == "b0":
+        if arm in ("b0", "b0t"):
+            # b0t is b0 with a non-zero matching.threshold, so the whole-meeting
+            # call can also decline to name someone.
+            th = threshold if arm == "b0t" else None
+            tag = f"{city}__{mid}__b0" if arm == "b0" else f"{city}__{mid}__b0t{threshold:g}"
             if dry:
-                print(f"  {city}/{mid}: b0 would submit 1 identify job "
-                      f"({rec['duration_s']/3600:.2f} h, {len(vps)} voiceprints)")
+                print(f"  {city}/{mid}: {arm} would submit 1 identify job "
+                      f"({rec['duration_s']/3600:.2f} h, {len(vps)} voiceprints"
+                      f"{'' if th is None else f', threshold={th:g}'})")
                 return None
-            r = identify_media(audio, key, f"{city}__{mid}__b0", vps, mdir / "raw")
+            r = identify_media(audio, key, tag, vps, mdir / "raw", threshold=th)
             tl = identification_timeline(r.get("output") or {}, None, known_labels)
             res = eval_result(tl, tl)
             dest.write_text(json.dumps(res, ensure_ascii=False))
