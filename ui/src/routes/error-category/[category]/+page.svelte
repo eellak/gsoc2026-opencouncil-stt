@@ -53,7 +53,7 @@
 		<p class="empty">{t('noItems')}</p>
 	{:else}
 		<ul class="rows">
-			{#each data.items as item}
+			{#each data.items as item (item.utterance_id)}
 				<li>
 					<a
 						class="row"

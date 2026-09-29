@@ -42,7 +42,7 @@
 		<p class="empty">Καμία εγγραφή σε αυτή την κατηγορία.</p>
 	{:else}
 		<ul class="rows">
-			{#each data.items as item}
+			{#each data.items as item (item.edit_id)}
 				<li>
 					<a class="row" href={editHref(item.edit_id, validatedSeed)}>
 						<div class="meta">

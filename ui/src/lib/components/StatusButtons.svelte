@@ -21,7 +21,7 @@
 </script>
 
 <div class="status-buttons" role="group" aria-label="Include status">
-	{#each options as opt}
+	{#each options as opt (opt.status)}
 		<button
 			type="button"
 			class="btn {opt.color}"

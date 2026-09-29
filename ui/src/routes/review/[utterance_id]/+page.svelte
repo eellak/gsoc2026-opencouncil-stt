@@ -180,9 +180,19 @@
 	}
 	function onAudioPause() { isPlaying = false; }
 	function onAudioEnded() { isPlaying = false; }
+	// Identity-stable primitives so that label patches (which spawn a new
+	// `item` object reference via SvelteMap) don't refire the prefetch
+	// effects below. Each derived only emits when its string value really
+	// changes — i.e. when the user navigates to a new utterance.
+	const currentId = $derived(item.utterance_id);
 	const audioSources = $derived(resolveAudioUrls(item.audio_url));
 	const primaryAudioUrl = $derived(audioSources.direct);
-	let usingFallback = $state(false);
+	// Each clip starts on the direct CDN URL; only failure flips it to proxied.
+	// Writable derived: resets to false whenever the utterance id changes.
+	let usingFallback = $derived.by(() => {
+		currentId; // dep
+		return false;
+	});
 	const activeAudioUrl = $derived(usingFallback ? audioSources.proxied : primaryAudioUrl);
 
 	function onAudioError() {
@@ -191,12 +201,6 @@
 			usingFallback = true;
 		}
 	}
-
-	// Identity-stable primitives so that label patches (which spawn a new
-	// `item` object reference via SvelteMap) don't refire the prefetch
-	// effects below. Each derived only emits when its string value really
-	// changes — i.e. when the user navigates to a new utterance.
-	const currentId = $derived(item.utterance_id);
 
 	// Warm-window radius for audio + transcript prefetch. Forward-biased and
 	// skip-aware (see queue.prefetchWindow) so we warm what we actually land on.
@@ -235,7 +239,7 @@
 		const id = currentId;
 		const url = activeAudioUrl;
 		untrack(() => {
-			if (!usingFallback) usingFallback = false; // no-op; reset happens when id changes below
+			if (!usingFallback) usingFallback = false; // no-op; reset happens via the usingFallback derived on id change
 			const audioNeighbours = queue
 				.prefetchWindow(id, PREFETCH_FORWARD, PREFETCH_BACK, skipNav)
 				.map((g) => ({
@@ -248,13 +252,6 @@
 				audioNeighbours
 			);
 		});
-	});
-
-	// Reset the fallback flag when the utterance id changes — each clip
-	// starts on the direct CDN URL; only failure flips it to proxied.
-	$effect(() => {
-		currentId; // dep
-		untrack(() => { usingFallback = false; });
 	});
 
 	// Remember the last item viewed per (seed, filter) so re-entering the same
@@ -352,27 +349,22 @@
 	});
 
 	// Keep scroll-margin-top in sync with the sticky header so anchor jumps
-	// (e.g. browser back/forward) also clear it.
+	// (e.g. browser back/forward) also clear it. Window resizes are handled by
+	// <svelte:window onresize>.
+	function updateTopBarH() {
+		const h = topBarEl?.getBoundingClientRect().height ?? 70;
+		document.documentElement.style.setProperty('--top-bar-h', `${Math.ceil(h)}px`);
+	}
 	$effect(() => {
-		if (typeof document === 'undefined') return;
-		const update = () => {
-			const h = topBarEl?.getBoundingClientRect().height ?? 70;
-			document.documentElement.style.setProperty('--top-bar-h', `${Math.ceil(h)}px`);
-		};
-		update();
-		const ro = topBarEl ? new ResizeObserver(update) : null;
+		updateTopBarH();
+		const ro = topBarEl ? new ResizeObserver(updateTopBarH) : null;
 		if (topBarEl && ro) ro.observe(topBarEl);
-		window.addEventListener('resize', update);
-		return () => {
-			ro?.disconnect();
-			window.removeEventListener('resize', update);
-		};
+		return () => ro?.disconnect();
 	});
 
 	// Toggle a body class so global CSS can react to mobile-mode (e.g. hide
 	// keyboard shortcut hints that aren't useful on touch).
 	$effect(() => {
-		if (typeof document === 'undefined') return;
 		const on = reviewPrefs.mobileMode;
 		document.body.classList.toggle('mobile-mode', on);
 		return () => document.body.classList.remove('mobile-mode');
@@ -411,22 +403,23 @@
 	// after=nextRadius). Only the needed neighbours come over the wire — no
 	// whole-meeting download. Speaker names aren't available from this endpoint.
 	let contextState = $state<'loading' | 'ready' | 'error' | 'empty'>('loading');
-	let contextData = $state<MeetingContext | null>(null);
-	let prevRadius = $state(5);
-	let nextRadius = $state(5);
+	let contextData = $state.raw<MeetingContext | null>(null);
+	// Writable deriveds: the panel grows them via onLoadMore; they reset to 5
+	// when navigating to a new utterance.
+	let prevRadius = $derived.by(() => {
+		currentId; // dep
+		return 5;
+	});
+	let nextRadius = $derived.by(() => {
+		currentId; // dep
+		return 5;
+	});
 	// Bumped by the in-panel "Retry" button to re-run the context effect. Failed
 	// lookups are evicted from the cache, so the re-run actually re-fetches.
 	let retryNonce = $state(0);
 	function retryContext() {
 		retryNonce++;
 	}
-
-	// Reset context radii when navigating to a new utterance
-	$effect(() => {
-		currentId;
-		prevRadius = 5;
-		nextRadius = 5;
-	});
 
 	$effect(() => {
 		const id = currentId;
@@ -777,7 +770,7 @@
 	}
 </script>
 
-<svelte:window onkeydown={onKeydown} />
+<svelte:window onkeydown={onKeydown} onresize={updateTopBarH} />
 
 <div class="review-page">
 	{#if autoSkip.paused}

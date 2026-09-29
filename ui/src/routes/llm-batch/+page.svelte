@@ -37,9 +37,9 @@
 		'other'
 	];
 
-	let stats = $state<Stats | null>(null);
-	let batches = $state<BatchSummary[]>([]);
-	let active = $state<Batch[]>([]);
+	let stats = $state.raw<Stats | null>(null);
+	let batches = $state.raw<BatchSummary[]>([]);
+	let active = $state.raw<Batch[]>([]);
 	let n = $state(200);
 	let model = $state('gemini-3.5-flash');
 	let modelOther = $state('');

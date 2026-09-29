@@ -85,7 +85,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					{#each stats.by_category as row}
+					{#each stats.by_category as row (row.category)}
 						<tr>
 							<td>
 								{#if row.category}
@@ -108,7 +108,7 @@
 			<h2>Ανά επεξεργαστή</h2>
 			<table>
 				<tbody>
-					{#each stats.by_editor as row}
+					{#each stats.by_editor as row (row.edited_by)}
 						<tr>
 							<td>{row.edited_by ?? '(άγνωστος)'}</td>
 							<td class="count">{row.count.toLocaleString('el-GR')}</td>
@@ -122,7 +122,7 @@
 			<h2>Ανά διάρκεια</h2>
 			<table>
 				<tbody>
-					{#each stats.by_duration_bucket as row}
+					{#each stats.by_duration_bucket as row (row.bucket)}
 						<tr>
 							<td>{row.bucket}</td>
 							<td class="count">{row.count.toLocaleString('el-GR')}</td>
@@ -152,7 +152,7 @@
 				<p class="card-note">Αυτόματη ταξινόμηση κατά την εισαγωγή. Κάντε κλικ για να δείτε παραδείγματα.</p>
 				<table>
 					<tbody>
-						{#each stats.by_ingest_category as row}
+						{#each stats.by_ingest_category as row (row.ingest_category)}
 							<tr class="cat-row" class:rejected={row.is_rejected === 1}>
 								<td>
 									<a href="/category/{row.ingest_category}" class="cat-link">

@@ -11,7 +11,7 @@
 	interface UserCounts { include: number; exclude: number; uncertain: number; total: number; }
 	interface UserRow { name: string; counts: UserCounts; }
 
-	let users = $state<UserRow[]>([]);
+	let users = $state.raw<UserRow[]>([]);
 	let newName = $state('');
 	let loading = $state(true);
 	let error = $state<string | null>(null);
@@ -58,7 +58,7 @@
 			<p class="hint">Φόρτωση...</p>
 		{:else if users.length > 0}
 			<ul class="existing">
-				{#each users as u}
+				{#each users as u (u.name)}
 					<li>
 						<button class="name-btn" onclick={() => pick(u.name)}>
 							<span class="name">{u.name}</span>

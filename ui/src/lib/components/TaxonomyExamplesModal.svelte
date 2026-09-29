@@ -33,11 +33,11 @@
 			<button type="button" class="close" onclick={onclose} aria-label={t('closeModal')}>✕</button>
 		</header>
 		<div class="body">
-			{#each grouped as g}
+			{#each grouped as g (g.group)}
 				<section>
 					<h3>{g.label}</h3>
 					<ul>
-						{#each g.items as cat}
+						{#each g.items as cat (cat.id)}
 							<li>
 								<div class="row-head">
 									{#if cat.shortcut}
