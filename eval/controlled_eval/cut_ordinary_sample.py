@@ -2,7 +2,7 @@
 
 Record: exp-2026-08-26-training-round-2. Design frozen 2026-09-06 in wayfinder #59,
 built under #64, **frame replaced 2026-09-06** after the v1 frame was found to be about
-to become training-contaminated. Terms: CONTEXT.md ("Ordinary sample", "Blind preference
+to become training-contaminated. Terms: GLOSSARY.md ("Ordinary sample", "Blind preference
 judgement").
 
 WHAT THIS IS FOR

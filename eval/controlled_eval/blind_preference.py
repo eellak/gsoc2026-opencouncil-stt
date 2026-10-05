@@ -1,7 +1,7 @@
 """The blind preference page, and the frozen rule that reads its answers.
 
 Record: exp-2026-08-26-training-round-2. Design frozen 2026-09-06 in wayfinder #59,
-built under #64. Terms: CONTEXT.md ("Blind preference judgement", "Ordinary sample",
+built under #64. Terms: GLOSSARY.md ("Blind preference judgement", "Ordinary sample",
 "Challenge sample").
 
 ONE QUESTION PER CLIP

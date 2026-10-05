@@ -1,7 +1,7 @@
 """Cut the CHALLENGE SAMPLE: 40 `deletion_hard` clips from the untouched meetings.
 
 Record: exp-2026-08-26-training-round-2. Design frozen 2026-09-06 in wayfinder #59,
-built under #64. Terms: CONTEXT.md ("Challenge sample").
+built under #64. Terms: GLOSSARY.md ("Challenge sample").
 
 A TRAINING-SIDE DIAGNOSTIC, NOT AN EVALUATION
 
